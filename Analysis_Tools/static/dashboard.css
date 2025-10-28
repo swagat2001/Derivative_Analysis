@@ -1,0 +1,305 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f8f8f8;
+    padding:0,0,0,0;
+}
+
+.container {
+    max-width: 2200px;
+    margin: 0 auto;
+    background: white;
+    border-bottom: 2px;
+    padding: 0px;
+    overflow: hidden;
+}
+
+.header {
+   
+    color: white;
+    padding: 0px;
+    text-align: center;
+}
+
+.title {
+    font-size: 18px;
+    background-color: #ffffff;
+    width: 100%;
+    font-size: 16px; 
+    font-weight: bold;
+    border: 0px solid #000;
+    
+}
+
+
+#h1 {
+    margin-bottom: 10px;
+    color: #7c1e1d;
+    text-shadow: 1px 1px 2px #000;
+    text-align: center; 
+    font-size: 24px; 
+    font-weight: 600;
+
+}
+
+.header .date {
+    font-size: 18px;
+    opacity: 0.95;
+}
+
+
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #8bb2d8;
+    border-top: 5px solid #7c1e1d;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.date-selector {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.date-selector select {
+    padding: 5px;
+    border: 0px solid #7c1e1d;
+    border-radius: 0px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #667eea;
+    background: white;
+    cursor: pointer;
+}
+
+.date-selector button {
+    padding: 5px;
+    background: #7c1e1d;
+    color: white;
+    border: none;
+    border-radius: 0px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.date-selector button:hover {
+    background: #000;
+    color: white;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab {
+    padding: 12px 30px;
+    border: none;
+    background: #e9ecef;
+    color: #495057;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.tab:hover {
+    background: #000;
+    color: white;
+}
+
+.tab.active {
+    background: #7c1e1d;
+    color: white;
+}
+
+.export-btn {
+    padding: 12px 25px;
+    background: #7c1e1d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.export-btn:hover {
+    background: #000;
+    color: white;
+}
+
+.loading {
+    text-align: center;
+    padding: 60px;
+    color: #667eea;
+    font-size: 18px;
+}
+
+.tab-content {
+    display: block;  /* Always render */
+    visibility: hidden;  /* But hide when not active */
+    height: 0;  /* Collapse height */
+    overflow: hidden;
+    padding: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.tab-content.active {
+    visibility: visible;
+    height: auto;
+    padding: 25px;
+    max-height: calc(100vh - 350px);
+    overflow-y: auto;
+    overflow-x: auto;
+    min-height: 500px;
+    opacity: 1;
+}
+
+/* Fix table layout to prevent jumping */
+table.dataTable {
+    width: 100% !important;
+    font-size: 12px;
+}
+
+table.dataTable thead {
+    background: #667eea;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+table.dataTable thead th {
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    position: sticky;
+    top: 0;
+    background: #667eea;
+}
+
+.call-header {
+    background: #27ae60 !important;
+}
+
+.put-header {
+    background: #e74c3c !important;
+}
+
+.stock-header {
+    background: #2c3e50 !important;
+}
+
+.closing-header {
+    background: #f39c12 !important;
+}
+
+.rsi-header {
+    background: #673ab7 !important;
+}
+
+table.dataTable tbody tr {
+    transition: all 0.2s;
+}
+
+table.dataTable tbody tr:hover {
+    background: #f1f3f5;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+table.dataTable tbody td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+    font-size: 12px;
+}
+
+.stock-name {
+    font-weight: 700;
+    color: white;
+    text-align: left !important;
+    padding-left: 20px !important;
+    background: #2c3e50;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.stock-name:hover {
+    background: #34495e;
+    text-decoration: underline;
+}
+
+table.dataTable tbody tr:nth-child(even) .stock-name {
+    background: #34495e;
+}
+
+.closing-price {
+    font-weight: 700;
+    color: #f39c12;
+    font-size: 13px;
+}
+
+.rsi-value {
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.rsi-overbought {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.rsi-oversold {
+    color: #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.rsi-neutral {
+    color: #673ab7;
+}
+
+.strike-value {
+    font-weight: 600;
+    color: #495057;
+}
+
+.percentage {
+    font-size: 11px;
+    margin-left: 3px;
+    font-weight: 600;
+}
+
+.positive {
+    color: #27ae60;
+}
+
+.negative {
+    color: #e74c3c;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-size: 14px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}

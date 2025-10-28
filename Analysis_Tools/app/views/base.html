@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Derivatives Dashboard{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      
+      <!-- Left Section (Logo + Company) -->
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='/image/Goldmine-logo.png') }}" alt="Goldmine Logo" style = "width:150px;height:40px;">
+        
+      </div>
+
+      <!-- Center Title -->
+      <div class="text-center flex-1">
+        <h2 class="text-xl font-extrabold text-gray-800">Derivatives Analysis Dashboard</h2>
+      </div>
+
+      <!-- Right Section (Indices) -->
+      <div class="text-xs text-gray-700 space-x-3">
+        <span class="font-semibold text-indigo-600">NIFTY:</span> {{ indices.NIFTY or '—' }}
+        <span class="font-semibold text-indigo-600">BANKNIFTY:</span> {{ indices.BANKNIFTY or '—' }}
+        <span class="font-semibold text-yellow-600">GOLD:</span> {{ indices.GOLD or '—' }}
+        <span class="font-semibold text-yellow-400">SILVER:</span> {{ indices.SILVER or '—' }}
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto p-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-xs text-gray-500 mt-8 py-4 border-t">
+    Options Dashboard v5.0 | Fast Pre-calculated Data | Tailwind + Flask MVC
+  </footer>
+
+</body>
+</html>

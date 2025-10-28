@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>{{ ticker }} - Option Chain Analysis</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: #f5f7fa;
+    padding: 20px;
+}
+
+/* Top Controls Section */
+.top-controls {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.control-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-group select,
+.control-group input {
+    padding: 8px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 160px;
+    background: white;
+    font-weight: 500;
+}
+
+.control-group select:focus,
+.control-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Symbol Header */
+.symbol-header {
+    background: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.symbol-header h2 {
+    font-size: 18px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.symbol-header span {
+    color: #667eea;
+}
+
+/* Main Grid Layout */
+.main-grid {
+    display: grid;
+    grid-template-columns: 500px 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* LEFT SIDE - Expiry Table */
+.expiry-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.expiry-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.expiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.expiry-table thead {
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.expiry-table th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 12px;
+}
+
+.expiry-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.expiry-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.positive {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.negative {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.expiry-info {
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.expiry-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.expiry-info-item label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.expiry-info-item span {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+/* RIGHT SIDE - Gauges and Stats */
+.stats-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.last-updated {
+    text-align: right;
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+/* Gauges Grid */
+.gauges-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.gauge-card {
+    text-align: center;
+    padding: 15px;
+    background: white;
+}
+
+.gauge-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gauge-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 10px;
+}
+
+.gauge-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.gauge-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.gauge-range {
+    font-size: 11px;
+    color: #6c757d;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.ivr-info {
+    font-size: 10px;
+    color: #6c757d;
+    margin-top: 8px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stat-value.positive {
+    color: #27ae60;
+}
+
+.stat-value.negative {
+    color: #e74c3c;
+}
+
+/* Bottom Grid - Charts */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.chart-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+#priceChartContainer {
+    height: 450px;
+    position: relative;
+}
+
+.option-chain-container {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Option Chain Table */
+.option-chain-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.option-chain-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.option-chain-table th {
+    padding: 10px 6px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.call-header {
+    background: #27ae60 !important;
+    color: white;
+}
+
+.put-header {
+    background: #e74c3c !important;
+    color: white;
+}
+
+.strike-header {
+    background: #f8f9fa !important;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.option-chain-table td {
+    padding: 8px 6px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.option-chain-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.strike-cell {
+    background: #fff9e6;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.oi-positive {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.oi-negative {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #667eea;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Scrollbar Styling */
+.expiry-table-container::-webkit-scrollbar,
+.option-chain-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.expiry-table-container::-webkit-scrollbar-track,
+.option-chain-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.expiry-table-container::-webkit-scrollbar-thumb,
+.option-chain-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.expiry-table-container::-webkit-scrollbar-thumb:hover,
+.option-chain-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gauges-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Top Controls -->
+ <div class="container" style="display: flex; align-items: center;  padding: 10px 20px;">
+<div class="header" style="width:100%;" >
+    <!-- Left side: Logo -->
+    <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}"
+         alt="Goldmine logo"
+         style="height: 60px;">
+</div>
+    <!-- Right side: Title -->
+    
+
+<div class="top-controls">
+    <div class="control-group">
+        <label>Select Symbol</label>
+        <select id="symbolSelect" onchange="changeSymbol()">
+            <option value="">Loading...</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <label>Expiry Date</label>
+        <select id="expirySelect" onchange="loadStockData()">
+            <option value="">Loading...</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <label>Historical Date</label>
+        <input type="date" id="historicalDate" onchange="onDateChange()">
+    </div>
+</div>
+
+</div>
+<!-- Symbol Header -->
+<div class="symbol-header">
+    <h2>Symbol : <span id="symbolName">{{ ticker }}</span></h2>
+</div>
+
+<!-- Main Grid: Expiry Table + Stats -->
+<div class="main-grid">
+    <!-- LEFT: Expiry Table -->
+    <div class="expiry-section">
+        <div class="expiry-table-container">
+            <table class="expiry-table">
+                <thead>
+                    <tr>
+                        <th>Expiry Date</th>
+                        <th>Price</th>
+                        <th>Price Chg</th>
+                        <th>Volume</th>
+                        <th>OI</th>
+                        <th>OI Chg</th>
+                    </tr>
+                </thead>
+                <tbody id="expiryTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading expiry data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="expiry-info">
+            <div class="expiry-info-item">
+                <label>Fair Price</label>
+                <span id="fairPrice">-</span>
+            </div>
+            <div class="expiry-info-item">
+                <label>Lot Size</label>
+                <span id="lotSize">-</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- RIGHT: Gauges and Stats -->
+    <div class="stats-section">
+        <div class="last-updated">
+            Last Updated at : <span id="lastUpdated">-</span>
+        </div>
+        
+        <!-- Gauges Grid -->
+        <div class="gauges-grid">
+            <div class="gauge-card" style="display: none;">
+                <div class="gauge-label">ROLLOVER</div>
+                <div class="gauge-container">
+                    <svg class="gauge-bg" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                        <circle id="rolloverCircle" cx="60" cy="60" r="50" fill="none" stroke="#27ae60" stroke-width="12" 
+                                stroke-dasharray="314" stroke-dashoffset="314" 
+                                transform="rotate(-90 60 60)" stroke-linecap="round"/>
+                    </svg>
+                    <div style="margin-left:60px" class="gauge-value" id="rolloverGauge">-</div>
+                </div>
+                <div class="gauge-range">
+                    <span>0</span>
+                    <span>100</span>
+                </div>
+            </div>
+            
+            <div class="gauge-card" style="display: none;">
+                <div class="gauge-label">MWPL</div>
+                <div class="gauge-container">
+                    <svg class="gauge-bg" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                        <circle id="mwplCircle" cx="60" cy="60" r="50" fill="none" stroke="#f39c12" stroke-width="12" 
+                                stroke-dasharray="314" stroke-dashoffset="314" 
+                                transform="rotate(-90 60 60)" stroke-linecap="round"/>
+                    </svg>
+                    <div class="gauge-value" id="mwplGauge">-</div>
+                </div>
+                <div class="gauge-range">
+                    <span style="font-size: 10px;">Max Pain</span>
+                </div>
+            </div>
+            
+            <div class="gauge-card">
+                <div class="gauge-label">IV</div>
+                <div class="gauge-container">
+                    <svg class="gauge-bg" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                        <circle id="ivCircle" cx="60" cy="60" r="50" fill="none" stroke="#3498db" stroke-width="12" 
+                                stroke-dasharray="314" stroke-dashoffset="314" 
+                                transform="rotate(-90 60 60)" stroke-linecap="round"/>
+                    </svg>
+                    <div style="margin-left:60px" class="gauge-value" id="ivGauge">-</div>
+                </div>
+                <div class="gauge-range">
+                    <span id="ivMin">0</span>
+                    <span id="ivMax">100</span>
+                </div>
+                <div class="ivr-info" id="ivRange">-</div>
+            </div>
+            
+            <div class="gauge-card">
+                <div class="gauge-label">PCR</div>
+                <div class="gauge-container">
+                    <svg class="gauge-bg" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                        <circle id="pcrCircle" cx="60" cy="60" r="50" fill="none" stroke="#667eea" stroke-width="12" 
+                                stroke-dasharray="314" stroke-dashoffset="314" 
+                                transform="rotate(-90 60 60)" stroke-linecap="round"/>
+                    </svg>
+                    <div style="margin-left:60px" class="gauge-value" id="pcrGauge">-</div>
+                </div>
+                <div class="gauge-range">
+                    <span id="pcrMin">0</span>
+                    <span id="pcrMax">2</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-row">
+                <span class="stat-label">Total CE OI:</span>
+                <span class="stat-value" id="totalCeOi">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Total CE OI Chg:</span>
+                <span class="stat-value" id="totalCeOiChg">-</span>
+            </div>
+            
+            <div class="stat-row">
+                <span class="stat-label">Total PE OI:</span>
+                <span class="stat-value" id="totalPeOi">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Total PE OI Chg:</span>
+                <span class="stat-value" id="totalPeOiChg">-</span>
+            </div>
+            
+            <div class="stat-row">
+                <span class="stat-label">Diff PE-CE OI:</span>
+                <span class="stat-value" id="diffPeCeOi">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Diff PE-CE OI Chg:</span>
+                <span class="stat-value" id="diffPeCeOiChg">-</span>
+            </div>
+            
+            <div class="stat-row">
+                <span class="stat-label">Trend OI:</span>
+                <span class="stat-value" id="trendOi">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Trend OI Chg:</span>
+                <span class="stat-value" id="trendOiChg">-</span>
+            </div>
+            
+            <div class="stat-row">
+                <span class="stat-label">Max CE OI Strike:</span>
+                <span class="stat-value" id="maxCeOiStrike">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Max PE OI Strike:</span>
+                <span class="stat-value" id="maxPeOiStrike">-</span>
+            </div>
+            
+            <div class="stat-row">
+                <span class="stat-label">Max CE OI Chg Strike:</span>
+                <span class="stat-value" id="maxCeOiChgStrike">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Max PE OI Chg Strike:</span>
+                <span class="stat-value" id="maxPeOiChgStrike">-</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RIGHT: Option Chain -->
+<div class="chart-section">
+    <h3>Option Chain</h3>
+
+    <!-- 🧱 Option Chain Container -->
+    <div class="option-chain-container">
+
+        <!-- SECTION 1: Controls -->
+        <div class="option-chain-controls">
+            <label for="expirySelect" class="expiry-label">Expiry:</label>
+            <select id="expirySelect"></select>
+            <div id="spotPriceDisplay" class="spot-price">Spot: --</div>
+        </div>
+
+        <!-- SECTION 2: Table Wrapper -->
+        <div class="option-chain-table-wrapper">
+            <table class="option-chain" aria-label="Options Chain Table">
+  <caption class="visually-hidden">Option Chain with Call and Put data</caption>
+
+  <thead>
+    <!-- Header Row 1 – CALL / PUT grouping -->
+    <tr>
+      <th colspan="4" class="side-header call-side">CALL</th>
+      <th class="strike-header col-strike">STRIKE PRICE</th>
+      <th colspan="4" class="side-header put-side">PUT</th>
+    </tr>
+
+    <!-- Header Row 2 – Column Titles -->
+    <tr class="sub-header">
+      <th class="col-iv">IV</th>
+      <th class="col-oi-chg">OI Chg</th>
+      <th class="col-oi">OI</th>
+      <th class="col-price">Price</th>
+      <th class="col-strike strike-cell">Strike</th>
+      <th class="col-price">Price</th>
+      <th class="col-oi">OI</th>
+      <th class="col-oi-chg">OI Chg</th>
+      <th class="col-iv">IV</th>
+    </tr>
+  </thead>
+
+  <tbody id="optionChainBody">
+    <tr>
+      <td colspan="9" class="loading">Select expiry to load option chain</td>
+    </tr>
+  </tbody>
+</table>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+<script src="{{ url_for('static', filename='stock_detail.js') }}"></script>
+</body>
+</html>

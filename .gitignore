@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+Database/*.sql
+Database/*.db
+Database/*.sqlite
+
+
+# Data Files
+BhavCopy_Backup2/
+*.csv
+*.xlsx
+*.xls
+
+# Reports
+Reports/
+
+# Configuration
+*.ini
+*.cfg
+Postgres_details.txt
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Batch files (if they contain sensitive paths)
+*.bat
+
+# Analysis outputs
+# Analysis_Tools/

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ ticker }} Details{% endblock %}
+{% block content %}
+
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between mb-4">
+        <h2 class="text-xl font-bold text-indigo-700">{{ ticker }} Details</h2>
+        <form method="get">
+            <select name="date" class="border p-2 rounded text-sm">
+                {% for d in dates %}
+                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded ml-2 hover:bg-indigo-700">Load</button>
+        </form>
+    </div>
+
+    {% if data %}
+    <table class="min-w-full border text-center text-sm border-gray-200">
+        <thead class="bg-indigo-600 text-white">
+            <tr>
+                <th class="py-2">Date</th>
+                <th>Expiry</th>
+                <th>Strike</th>
+                <th>Option Type</th>
+                <th>Open Interest</th>
+                <th>Volume</th>
+                <th>Close</th>
+                <th>Underlying</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr class="hover:bg-gray-50">
+                <td>{{ row.BizDt }}</td>
+                <td>{{ row.FininstrmActlXpryDt }}</td>
+                <td>{{ row.StrkPric }}</td>
+                <td>{{ row.OptnTp }}</td>
+                <td>{{ row.OpnIntrst }}</td>
+                <td>{{ row.TtlTradgVol }}</td>
+                <td>{{ row.ClsPric }}</td>
+                <td>{{ row.UndrlygPric }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="text-center text-gray-500 mt-4">No stock details found.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
