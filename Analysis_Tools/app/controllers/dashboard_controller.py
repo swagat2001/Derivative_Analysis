@@ -6,7 +6,7 @@ from datetime import datetime
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-# Static indices — can later be made dynamic from DB/API
+# Static indices â€” can later be made dynamic from DB/API
 indices = {
     "NIFTY": 255000.35,
     "BANKNIFTY": 58200.35,
@@ -15,7 +15,7 @@ indices = {
 }
 
 # -----------------------------------------------------------
-# 📊 Dashboard Route
+# ðŸ“Š Dashboard Route
 # -----------------------------------------------------------
 @dashboard_bp.route('/')
 def dashboard():
@@ -40,7 +40,7 @@ def dashboard():
 
 
 # -----------------------------------------------------------
-# 📤 Export to Excel
+# ðŸ“¤ Export to Excel
 # -----------------------------------------------------------
 @dashboard_bp.route('/export', methods=['GET'])
 def export_dashboard():

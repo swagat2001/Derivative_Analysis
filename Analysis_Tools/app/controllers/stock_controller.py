@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from ..models.stock_model import get_available_dates
+from ..models.stock_model import get_available_dates, get_stock_detail_data
 
 
 stock_bp = Blueprint('stock', __name__)

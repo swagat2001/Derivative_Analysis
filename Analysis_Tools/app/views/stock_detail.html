@@ -1,52 +1,95 @@
 {% extends "base.html" %}
 {% block title %}{{ ticker }} Details{% endblock %}
-{% block content %}
 
-<div class="bg-white rounded-lg shadow p-6">
-    <div class="flex justify-between mb-4">
-        <h2 class="text-xl font-bold text-indigo-700">{{ ticker }} Details</h2>
-        <form method="get">
-            <select name="date" class="border p-2 rounded text-sm">
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail.css') }}">
+
+<div class="stock-detail-container">
+    <h1 class="stock-title">{{ ticker }} Option Chain</h1>
+
+    <!-- Date Selector -->
+    <div class="date-selector">
+        <form method="GET" class="date-form">
+            <label for="date" class="date-label">📅 Select Date:</label>
+            <select name="date" id="date" class="date-select">
                 {% for d in dates %}
                 <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
                 {% endfor %}
             </select>
-            <button class="bg-indigo-600 text-white px-4 py-2 rounded ml-2 hover:bg-indigo-700">Load</button>
+            <button type="submit" class="btn-load">Load</button>
         </form>
     </div>
 
     {% if data %}
-    <table class="min-w-full border text-center text-sm border-gray-200">
-        <thead class="bg-indigo-600 text-white">
-            <tr>
-                <th class="py-2">Date</th>
-                <th>Expiry</th>
-                <th>Strike</th>
-                <th>Option Type</th>
-                <th>Open Interest</th>
-                <th>Volume</th>
-                <th>Close</th>
-                <th>Underlying</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in data %}
-            <tr class="hover:bg-gray-50">
-                <td>{{ row.BizDt }}</td>
-                <td>{{ row.FininstrmActlXpryDt }}</td>
-                <td>{{ row.StrkPric }}</td>
-                <td>{{ row.OptnTp }}</td>
-                <td>{{ row.OpnIntrst }}</td>
-                <td>{{ row.TtlTradgVol }}</td>
-                <td>{{ row.ClsPric }}</td>
-                <td>{{ row.UndrlygPric }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-wrapper">
+        <table class="option-chain-table" id="optionChainTable">
+            <thead>
+                <tr>
+                    <th rowspan="2">Date</th>
+                    <th rowspan="2">Expiry</th>
+                    <th rowspan="2">Strike</th>
+                    <th rowspan="2">Type</th>
+                    <th colspan="5" class="current-header">Current Data</th>
+                    <th colspan="5" class="greek-header">Greeks</th>
+                    <th colspan="4" class="prev-header">Previous Day</th>
+                </tr>
+                <tr>
+                    <!-- Current Data -->
+                    <th>OI</th>
+                    <th>OI Chg</th>
+                    <th>Volume</th>
+                    <th>Close</th>
+                    <th>Underlying</th>
+                    <!-- Greeks -->
+                    <th class="greek-col">IV %</th>
+                    <th class="greek-col">Delta</th>
+                    <th class="greek-col">Vega</th>
+                    <th class="greek-col">Gamma</th>
+                    <th class="greek-col">Theta</th>
+                    <!-- Previous Day -->
+                    <th class="prev-col">Prev OI</th>
+                    <th class="prev-col">OI Chg %</th>
+                    <th class="prev-col">Prev Price</th>
+                    <th class="prev-col">Price Chg %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr class="{% if row.OptnTp == 'CE' %}call-row{% else %}put-row{% endif %}">
+                    <td>{{ row.BizDt }}</td>
+                    <td>{{ row.FininstrmActlXpryDt }}</td>
+                    <td class="strike-cell">{{ "%.2f"|format(row.StrkPric) }}</td>
+                    <td class="{% if row.OptnTp == 'CE' %}call-type{% else %}put-type{% endif %}">
+                        {{ row.OptnTp }}
+                    </td>
+                    <!-- Current Data -->
+                    <td class="num-cell">{{ "%.0f"|format(row.OpnIntrst) }}</td>
+                    <td class="num-cell">{{ "%.0f"|format(row.ChngInOpnIntrst) }}</td>
+                    <td class="num-cell">{{ "%.0f"|format(row.TtlTradgVol) }}</td>
+                    <td class="num-cell">{{ "%.2f"|format(row.ClsPric) }}</td>
+                    <td class="num-cell">{{ "%.2f"|format(row.UndrlygPric) }}</td>
+                    <!-- Greeks -->
+                    <td class="greek-cell">{{ "%.2f"|format(row.IV) }}</td>
+                    <td class="greek-cell">{{ "%.4f"|format(row.Delta) }}</td>
+                    <td class="greek-cell">{{ "%.4f"|format(row.Vega) }}</td>
+                    <td class="greek-cell">{{ "%.6f"|format(row.Gamma) }}</td>
+                    <td class="greek-cell">{{ "%.4f"|format(row.Theta) }}</td>
+                    <!-- Previous Day -->
+                    <td class="prev-cell">{% if row.PrevOI %}{{ "%.0f"|format(row.PrevOI) }}{% else %}-{% endif %}</td>
+                    <td class="prev-cell {% if row['OI_Chg_%'] > 0 %}positive{% elif row['OI_Chg_%'] < 0 %}negative{% endif %}">
+                        {% if row.PrevOI %}{{ "%.2f"|format(row['OI_Chg_%']) }}%{% else %}-{% endif %}
+                    </td>
+                    <td class="prev-cell">{% if row.PrevPrice %}{{ "%.2f"|format(row.PrevPrice) }}{% else %}-{% endif %}</td>
+                    <td class="prev-cell {% if row['Price_Chg_%'] > 0 %}positive{% elif row['Price_Chg_%'] < 0 %}negative{% endif %}">
+                        {% if row.PrevPrice %}{{ "%.2f"|format(row['Price_Chg_%']) }}%{% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-        <p class="text-center text-gray-500 mt-4">No stock details found.</p>
+    <p class="no-data">No stock details found.</p>
     {% endif %}
 </div>
-
 {% endblock %}
