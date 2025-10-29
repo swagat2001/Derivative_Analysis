@@ -1,0 +1,50 @@
+/* ============================ */
+/* STOCK DETAIL EXPIRY STYLES */
+/* ============================ */
+
+.expiry-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.expiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.expiry-table th {
+    padding: 10px;
+    background: #f3f4f6;
+    border-bottom: 2px solid #d1d5db;
+    font-weight: 600;
+    text-align: left;
+    color: #374151;
+}
+
+.expiry-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+.expiry-table tr:hover {
+    background-color: #f9fafb;
+}
+
+.call-value {
+    color: #059669;
+    font-weight: 600;
+}
+
+.put-value {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.pcr-value {
+    font-weight: 700;
+    color: #2563eb;
+}

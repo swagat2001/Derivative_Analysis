@@ -1,0 +1,139 @@
+/* ============================ */
+/* STOCK DETAIL OPTION CHAIN STYLES */
+/* ============================ */
+
+.option-chain-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin: 20px 10px;
+}
+
+.table-scroll-container {
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.option-chain-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.option-chain-table thead {
+    background-color: #374151;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.option-chain-table th {
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #4b5563;
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+/* Header group colors */
+.current-header {
+    background-color: #4b5563;
+}
+
+.greek-header {
+    background-color: #1e40af;
+}
+
+.prev-header {
+    background-color: #b45309;
+}
+
+/* Column headers */
+.greek-col {
+    background-color: #2563eb;
+}
+
+.prev-col {
+    background-color: #d97706;
+}
+
+/* Table Body */
+.option-chain-table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.option-chain-table tbody tr:hover {
+    background-color: #dbeafe;
+    transition: background-color 0.2s;
+}
+
+.option-chain-table td {
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+}
+
+/* Call and Put Styling */
+.call-row {
+    border-left: 3px solid #10b981;
+}
+
+.put-row {
+    border-left: 3px solid #ef4444;
+}
+
+.call-type {
+    background-color: #d1fae5;
+    color: #065f46;
+    font-weight: 700;
+}
+
+.put-type {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-weight: 700;
+}
+
+/* Special Cells */
+.strike-cell {
+    font-weight: 600;
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.num-cell {
+    text-align: right;
+    font-family: 'Courier New', monospace;
+}
+
+/* Greeks cells styling */
+.greek-cell {
+    background-color: #eff6ff;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #1e40af;
+}
+
+/* Previous day cells styling */
+.prev-cell {
+    background-color: #fffbeb;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #92400e;
+}
+
+/* Positive/Negative Changes */
+.positive {
+    color: #065f46 !important;
+    font-weight: 700;
+}
+
+.negative {
+    color: #991b1b !important;
+    font-weight: 700;
+}

@@ -1,0 +1,34 @@
+<!-- ==============================
+     STOCK DETAIL EXPIRY COMPONENT
+     ============================== -->
+<div class="expiry-section">
+    <h3 class="section-title">📅 Expiry Summary</h3>
+    {% if expiry_data %}
+    <table class="expiry-table">
+        <thead>
+            <tr>
+                <th>Expiry Date</th>
+                <th>Contracts</th>
+                <th>Total OI</th>
+                <th>Call OI</th>
+                <th>Put OI</th>
+                <th>PCR</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in expiry_data %}
+            <tr>
+                <td>{{ exp.expiry }}</td>
+                <td>{{ exp.contracts }}</td>
+                <td>{{ "{:,.0f}".format(exp.total_oi) }}</td>
+                <td class="call-value">{{ "{:,.0f}".format(exp.call_oi) }}</td>
+                <td class="put-value">{{ "{:,.0f}".format(exp.put_oi) }}</td>
+                <td class="pcr-value">{{ exp.pcr }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data-message">No expiry data available</p>
+    {% endif %}
+</div>

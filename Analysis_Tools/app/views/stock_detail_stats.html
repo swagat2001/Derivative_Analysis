@@ -1,0 +1,46 @@
+<!-- ==============================
+     STOCK DETAIL STATISTICS COMPONENT
+     ============================== -->
+<div class="stats-section">
+    <h3 class="section-title">📊 Key Metrics</h3>
+    
+    {% if stats %}
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Current Price</div>
+            <div class="stat-value">₹{{ stats.current_price }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Expiries</div>
+            <div class="stat-value">{{ stats.expiry_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Call OI</div>
+            <div class="stat-value stat-call">{{ "{:,.0f}".format(stats.total_call_oi) }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Put OI</div>
+            <div class="stat-value stat-put">{{ "{:,.0f}".format(stats.total_put_oi) }}</div>
+        </div>
+    </div>
+
+    <!-- Gauges -->
+    <div class="gauges-container">
+        <div class="gauge-card">
+            <div class="gauge-label">PCR (OI)</div>
+            <div class="gauge-display">
+                <div class="gauge-value">{{ stats.pcr_oi }}</div>
+            </div>
+        </div>
+        <div class="gauge-card">
+            <div class="gauge-label">PCR (Volume)</div>
+            <div class="gauge-display">
+                <div class="gauge-value">{{ stats.pcr_volume }}</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="no-data-message">No statistics available</p>
+    {% endif %}
+</div>

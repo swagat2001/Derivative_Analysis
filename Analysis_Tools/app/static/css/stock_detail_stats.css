@@ -1,0 +1,83 @@
+/* ============================ */
+/* STOCK DETAIL STATISTICS STYLES */
+/* ============================ */
+
+.stats-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.stat-call {
+    color: #059669;
+}
+
+.stat-put {
+    color: #dc2626;
+}
+
+/* Gauges */
+.gauges-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.gauge-card {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.gauge-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.gauge-display {
+    position: relative;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gauge-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2563eb;
+}

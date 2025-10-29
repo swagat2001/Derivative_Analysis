@@ -1,0 +1,83 @@
+<!-- ==============================
+     STOCK DETAIL CHART COMPONENT
+     ============================== -->
+<div class="chart-section">
+    <h3 class="section-title">📈 Price History (Last 90 Days)</h3>
+    <div class="price-chart-container" id="priceChart">
+        <div class="chart-loading">
+            <div class="loading-spinner"></div>
+            <span>Loading chart...</span>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+
+<script>
+// Load price chart
+document.addEventListener('DOMContentLoaded', function() {
+    const ticker = '{{ ticker }}';
+    const chartContainer = document.getElementById('priceChart');
+    
+    // Fetch chart data
+    fetch(`/api/stock-chart/${ticker}?days=90`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.success && result.data.length > 0) {
+                renderPriceChart(result.data);
+            } else {
+                chartContainer.innerHTML = '<div class="no-data-message">No price data available</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading chart:', error);
+            chartContainer.innerHTML = '<div class="error-message">Error loading chart</div>';
+        });
+});
+
+function renderPriceChart(data) {
+    const container = document.getElementById('priceChart');
+    container.innerHTML = '';
+    
+    const chart = LightweightCharts.createChart(container, {
+        layout: {
+            background: { color: '#ffffff' },
+            textColor: '#333',
+        },
+        grid: {
+            vertLines: { color: '#e5e7eb' },
+            horzLines: { color: '#e5e7eb' },
+        },
+        width: container.clientWidth,
+        height: 380,
+        timeScale: {
+            timeVisible: true,
+            secondsVisible: false,
+        },
+    });
+    
+    const candlestickSeries = chart.addCandlestickSeries({
+        upColor: '#059669',
+        downColor: '#dc2626',
+        borderUpColor: '#059669',
+        borderDownColor: '#dc2626',
+        wickUpColor: '#059669',
+        wickDownColor: '#dc2626',
+    });
+    
+    const chartData = data.map(point => ({
+        time: point.date,
+        open: point.open,
+        high: point.high,
+        low: point.low,
+        close: point.close
+    })).sort((a, b) => new Date(a.time) - new Date(b.time));
+    
+    candlestickSeries.setData(chartData);
+    chart.timeScale().fitContent();
+    
+    window.addEventListener('resize', () => {
+        chart.applyOptions({ width: container.clientWidth });
+    });
+}
+</script>
