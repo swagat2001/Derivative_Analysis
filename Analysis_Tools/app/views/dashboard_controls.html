@@ -1,0 +1,30 @@
+<!-- ==============================
+     DASHBOARD CONTROLS COMPONENT
+     ============================== -->
+<div class="dashboard-controls">
+
+  <!-- 📅 Date & Load Section -->
+  <div class="date-section">
+    <form method="get" class="date-form">
+      <label for="date" class="date-label">📅 Date:</label>
+      <select id="date" name="date" class="date-select">
+        {% for d in dates %}
+        <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn-load">Load</button>
+    </form>
+  </div>
+
+  <!-- 🔘 Button Group -->
+  <div class="button-group">
+    <a href="/?date={{ selected_date }}&mtype=TOTAL"
+       class="btn-total {% if mtype=='TOTAL' %}active{% endif %}">TOTAL</a>
+    <a href="/?date={{ selected_date }}&mtype=OTM"
+       class="btn-otm {% if mtype=='OTM' %}active{% endif %}">OTM</a>
+    <a href="/?date={{ selected_date }}&mtype=ITM"
+       class="btn-itm {% if mtype=='ITM' %}active{% endif %}">ITM</a>
+    <a href="/export?date={{ selected_date }}&mtype={{ mtype }}" class="btn-export">⬇ Export</a>
+  </div>
+
+</div>

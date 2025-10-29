@@ -1,0 +1,113 @@
+/* ============================ */
+/* DASHBOARD HEADER STYLES */
+/* ============================ */
+
+.dashboard-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: white;
+  z-index: 1100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.header-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo Section */
+.header-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 150px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Title Section */
+.header-title {
+  text-align: center;
+  flex: 1;
+  margin: 0 20px;
+}
+
+.title-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* Indices Section */
+.header-indices {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.index-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  min-width: 85px;
+}
+
+.index-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.index-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #059669;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .header-indices {
+    gap: 10px;
+  }
+  
+  .index-item {
+    min-width: 70px;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 16px;
+  }
+  
+  .dashboard-header {
+    height: auto;
+  }
+  
+  .header-indices {
+    margin-top: 8px;
+  }
+}

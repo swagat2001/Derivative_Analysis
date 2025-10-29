@@ -1,0 +1,169 @@
+/* ============================ */
+/* DASHBOARD CONTROLS STYLES */
+/* ============================ */
+
+.dashboard-controls {
+  position: sticky;
+  top: 70px;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 10px 20px;
+  margin: 76px 10px 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+}
+
+/* Left Section - Date Controls */
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-icon {
+  font-size: 16px;
+}
+
+.date-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #374151;
+}
+
+.date-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+
+.date-select {
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  color: #111827;
+  cursor: pointer;
+  min-width: 130px;
+}
+
+.date-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.btn-load {
+  background-color: #2563eb;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-load:hover {
+  background-color: #1d4ed8;
+}
+
+/* Right Section - Filter Buttons */
+.controls-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-filter {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 18px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 2px solid #d1d5db;
+  background-color: #f3f4f6;
+  color: #374151;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-filter:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* Active States for Each Button */
+.btn-total {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #374151;
+}
+
+.btn-total.active {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #374151;
+  font-weight: 700;
+}
+
+.btn-otm {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.btn-otm.active {
+  background-color: white;
+  color: #374151;
+  border-color: #374151;
+  font-weight: 700;
+}
+
+.btn-itm {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.btn-itm.active {
+  background-color: white;
+  color: #374151;
+  border-color: #374151;
+  font-weight: 700;
+}
+
+/* Export Button */
+.btn-export {
+  background-color: #059669;
+  color: white;
+  border-color: #059669;
+}
+
+.btn-export:hover {
+  background-color: #047857;
+  border-color: #047857;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-controls {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .controls-right {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}

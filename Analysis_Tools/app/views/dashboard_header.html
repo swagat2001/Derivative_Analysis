@@ -1,0 +1,39 @@
+<!-- ==============================
+     DASHBOARD HEADER COMPONENT
+     ============================== -->
+<header class="dashboard-header">
+  <div class="header-container">
+
+    <!-- Left Section (Logo) -->
+    <div class="header-logo">
+      <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" 
+           alt="Goldmine Logo" class="logo-img">
+    </div>
+
+    <!-- Center Title -->
+    <div class="header-title">
+      <h2 class="title-text"> Derivatives Analysis Dashboard</h2>
+    </div>
+
+    <!-- Right Section (Indices) -->
+    <div class="header-indices">
+      <div class="index-item">
+        <span class="index-label">NIFTY</span>
+        <span class="index-value">{{ "%.2f"|format(indices.NIFTY) }}</span>
+      </div>
+      <div class="index-item">
+        <span class="index-label">BANKNIFTY</span>
+        <span class="index-value">{{ "%.2f"|format(indices.BANKNIFTY) }}</span>
+      </div>
+      <div class="index-item">
+        <span class="index-label">GOLD</span>
+        <span class="index-value">{{ "%.2f"|format(indices.GOLD) }}</span>
+      </div>
+      <div class="index-item">
+        <span class="index-label">SILVER</span>
+        <span class="index-value">{{ "%.2f"|format(indices.SILVER) }}</span>
+      </div>
+    </div>
+
+  </div>
+</header>

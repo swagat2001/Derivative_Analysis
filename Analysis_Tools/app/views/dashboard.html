@@ -2,112 +2,13 @@
 {% block title %}Derivatives Dashboard{% endblock %}
 {% block content %}
 
-<!-- Filter Section -->
-<div class="bg-lightgrey p-0 rounded-lg mb-1 flex flex-wrap items-center gap-4">
-  <form method="get" class="flex items-center gap-2">
-    <label for="date" class="text-gray-700 font-semibold">📅 Date:</label>
-    <select id="date" name="date" class="rounded px-2 py-1 border-gray-300">
-      {% for d in dates %}
-      <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
-      {% endfor %}
-    </select>
-    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded">Load</button>
-  </form>
+<!-- Include Header Component -->
+{% include 'dashboard_header.html' %}
 
-  <div class="flex gap-2 ml-auto">
-    <a href="/?mtype=TOTAL" class="px-4 py-1 rounded text-white bg-red-600 hover:bg-red-700 {% if mtype=='TOTAL' %}ring-2 ring-red-300{% endif %}">TOTAL</a>
-    <a href="/?mtype=OTM" class="px-4 py-1 rounded text-white bg-purple-600 hover:bg-purple-700 {% if mtype=='OTM' %}ring-2 ring-purple-300{% endif %}">OTM</a>
-    <a href="/?mtype=ITM" class="px-4 py-1 rounded text-white bg-pink-600 hover:bg-pink-700 {% if mtype=='ITM' %}ring-2 ring-pink-300{% endif %}">ITM</a>
-  </div>
+<!-- Include Controls Component -->
+{% include 'dashboard_controls.html' %}
 
-  <a href="/export?date={{ selected_date }}&mtype={{ mtype }}" class="ml-4 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">⬇ Export</a>
-</div>
+<!-- Include Table Component -->
+{% include 'dashboard_table.html' %}
 
-<!-- Data Table -->
-<div class="overflow-x-auto bg-white rounded-lg shadow-md">
-  <table class="min-w-full border text-sm text-center">
-    <thead style="background-color:lightgrey;">
-      <tr>
-        <th class="py-2 px-3">Stock</th>
-        <th>Call Δ+ Strike</th>
-        <th>Call Δ+ %</th>
-        <th>Call Δ– Strike</th>
-        <th>Call Δ– %</th>
-        <th>Call Vega+ Strike</th>
-        <th>Call Vega+ %</th>
-        <th>Call Vega– Strike</th>
-        <th>Call Vega– %</th>
-        <th>Call ATV</th>
-        <th>Call AMoney</th>
-        <th>Close</th>
-        <th>RSI</th>
-        <th>Put Δ+ Strike</th>
-        <th>Put Δ+ %</th>
-        <th>Put Δ– Strike</th>
-        <th>Put Δ– %</th>
-        <th>Put Vega+ Strike</th>
-        <th>Put Vega+ %</th>
-        <th>Put Vega– Strike</th>
-        <th>Put Vega– %</th>
-        <th>Put ATV</th>
-        <th>Put AMoney</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-200">
-      {% for row in data %}
-      <tr class="hover:bg-gray-50 transition">
-        <td class="font-semibold text-blue-800 text-left pl-2">{{ row.stock }}</td>
-        <td>{{ row.call_delta_pos_strike }}</td>
-        <td class="text-green-600">{{ row.call_delta_pos_pct }}</td>
-        <td>{{ row.call_delta_neg_strike }}</td>
-        <td class="text-red-600">{{ row.call_delta_neg_pct }}</td>
-        <td>{{ row.call_vega_pos_strike }}</td>
-        <td class="text-green-600">{{ row.call_vega_pos_pct }}</td>
-        <td>{{ row.call_vega_neg_strike }}</td>
-        <td class="text-red-600">{{ row.call_vega_neg_pct }}</td>
-        <td>{{ "%.2f"|format(row.call_total_tradval or 0) }}</td>
-        <td class="{% if row.call_total_money>0 %}text-green-600{% else %}text-red-600{% endif %}">
-          {{ "%.2f"|format(row.call_total_money or 0) }}
-        </td>
-        <td>{{ "%.2f"|format(row.closing_price or 0) }}</td>
-        <td class="{% if row.rsi>70 %}text-red-600{% elif row.rsi<30 %}text-green-600{% else %}text-gray-800{% endif %}">
-          {{ "%.2f"|format(row.rsi or 0) }}
-        </td>
-        <td>{{ row.put_delta_pos_strike }}</td>
-        <td class="text-green-600">{{ row.put_delta_pos_pct }}</td>
-        <td>{{ row.put_delta_neg_strike }}</td>
-        <td class="text-red-600">{{ row.put_delta_neg_pct }}</td>
-        <td>{{ row.put_vega_pos_strike }}</td>
-        <td class="text-green-600">{{ row.put_vega_pos_pct }}</td>
-        <td>{{ row.put_vega_neg_strike }}</td>
-        <td class="text-red-600">{{ row.put_vega_neg_pct }}</td>
-        <td>{{ "%.2f"|format(row.put_total_tradval or 0) }}</td>
-        <td class="{% if row.put_total_money>0 %}text-green-600{% else %}text-red-600{% endif %}">
-          {{ "%.2f"|format(row.put_total_money or 0) }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
 {% endblock %}
-
-<div class="dashboard-controls">
-  <div class="date-section">
-      <label for="date">📅 Date:</label>
-      <select id="date" name="date">
-          {% for date in dates %}
-          <option value="{{ date }}" {% if date == selected_date %}selected{% endif %}>{{ date }}</option>
-          {% endfor %}
-      </select>
-      <button class="btn-load" onclick="loadData()">Load</button>
-  </div>
-
-  <div class="button-group">
-      <button class="btn-total">TOTAL</button>
-      <button class="btn-otm">OTM</button>
-      <button class="btn-itm">ITM</button>
-      <button class="btn-export">⬇ Export</button>
-  </div>
-</div>
-

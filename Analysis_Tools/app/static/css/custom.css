@@ -1,272 +1,172 @@
-.text-sm {
-    font-size: 10px !important;
-    line-height: 1.25rem !important;
-}
-
-/* ============================
-   COMPACT TRADING DASHBOARD STYLE
-   ============================ */
-
-/* Global typography for dashboard */
+/* ============================ */
+/* GLOBAL & TEXT STYLING */
+/* ============================ */
 body {
-    font-family: "Inter", Arial, sans-serif;
-    font-size: 11px;
-    background-color: #f8fafc;
-    color: #222;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 11px;
+  background-color: #f8fafc;
+  color: #222;
+  margin: 0;
+  padding: 0;
 }
 
-/* Compact table */
-table.dataTable {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
+/* ============================ */
+/* HEADER (Fixed Top Bar) */
+/* ============================ */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: white;
+  z-index: 1100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Header styling */
-table.dataTable thead th {
-    background-color: #002147;
-    color: #fff;
-    font-weight: 600;
-    text-align: center;
-    padding: 4px 6px;
-    font-size: 10px;
-    white-space: nowrap;
-}
-
-/* Table rows compact */
-table.dataTable tbody td {
-    padding: 2px 5px;
-    font-size: 10px;
-    white-space: nowrap;
-    text-align: right;
-}
-
-/* Stock column (left aligned) */
-table.dataTable tbody td:first-child {
-    text-align: left;
-    font-weight: 600;
-    color: #0f172a;
-}
-
-/* Alternate row shading for clarity */
-table.dataTable tbody tr:nth-child(even) {
-    background-color: #f1f5f9;
-}
-
-/* Hover highlight for fast scanning */
-table.dataTable tbody tr:hover {
-    background-color: #e2e8f0;
-}
-
-/* Buttons */
-button, .btn {
-    font-size: 10px !important;
-    padding: 4px 8px !important;
-    border-radius: 3px !important;
-}
-
-/* Header adjustments */
-header, .title, h1 {
-    font-size: 14px;
-    font-weight: 700;
-    color: #111;
-}
-
-/* Nifty index display (top bar) */
-.top-bar {
-    font-size: 10px;
-    font-weight: 600;
-    color: #111;
-}
-
-/* Compact dropdowns and input fields */
-select, input, .dataTables_filter input {
-    font-size: 10px !important;
-    height: 20px !important;
-    padding: 2px 4px !important;
-}
-
-/* ===============================
-   DASHBOARD HEADER + CONTROL PANEL
-   =============================== */
-
-/* Top container under header */
+/* ============================ */
+/* DASHBOARD CONTROL PANEL */
+/* ============================ */
 .dashboard-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #f8fafc;
-    padding: 6px 12px;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    margin: 10px 10px 6px 10px;
+  position: sticky;
+  top: 70px;
+  z-index: 1050;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  padding: 6px 14px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin: 1px 5px 6px 5px;
+  border: 1px solid #e5e7eb;
+  backdrop-filter: blur(6px);
 }
 
-/* Date + Load button group */
+/* Left Section (Date Controls) */
 .dashboard-controls .date-section {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Date label and selector */
-.dashboard-controls label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #374151;
-}
-
-.dashboard-controls input,
-.dashboard-controls select {
-    font-size: 11px;
-    padding: 2px 4px;
-    height: 22px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-}
-
-/* Load button */
-.dashboard-controls .btn-load {
-    font-size: 11px;
-    background-color: #2563eb;
-    color: #fff;
-    padding: 3px 8px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease-in-out;
-}
-
-.dashboard-controls .btn-load:hover {
-    background-color: #1e40af;
-}
-
-/* Action buttons group */
-.dashboard-controls .button-group {
-    display: flex;
-    gap: 8px;
-}
-
-.dashboard-controls .button-group button {
-    font-size: 11px;
-    padding: 4px 10px;
-    font-weight: 600;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-}
-
-.button-group .btn-total { background-color: #ef4444; }
-.button-group .btn-otm { background-color: #8b5cf6; }
-.button-group .btn-itm { background-color: #db2777; }
-.button-group .btn-export { background-color: #dc2626; }
-
-.button-group .btn-total:hover,
-.button-group .btn-otm:hover,
-.button-group .btn-itm:hover,
-.button-group .btn-export:hover {
-    opacity: 0.85;
-}
-
-/* Ensure table sits closer to controls */
-.dataTables_wrapper {
-    margin-top: 8px;
-}
-/* ===============================
-   STICKY DASHBOARD CONTROL PANEL
-   =============================== */
-
-.dashboard-controls {
-    position: sticky;             /* keeps it visible on scroll */
-    top: 60px;                    /* adjust based on your header height */
-    z-index: 1000;                /* stays above table and content */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #f9fafb;
-    padding: 6px 14px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    margin: 8px 10px;
-    backdrop-filter: blur(6px);
-    border: 1px solid #e5e7eb;
-}
-
-/* Left section: Date controls */
-.dashboard-controls .date-section {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .dashboard-controls label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
 }
 
 .dashboard-controls select {
-    font-size: 11px;
-    padding: 3px 4px;
-    height: 22px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    background-color: #fff;
-    color: #111;
+  font-size: 11px;
+  padding: 3px 4px;
+  height: 22px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #111;
 }
 
 .btn-load {
-    font-size: 11px;
-    background-color: #2563eb;
-    color: #fff;
-    padding: 3px 8px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease-in-out;
+  font-size: 11px;
+  background-color: #2563eb;
+  color: #fff;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
 }
 
 .btn-load:hover {
-    background-color: #1e40af;
+  background-color: #1e40af;
 }
 
-/* Right section: action buttons */
+/* Right Section (Buttons) */
 .button-group {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
-.button-group button {
-    font-size: 11px;
-    padding: 4px 10px;
-    font-weight: 600;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.1s ease, opacity 0.15s ease;
+.button-group a {
+  font-size: 11px;
+  padding: 4px 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
 }
 
-.button-group button:hover {
-    transform: scale(1.05);
-    opacity: 0.85;
+.button-group a:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
 }
 
-.btn-total { background-color: #ef4444; }
-.btn-otm { background-color: #8b5cf6; }
-.btn-itm { background-color: #db2777; }
-.btn-export { background-color: #dc2626; }
-
-/* Make table closer to controls */
-.dataTables_wrapper {
-    margin-top: 5px;
+.btn-total,
+.btn-otm,
+.btn-itm {
+  background-color: #c3c3c3;
 }
 
-/* Optional: sticky table header for better UX */
+.btn-export {
+  background-color: #16a34a;
+}
+
+/* ============================ */
+/* DATA TABLE */
+/* ============================ */
+table.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 0 !important;
+}
+
 table.dataTable thead th {
-    position: sticky;
-    top: 110px; /* height of your header + controls combined */
-    z-index: 999;
-    background-color: #002147 !important;
+  position: sticky;
+  top: 110px; /* Header (68) + Control bar (42) */
+  z-index: 1500;
+  background-color: #cacaca !important;
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 6px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+table.dataTable tbody td {
+  padding: 2px 5px;
+  font-size: 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+table.dataTable tbody td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+  background-color: #f1f5f9;
+}
+
+table.dataTable tbody tr:hover {
+  background-color: #e2e8f0;
+}
+
+/* ============================ */
+/* SCROLL + SPACING FIXES */
+/* ============================ */
+table.dataTable tbody {
+  position: static !important;
+  top: auto !important;
+}
+
+div.dataTables_wrapper,
+div.dataTables_scrollBody {
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
