@@ -41,36 +41,106 @@
           <td class="cell-stock">
             <a href="/stock/{{ row.stock }}?date={{ selected_date }}" class="stock-link">{{ row.stock }}</a>
           </td>
+          
+          <!-- Call Delta+ -->
           <td>{{ row.call_delta_pos_strike }}</td>
           <td>{{ row.call_delta_pos_pct }}</td>
+          
+          <!-- Call Delta- -->
           <td>{{ row.call_delta_neg_strike }}</td>
           <td>{{ row.call_delta_neg_pct }}</td>
+          
+          <!-- Call Vega+ (CLICKABLE) -->
           <td>{{ row.call_vega_pos_strike }}</td>
-          <td>{{ row.call_vega_pos_pct }}</td>
-          <td>{{ row.call_vega_neg_strike }}</td>
-          <td>{{ row.call_vega_neg_pct }}</td>
-          <td>{{ "%.2f"|format(row.call_total_tradval or 0) }}</td>
           <td class="money-clickable" 
+              {% if row.call_vega_pos_strike != 'N/A' %}
+              onclick="openChartModal(this)" 
               data-stock="{{ row.stock }}" 
-              data-metric="call_money"
-              onclick="openChartModal(this)">
+              data-option-type="call" 
+              data-metric="vega" 
+              data-strike="{{ row.call_vega_pos_strike }}"
+              data-date="{{ selected_date }}"
+              {% endif %}>
+            {{ row.call_vega_pos_pct }}
+          </td>
+          
+          <!-- Call Vega- (CLICKABLE) -->
+          <td>{{ row.call_vega_neg_strike }}</td>
+          <td class="money-clickable" 
+              {% if row.call_vega_neg_strike != 'N/A' %}
+              onclick="openChartModal(this)" 
+              data-stock="{{ row.stock }}" 
+              data-option-type="call" 
+              data-metric="vega" 
+              data-strike="{{ row.call_vega_neg_strike }}"
+              data-date="{{ selected_date }}"
+              {% endif %}>
+            {{ row.call_vega_neg_pct }}
+          </td>
+          
+          <!-- Call ΔTV -->
+          <td>{{ "%.2f"|format(row.call_total_tradval or 0) }}</td>
+          
+          <!-- Call ΔMoney (CLICKABLE) -->
+          <td class="money-clickable" 
+              onclick="openChartModal(this)" 
+              data-stock="{{ row.stock }}" 
+              data-option-type="call" 
+              data-metric="money"
+              data-date="{{ selected_date }}">
             {{ "%.2f"|format(row.call_total_money or 0) }}
           </td>
+          
+          <!-- Close & RSI -->
           <td class="cell-center">{{ "%.2f"|format(row.closing_price or 0) }}</td>
           <td class="cell-center">{{ "%.2f"|format(row.rsi or 0) }}</td>
+          
+          <!-- Put Delta+ -->
           <td>{{ row.put_delta_pos_strike }}</td>
           <td>{{ row.put_delta_pos_pct }}</td>
+          
+          <!-- Put Delta- -->
           <td>{{ row.put_delta_neg_strike }}</td>
           <td>{{ row.put_delta_neg_pct }}</td>
+          
+          <!-- Put Vega+ (CLICKABLE) -->
           <td>{{ row.put_vega_pos_strike }}</td>
-          <td>{{ row.put_vega_pos_pct }}</td>
-          <td>{{ row.put_vega_neg_strike }}</td>
-          <td>{{ row.put_vega_neg_pct }}</td>
-          <td>{{ "%.2f"|format(row.put_total_tradval or 0) }}</td>
           <td class="money-clickable" 
+              {% if row.put_vega_pos_strike != 'N/A' %}
+              onclick="openChartModal(this)" 
               data-stock="{{ row.stock }}" 
-              data-metric="put_money"
-              onclick="openChartModal(this)">
+              data-option-type="put" 
+              data-metric="vega" 
+              data-strike="{{ row.put_vega_pos_strike }}"
+              data-date="{{ selected_date }}"
+              {% endif %}>
+            {{ row.put_vega_pos_pct }}
+          </td>
+          
+          <!-- Put Vega- (CLICKABLE) -->
+          <td>{{ row.put_vega_neg_strike }}</td>
+          <td class="money-clickable" 
+              {% if row.put_vega_neg_strike != 'N/A' %}
+              onclick="openChartModal(this)" 
+              data-stock="{{ row.stock }}" 
+              data-option-type="put" 
+              data-metric="vega" 
+              data-strike="{{ row.put_vega_neg_strike }}"
+              data-date="{{ selected_date }}"
+              {% endif %}>
+            {{ row.put_vega_neg_pct }}
+          </td>
+          
+          <!-- Put ΔTV -->
+          <td>{{ "%.2f"|format(row.put_total_tradval or 0) }}</td>
+          
+          <!-- Put ΔMoney (CLICKABLE) -->
+          <td class="money-clickable" 
+              onclick="openChartModal(this)" 
+              data-stock="{{ row.stock }}" 
+              data-option-type="put" 
+              data-metric="money"
+              data-date="{{ selected_date }}">
             {{ "%.2f"|format(row.put_total_money or 0) }}
           </td>
         </tr>

@@ -15,5 +15,56 @@
   {% block content %}
   <!-- Page content goes here -->
   {% endblock %}
+
+  <!-- ✅ Move JS here so DOM is ready -->
+  <script src="{{ url_for('static', filename='js/dashboard_header_live.js') }}"></script>
+</body>
+</html>
+
+ <!-- Include Socket.IO client -->
+<!--script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+const socket = io.connect("http://127.0.0.1:5000"); // Flask backend
+
+let prev = {}; // store previous values for color change
+
+socket.on("connect", () => {
+  console.log("✅ Connected to live data stream");
+});
+
+// Receive live tick updates
+socket.on("new_tick", (data) => {
+  console.log("🎯 Live update:", data);
+  updateLiveValues(data);
+});
+
+function updateLiveValues(data) {
+  const fields = ["NIFTY", "BANKNIFTY", "GOLD", "SILVER"];
+
+  fields.forEach((field, i) => {
+    const valueElement = document.querySelector(`.index-item:nth-child(${i + 1}) .index-value`);
+    if (!valueElement || !data[field]) return;
+
+    const newValue = parseFloat(data[field]);
+    const oldValue = prev[field];
+
+    // Update text
+    valueElement.textContent = newValue.toFixed(2);
+
+    // Color flash animation
+    if (oldValue !== undefined) {
+      if (newValue > oldValue) valueElement.style.color = "green";
+      else if (newValue < oldValue) valueElement.style.color = "red";
+      else valueElement.style.color = "black";
+    }
+
+    prev[field] = newValue;
+  });
+}
+</script-->
+
+
+
 </body>
 </html>

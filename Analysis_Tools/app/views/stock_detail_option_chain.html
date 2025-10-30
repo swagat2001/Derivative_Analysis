@@ -52,20 +52,34 @@
                     <td class="num-cell">{{ "%.2f"|format(row.ClsPric) }}</td>
                     <td class="num-cell">{{ "%.2f"|format(row.UndrlygPric) }}</td>
                     <!-- Greeks -->
-                    <td class="greek-cell">{{ "%.2f"|format(row.IV) }}</td>
-                    <td class="greek-cell">{{ "%.4f"|format(row.Delta) }}</td>
-                    <td class="greek-cell">{{ "%.4f"|format(row.Vega) }}</td>
-                    <td class="greek-cell">{{ "%.6f"|format(row.Gamma) }}</td>
-                    <td class="greek-cell">{{ "%.4f"|format(row.Theta) }}</td>
+                    
+                    <td class="greek-cell">{{ "%.4f"|format(row.Delta) if row.Delta is not none else '' }}</td>
+                    <td class="greek-cell">{{ "%.4f"|format(row.Vega) if row.Vega is not none else '' }}</td>
+                    <td class="greek-cell">{{ "%.6f"|format(row.Gamma) if row.Gamma is not none else '' }}</td>
+                    <td class="greek-cell">{{ "%.6f"|format(row.Theta) if row.Theta is not none else '' }}</td>
+                    <td class="greek-cell">{{ "%.2f"|format(row.IV) if row.IV is not none else '' }}</td>
+
                     <!-- Previous Day -->
                     <td class="prev-cell">{% if row.PrevOI %}{{ "{:,.0f}".format(row.PrevOI) }}{% else %}-{% endif %}</td>
-                    <td class="prev-cell {% if row['OI_Chg_%'] > 0 %}positive{% elif row['OI_Chg_%'] < 0 %}negative{% endif %}">
-                        {% if row.PrevOI %}{{ "%.2f"|format(row['OI_Chg_%']) }}%{% else %}-{% endif %}
+                    <td class="prev-cell 
+                        {% if row['OI_Chg_%'] is not none %}
+                            {% if row['OI_Chg_%'] > 0 %}positive
+                            {% elif row['OI_Chg_%'] < 0 %}negative
+                            {% endif %}
+                        {% endif %}">
+                        {{ "%.2f"|format(row['OI_Chg_%']) if row['OI_Chg_%'] is not none else '' }}
                     </td>
+
                     <td class="prev-cell">{% if row.PrevPrice %}{{ "%.2f"|format(row.PrevPrice) }}{% else %}-{% endif %}</td>
-                    <td class="prev-cell {% if row['Price_Chg_%'] > 0 %}positive{% elif row['Price_Chg_%'] < 0 %}negative{% endif %}">
-                        {% if row.PrevPrice %}{{ "%.2f"|format(row['Price_Chg_%']) }}%{% else %}-{% endif %}
+                    <td class="prev-cell 
+                        {% if row['Price_Chg_%'] is not none %}
+                            {% if row['Price_Chg_%'] > 0 %}positive
+                            {% elif row['Price_Chg_%'] < 0 %}negative
+                            {% endif %}
+                        {% endif %}">
+                        {{ "%.2f"|format(row['Price_Chg_%']) if row['Price_Chg_%'] is not none else '' }}
                     </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
