@@ -165,78 +165,113 @@ def stream_live_indices():
 
 @dashboard_bp.route('/api/historical-chart-data')
 def get_historical_chart_data():
+    """
+    Returns 40-day historical data for CALL/PUT charts
+    with correct daily underlying price (from base table).
+    """
     ticker = request.args.get('ticker')
-    option_type = request.args.get('option_type')
+    option_type = request.args.get('option_type')  # 'call' or 'put'
     metric = request.args.get('metric')
     strike = request.args.get('strike')
     curr_date = request.args.get('date')
     
     if not all([ticker, option_type, metric, curr_date]):
         return jsonify({'error': 'Missing parameters'}), 400
-    
+
     try:
         from sqlalchemy import text
         from ..models.dashboard_model import engine
         import json
         
         table_name = f"TBL_{ticker}_DERIVED"
-        
-        # Get last 40 dates from ticker table (SAME AS OLD CODE)
+        base_table = f"TBL_{ticker}"  # ✅ base table for UndrlygPric
+        opt_type_param = 'CE' if option_type == 'call' else 'PE'
+
+        # -------------------------------------------------------------
+        # 🗓️ 1. Get last 40 business dates
+        # -------------------------------------------------------------
         query_dates = text(f'''
-            SELECT DISTINCT "BizDt" FROM "{table_name}"
+            SELECT DISTINCT "BizDt" 
+            FROM "{table_name}"
             WHERE "BizDt" <= :curr_date 
-            ORDER BY "BizDt" DESC LIMIT 40
+            ORDER BY "BizDt" DESC 
+            LIMIT 40
         ''')
         dates_df = pd.read_sql(query_dates, engine, params={"curr_date": curr_date})
-        
         if dates_df.empty:
             return jsonify({'error': 'No data', 'success': False}), 404
         
-        dates = [d.strftime('%Y-%m-%d') if hasattr(d, 'strftime') else str(d) for d in dates_df['BizDt']]
+        dates = [str(d) for d in dates_df['BizDt']]
         dates.reverse()
-        
+
+        # -------------------------------------------------------------
+        # ⚡ Cache underlying prices for 40 dates
+        # -------------------------------------------------------------
+        q_underlying_all = text(f'''
+            SELECT DISTINCT "BizDt", "UndrlygPric"
+            FROM "{base_table}"
+            WHERE "BizDt" IN :dates
+        ''')
+        df_under_all = pd.read_sql(q_underlying_all, engine, params={"dates": tuple(dates)})
+
+        # Build fast lookup map
+        underlying_map = {
+            str(row['BizDt']): float(row['UndrlygPric'])
+            for _, row in df_under_all.iterrows()
+        }
+
         historical_data = []
-        opt_type_param = 'CE' if option_type == 'call' else 'PE'
-        
+
+        # -------------------------------------------------------------
+        # 🔁 2. Loop through each date
+        # -------------------------------------------------------------
         for date in dates:
             try:
-                # Get all data for this date (SAME AS OLD CODE line 807-812)
                 base_query = text(f'''
                     SELECT "OptnTp", "StrkPric", "TtlTradgVol", "OpnIntrst", 
-                           "TtlTrfVal", "UndrlygPric", "vega"
+                           "TtlTrfVal", "vega"
                     FROM "{table_name}"
                     WHERE "BizDt" = :date
                 ''')
                 df_date = pd.read_sql(base_query, engine, params={"date": date})
-                
                 if df_date.empty:
                     continue
+
+                # ✅ Fetch cached underlying price for that date
+                underlying_price = underlying_map.get(date, None)
+                if underlying_price is None:
+                    continue  # skip if not found (shouldn't happen)
                 
-                # Calculate PCR (SAME AS OLD CODE)
+                # -----------------------------------------------------
+                # 📈 PCR Calculations
+                # -----------------------------------------------------
                 put_volume = df_date[df_date['OptnTp'] == 'PE']['TtlTradgVol'].sum()
                 call_volume = df_date[df_date['OptnTp'] == 'CE']['TtlTradgVol'].sum()
                 put_oi = df_date[df_date['OptnTp'] == 'PE']['OpnIntrst'].sum()
                 call_oi = df_date[df_date['OptnTp'] == 'CE']['OpnIntrst'].sum()
-                
+
                 pcr_volume = round(put_volume / call_volume, 4) if call_volume > 0 else 0
                 pcr_oi = round(put_oi / call_oi, 4) if call_oi > 0 else 0
-                
-                underlying_price = float(df_date['UndrlygPric'].iloc[0])
-                
-                # Get RSI from cache
+
+                # -----------------------------------------------------
+                # 📊 RSI from cache
+                # -----------------------------------------------------
                 cache_query = text("""
                     SELECT data_json FROM options_dashboard_cache 
                     WHERE biz_date = :date AND moneyness_type = 'TOTAL'
                 """)
                 cache_result = pd.read_sql(cache_query, engine, params={"date": date})
-                
+
                 rsi_value = None
                 if not cache_result.empty:
                     cache_data = json.loads(cache_result.iloc[0]['data_json'])
                     ticker_data = next((item for item in cache_data if item['stock'] == ticker), None)
                     if ticker_data:
                         rsi_value = float(ticker_data.get('rsi')) if ticker_data.get('rsi') else None
-                
+
+                # -----------------------------------------------------
+                # 💰 3. Metric Calculation (Money / Vega)
+                # -----------------------------------------------------
                 data_point = {
                     'date': date,
                     'pcr_volume': pcr_volume,
@@ -244,46 +279,44 @@ def get_historical_chart_data():
                     'underlying_price': round(underlying_price, 2),
                     'rsi': rsi_value
                 }
-                
-                # Calculate metric value (EXACT SAME AS OLD CODE lines 821-846)
+
                 if metric == 'money':
-                    # OLD CODE lines 821-830
                     if option_type == 'call':
                         mask = (df_date['OptnTp'] == 'CE') & (df_date['StrkPric'] < underlying_price)
                     else:
                         mask = (df_date['OptnTp'] == 'PE') & (df_date['StrkPric'] > underlying_price)
                     
                     itm_contracts = df_date[mask].copy()
-                    total_money = (itm_contracts['TtlTrfVal'] * abs(itm_contracts['StrkPric'] - underlying_price)).sum()
+                    total_money = (itm_contracts['TtlTrfVal'] *
+                                   abs(itm_contracts['StrkPric'] - underlying_price)).sum()
                     data_point['value'] = float(total_money)
                     data_point['metric_label'] = 'Money'
-                    
+
                 elif metric == 'vega':
-                    # OLD CODE lines 832-846
                     if strike and strike != 'N/A':
                         strike_data = df_date[(df_date['OptnTp'] == opt_type_param) & 
-                                             (df_date['StrkPric'] == float(strike))]
-                        if not strike_data.empty:
-                            value = float(strike_data['vega'].iloc[0])
-                        else:
-                            value = 0
+                                              (df_date['StrkPric'] == float(strike))]
+                        value = float(strike_data['vega'].iloc[0]) if not strike_data.empty else 0
                         data_point['value'] = value
                         data_point['metric_label'] = f'Vega @ {strike}'
                     else:
                         avg_vega = df_date[df_date['OptnTp'] == opt_type_param]['vega'].mean()
                         data_point['value'] = float(avg_vega) if not pd.isna(avg_vega) else 0
                         data_point['metric_label'] = 'Avg Vega'
-                
+
                 historical_data.append(data_point)
-                
+
             except Exception as e:
-                print(f"Error processing {date}: {e}")
+                print(f"[ERROR] {ticker} | {date} | {e}")
                 continue
-        
+
+        # -------------------------------------------------------------
+        # ✅ Return data
+        # -------------------------------------------------------------
         return jsonify({'success': True, 'ticker': ticker, 'data': historical_data})
-        
+
     except Exception as e:
-        print(f"[ERROR] {e}")
+        print(f"[FATAL] {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e), 'success': False}), 500
