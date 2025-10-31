@@ -1,46 +1,67 @@
-<!-- ==============================
-     STOCK DETAIL STATISTICS COMPONENT
-     ============================== -->
+<!-- ============================== -->
+<!-- 📊 STOCK DETAIL STATISTICS COMPONENT -->
+<!-- ============================== -->
 <div class="stats-section">
-    <h3 class="section-title">📊 Key Metrics</h3>
-    
-    {% if stats %}
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">Current Price</div>
-            <div class="stat-value">₹{{ stats.current_price }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Expiries</div>
-            <div class="stat-value">{{ stats.expiry_count }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Call OI</div>
-            <div class="stat-value stat-call">{{ "{:,.0f}".format(stats.total_call_oi) }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Put OI</div>
-            <div class="stat-value stat-put">{{ "{:,.0f}".format(stats.total_put_oi) }}</div>
-        </div>
-    </div>
 
-    <!-- Gauges -->
-    <div class="gauges-container">
-        <div class="gauge-card">
-            <div class="gauge-label">PCR (OI)</div>
-            <div class="gauge-display">
-                <div class="gauge-value">{{ stats.pcr_oi }}</div>
-            </div>
-        </div>
-        <div class="gauge-card">
-            <div class="gauge-label">PCR (Volume)</div>
-            <div class="gauge-display">
-                <div class="gauge-value">{{ stats.pcr_volume }}</div>
-            </div>
-        </div>
+  {% if stats %}
+  <!-- Metrics Grid - 2 Columns -->
+  <div class="stats-grid-two-col">
+    <div class="stat-card">
+      <div class="stat-label">Total CE OI</div>
+      <div class="stat-value stat-call">{{ stats.total_ce_oi or "20.75 Cr" }}</div>
     </div>
-    {% else %}
-    <p class="no-data-message">No statistics available</p>
-    {% endif %}
+    <div class="stat-card">
+      <div class="stat-label">Total PE OI</div>
+      <div class="stat-value stat-put">{{ stats.total_pe_oi or "12.43 Cr" }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">Diff PE-CE OI</div>
+      <div class="stat-value">{{ stats.diff_pe_ce_oi or "-8.32 Cr" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Trend OI</div>
+      <div class="stat-value trend-{{ stats.trend_oi|lower if stats.trend_oi else 'bearish' }}">{{ stats.trend_oi or "Bearish" }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">Max CE OI Strike</div>
+      <div class="stat-value">{{ stats.max_ce_oi_strike or "27000" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Max CE OI Chg Strike</div>
+      <div class="stat-value">{{ stats.max_ce_oi_chg_strike or "27000" }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">Total CE OI Chg</div>
+      <div class="stat-value">{{ stats.total_ce_oi_chg or "9.31 Cr" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total PE OI Chg</div>
+      <div class="stat-value">{{ stats.total_pe_oi_chg or "34.55 L" }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">Diff PE-CE OI Chg</div>
+      <div class="stat-value">{{ stats.diff_pe_ce_oi_chg or "-8.97 Cr" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Trend OI Chg</div>
+      <div class="stat-value trend-{{ stats.trend_oi_chg|lower if stats.trend_oi_chg else 'bearish' }}">{{ stats.trend_oi_chg or "Bearish" }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">Max PE OI Strike</div>
+      <div class="stat-value">{{ stats.max_pe_oi_strike or "25000" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Max PE OI Chg Strike</div>
+      <div class="stat-value">{{ stats.max_pe_oi_chg_strike or "25000" }}</div>
+    </div>
+  </div>
+
+  {% else %}
+  <p class="no-data-message">No statistics available</p>
+  {% endif %}
 </div>

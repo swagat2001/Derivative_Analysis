@@ -8,22 +8,26 @@
         <thead>
             <tr>
                 <th>Expiry Date</th>
-                <th>Contracts</th>
-                <th>Total OI</th>
-                <th>Call OI</th>
-                <th>Put OI</th>
-                <th>PCR</th>
+                <th>Price</th>
+                <th>Price Chg</th>
+                <th>Volume</th>
+                <th>OI</th>
+                <th>OI Chg</th>
             </tr>
         </thead>
         <tbody>
             {% for exp in expiry_data %}
             <tr>
                 <td>{{ exp.expiry }}</td>
-                <td>{{ exp.contracts }}</td>
+                <td>{{ "%.2f"|format(exp.get('price', 0)) }}</td>
+                <td class="{% if exp.get('price_chg', 0) > 0 %}positive{% elif exp.get('price_chg', 0) < 0 %}negative{% endif %}">
+                    {{ "%+.2f"|format(exp.get('price_chg', 0)) }}
+                </td>
+                <td>{{ "{:,.0f}".format(exp.get('volume', 0)) }}</td>
                 <td>{{ "{:,.0f}".format(exp.total_oi) }}</td>
-                <td class="call-value">{{ "{:,.0f}".format(exp.call_oi) }}</td>
-                <td class="put-value">{{ "{:,.0f}".format(exp.put_oi) }}</td>
-                <td class="pcr-value">{{ exp.pcr }}</td>
+                <td class="{% if exp.get('oi_chg', 0) > 0 %}positive{% elif exp.get('oi_chg', 0) < 0 %}negative{% endif %}">
+                    {{ "%+.0f"|format(exp.get('oi_chg', 0)) }}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

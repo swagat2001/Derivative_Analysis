@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_stats.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_chart.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_option_chain.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_gauges.css') }}">
 
 <!-- ============================= -->
 <!-- 🌐 Universal Header -->
@@ -21,20 +22,33 @@
 <!-- ============================= -->
 <!-- 📈 Stock Detail Section -->
 <!-- ============================= -->
-<div class="stock-detail-container">
+<div class="stock-detail-container" data-ticker="{{ ticker }}" data-date="{{ selected_date }}">
 
   {% if data %}
 
-  <!-- Top Section: Expiry Summary + Stats -->
+  <!-- 🧱 Top Section (Expiry Summary + Gauges + Stats) -->
   <div class="top-section">
-    {% include 'stock_detail_expiry.html' %}
-    {% include 'stock_detail_stats.html' %}
+    
+    <!-- 📅 Left Column: Expiry Summary -->
+    <div class="top-card left-column">
+      {% include 'stock_detail_expiry.html' %}
+    </div>
+
+    <!-- ⚙️ Middle Column: Gauges + Metrics -->
+    <div class="top-card middle-column">
+      {% include 'stock_detail_gauges.html' %}
+    </div>
+
+    <!-- 📊 Right Column: Key Statistics -->
+    <div class="top-card right-column">
+      {% include 'stock_detail_stats.html' %}
+    </div>
   </div>
 
-  <!-- Mid Section: Historical Chart -->
+  <!-- 📈 Price Chart -->
   {% include 'stock_detail_chart.html' %}
 
-  <!-- Bottom Section: Option Chain Table -->
+  <!-- 📘 Option Chain Table -->
   {% include 'stock_detail_option_chain.html' %}
 
   {% else %}
@@ -44,7 +58,7 @@
 </div>
 
 <!-- ============================= -->
-<!-- 📜 Optional Header Shrink Script -->
+<!-- 📜 Header Shrink Script -->
 <!-- ============================= -->
 <script>
 window.addEventListener('scroll', function() {
@@ -53,5 +67,11 @@ window.addEventListener('scroll', function() {
   else header.classList.remove('shrink');
 });
 </script>
+
+<!-- ============================= -->
+<!-- ⚙️ ApexCharts + Custom JS -->
+<!-- ============================= -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{{ url_for('static', filename='js/stock_detail_gauges.js') }}"></script>
 
 {% endblock %}
