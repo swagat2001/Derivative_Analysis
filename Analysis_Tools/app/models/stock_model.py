@@ -305,8 +305,8 @@ def get_stock_detail_data(ticker: str, selected_date: str):
 
 def get_stock_expiry_data(ticker: str, selected_date: str):
     """
-    Aggregate OI by expiry for the given ticker/date using derived table if present.
-    Returns list of dict: expiry, contracts, total_oi, call_oi, put_oi, pcr
+    Get expiry-wise summary with price, volume, OI and their changes.
+    Returns: expiry, price, price_chg, volume, oi, oi_chg
     """
     try:
         derived_table = _derived_table_name(ticker)
@@ -314,41 +314,93 @@ def get_stock_expiry_data(ticker: str, selected_date: str):
         inspector = inspect(engine)
         table_to_use = derived_table if derived_table in inspector.get_table_names(schema='public') else base_table
 
-        q = text(f'''
-            WITH base AS (
-                SELECT
-                    "FininstrmActlXpryDt" AS expiry,
-                    "OptnTp",
-                    "OpnIntrst"
+        # Get previous date
+        dates = get_available_dates()
+        prev_date = _get_prev_date(selected_date, dates)
+
+        # Current day futures data (OptnTp IS NULL = futures)
+        q_curr = text(f'''
+            SELECT 
+                "FininstrmActlXpryDt"::text as expiry,
+                "ClsPric" as price,
+                "OpnIntrst" as oi,
+                "ChngInOpnIntrst" as oi_chg
+            FROM public."{table_to_use}"
+            WHERE "BizDt" = :bizdt
+            AND "FininstrmActlXpryDt" IS NOT NULL
+            AND "OptnTp" IS NULL
+            ORDER BY "FininstrmActlXpryDt"
+        ''')
+        df_curr = pd.read_sql(q_curr, con=engine, params={"bizdt": selected_date})
+
+        # Get volume from options (CE + PE summed)
+        q_vol = text(f'''
+            SELECT 
+                "FininstrmActlXpryDt"::text as expiry,
+                SUM("TtlTradgVol") as volume
+            FROM public."{table_to_use}"
+            WHERE "BizDt" = :bizdt
+            AND "FininstrmActlXpryDt" IS NOT NULL
+            AND "OptnTp" IN ('CE', 'PE')
+            GROUP BY "FininstrmActlXpryDt"
+        ''')
+        df_vol = pd.read_sql(q_vol, con=engine, params={"bizdt": selected_date})
+
+        # Merge volume
+        if not df_vol.empty:
+            df_curr = pd.merge(df_curr, df_vol, on='expiry', how='left')
+        else:
+            df_curr['volume'] = 0
+
+        # Previous day price for price_chg calculation
+        prev_prices = {}
+        if prev_date:
+            q_prev = text(f'''
+                SELECT 
+                    "FininstrmActlXpryDt"::text as expiry,
+                    "ClsPric" as prev_price
                 FROM public."{table_to_use}"
                 WHERE "BizDt" = :bizdt
-            )
-            SELECT
-                expiry::text AS expiry,
-                COUNT(*) AS contracts,
-                SUM("OpnIntrst") AS total_oi,
-                SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) AS call_oi,
-                SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) AS put_oi,
-                ROUND(
-                    CASE WHEN SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) > 0
-                    THEN SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) /
-                         SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END)
-                    ELSE NULL END, 2
-                ) AS pcr
-            FROM base
-            GROUP BY expiry
-            ORDER BY expiry;
-        ''')
-        df = pd.read_sql(q, con=engine, params={"bizdt": selected_date})
-        return df.to_dict(orient='records')
+                AND "FininstrmActlXpryDt" IS NOT NULL
+                AND "OptnTp" IS NULL
+            ''')
+            df_prev = pd.read_sql(q_prev, con=engine, params={"bizdt": prev_date})
+            if not df_prev.empty:
+                for _, row in df_prev.iterrows():
+                    prev_prices[row['expiry']] = float(row['prev_price'])
+
+        # Build result
+        result = []
+        for _, row in df_curr.iterrows():
+            expiry = row['expiry']
+            curr_price = float(row['price']) if pd.notna(row['price']) else 0
+            prev_price = prev_prices.get(expiry, 0)
+            
+            price_chg = 0
+            if prev_price > 0 and curr_price > 0:
+                price_chg = ((curr_price - prev_price) / prev_price) * 100
+
+            result.append({
+                'expiry': expiry,
+                'price': curr_price,
+                'price_chg': round(price_chg, 2),
+                'volume': int(row['volume']) if pd.notna(row['volume']) else 0,
+                'oi': int(row['oi']) if pd.notna(row['oi']) else 0,
+                'oi_chg': int(row['oi_chg']) if pd.notna(row['oi_chg']) else 0
+            })
+
+        return result
     except Exception as e:
         print(f"[ERROR] get_stock_expiry_data({ticker},{selected_date}): {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 
 def get_stock_stats(ticker: str, selected_date: str):
     """
-    Aggregated top-level stats for the stock (current_price, expiry_count, total_call_oi, total_put_oi, pcr_oi, pcr_volume)
+    Comprehensive stats matching stock_detail_stats.html template.
+    Returns all stats shown in the screenshot.
     """
     try:
         derived_table = _derived_table_name(ticker)
@@ -356,54 +408,104 @@ def get_stock_stats(ticker: str, selected_date: str):
         inspector = inspect(engine)
         table_to_use = derived_table if derived_table in inspector.get_table_names(schema='public') else base_table
 
+        # Main aggregation query
         q = text(f'''
-            WITH base AS (
-                SELECT
-                    "OptnTp",
-                    "OpnIntrst",
-                    "TtlTradgVol",
-                    "UndrlygPric",
-                    "FininstrmActlXpryDt"
-                FROM public."{table_to_use}"
-                WHERE "BizDt" = :bizdt
-            )
             SELECT
-                ROUND(MAX("UndrlygPric"), 2) AS current_price,
-                COUNT(DISTINCT "FininstrmActlXpryDt") AS expiry_count,
-                SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) AS total_call_oi,
-                SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) AS total_put_oi,
-                ROUND(
-                    CASE
-                        WHEN SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) > 0
-                        THEN SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) /
-                             SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END)
-                        ELSE NULL
-                    END, 2
-                ) AS pcr_oi,
-                ROUND(
-                    CASE
-                        WHEN SUM(CASE WHEN "OptnTp" = 'CE' THEN "TtlTradgVol" ELSE 0 END) > 0
-                        THEN SUM(CASE WHEN "OptnTp" = 'PE' THEN "TtlTradgVol" ELSE 0 END) /
-                             SUM(CASE WHEN "OptnTp" = 'CE' THEN "TtlTradgVol" ELSE 0 END)
-                        ELSE NULL
-                    END, 2
-                ) AS pcr_volume
-            FROM base;
+                SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) AS total_ce_oi,
+                SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) AS total_pe_oi,
+                SUM(CASE WHEN "OptnTp" = 'CE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_ce_oi_chg,
+                SUM(CASE WHEN "OptnTp" = 'PE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_pe_oi_chg
+            FROM public."{table_to_use}"
+            WHERE "BizDt" = :bizdt
         ''')
         df = pd.read_sql(q, con=engine, params={"bizdt": selected_date})
+        
         if df.empty:
             return {}
-        row = df.iloc[0].to_dict()
-        return {
-            "current_price": float(row.get("current_price") or 0),
-            "expiry_count": int(row.get("expiry_count") or 0),
-            "total_call_oi": int(row.get("total_call_oi") or 0),
-            "total_put_oi": int(row.get("total_put_oi") or 0),
-            "pcr_oi": row.get("pcr_oi"),
-            "pcr_volume": row.get("pcr_volume")
+        
+        row = df.iloc[0]
+        total_ce_oi = int(row['total_ce_oi']) if pd.notna(row['total_ce_oi']) else 0
+        total_pe_oi = int(row['total_pe_oi']) if pd.notna(row['total_pe_oi']) else 0
+        total_ce_oi_chg = int(row['total_ce_oi_chg']) if pd.notna(row['total_ce_oi_chg']) else 0
+        total_pe_oi_chg = int(row['total_pe_oi_chg']) if pd.notna(row['total_pe_oi_chg']) else 0
+
+        # Calculate differences
+        diff_pe_ce_oi = total_pe_oi - total_ce_oi
+        diff_pe_ce_oi_chg = total_pe_oi_chg - total_ce_oi_chg
+
+        # Determine trends (PCR > 1 = Bullish, PCR < 1 = Bearish)
+        pcr_oi = total_pe_oi / total_ce_oi if total_ce_oi > 0 else 0
+        trend_oi = "Bullish" if pcr_oi > 1 else "Bearish" if pcr_oi < 1 else "Neutral"
+        trend_oi_chg = "Bullish" if diff_pe_ce_oi_chg > 0 else "Bearish" if diff_pe_ce_oi_chg < 0 else "Neutral"
+
+        # Get max strikes
+        q_strikes = text(f'''
+            WITH ce_oi AS (
+                SELECT "StrkPric", "OpnIntrst", "ChngInOpnIntrst"
+                FROM public."{table_to_use}"
+                WHERE "BizDt" = :bizdt AND "OptnTp" = 'CE'
+                ORDER BY "OpnIntrst" DESC LIMIT 1
+            ),
+            ce_oi_chg AS (
+                SELECT "StrkPric", "ChngInOpnIntrst"
+                FROM public."{table_to_use}"
+                WHERE "BizDt" = :bizdt AND "OptnTp" = 'CE'
+                ORDER BY "ChngInOpnIntrst" DESC LIMIT 1
+            ),
+            pe_oi AS (
+                SELECT "StrkPric", "OpnIntrst", "ChngInOpnIntrst"
+                FROM public."{table_to_use}"
+                WHERE "BizDt" = :bizdt AND "OptnTp" = 'PE'
+                ORDER BY "OpnIntrst" DESC LIMIT 1
+            ),
+            pe_oi_chg AS (
+                SELECT "StrkPric", "ChngInOpnIntrst"
+                FROM public."{table_to_use}"
+                WHERE "BizDt" = :bizdt AND "OptnTp" = 'PE'
+                ORDER BY "ChngInOpnIntrst" DESC LIMIT 1
+            )
+            SELECT 
+                (SELECT "StrkPric" FROM ce_oi) as max_ce_oi_strike,
+                (SELECT "StrkPric" FROM ce_oi_chg) as max_ce_oi_chg_strike,
+                (SELECT "StrkPric" FROM pe_oi) as max_pe_oi_strike,
+                (SELECT "StrkPric" FROM pe_oi_chg) as max_pe_oi_chg_strike
+        ''')
+        df_strikes = pd.read_sql(q_strikes, con=engine, params={"bizdt": selected_date})
+
+        # Format helper
+        def format_crores(val):
+            if val >= 1e7:
+                return f"{val/1e7:.2f} Cr"
+            elif val >= 1e5:
+                return f"{val/1e5:.2f} L"
+            return f"{val:.0f}"
+
+        result = {
+            "total_ce_oi": format_crores(total_ce_oi),
+            "total_pe_oi": format_crores(total_pe_oi),
+            "total_ce_oi_chg": format_crores(total_ce_oi_chg),
+            "total_pe_oi_chg": format_crores(total_pe_oi_chg),
+            "diff_pe_ce_oi": format_crores(diff_pe_ce_oi),
+            "diff_pe_ce_oi_chg": format_crores(diff_pe_ce_oi_chg),
+            "trend_oi": trend_oi,
+            "trend_oi_chg": trend_oi_chg,
+            "pcr_oi": round(pcr_oi, 2)
         }
+
+        # Add strikes if available
+        if not df_strikes.empty:
+            strike_row = df_strikes.iloc[0]
+            result["max_ce_oi_strike"] = int(strike_row['max_ce_oi_strike']) if pd.notna(strike_row['max_ce_oi_strike']) else "N/A"
+            result["max_ce_oi_chg_strike"] = int(strike_row['max_ce_oi_chg_strike']) if pd.notna(strike_row['max_ce_oi_chg_strike']) else "N/A"
+            result["max_pe_oi_strike"] = int(strike_row['max_pe_oi_strike']) if pd.notna(strike_row['max_pe_oi_strike']) else "N/A"
+            result["max_pe_oi_chg_strike"] = int(strike_row['max_pe_oi_chg_strike']) if pd.notna(strike_row['max_pe_oi_chg_strike']) else "N/A"
+
+        return result
+        
     except Exception as e:
         print(f"[ERROR] get_stock_stats({ticker},{selected_date}): {e}")
+        import traceback
+        traceback.print_exc()
         return {}
 
 

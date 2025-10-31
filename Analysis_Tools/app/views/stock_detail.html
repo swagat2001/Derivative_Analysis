@@ -58,7 +58,8 @@
 </div>
 
 <!-- ============================= -->
-<!-- 📜 Header Shrink Script -->
+<!-- 📜 Minimal JavaScript -->
+<!-- Header shrink on scroll -->
 <!-- ============================= -->
 <script>
 window.addEventListener('scroll', function() {
@@ -67,11 +68,5 @@ window.addEventListener('scroll', function() {
   else header.classList.remove('shrink');
 });
 </script>
-
-<!-- ============================= -->
-<!-- ⚙️ ApexCharts + Custom JS -->
-<!-- ============================= -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script src="{{ url_for('static', filename='js/stock_detail_gauges.js') }}"></script>
 
 {% endblock %}

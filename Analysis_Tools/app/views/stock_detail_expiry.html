@@ -19,14 +19,14 @@
             {% for exp in expiry_data %}
             <tr>
                 <td>{{ exp.expiry }}</td>
-                <td>{{ "%.2f"|format(exp.get('price', 0)) }}</td>
-                <td class="{% if exp.get('price_chg', 0) > 0 %}positive{% elif exp.get('price_chg', 0) < 0 %}negative{% endif %}">
-                    {{ "%+.2f"|format(exp.get('price_chg', 0)) }}
+                <td>{{ "%.2f"|format(exp.price) }}</td>
+                <td class="{% if exp.price_chg > 0 %}positive{% elif exp.price_chg < 0 %}negative{% endif %}">
+                    {{ "%+.2f%%"|format(exp.price_chg) }}
                 </td>
-                <td>{{ "{:,.0f}".format(exp.get('volume', 0)) }}</td>
-                <td>{{ "{:,.0f}".format(exp.total_oi) }}</td>
-                <td class="{% if exp.get('oi_chg', 0) > 0 %}positive{% elif exp.get('oi_chg', 0) < 0 %}negative{% endif %}">
-                    {{ "%+.0f"|format(exp.get('oi_chg', 0)) }}
+                <td>{{ "{:,.0f}".format(exp.volume) }}</td>
+                <td>{{ "{:,.0f}".format(exp.oi) }}</td>
+                <td class="{% if exp.oi_chg > 0 %}positive{% elif exp.oi_chg < 0 %}negative{% endif %}">
+                    {{ "%+.0f"|format(exp.oi_chg) }}
                 </td>
             </tr>
             {% endfor %}

@@ -28,6 +28,24 @@ def stock_detail(ticker):
 
         # Aggregated stats / gauges (used by stock_detail_stats.html)
         stats = get_stock_stats(ticker, selected_date)
+        
+        # Calculate average IV from option chain data if available
+        if data:
+            iv_values = []
+            for row in data:
+                if row.get('IV') is not None and row['IV'] > 0:
+                    iv_values.append(row['IV'])
+            
+            if iv_values:
+                avg_iv = sum(iv_values) / len(iv_values)
+                # Scale if in 0-1 range
+                if avg_iv < 1:
+                    avg_iv = avg_iv * 100
+                stats['avg_iv'] = round(avg_iv, 2)
+            else:
+                stats['avg_iv'] = 0
+        else:
+            stats['avg_iv'] = 0
 
     return render_template(
         'stock_detail.html',
