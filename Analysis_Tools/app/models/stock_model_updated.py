@@ -68,6 +68,19 @@ def get_available_dates():
         return []
 
 
+def get_all_tickers():
+    """Get list of all available ticker symbols from database"""
+    try:
+        inspector = inspect(engine)
+        tables = [t for t in inspector.get_table_names(schema='public') 
+                 if t.startswith('TBL_') and t.endswith('_DERIVED')]
+        tickers = sorted([t.replace('TBL_', '').replace('_DERIVED', '') for t in tables])
+        return tickers
+    except Exception as e:
+        print(f"[ERROR] get_all_tickers(): {e}")
+        return []
+
+
 def _get_prev_date(selected_date, dates_list):
     """
     Given selected_date (YYYY-MM-DD) and dates_list sorted desc, find the immediate previous date.
@@ -125,6 +138,10 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
                 greeks.append('"vega" AS "Vega"')
             elif 'Vega' in cols:
                 greeks.append('"Vega"')
+            if 'iv' in [c.lower() for c in cols]:
+                greeks.append('"iv" AS "IV"')
+            elif 'IV' in cols:
+                greeks.append('"IV"')
 
             greeks_sql = ',\n                    '.join(greeks) if greeks else ''
 
@@ -215,7 +232,7 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
 
         # normalize column types
         numeric_cols = ["StrkPric", "OpnIntrst", "TtlTradgVol", "ClsPric", "UndrlygPric", "LastPric",
-                        "Delta", "Vega", "Gamma", "Theta"]
+                        "Delta", "Vega", "Gamma", "Theta", "IV"]
         for c in numeric_cols:
             if c in df_curr.columns:
                 df_curr[c] = pd.to_numeric(df_curr[c], errors='coerce')
@@ -235,7 +252,7 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
                 elif c.lower() in ['prevlastpric', 'lastpric', 'lastprice', 'clspric', 'close']:
                     prev_price_col = c
 
-            # If not found, create empty columns so merge doesn’t fail
+            # If not found, create empty columns so merge doesn't fail
             if prev_oi_col and 'PrevOI' not in df_prev.columns:
                 df_prev.rename(columns={prev_oi_col: 'PrevOI'}, inplace=True)
             elif 'PrevOI' not in df_prev.columns:
@@ -308,7 +325,9 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
         return out_rows
 
     except Exception as e:
-        print(f"[ERROR] get_stock_detail_data({ticker},{selected_date}): {e}")
+        print(f"[ERROR] get_stock_detail_data({ticker},{selected_date},{selected_expiry}): {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 
@@ -418,13 +437,16 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
         inspector = inspect(engine)
         table_to_use = derived_table if derived_table in inspector.get_table_names(schema='public') else base_table
 
-        # Main aggregation query
+        # Build WHERE clause and params
         query_filter = '"BizDt" = :bizdt'
         params = {"bizdt": selected_date}
+        
         if selected_expiry:
             query_filter += ' AND "FininstrmActlXpryDt" = :expiry'
             params["expiry"] = selected_expiry
-        
+            print(f"[DEBUG] get_stock_stats: Filtering by expiry {selected_expiry}")
+
+        # Main aggregation query
         q = text(f'''
             SELECT
                 SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) AS total_ce_oi,
@@ -454,7 +476,7 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
         trend_oi = "Bullish" if pcr_oi > 1 else "Bearish" if pcr_oi < 1 else "Neutral"
         trend_oi_chg = "Bullish" if diff_pe_ce_oi_chg > 0 else "Bearish" if diff_pe_ce_oi_chg < 0 else "Neutral"
 
-        # Get max strikes
+        # Get max strikes - also filter by expiry
         q_strikes = text(f'''
             WITH ce_oi AS (
                 SELECT "StrkPric", "OpnIntrst", "ChngInOpnIntrst"
@@ -516,10 +538,11 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
             result["max_pe_oi_strike"] = int(strike_row['max_pe_oi_strike']) if pd.notna(strike_row['max_pe_oi_strike']) else "N/A"
             result["max_pe_oi_chg_strike"] = int(strike_row['max_pe_oi_chg_strike']) if pd.notna(strike_row['max_pe_oi_chg_strike']) else "N/A"
 
+        print(f"[DEBUG] get_stock_stats result: PCR={result['pcr_oi']}, CE_OI={result['total_ce_oi']}, PE_OI={result['total_pe_oi']}")
         return result
         
     except Exception as e:
-        print(f"[ERROR] get_stock_stats({ticker},{selected_date}): {e}")
+        print(f"[ERROR] get_stock_stats({ticker},{selected_date},{selected_expiry}): {e}")
         import traceback
         traceback.print_exc()
         return {}
@@ -566,16 +589,4 @@ def get_stock_chart_data(ticker: str, days: int = 90):
         return df.to_dict(orient='records')
     except Exception as e:
         print(f"[ERROR] get_stock_chart_data({ticker},{days}): {e}")
-        return []
-
-def get_all_tickers():
-    """Get list of all available ticker symbols from database"""
-    try:
-        inspector = inspect(engine)
-        tables = [t for t in inspector.get_table_names(schema='public') 
-                 if t.startswith('TBL_') and t.endswith('_DERIVED')]
-        tickers = sorted([t.replace('TBL_', '').replace('_DERIVED', '') for t in tables])
-        return tickers
-    except Exception as e:
-        print(f"[ERROR] get_all_tickers(): {e}")
         return []

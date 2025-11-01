@@ -7,6 +7,7 @@
 <!-- 🔗 Component & Page Styles -->
 <!-- ============================= -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_controls_bar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_header.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_expiry.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_stats.css') }}">
@@ -18,6 +19,18 @@
 <!-- 🌐 Universal Header -->
 <!-- ============================= -->
 {% include 'dashboard_header.html' %}
+
+<!-- ============================= -->
+<!-- 🎛️ Stock Detail Controls Bar -->
+<!-- ============================= -->
+{% include 'stock_detail_controls_bar.html' %}
+
+<!-- ============================= -->
+<!-- 📌 Symbol Header -->
+<!-- ============================= -->
+<div class="symbol-header">
+  <h2>Symbol : <span class="symbol-name">{{ ticker }}</span></h2>
+</div>
 
 <!-- ============================= -->
 <!-- 📈 Stock Detail Section -->
