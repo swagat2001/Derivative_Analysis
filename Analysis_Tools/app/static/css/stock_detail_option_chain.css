@@ -1,3 +1,7 @@
+/* ==============================
+   OPTION CHAIN TABLE STYLES
+   ============================== */
+
 .option-chain-section {
     background: #fff;
     padding: 20px;
@@ -60,6 +64,10 @@
     border-right: 3px solid #facc15;
 }
 
+/* ==============================
+   TABLE BODY STYLING
+   ============================== */
+
 .option-chain-table tbody tr {
     border-bottom: 1px solid #f3f4f6;
 }
@@ -75,6 +83,7 @@
 .ce-td, .pe-td, .strike-td {
     padding: 10px 12px;
     text-align: right;
+    vertical-align: middle;
 }
 
 .strike-td {
@@ -87,28 +96,75 @@
     border-right: 3px solid #facc15;
 }
 
+/* ==============================
+   🎯 ATM ROW — FULL SOLID YELLOW (iCharts Style)
+   ============================== */
+
 .atm-row {
-    background: #fff8dc !important;
+    background: #f5eab6 !important; /* soft solid yellow */
+    font-weight: 600;
+    border-top: 1px solid #e0c85b;
+    border-bottom: 1px solid #e0c85b;
 }
 
+/* ATM Strike Cell — darker yellow with bold white text */
 .atm-strike {
     background: #fbbf24 !important;
     color: #fff !important;
     font-weight: 800;
+    border-left: 3px solid #fbbf24;
+    border-right: 3px solid #fbbf24;
 }
 
+/* Hover — slightly brighter to show interactivity */
+.atm-row:hover {
+    background: #f9e98c !important;
+}
+
+/* ==============================
+   POSITIVE / NEGATIVE TEXT COLORS
+   ============================== */
+
 .pos {
-    color: #22c55e !important;
+    color: #22c55e !important; /* Green for positive OI change */
     font-weight: 700;
 }
 
 .neg {
-    color: #ef4444 !important;
+    color: #ef4444 !important; /* Red for negative OI change */
     font-weight: 700;
 }
+
+/* ==============================
+   NO DATA PLACEHOLDER
+   ============================== */
 
 .no-data {
     text-align: center;
     padding: 40px;
     color: #9ca3af;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* ==============================
+   SCROLLBAR STYLING (Optional)
+   ============================== */
+
+.table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #d6d3d1;
+    border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a29e;
 }

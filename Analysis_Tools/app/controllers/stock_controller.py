@@ -49,6 +49,33 @@ def stock_detail(ticker):
         # Fetch option chain & summary stats
         data = get_stock_detail_data(ticker, selected_date, selected_expiry)
         stats = get_stock_stats(ticker, selected_date, selected_expiry)
+        
+            # ==============================
+        # 🔍 Detect Underlying Price
+        # ==============================
+        underlying = None
+        if data:
+            # Try to find from any CE/PE row
+            for row in data:
+                if "UndrlygPric" in row and row["UndrlygPric"]:
+                    underlying = row["UndrlygPric"]
+                    break
+                elif "UnderlyingValue" in row and row["UnderlyingValue"]:
+                    underlying = row["UnderlyingValue"]
+                    break
+                elif "underlying" in row and row["underlying"]:
+                    underlying = row["underlying"]
+                    break
+            # Fallback — try from stats or average mid CE/PE
+            if not underlying:
+                try:
+                    ce_prices = [r["ClsPric"] for r in data if r.get("OptnTp") == "CE" and r.get("ClsPric")]
+                    pe_prices = [r["ClsPric"] for r in data if r.get("OptnTp") == "PE" and r.get("ClsPric")]
+                    if ce_prices and pe_prices:
+                        underlying = (max(ce_prices) + min(pe_prices)) / 2
+                except Exception:
+                    pass
+
 
         # ==============================
         # 📈 Compute Average IV
@@ -88,7 +115,8 @@ def stock_detail(ticker):
         dates=dates,
         selected_date=selected_date,
         selected_expiry=selected_expiry,
-        chart_data=chart_data  # ✅ JSON data for frontend TradingView charts
+        chart_data=chart_data,  # ✅ JSON data for frontend TradingView charts
+        underlying=underlying  # ✅ Pass to template
     )
 
 
