@@ -1,0 +1,25 @@
+/* ================================================
+   GLOBAL STYLES - POPPINS FONT
+   Applied to entire application
+   ================================================ */
+
+/* Import Poppins font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* Apply Poppins globally */
+* {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure all text elements use Poppins */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, button, input, select, textarea, label,
+table, th, td, li, ul, ol {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+}

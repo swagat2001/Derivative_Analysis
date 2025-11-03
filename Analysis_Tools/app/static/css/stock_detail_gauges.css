@@ -60,8 +60,8 @@
 
 /* Gauge SVG Container */
 .gauge-container {
-  width: 290px;
-  height: 177px;
+  width: 550px;
+  height: 202px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,8 +71,8 @@
 
 /* SVG Gauge Styling */
 .gauge-svg {
-  width: 290px;
-  height: 177px;
+  width: 550px;
+  height: 202px;
   display: block;
 }
 
