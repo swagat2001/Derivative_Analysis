@@ -4,10 +4,11 @@
 
 .chart-section {
     background: white;
-    padding: 20px;
+    padding: 1px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin: 20px 10px;
+    margin: 20px 0;
+    width: 100%;
 }
 
 .section-title {
@@ -21,10 +22,13 @@
 
 .price-chart-container {
     height: 400px;
+    width: 1567px;
     background: #f9fafb;
     border-radius: 6px;
     padding: 10px;
     position: relative;
+    padding-left: 10px;
+    margin-left: 10px;
 }
 
 .chart-loading {
@@ -43,7 +47,6 @@
     width: 30px;
     height: 30px;
     animation: spin 1s linear infinite;
-    margin-right: 10px;
 }
 
 @keyframes spin {

@@ -15,6 +15,7 @@ import pandas as pd
 from urllib.parse import quote_plus
 from datetime import datetime
 
+
 # -------------------------
 # DB engine (same as other models)
 # -------------------------
@@ -125,6 +126,10 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
                 greeks.append('"vega" AS "Vega"')
             elif 'Vega' in cols:
                 greeks.append('"Vega"')
+            if 'iv' in [c.lower() for c in cols]:        # ← ADD THIS LINE
+                greeks.append('"iv" AS "IV"')             # ← ADD THIS LINE
+            elif 'IV' in cols:                            # ← ADD THIS LINE
+                greeks.append('"IV"')                     # ← ADD THIS LINE
 
             greeks_sql = ',\n                    '.join(greeks) if greeks else ''
 
@@ -287,7 +292,14 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
             row['Vega'] = round(float(r.get('Vega')), 4) if 'Vega' in r and pd.notna(r.get('Vega')) else None
             row['Gamma'] = round(float(r.get('Gamma')), 6) if 'Gamma' in r and pd.notna(r.get('Gamma')) else None
             row['Theta'] = round(float(r.get('Theta')), 6) if 'Theta' in r and pd.notna(r.get('Theta')) else None
-            row['IV'] = round(float(r.get('IV')), 4) if 'IV' in r and pd.notna(r.get('IV')) else None
+            # IV conversion - stored as decimal (0.1435), display as percentage (14.35)
+            if 'IV' in r and pd.notna(r.get('IV')):
+                iv_val = float(r.get('IV'))
+                if iv_val < 1:  # Convert decimal to percentage
+                    iv_val = iv_val * 100
+                row['IV'] = round(iv_val, 2)
+            else:
+                row['IV'] = None
 
 
             # previous values
@@ -430,7 +442,8 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
                 SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) AS total_ce_oi,
                 SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) AS total_pe_oi,
                 SUM(CASE WHEN "OptnTp" = 'CE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_ce_oi_chg,
-                SUM(CASE WHEN "OptnTp" = 'PE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_pe_oi_chg
+                SUM(CASE WHEN "OptnTp" = 'PE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_pe_oi_chg,
+                AVG(CASE WHEN "iv" IS NOT NULL AND "OptnTp" IN ('CE','PE') THEN "iv" ELSE NULL END) AS avg_iv
             FROM public."{table_to_use}"
             WHERE {query_filter}
         ''')
@@ -505,7 +518,8 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
             "diff_pe_ce_oi_chg": format_crores(diff_pe_ce_oi_chg),
             "trend_oi": trend_oi,
             "trend_oi_chg": trend_oi_chg,
-            "pcr_oi": round(pcr_oi, 2)
+            "pcr_oi": round(pcr_oi, 2),
+            "avg_iv": round(float(row['avg_iv']), 2) if pd.notna(row.get('avg_iv')) else 0
         }
 
         # Add strikes if available
@@ -525,49 +539,76 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
         return {}
 
 
-def get_stock_chart_data(ticker: str, days: int = 90):
+def get_stock_chart_data(ticker: str, days: int = 40):
     """
-    Fetch OHLC/price history for 'ticker' using base TBL_<TICKER>.
-    Returns list of {date, open, high, low, close} in chronological order (oldest -> newest).
+    Fetch comprehensive historical data: Price + OI + Volume + IV + PCR
+    Returns list of {date, open, high, low, close, oi, volume, iv, pcr}
     """
     try:
+        derived_table = _derived_table_name(ticker)
         base_table = _base_table_name(ticker)
         inspector = inspect(engine)
-        if base_table not in inspector.get_table_names(schema='public'):
-            # fallback: try derived table for date/close columns
-            derived_table = _derived_table_name(ticker)
-            if derived_table not in inspector.get_table_names(schema='public'):
-                return []
-
-            q = text(f'''
-                SELECT "BizDt"::text AS date, "OpnPric" AS open, "HghPric" AS high, "LwPric" AS low, "ClsPric" AS close
-                FROM public."{derived_table}"
-                WHERE "OpnPric" IS NOT NULL
-                ORDER BY "BizDt" DESC
-                LIMIT :days;
-            ''')
-        else:
-            q = text(f'''
-                SELECT "BizDt"::text AS date, "OpnPric" AS open, "HghPric" AS high, "LwPric" AS low, "ClsPric" AS close
-                FROM public."{base_table}"
-                WHERE "OpnPric" IS NOT NULL
-                ORDER BY "BizDt" DESC
-                LIMIT :days;
-            ''')
-
+        
+        # Use derived table if available
+        use_derived = derived_table in inspector.get_table_names(schema='public')
+        table_to_use = derived_table if use_derived else base_table
+        
+        # Single comprehensive query
+        q = text(f'''
+            SELECT
+                "BizDt"::text AS date,
+                MAX("UndrlygPric") AS close,
+                MAX("UndrlygPric") AS open,
+                MAX("UndrlygPric") AS high,
+                MIN("UndrlygPric") AS low,
+                SUM("OpnIntrst") AS oi,
+                SUM("TtlTradgVol") AS volume,
+                AVG(CASE WHEN "iv" IS NOT NULL AND "OptnTp" IN ('CE','PE') THEN "iv" END) AS avg_iv,
+                SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) / 
+                NULLIF(SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END), 0) AS pcr
+            FROM public."{table_to_use}"
+            WHERE "UndrlygPric" IS NOT NULL
+            AND "OptnTp" IN ('CE', 'PE')
+            GROUP BY "BizDt"
+            ORDER BY "BizDt" DESC
+            LIMIT :days
+        ''')
+        
         df = pd.read_sql(q, con=engine, params={"days": days})
+        
         if df.empty:
             return []
-        df = df.sort_values("date")
-        # ensure numeric
-        for col in ["open", "high", "low", "close"]:
+        
+        df = df.sort_values('date')
+        
+        # Ensure numeric types and fill NA with 0
+        for col in ['open', 'high', 'low', 'close', 'oi', 'volume', 'avg_iv', 'pcr']:
             if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-        return df.to_dict(orient='records')
+                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+        
+        # Build result
+        result = []
+        for _, row in df.iterrows():
+            result.append({
+                'date': row['date'],
+                'open': float(row['open']),
+                'high': float(row['high']),
+                'low': float(row['low']),
+                'close': float(row['close']),
+                'oi': int(row['oi']),
+                'volume': int(row['volume']),
+                'iv': round(float(row['avg_iv']) * 100 if row['avg_iv'] < 1 and row['avg_iv'] > 0 else float(row['avg_iv']), 2),
+                'pcr': round(float(row['pcr']), 2)
+            })
+        
+        return result
+        
     except Exception as e:
         print(f"[ERROR] get_stock_chart_data({ticker},{days}): {e}")
+        import traceback
+        traceback.print_exc()
         return []
-
+    
 def get_all_tickers():
     """Get list of all available ticker symbols from database"""
     try:
@@ -579,3 +620,71 @@ def get_all_tickers():
     except Exception as e:
         print(f"[ERROR] get_all_tickers(): {e}")
         return []
+    
+def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = None):
+    """
+    Generate OI chart data for TradingView
+    Returns dictionary with strikes and OI data
+    """
+    try:
+        # Get data
+        data = get_stock_detail_data(ticker, selected_date, selected_expiry)
+        if not data:
+            print(f"[DEBUG] No data for chart: {ticker}, {selected_date}, {selected_expiry}")
+            return None
+        
+        # Organize by strike
+        strikes_dict = {}
+        underlying = None
+        
+        for row in data:
+            strike = row.get('StrkPric')
+            if not strike or pd.isna(strike) or strike <= 0:
+                continue
+                
+            if strike not in strikes_dict:
+                strikes_dict[strike] = {'ce_oi': 0, 'pe_oi': 0, 'ce_oi_chg': 0, 'pe_oi_chg': 0}
+            
+            if row.get('OptnTp') == 'CE':
+                strikes_dict[strike]['ce_oi'] = row.get('OpnIntrst', 0) or 0
+                strikes_dict[strike]['ce_oi_chg'] = row.get('ChngInOpnIntrst', 0) or 0
+            elif row.get('OptnTp') == 'PE':
+                strikes_dict[strike]['pe_oi'] = row.get('OpnIntrst', 0) or 0
+                strikes_dict[strike]['pe_oi_chg'] = row.get('ChngInOpnIntrst', 0) or 0
+            
+            if not underlying and row.get('UndrlygPric'):
+                underlying = row.get('UndrlygPric')
+        
+        if not strikes_dict:
+            print(f"[DEBUG] No strikes_dict built")
+            return None
+        
+        # Prepare data - Filter out NaN strikes
+        strikes = sorted([s for s in strikes_dict.keys() if pd.notna(s) and s > 0])
+        ce_oi = [strikes_dict[s]['ce_oi'] for s in strikes]
+        pe_oi = [strikes_dict[s]['pe_oi'] for s in strikes]
+        ce_oi_chg = [strikes_dict[s]['ce_oi_chg'] for s in strikes]
+        pe_oi_chg = [strikes_dict[s]['pe_oi_chg'] for s in strikes]
+        
+        print(f"[DEBUG] Chart data: {len(strikes)} strikes, underlying={underlying}")
+        
+        # Return JSON-serializable dict for TradingView
+        return {
+            "strikes": [int(s) for s in strikes],
+            "ce_oi": ce_oi,
+            "pe_oi": pe_oi,
+            "ce_oi_chg": ce_oi_chg,
+            "pe_oi_chg": pe_oi_chg,
+            "underlying_price": float(underlying) if underlying else None,
+            "meta": {
+                "ticker": ticker,
+                "expiry": selected_expiry,
+                "date": selected_date
+            }
+        }
+        
+    except Exception as e:
+        print(f"[ERROR] generate_oi_chart: {e}")
+        import traceback
+        traceback.print_exc()
+        return None

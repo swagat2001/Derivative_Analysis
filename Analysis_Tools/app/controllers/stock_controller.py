@@ -6,8 +6,10 @@ from ..models.stock_model import (
     get_stock_detail_data,
     get_stock_expiry_data,
     get_stock_stats,
-    get_stock_chart_data
+    get_stock_chart_data,
+    generate_oi_chart
 )
+import json
 
 stock_bp = Blueprint('stock', __name__)
 
@@ -17,50 +19,65 @@ def stock_detail(ticker):
     Stock detail page with server-side filtering
     Query params: date, expiry
     """
-    # Get all available dates and tickers
+
+    # ==============================
+    # 📅 Fetch all available dates and symbols
+    # ==============================
     dates = get_available_dates()
     all_symbols = get_all_tickers()
-    
-    # Get parameters from query string or use defaults
+
+    # ==============================
+    # 🧭 Determine selected date and expiry
+    # ==============================
     selected_date = request.args.get('date', dates[0] if dates else None)
-    selected_expiry = request.args.get('expiry', None)  # Will be set later if None
+    selected_expiry = request.args.get('expiry', None)
 
     data = []
     expiry_data = []
     stats = {}
 
     if selected_date:
-        # Get expiry summary first (used by stock_detail_expiry.html)
+        # ==============================
+        # 📘 Expiry data for left panel
+        # ==============================
         expiry_data = get_stock_expiry_data(ticker, selected_date)
-        
-        # If no expiry specified in URL, use first/nearest expiry
+
+        # Auto-select first expiry if none chosen
         if not selected_expiry and expiry_data and len(expiry_data) > 0:
             selected_expiry = expiry_data[0]['expiry']
-        
-        # Detailed option chain rows - filtered by selected expiry
-        data = get_stock_detail_data(ticker, selected_date, selected_expiry)
 
-        # Aggregated stats / gauges for the selected expiry
+        # Fetch option chain & summary stats
+        data = get_stock_detail_data(ticker, selected_date, selected_expiry)
         stats = get_stock_stats(ticker, selected_date, selected_expiry)
-        
-        # Calculate average IV from option chain data if available
+
+        # ==============================
+        # 📈 Compute Average IV
+        # ==============================
         if data:
-            iv_values = []
-            for row in data:
-                if row.get('IV') is not None and row['IV'] > 0:
-                    iv_values.append(row['IV'])
-            
+            iv_values = [row.get('IV') for row in data if row.get('IV') and row['IV'] > 0]
             if iv_values:
                 avg_iv = sum(iv_values) / len(iv_values)
-                # Scale if in 0-1 range
                 if avg_iv < 1:
-                    avg_iv = avg_iv * 100
+                    avg_iv *= 100
                 stats['avg_iv'] = round(avg_iv, 2)
             else:
                 stats['avg_iv'] = 0
         else:
             stats['avg_iv'] = 0
 
+    # ==============================
+    # 🧠 Generate OI Chart Data (TradingView format)
+    # ==============================
+    chart_data = None
+    if selected_date and selected_expiry:
+        oi_chart_dict = generate_oi_chart(ticker, selected_date, selected_expiry)
+        if oi_chart_dict:
+            # Convert to JSON for frontend
+            chart_data = json.dumps(oi_chart_dict)
+
+    # ==============================
+    # 🎨 Render Template
+    # ==============================
     return render_template(
         'stock_detail.html',
         ticker=ticker,
@@ -70,11 +87,14 @@ def stock_detail(ticker):
         stats=stats,
         dates=dates,
         selected_date=selected_date,
-        selected_expiry=selected_expiry
+        selected_expiry=selected_expiry,
+        chart_data=chart_data  # ✅ JSON data for frontend TradingView charts
     )
 
 
-# API endpoint used by stock_detail_chart.html fetch(`/api/stock-chart/${ticker}?days=90`)
+# ==============================
+# 📈 API endpoint for mini stock chart (price data)
+# ==============================
 @stock_bp.route('/api/stock-chart/<ticker>')
 def api_stock_chart(ticker):
     days = int(request.args.get('days', 90))

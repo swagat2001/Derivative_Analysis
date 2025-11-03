@@ -1,5 +1,6 @@
 <!-- ==============================
      STOCK DETAIL CHART COMPONENT
+     Multi-Panel: Price, OI, Volume, IV, PCR
      ============================== -->
 <div class="chart-section">
     <h3 class="section-title">📈 Price History (Last 90 Days)</h3>
@@ -11,10 +12,10 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
-// Load price chart
+// Load comprehensive chart data
 document.addEventListener('DOMContentLoaded', function() {
     const ticker = '{{ ticker }}';
     const chartContainer = document.getElementById('priceChart');
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(result => {
             if (result.success && result.data.length > 0) {
-                renderPriceChart(result.data);
+                renderComprehensiveChart(result.data);
             } else {
                 chartContainer.innerHTML = '<div class="no-data-message">No price data available</div>';
             }
@@ -35,49 +36,172 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });
 
-function renderPriceChart(data) {
+function renderComprehensiveChart(data) {
     const container = document.getElementById('priceChart');
-    container.innerHTML = '';
+    container.innerHTML = '<canvas id="mainChart"></canvas>';
     
-    const chart = LightweightCharts.createChart(container, {
-        layout: {
-            background: { color: '#ffffff' },
-            textColor: '#333',
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    
+    // Sort data by date
+    const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // Extract data
+    const labels = sortedData.map(d => d.date);
+    const prices = sortedData.map(d => d.close);
+    const oi = sortedData.map(d => d.oi || 0);
+    const volume = sortedData.map(d => d.volume || 0);
+    const iv = sortedData.map(d => d.iv || 0);
+    const pcr = sortedData.map(d => d.pcr || 0);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Price',
+                    data: prices,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.1,
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Open Interest',
+                    data: oi,
+                    borderColor: '#059669',
+                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    hidden: true,
+                },
+                {
+                    label: 'Volume',
+                    data: volume,
+                    borderColor: '#d97706',
+                    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                    yAxisID: 'y2',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    hidden: true,
+                },
+                {
+                    label: 'IV',
+                    data: iv,
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    yAxisID: 'y3',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    hidden: true,
+                },
+                {
+                    label: 'PCR',
+                    data: pcr,
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    yAxisID: 'y4',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    hidden: true,
+                }
+            ]
         },
-        grid: {
-            vertLines: { color: '#e5e7eb' },
-            horzLines: { color: '#e5e7eb' },
-        },
-        width: container.clientWidth,
-        height: 380,
-        timeScale: {
-            timeVisible: true,
-            secondsVisible: false,
-        },
-    });
-    
-    const candlestickSeries = chart.addCandlestickSeries({
-        upColor: '#059669',
-        downColor: '#dc2626',
-        borderUpColor: '#059669',
-        borderDownColor: '#dc2626',
-        wickUpColor: '#059669',
-        wickDownColor: '#dc2626',
-    });
-    
-    const chartData = data.map(point => ({
-        time: point.date,
-        open: point.open,
-        high: point.high,
-        low: point.low,
-        close: point.close
-    })).sort((a, b) => new Date(a.time) - new Date(b.time));
-    
-    candlestickSeries.setData(chartData);
-    chart.timeScale().fitContent();
-    
-    window.addEventListener('resize', () => {
-        chart.applyOptions({ width: container.clientWidth });
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    onClick: function(e, legendItem, legend) {
+                        const index = legendItem.datasetIndex;
+                        const chart = legend.chart;
+                        const meta = chart.getDatasetMeta(index);
+                        meta.hidden = !meta.hidden;
+                        chart.update();
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-IN').format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Price',
+                        color: '#2563eb'
+                    },
+                    ticks: {
+                        color: '#2563eb'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: false,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'OI'
+                    }
+                },
+                y2: {
+                    type: 'linear',
+                    display: false,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Volume'
+                    }
+                },
+                y3: {
+                    type: 'linear',
+                    display: false,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'IV'
+                    }
+                },
+                y4: {
+                    type: 'linear',
+                    display: false,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'PCR'
+                    }
+                }
+            }
+        }
     });
 }
 </script>

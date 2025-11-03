@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_chart.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_option_chain.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_gauges.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_oi_charts.css') }}">
 
 <!-- ============================= -->
 <!-- 🌐 Universal Header -->
@@ -39,22 +40,27 @@
 
   {% if data %}
 
-  <!-- 🧱 Top Section (Expiry Summary + Gauges + Stats) -->
-  <div class="top-section">
+  <!-- 🧱 Main Grid Layout: Expiry Table + Stats (Left) | Gauges (Right) -->
+  <div class="main-grid">
     
-    <!-- 📅 Left Column: Expiry Summary -->
-    <div class="top-card left-column">
-      {% include 'stock_detail_expiry.html' %}
+    <!-- LEFT SIDE: Expiry Table + Stats Stacked -->
+    <div class="left-side">
+      <!-- 📅 Expiry Summary Table -->
+      <div class="card">
+        {% include 'stock_detail_expiry.html' %}
+      </div>
+      
+      <!-- 📊 Stats Table -->
+      <div class="card">
+        {% include 'stock_detail_stats.html' %}
+      </div>
     </div>
 
-    <!-- ⚙️ Middle Column: Gauges + Metrics -->
-    <div class="top-card middle-column">
-      {% include 'stock_detail_gauges.html' %}
-    </div>
-
-    <!-- 📊 Right Column: Key Statistics -->
-    <div class="top-card right-column">
-      {% include 'stock_detail_stats.html' %}
+    <!-- RIGHT SIDE: Gauges -->
+    <div class="right-side">
+      <div class="card">
+        {% include 'stock_detail_gauges.html' %}
+      </div>
     </div>
   </div>
 
@@ -63,6 +69,8 @@
 
   <!-- 📘 Option Chain Table -->
   {% include 'stock_detail_option_chain.html' %}
+
+  {% include 'stock_detail_oi_charts.html' %}
 
   {% else %}
   <p class="no-data">No stock details found for {{ ticker }} on {{ selected_date }}</p>

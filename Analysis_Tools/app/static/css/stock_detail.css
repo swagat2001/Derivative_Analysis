@@ -3,345 +3,54 @@
 /* ============================ */
 
 .stock-detail-container {
-    padding-top: 0px; /* Prevent overlap with fixed header */
+    padding: 20px;
     max-width: 1600px;
     margin: 0 auto;
 }
 
-/* Page Title */
-.stock-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
 /* ============================ */
-/* DATE SELECTOR */
+/* MAIN GRID LAYOUT */
 /* ============================ */
 
-.date-selector {
-    margin: 1px 0;
-    padding: 0px;
-    background: white;
-    border-radius: 2px;
-    box-shadow: 0 1px 30px rgba(0, 0, 0, 0.1);
+.main-grid {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    gap: 20px;
+    margin-bottom: 30px;
+    align-items: start;
 }
 
-.date-form {
+.left-side {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    
 }
 
-.date-label {
-    font-weight: 600;
-    font-size: 14px;
-    color: #374151;
+.right-side {
+    display: flex;
 }
 
-.date-select {
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 14px;
-    min-width: 150px;
-    cursor: pointer;
-}
-
-.date-select:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-}
-
-.btn-load {
-    padding: 8px 20px;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.btn-load:hover {
-    background: #1d4ed8;
-}
-
-/* ============================ */
-/* GRID LAYOUT (Expiry + Gauges + Stats) */
-/* ============================ */
-
-.top-section {
-    display: grid !important;
-    grid-template-columns: 1.5fr 0.8fr 1.5fr !important; /* Expiry | Gauges(smaller) | Stats */
-    gap: 15px !important;
-    margin: 20px 10px !important;
-    align-items: stretch !important;
-}
-
-/* Common Card Styling */
-.top-card,
-.left-column,
-.middle-column,
-.right-column {
-    background: #ffffff !important;
-    border-radius: 10px !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-    padding: 16px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    transition: all 0.25s ease-in-out !important;
-}
-
-/* Left: Expiry Summary */
-.left-column {
-    overflow: auto !important;
-    justify-content: flex-start !important;
-}
-
-/* Middle: Gauges Column */
-.middle-column {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    justify-content: space-between !important;
-}
-
-/* Right: Stats */
-.right-column {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    justify-content: space-between !important;
-}
-
-/* Equal Height Columns */
-.top-section > div {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-}
-
-/* Hover Elevation */
-.top-card:hover,
-.left-column:hover,
-.middle-column:hover,
-.right-column:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Responsive Grid */
-@media (max-width: 1200px) {
-    .top-section {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ============================ */
-/* TABLE WRAPPER */
-/* ============================ */
-
-.table-wrapper {
+.card {
     background: white;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-    margin-top: 20px;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
-/* ============================ */
-/* OPTION CHAIN TABLE */
-/* ============================ */
-
-.option-chain-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11px;
-}
-
-.option-chain-table thead {
-    background-color: #374151;
-    color: white;
-    position: sticky;
-    top: 0px;
-    z-index: 10;
-}
-
-.option-chain-table th {
-    padding: 10px 8px;
-    text-align: center;
-    font-weight: 600;
-    border: 1px solid #4b5563;
-    white-space: nowrap;
-    font-size: 11px;
-}
-
-/* Header group colors */
-.current-header {
-    background-color: #4b5563;
-}
-
-.greek-header {
-    background-color: #1e40af;
-}
-
-.prev-header {
-    background-color: #b45309;
-}
-
-/* Column headers */
-.greek-col {
-    background-color: #2563eb;
-}
-
-.prev-col {
-    background-color: #d97706;
-}
-
-/* ============================ */
-/* TABLE BODY */
-/* ============================ */
-
-.option-chain-table tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-}
-
-.option-chain-table tbody tr:hover {
-    background-color: #dbeafe;
-    transition: background-color 0.2s;
-}
-
-.option-chain-table td {
-    padding: 8px 6px;
-    text-align: center;
-    border: 1px solid #e5e7eb;
-    font-size: 11px;
-}
-
-/* ============================ */
-/* CALL AND PUT STYLING */
-/* ============================ */
-
-.call-row {
-    border-left: 3px solid #10b981;
-}
-
-.put-row {
-    border-left: 3px solid #ef4444;
-}
-
-.call-type {
-    background-color: #d1fae5;
-    color: #065f46;
-    font-weight: 700;
-}
-
-.put-type {
-    background-color: #fee2e2;
-    color: #991b1b;
-    font-weight: 700;
-}
-
-/* ============================ */
-/* SPECIAL CELLS */
-/* ============================ */
-
-.strike-cell {
-    font-weight: 600;
-    background-color: #fef3c7;
-    color: #92400e;
-}
-
-.num-cell {
-    text-align: right;
-    font-family: 'Courier New', monospace;
-}
-
-/* Greeks cells styling */
-.greek-cell {
-    background-color: #eff6ff;
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    color: #1e40af;
-}
-
-/* Previous day cells styling */
-.prev-cell {
-    background-color: #fffbeb;
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    color: #92400e;
-}
-
-/* ============================ */
-/* POSITIVE/NEGATIVE CHANGES */
-/* ============================ */
-
-.positive {
-    color: #065f46 !important;
-    font-weight: 700;
-}
-
-.negative {
-    color: #991b1b !important;
-    font-weight: 700;
-}
-
-/* ============================ */
-/* NO DATA MESSAGE */
-/* ============================ */
 
 .no-data {
     text-align: center;
-    padding: 60px 20px;
-    color: #6b7280;
-    font-size: 16px;
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+    padding: 60px;
+    color: #999;
+    font-size: 18px;
 }
 
 /* ============================ */
 /* RESPONSIVE DESIGN */
 /* ============================ */
 
-@media (max-width: 1024px) {
-    .stock-detail-container {
-        padding: 10px;
-        margin-top: 70px;
+@media (max-width: 1200px) {
+    .main-grid {
+        grid-template-columns: 1fr;
     }
-
-    .option-chain-table {
-        font-size: 10px;
-    }
-
-    .option-chain-table th {
-        padding: 6px 4px;
-        font-size: 10px;
-    }
-
-    .option-chain-table td {
-        padding: 6px 4px;
-        font-size: 10px;
-    }
-}
-.top-section {
-  align-items: stretch;
-}
-
-.left-column,
-.middle-column,
-.right-column {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
 }
