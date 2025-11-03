@@ -97,28 +97,68 @@
 }
 
 /* ==============================
-   🎯 ATM ROW — FULL SOLID YELLOW (iCharts Style)
+   🎯 ATM ROW — SOLID YELLOW DIVIDER
    ============================== */
 
 .atm-row {
-    background: #f5eab6 !important; /* soft solid yellow */
+    background: #f5eab6 !important;
     font-weight: 600;
-    border-top: 1px solid #e0c85b;
-    border-bottom: 1px solid #e0c85b;
+    border-top: 1px dashed #ffdd89;
+    border-bottom: 1px dashed #ffdd89;
+    transition: background 0.3s ease;
 }
 
-/* ATM Strike Cell — darker yellow with bold white text */
 .atm-strike {
-    background: #fbbf24 !important;
+    background: #ffdd89 !important;
     color: #fff !important;
     font-weight: 800;
-    border-left: 3px solid #fbbf24;
-    border-right: 3px solid #fbbf24;
+    border-left: 3px solid #ffdd89;
+    border-right: 3px solid #ffdd89;
 }
 
-/* Hover — slightly brighter to show interactivity */
 .atm-row:hover {
     background: #f9e98c !important;
+}
+
+/* ==============================
+   🎨 OTM / ITM ZONE LOGIC (Symmetric)
+   ============================== */
+
+/* ✅ Above ATM — Calls are OTM (gray), Puts are ITM (white) */
+.otm-call td.ce-td {
+    background: #bbbfc7 !important; /* gray */
+    color: #374151 !important;
+}
+.otm-call td.pe-td {
+    background: #ffffff !important; /* white */
+    color: #111827 !important;
+}
+
+/* ✅ Below ATM — Calls are ITM (white), Puts are OTM (gray) */
+.otm-put td.ce-td {
+    background: #ffffff !important; /* white */
+    color: #111827 !important;
+}
+.otm-put td.pe-td {
+    background: #bbbfc7 !important; /* gray */
+    color: #374151 !important;
+}
+
+/* Keep ATM row isolated */
+.atm-row td {
+    background: #f5eab6 !important;
+}
+.atm-row td.strike-td {
+    background: #ffdd89 !important;
+    color: #fff !important;
+}
+
+/* Smooth transitions */
+.otm-call td.ce-td,
+.otm-put td.pe-td,
+.otm-call td.pe-td,
+.otm-put td.ce-td {
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* ==============================
@@ -126,12 +166,12 @@
    ============================== */
 
 .pos {
-    color: #22c55e !important; /* Green for positive OI change */
+    color: #22c55e !important;
     font-weight: 700;
 }
 
 .neg {
-    color: #ef4444 !important; /* Red for negative OI change */
+    color: #ef4444 !important;
     font-weight: 700;
 }
 
@@ -148,7 +188,7 @@
 }
 
 /* ==============================
-   SCROLLBAR STYLING (Optional)
+   SCROLLBAR STYLING
    ============================== */
 
 .table-container::-webkit-scrollbar {

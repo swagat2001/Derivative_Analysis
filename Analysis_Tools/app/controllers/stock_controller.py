@@ -49,33 +49,39 @@ def stock_detail(ticker):
         # Fetch option chain & summary stats
         data = get_stock_detail_data(ticker, selected_date, selected_expiry)
         stats = get_stock_stats(ticker, selected_date, selected_expiry)
-        
-            # ==============================
+
+        # ==============================
         # 🔍 Detect Underlying Price
         # ==============================
         underlying = None
         if data:
-            # Try to find from any CE/PE row
             for row in data:
-                if "UndrlygPric" in row and row["UndrlygPric"]:
+                if row.get("UndrlygPric"):
                     underlying = row["UndrlygPric"]
                     break
-                elif "UnderlyingValue" in row and row["UnderlyingValue"]:
+                elif row.get("UnderlyingValue"):
                     underlying = row["UnderlyingValue"]
                     break
-                elif "underlying" in row and row["underlying"]:
+                elif row.get("underlying"):
                     underlying = row["underlying"]
                     break
-            # Fallback — try from stats or average mid CE/PE
-            if not underlying:
-                try:
-                    ce_prices = [r["ClsPric"] for r in data if r.get("OptnTp") == "CE" and r.get("ClsPric")]
-                    pe_prices = [r["ClsPric"] for r in data if r.get("OptnTp") == "PE" and r.get("ClsPric")]
-                    if ce_prices and pe_prices:
-                        underlying = (max(ce_prices) + min(pe_prices)) / 2
-                except Exception:
-                    pass
 
+        # Safely clean underlying string (e.g. "5,298.00 ")
+        if underlying:
+            try:
+                underlying = float(str(underlying).replace(",", "").strip())
+            except Exception:
+                underlying = None
+
+        # ==============================
+        # 🎯 Find ATM Strike (Closest to Underlying)
+        # ==============================
+        atm = None
+        if data and underlying:
+            strike_prices = sorted({float(row["StrkPric"]) for row in data if row.get("StrkPric")})
+            if strike_prices:
+                # Find strike with smallest distance from underlying
+                atm = min(strike_prices, key=lambda x: abs(x - underlying))
 
         # ==============================
         # 📈 Compute Average IV
@@ -93,13 +99,12 @@ def stock_detail(ticker):
             stats['avg_iv'] = 0
 
     # ==============================
-    # 🧠 Generate OI Chart Data (TradingView format)
+    # 🧠 Generate OI Chart Data
     # ==============================
     chart_data = None
     if selected_date and selected_expiry:
         oi_chart_dict = generate_oi_chart(ticker, selected_date, selected_expiry)
         if oi_chart_dict:
-            # Convert to JSON for frontend
             chart_data = json.dumps(oi_chart_dict)
 
     # ==============================
@@ -115,8 +120,9 @@ def stock_detail(ticker):
         dates=dates,
         selected_date=selected_date,
         selected_expiry=selected_expiry,
-        chart_data=chart_data,  # ✅ JSON data for frontend TradingView charts
-        underlying=underlying  # ✅ Pass to template
+        chart_data=chart_data,
+        underlying=underlying,  # ✅ numeric float
+        atm=atm,                # ✅ correct closest strike
     )
 
 

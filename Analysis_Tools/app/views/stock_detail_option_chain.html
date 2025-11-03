@@ -6,7 +6,6 @@
 
   {% if data %}
   <div class="table-container">
-    {# ✅ Debug line — shows detected values #}
     <p style="margin:8px 0;font-size:13px;color:#6b7280;">
       ⚙️ Underlying: <b>{{ underlying if underlying else 'N/A' }}</b> |
       🎯 ATM Strike: <b>{{ atm if atm else 'N/A' }}</b>
@@ -28,7 +27,6 @@
       </thead>
       <tbody>
         {% set strikes = {} %}
-        {% set underlying = None %}
 
         {# ===============================
            MAP CE / PE BY STRIKE
@@ -38,56 +36,35 @@
             {% if row.StrkPric not in strikes %}
               {% set _ = strikes.update({row.StrkPric: {}}) %}
             {% endif %}
-
             {% if row.OptnTp == 'CE' %}
               {% set _ = strikes[row.StrkPric].update({'ce': row}) %}
             {% elif row.OptnTp == 'PE' %}
               {% set _ = strikes[row.StrkPric].update({'pe': row}) %}
             {% endif %}
-
-            {# Detect underlying value if not already set #}
-            {% if not underlying %}
-              {% if row.UndrlygPric %}
-                {% set underlying = row.UndrlygPric|float %}
-              {% elif row.UnderlyingValue %}
-                {% set underlying = row.UnderlyingValue|float %}
-              {% elif row.underlying %}
-                {% set underlying = row.underlying|float %}
-              {% endif %}
-            {% endif %}
           {% endif %}
         {% endfor %}
 
         {# ===============================
-           FIND ATM STRIKE CLOSEST TO UNDERLYING
-           OR FALLBACK TO MID STRIKE
-           =============================== #}
-        {% set atm = None %}
-        {% if underlying %}
-          {% set min_diff = 999999 %}
-          {% for s in strikes.keys() %}
-            {% set diff = (s|float - underlying)|abs %}
-            {% if diff < min_diff %}
-              {% set min_diff = diff %}
-              {% set atm = s %}
-            {% endif %}
-          {% endfor %}
-        {% else %}
-          {# fallback: pick middle strike if underlying not found #}
-          {% set sorted_strikes = strikes.keys()|list|sort %}
-          {% set atm = sorted_strikes[(sorted_strikes|length // 2)] %}
-        {% endif %}
-
-        {# ===============================
            RENDER TABLE ROWS
            =============================== #}
-        {% for strike in strikes.keys()|sort %}
+        {% for strike in strikes.keys()|list|sort %}
           {% set ce = strikes[strike].get('ce') %}
           {% set pe = strikes[strike].get('pe') %}
           {% set strike_val = strike|float %}
           {% set atm_val = atm|float %}
 
-          <tr class="{% if (strike_val - atm_val)|abs < 0.1 %}atm-row{% endif %}">
+          <tr
+            class="
+              {% if strike_val == atm_val %}
+                atm-row
+              {% elif strike_val > atm_val %}
+                otm-call
+              {% elif strike_val < atm_val %}
+                otm-put
+              {% endif %}
+            "
+          >
+            <!-- CE IV -->
             <td class="ce-td">
               {% if ce %}
                 {% if ce.IV %}{{ "%.2f"|format(ce.IV) }}
@@ -96,6 +73,7 @@
               {% else %}-{% endif %}
             </td>
 
+            <!-- CE OI Change -->
             <td class="ce-td {% if ce and ce.ChngInOpnIntrst %}{% if ce.ChngInOpnIntrst > 0 %}pos{% elif ce.ChngInOpnIntrst < 0 %}neg{% endif %}{% endif %}">
               {% if ce and ce.ChngInOpnIntrst %}
                 {% set v = ce.ChngInOpnIntrst %}
@@ -106,6 +84,7 @@
               {% else %}-{% endif %}
             </td>
 
+            <!-- CE OI -->
             <td class="ce-td">
               {% if ce and ce.OpnIntrst %}
                 {% set v = ce.OpnIntrst %}
@@ -116,14 +95,16 @@
               {% else %}-{% endif %}
             </td>
 
+            <!-- CE Price -->
             <td class="ce-td">{% if ce and ce.ClsPric %}{{ "%.2f"|format(ce.ClsPric) }}{% else %}-{% endif %}</td>
 
-            <td class="strike-td {% if (strike_val - atm_val)|abs < 0.1 %}atm-strike{% endif %}">
-              {{ strike|int }}
-            </td>
+            <!-- Strike -->
+            <td class="strike-td {% if strike_val == atm_val %}atm-strike{% endif %}">{{ strike|int }}</td>
 
+            <!-- PE Price -->
             <td class="pe-td">{% if pe and pe.ClsPric %}{{ "%.2f"|format(pe.ClsPric) }}{% else %}-{% endif %}</td>
 
+            <!-- PE OI -->
             <td class="pe-td">
               {% if pe and pe.OpnIntrst %}
                 {% set v = pe.OpnIntrst %}
@@ -134,6 +115,7 @@
               {% else %}-{% endif %}
             </td>
 
+            <!-- PE OI Change -->
             <td class="pe-td {% if pe and pe.ChngInOpnIntrst %}{% if pe.ChngInOpnIntrst > 0 %}pos{% elif pe.ChngInOpnIntrst < 0 %}neg{% endif %}{% endif %}">
               {% if pe and pe.ChngInOpnIntrst %}
                 {% set v = pe.ChngInOpnIntrst %}
@@ -144,6 +126,7 @@
               {% else %}-{% endif %}
             </td>
 
+            <!-- PE IV -->
             <td class="pe-td">
               {% if pe %}
                 {% if pe.IV %}{{ "%.2f"|format(pe.IV) }}
