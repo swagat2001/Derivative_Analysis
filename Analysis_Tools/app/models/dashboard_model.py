@@ -1,6 +1,7 @@
 # =============================================================
 #  DASHBOARD MODEL MODULE (Flask MVC - Model Layer)
 #  Purpose: Loads pre-calculated dashboard data for TOTAL / OTM / ITM views
+#  Filters stocks based on stock list.xlsx
 # =============================================================
 
 from sqlalchemy import create_engine, text
@@ -42,16 +43,31 @@ def get_available_dates():
         return []
 
 # =============================================================
-# 2️⃣ DASHBOARD DATA (TOTAL / OTM / ITM)
+# 2️⃣ DASHBOARD DATA (TOTAL / OTM / ITM) with Excel Filter
 # =============================================================
 
 def get_dashboard_data(selected_date, mtype="TOTAL"):
     """
     Loads pre-calculated dashboard data from options_dashboard_cache
     for given date and moneyness_type.
-    Each record's data_json column contains serialized dashboard rows.
+    Filters stocks based on stock list.xlsx
     """
     try:
+        # Load allowed stocks from Excel
+        excel_path = r"C:\Users\Admin\Desktop\Derivative_Analysis\stock list.xlsx"
+        allowed_stocks = []
+        
+        try:
+            stock_df = pd.read_excel(excel_path)
+            # Try column 'A' first, then first column
+            if 'A' in stock_df.columns:
+                allowed_stocks = [str(s).strip().upper() for s in stock_df['A'].dropna().tolist()]
+            elif stock_df.shape[1] > 0:
+                allowed_stocks = [str(s).strip().upper() for s in stock_df.iloc[:, 0].dropna().tolist()]
+            print(f"[INFO] Loaded {len(allowed_stocks)} stocks from Excel filter")
+        except Exception as e:
+            print(f"[WARNING] Could not load stock list Excel: {e}. Showing all stocks.")
+        
         query = text("""
             SELECT data_json
             FROM options_dashboard_cache
@@ -74,15 +90,21 @@ def get_dashboard_data(selected_date, mtype="TOTAL"):
 
         # Data should be a list of dicts
         if isinstance(parsed, dict):
-            # If nested dict, extract table key
             parsed = parsed.get("data", [])
         elif not isinstance(parsed, list):
             return []
 
-        # Convert to DataFrame for any column-level cleanup if needed
+        # Convert to DataFrame
         dashboard_df = pd.DataFrame(parsed)
 
-        # (Optional) Standardize column naming for dashboard_table.html
+        # Filter by allowed stocks from Excel
+        if allowed_stocks and 'stock' in dashboard_df.columns:
+            dashboard_df['stock_upper'] = dashboard_df['stock'].str.strip().str.upper()
+            dashboard_df = dashboard_df[dashboard_df['stock_upper'].isin(allowed_stocks)]
+            dashboard_df = dashboard_df.drop(columns=['stock_upper'])
+            print(f"[INFO] Filtered to {len(dashboard_df)} stocks from Excel list")
+
+        # Standardize column naming
         rename_map = {
             "stock": "stock",
             "call_delta_pos_strike": "call_delta_pos_strike",

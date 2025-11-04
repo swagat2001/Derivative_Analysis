@@ -126,22 +126,24 @@
 
 /* ✅ Above ATM — Calls are OTM (gray), Puts are ITM (white) */
 .otm-call td.ce-td {
-    background: #bbbfc7 !important; /* gray */
-    color: #374151 !important;
-}
-.otm-call td.pe-td {
     background: #ffffff !important; /* white */
     color: #111827 !important;
 }
+.otm-call td.pe-td {
+    background: #bbbfc7 !important; /* gray */
+    color: #374151 !important;
+}
+
 
 /* ✅ Below ATM — Calls are ITM (white), Puts are OTM (gray) */
 .otm-put td.ce-td {
-    background: #ffffff !important; /* white */
-    color: #111827 !important;
-}
-.otm-put td.pe-td {
     background: #bbbfc7 !important; /* gray */
     color: #374151 !important;
+    
+}
+.otm-put td.pe-td {
+    background: #ffffff !important; /* white */
+    color: #111827 !important;
 }
 
 /* Keep ATM row isolated */
