@@ -78,6 +78,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const chart = LightweightCharts.createChart(block, baseOptions);
 
+    // Calculate max value for bar height
+    const maxValue = Math.max(...ceData.map(d => d.value), ...peData.map(d => d.value));
+
     // Series
     const ceSeries = chart.addHistogramSeries({ color: legendItems[2].color });
     const peSeries = chart.addHistogramSeries({ color: legendItems[3].color });
@@ -98,58 +101,52 @@ document.addEventListener("DOMContentLoaded", function () {
     maxCELine.setData([maxCE]);
     maxPELine.setData([maxPE]);
 
-    // ✅ Add Underlying Price Line
-    let underlyingLineSeries = null;
+    // ✅ Add Underlying Price Bar (HistogramSeries)
+    let underlyingBarSeries = null;
+    let underlyingBarIndex = null;
+    const spotColor = '#FF9800';
     if (underlyingPrice) {
       const underlyingIndex = findClosestStrikeIndex(underlyingPrice);
       if (underlyingIndex !== null) {
-        underlyingLineSeries = chart.addLineSeries({
-          color: '#FF9800',
-          lineWidth: 3,
-          lineStyle: 0,
-          priceLineVisible: false,
-          lastValueVisible: false
+        underlyingBarIndex = underlyingIndex;
+        underlyingBarSeries = chart.addHistogramSeries({ 
+          color: spotColor,
+          priceFormat: { type: 'price', precision: 0, minMove: 1 }
         });
-        const maxValue = Math.max(...ceData.map(d => d.value), ...peData.map(d => d.value));
-        underlyingLineSeries.setData([{ time: underlyingIndex, value: maxValue * 1.05 }]);
-        
-        underlyingLineSeries.setMarkers([{
-          time: underlyingIndex,
-          position: 'aboveBar',
-          color: '#FF9800',
-          shape: 'arrowDown',
-          text: `Spot: ${underlyingPrice.toFixed(0)}`
+        // Create a single bar at the strike position with height matching max OI
+        underlyingBarSeries.setData([{ 
+          time: underlyingIndex, 
+          value: maxValue 
         }]);
       }
     }
 
-    // ✅ Add Futures Expiry Lines (3 lines)
+    // ✅ Add Futures Expiry Bars (HistogramSeries) - 3 bars
     const futuresColors = ['#2196F3', '#9C27B0', '#4CAF50'];
-    const futuresLineSeries = [];
+    const futuresBarSeries = [];
+    const futuresBarIndices = [];
     futuresPrices.forEach((future, idx) => {
       if (future.price) {
         const futureIndex = findClosestStrikeIndex(future.price);
         if (futureIndex !== null) {
-          const futureLine = chart.addLineSeries({
+          futuresBarIndices.push(futureIndex);
+          const futureBar = chart.addHistogramSeries({ 
             color: futuresColors[idx],
-            lineWidth: 2,
-            lineStyle: 2,
-            priceLineVisible: false,
-            lastValueVisible: false
+            priceFormat: { type: 'price', precision: 0, minMove: 1 }
           });
-          const maxValue = Math.max(...ceData.map(d => d.value), ...peData.map(d => d.value));
-          futureLine.setData([{ time: futureIndex, value: maxValue * 1.05 }]);
-          
-          futureLine.setMarkers([{
-            time: futureIndex,
-            position: 'belowBar',
-            color: futuresColors[idx],
-            shape: 'arrowUp',
-            text: `F${idx + 1}: ${future.price.toFixed(0)}`
+          // Create a single bar at the strike position with height matching max OI
+          futureBar.setData([{ 
+            time: futureIndex, 
+            value: maxValue 
           }]);
-          
-          futuresLineSeries.push(futureLine);
+          futuresBarSeries.push(futureBar);
+        } else {
+          futuresBarIndices.push(null);
+          futuresBarSeries.push(null);
         }
+      } else {
+        futuresBarIndices.push(null);
+        futuresBarSeries.push(null);
       }
     });
 
@@ -161,10 +158,34 @@ document.addEventListener("DOMContentLoaded", function () {
     titleLabel.innerText = title;
     block.appendChild(titleLabel);
 
+    // ✅ Build extended legend items (original + spot + futures)
+    const extendedLegendItems = [...legendItems];
+    
+    // Add Spot legend item
+    if (underlyingPrice && underlyingBarSeries) {
+      extendedLegendItems.push({
+        key: 'spot',
+        label: `Spot: ${underlyingPrice.toFixed(0)}`,
+        color: spotColor
+      });
+    }
+
+    // Add Futures legend items
+    futuresPrices.forEach((future, idx) => {
+      if (future.price && futuresBarSeries[idx] !== null && futuresBarSeries[idx] !== undefined) {
+        const expiryDate = future.expiry ? new Date(future.expiry).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+        extendedLegendItems.push({
+          key: `f${idx + 1}`,
+          label: `F${idx + 1}: ${future.price.toFixed(0)}${expiryDate ? ` (${expiryDate})` : ''}`,
+          color: futuresColors[idx]
+        });
+      }
+    });
+
     // Legend
     const legend = document.createElement("div");
     legend.className = "chart-inline-legend";
-    legendItems.forEach((item) => {
+    extendedLegendItems.forEach((item) => {
       const el = document.createElement("div");
       el.className = "legend-item active";
       el.dataset.key = item.key;
@@ -173,15 +194,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     block.appendChild(legend);
 
+    // ✅ Build series map including spot and futures bars
+    const seriesMap = { 
+      maxCE: maxCELine, 
+      maxPE: maxPELine, 
+      ce: ceSeries, 
+      pe: peSeries 
+    };
+    
+    if (underlyingBarSeries) {
+      seriesMap['spot'] = underlyingBarSeries;
+    }
+    
+    futuresBarSeries.forEach((bar, idx) => {
+      if (bar) {
+        seriesMap[`f${idx + 1}`] = bar;
+      }
+    });
+
     // Legend toggle
-    const seriesMap = { maxCE: maxCELine, maxPE: maxPELine, ce: ceSeries, pe: peSeries };
     legend.querySelectorAll(".legend-item").forEach((item) => {
       item.addEventListener("click", () => {
         item.classList.toggle("inactive");
         const key = item.dataset.key;
-        seriesMap[key].applyOptions({
-          visible: !item.classList.contains("inactive"),
-        });
+        if (seriesMap[key]) {
+          seriesMap[key].applyOptions({
+            visible: !item.classList.contains("inactive"),
+          });
+        }
       });
     });
 
@@ -205,11 +245,28 @@ document.addEventListener("DOMContentLoaded", function () {
       const ceValue = isChangeChart ? chartData.ce_oi_chg[idx] : chartData.ce_oi[idx];
       const peValue = isChangeChart ? chartData.pe_oi_chg[idx] : chartData.pe_oi[idx];
 
-      tooltip.innerHTML = `
+      // Build tooltip content
+      let tooltipContent = `
         <b>Strike:</b> ${strike}<br>
         <span style="color:${legendItems[2].color}">${legendItems[2].label}:</span> ${formatValue(ceValue || 0)}<br>
         <span style="color:${legendItems[3].color}">${legendItems[3].label}:</span> ${formatValue(peValue || 0)}
       `;
+
+      // ✅ Check if hovering over Spot bar
+      if (underlyingBarIndex !== null && idx === underlyingBarIndex) {
+        tooltipContent += `<br><span style="color:${spotColor}"><b>Spot Price:</b> ${underlyingPrice.toFixed(2)}</span>`;
+      }
+
+      // ✅ Check if hovering over any Future bar
+      futuresBarIndices.forEach((futureIdx, futureArrayIdx) => {
+        if (futureIdx !== null && idx === futureIdx && futuresPrices[futureArrayIdx]) {
+          const future = futuresPrices[futureArrayIdx];
+          const expiryDate = future.expiry ? new Date(future.expiry).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+          tooltipContent += `<br><span style="color:${futuresColors[futureArrayIdx]}"><b>F${futureArrayIdx + 1}:</b> ${future.price.toFixed(2)} (Exp: ${expiryDate})</span>`;
+        }
+      });
+
+      tooltip.innerHTML = tooltipContent;
       tooltip.style.left = param.point.x + 15 + "px";
       tooltip.style.top = param.point.y + 15 + "px";
       tooltip.style.display = "block";

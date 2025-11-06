@@ -17,6 +17,10 @@
     </div>
     <div class="control-group">
         <label for="dateSelect">Select Date</label>
-        <input type="date" id="dateSelect" name="date" value="{{ selected_date }}" onchange="window.location.href='/stock/{{ ticker }}?date='+this.value">
+        <select id="dateSelect" name="date" data-expiry="{{ selected_expiry or '' }}" onchange="var url='/stock/{{ ticker }}?date='+this.value; if(this.dataset.expiry){url+='&expiry='+this.dataset.expiry;} window.location.href=url;">
+            {% for d in dates %}
+            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
     </div>
 </div>
