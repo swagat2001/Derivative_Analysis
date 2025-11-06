@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, jsonify
 from ..models.stock_model import (
     get_available_dates,
     get_all_tickers,
+    get_filtered_tickers,
     get_stock_detail_data,
     get_stock_expiry_data,
     get_stock_stats,
@@ -24,7 +25,7 @@ def stock_detail(ticker):
     # 📅 Fetch all available dates and symbols
     # ==============================
     dates = get_available_dates()
-    all_symbols = get_all_tickers()
+    all_symbols = get_filtered_tickers()  # ✅ Filter by Excel list
 
     # ==============================
     # 🧭 Determine selected date and expiry

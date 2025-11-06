@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Derivatives Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Logo" class="login-logo"/>
+      <h1 class="login-title">Sign in</h1>
+      <p class="login-subtitle">Access the Derivatives Analysis Dashboard</p>
+    </div>
+
+    {% with messages = get_flashed_messages(category_filter=['error']) %}
+      {% if messages %}
+        <div class="login-error">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" class="login-form" action="{{ url_for('auth.login') }}">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" required autofocus />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+      </div>
+
+      <button type="submit" class="login-button">Login</button>
+    </form>
+
+    <div class="login-footnote">
+      <p>Default: admin / admin123 (configurable via env)</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

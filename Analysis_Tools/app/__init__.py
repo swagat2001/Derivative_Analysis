@@ -1,6 +1,7 @@
 from flask import Flask
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.stock_controller import stock_bp
+from .controllers.auth_controller import auth_bp
 from datetime import datetime
 import os
 
@@ -10,10 +11,12 @@ def create_app():
     static_dir = os.path.join(base_dir, "static")
 
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+    app.secret_key = os.environ.get("APP_SECRET_KEY", "dev-secret-key-change-me")
 
     # Register blueprints
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(stock_bp)
+    app.register_blueprint(auth_bp)
     
     # Add custom Jinja2 filter for expiry date formatting
     def format_expiry_date(date_str):

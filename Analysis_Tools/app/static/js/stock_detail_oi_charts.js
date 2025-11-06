@@ -22,13 +22,32 @@ document.addEventListener("DOMContentLoaded", function () {
   const ticker = chartData.meta?.ticker || "Unknown";
   const expiry = chartData.meta?.expiry || "Unknown";
   const strikes = chartData.strikes;
+  const underlyingPrice = chartData.underlying_price;
+  const futuresPrices = chartData.futures_prices || [];
 
-  // Helper to format large numbers (e.g. 25.3L, 10.2K)
+  // Helper to format large numbers (e.g. 25.3L, 10.2K) - preserves sign
   const formatValue = (v) => {
     if (isNaN(v)) return "-";
-    if (Math.abs(v) >= 100000) return (v / 100000).toFixed(1) + " L";
-    if (Math.abs(v) >= 1000) return (v / 1000).toFixed(0) + " K";
+    const sign = v < 0 ? "-" : "";
+    const absV = Math.abs(v);
+    if (absV >= 100000) return sign + (absV / 100000).toFixed(1) + " L";
+    if (absV >= 1000) return sign + (absV / 1000).toFixed(0) + " K";
     return v.toFixed(0);
+  };
+
+  // Helper to find closest strike index for a given price
+  const findClosestStrikeIndex = (price) => {
+    if (!price || strikes.length === 0) return null;
+    let closestIndex = 0;
+    let minDiff = Math.abs(strikes[0] - price);
+    for (let i = 1; i < strikes.length; i++) {
+      const diff = Math.abs(strikes[i] - price);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    }
+    return closestIndex;
   };
 
   // Base chart config
@@ -52,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ==============================
   // 🧩 Chart Block Creator
   // ==============================
-  function createChartBlock(title, legendItems, ceData, peData, maxCE, maxPE) {
+  function createChartBlock(title, legendItems, ceData, peData, maxCE, maxPE, isChangeChart = false) {
     const block = document.createElement("div");
     block.className = "tv-chart-block";
     container.appendChild(block);
@@ -78,6 +97,61 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     maxCELine.setData([maxCE]);
     maxPELine.setData([maxPE]);
+
+    // ✅ Add Underlying Price Line
+    let underlyingLineSeries = null;
+    if (underlyingPrice) {
+      const underlyingIndex = findClosestStrikeIndex(underlyingPrice);
+      if (underlyingIndex !== null) {
+        underlyingLineSeries = chart.addLineSeries({
+          color: '#FF9800',
+          lineWidth: 3,
+          lineStyle: 0,
+          priceLineVisible: false,
+          lastValueVisible: false
+        });
+        const maxValue = Math.max(...ceData.map(d => d.value), ...peData.map(d => d.value));
+        underlyingLineSeries.setData([{ time: underlyingIndex, value: maxValue * 1.05 }]);
+        
+        underlyingLineSeries.setMarkers([{
+          time: underlyingIndex,
+          position: 'aboveBar',
+          color: '#FF9800',
+          shape: 'arrowDown',
+          text: `Spot: ${underlyingPrice.toFixed(0)}`
+        }]);
+      }
+    }
+
+    // ✅ Add Futures Expiry Lines (3 lines)
+    const futuresColors = ['#2196F3', '#9C27B0', '#4CAF50'];
+    const futuresLineSeries = [];
+    futuresPrices.forEach((future, idx) => {
+      if (future.price) {
+        const futureIndex = findClosestStrikeIndex(future.price);
+        if (futureIndex !== null) {
+          const futureLine = chart.addLineSeries({
+            color: futuresColors[idx],
+            lineWidth: 2,
+            lineStyle: 2,
+            priceLineVisible: false,
+            lastValueVisible: false
+          });
+          const maxValue = Math.max(...ceData.map(d => d.value), ...peData.map(d => d.value));
+          futureLine.setData([{ time: futureIndex, value: maxValue * 1.05 }]);
+          
+          futureLine.setMarkers([{
+            time: futureIndex,
+            position: 'belowBar',
+            color: futuresColors[idx],
+            shape: 'arrowUp',
+            text: `F${idx + 1}: ${future.price.toFixed(0)}`
+          }]);
+          
+          futuresLineSeries.push(futureLine);
+        }
+      }
+    });
 
     chart.timeScale().fitContent();
 
@@ -127,10 +201,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const strike = strikes[idx];
       if (strike === undefined) return;
 
+      // ✅ Get raw values directly from the chart data
+      const ceValue = isChangeChart ? chartData.ce_oi_chg[idx] : chartData.ce_oi[idx];
+      const peValue = isChangeChart ? chartData.pe_oi_chg[idx] : chartData.pe_oi[idx];
+
       tooltip.innerHTML = `
         <b>Strike:</b> ${strike}<br>
-        <span style="color:${legendItems[2].color}">${legendItems[2].label}:</span> ${formatValue(chartData.ce_oi[idx] || chartData.ce_oi_chg[idx] || 0)}<br>
-        <span style="color:${legendItems[3].color}">${legendItems[3].label}:</span> ${formatValue(chartData.pe_oi[idx] || chartData.pe_oi_chg[idx] || 0)}
+        <span style="color:${legendItems[2].color}">${legendItems[2].label}:</span> ${formatValue(ceValue || 0)}<br>
+        <span style="color:${legendItems[3].color}">${legendItems[3].label}:</span> ${formatValue(peValue || 0)}
       `;
       tooltip.style.left = param.point.x + 15 + "px";
       tooltip.style.top = param.point.y + 15 + "px";
@@ -154,8 +232,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // ==============================
   const ceOI = strikes.map((s, i) => ({ time: i, value: chartData.ce_oi[i] }));
   const peOI = strikes.map((s, i) => ({ time: i, value: chartData.pe_oi[i] }));
-  const ceChg = strikes.map((s, i) => ({ time: i, value: chartData.ce_oi_chg[i] }));
-  const peChg = strikes.map((s, i) => ({ time: i, value: chartData.pe_oi_chg[i] }));
+  // ✅ Keep negative values for OI Change (don't use absolute)
+  const ceChg = strikes.map((s, i) => ({ time: i, value: chartData.ce_oi_chg[i] || 0 }));
+  const peChg = strikes.map((s, i) => ({ time: i, value: chartData.pe_oi_chg[i] || 0 }));
 
   const maxCEVal = Math.max(...chartData.ce_oi);
   const maxPEVal = Math.max(...chartData.pe_oi);
@@ -192,7 +271,8 @@ document.addEventListener("DOMContentLoaded", function () {
     ceOI,
     peOI,
     maxCE,
-    maxPE
+    maxPE,
+    false
   );
 
   const oiChangeChart = createChartBlock(
@@ -206,7 +286,8 @@ document.addEventListener("DOMContentLoaded", function () {
     ceChg,
     peChg,
     maxCEChg,
-    maxPEChg
+    maxPEChg,
+    true
   );
 
   // 🔗 Sync crosshair

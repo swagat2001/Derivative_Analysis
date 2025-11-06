@@ -620,11 +620,44 @@ def get_all_tickers():
     except Exception as e:
         print(f"[ERROR] get_all_tickers(): {e}")
         return []
+
+def get_filtered_tickers():
+    """Get list of tickers filtered by stock list.xlsx"""
+    try:
+        # Load allowed stocks from Excel
+        excel_path = r"C:\Users\Admin\Desktop\Derivative_Analysis\stock list.xlsx"
+        allowed_stocks = []
+        
+        try:
+            stock_df = pd.read_excel(excel_path)
+            # Try column 'A' first, then first column
+            if 'A' in stock_df.columns:
+                allowed_stocks = [str(s).strip().upper() for s in stock_df['A'].dropna().tolist()]
+            elif stock_df.shape[1] > 0:
+                allowed_stocks = [str(s).strip().upper() for s in stock_df.iloc[:, 0].dropna().tolist()]
+            print(f"[INFO] Loaded {len(allowed_stocks)} stocks from Excel filter for dropdown")
+        except Exception as e:
+            print(f"[WARNING] Could not load stock list Excel: {e}. Showing all stocks.")
+            return get_all_tickers()
+        
+        # Get all tickers from database
+        all_tickers = get_all_tickers()
+        
+        # Filter tickers based on Excel list
+        if allowed_stocks:
+            filtered = [t for t in all_tickers if t.upper() in allowed_stocks]
+            return sorted(filtered)
+        
+        return all_tickers
+        
+    except Exception as e:
+        print(f"[ERROR] get_filtered_tickers(): {e}")
+        return get_all_tickers()
     
 def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = None):
     """
     Generate OI chart data for TradingView
-    Returns dictionary with strikes and OI data
+    Returns dictionary with strikes and OI data + futures expiry prices
     """
     try:
         # Get data
@@ -659,6 +692,15 @@ def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = No
             print(f"[DEBUG] No strikes_dict built")
             return None
         
+        # ✅ Get futures expiry data (3 expiries)
+        expiry_data = get_stock_expiry_data(ticker, selected_date)
+        futures_prices = []
+        for exp in expiry_data[:3]:  # Take first 3 expiries
+            futures_prices.append({
+                'expiry': exp['expiry'],
+                'price': float(exp['price']) if exp['price'] else None
+            })
+        
         # Prepare data - Filter out NaN strikes
         strikes = sorted([s for s in strikes_dict.keys() if pd.notna(s) and s > 0])
         ce_oi = [strikes_dict[s]['ce_oi'] for s in strikes]
@@ -666,7 +708,7 @@ def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = No
         ce_oi_chg = [strikes_dict[s]['ce_oi_chg'] for s in strikes]
         pe_oi_chg = [strikes_dict[s]['pe_oi_chg'] for s in strikes]
         
-        print(f"[DEBUG] Chart data: {len(strikes)} strikes, underlying={underlying}")
+        print(f"[DEBUG] Chart data: {len(strikes)} strikes, underlying={underlying}, futures={len(futures_prices)}")
         
         # Return JSON-serializable dict for TradingView
         return {
@@ -676,6 +718,7 @@ def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = No
             "ce_oi_chg": ce_oi_chg,
             "pe_oi_chg": pe_oi_chg,
             "underlying_price": float(underlying) if underlying else None,
+            "futures_prices": futures_prices,  # ✅ Add futures data
             "meta": {
                 "ticker": ticker,
                 "expiry": selected_expiry,

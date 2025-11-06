@@ -95,10 +95,23 @@ function renderChart(data) {
     
     // Metric (left scale for vega, right for money)
     const metricPriceScale = data[0].metric_label.includes('Money') ? 'right' : 'left';
+    const isMoneyMetric = data[0].metric_label.includes('Money');
+    
     const s4 = currentChart.addLineSeries({
         color: '#9c27b0', 
         lineWidth: 2,
-        priceScaleId: metricPriceScale
+        priceScaleId: metricPriceScale,
+        priceFormat: {
+            type: 'custom',
+            formatter: (price) => {
+                if (isMoneyMetric) {
+                    // Convert to Crores for Money metric
+                    const crores = price / 10000000;
+                    return crores.toFixed(2) + ' Cr';
+                }
+                return price.toFixed(2);
+            }
+        }
     });
     
     const chartData = data.map(d => ({
