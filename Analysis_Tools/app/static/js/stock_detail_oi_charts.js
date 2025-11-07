@@ -124,10 +124,10 @@
         lineEl.style.position = 'absolute';
         lineEl.style.top = '0px';
         lineEl.style.bottom = '0px';
-        lineEl.style.width = '2px';
+        lineEl.style.width = '3px';
         lineEl.style.background = color;
         lineEl.style.opacity = '0.85';
-        lineEl.style.transform = 'translateX(-1px)';
+        lineEl.style.transform = 'translateX(-1.5px)';
         overlayLayer.appendChild(lineEl);
         const updater = () => {
           const x = chart.timeScale().logicalToCoordinate(index);

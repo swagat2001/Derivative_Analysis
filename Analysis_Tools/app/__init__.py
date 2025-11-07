@@ -1,7 +1,7 @@
 from flask import Flask
+# from flask import request, redirect, url_for, session
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.stock_controller import stock_bp
-from .controllers.auth_controller import auth_bp
 from datetime import datetime
 import os
 
@@ -16,7 +16,6 @@ def create_app():
     # Register blueprints
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(stock_bp)
-    app.register_blueprint(auth_bp)
     
     # Add custom Jinja2 filter for expiry date formatting
     def format_expiry_date(date_str):
@@ -34,4 +33,6 @@ def create_app():
     
     app.jinja_env.filters['format_expiry'] = format_expiry_date
     
+    # Auth not integrated yet: blueprint unregistered, no global guard
+
     return app
