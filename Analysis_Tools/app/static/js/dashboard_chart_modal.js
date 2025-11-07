@@ -56,12 +56,34 @@ function renderChart(data) {
     mainDiv.style.marginBottom = '10px';
     canvas.appendChild(mainDiv);
     
+    // Check if Money metric before creating chart
+    const isMoneyMetric = data[0].metric_label.includes('Money');
+    
+    // Create localization formatter - format large values (Money) in lakhs, small values normally
+    const priceFormatter = (price) => {
+        // If value is very large (likely Money metric), format in lakhs
+        if (Math.abs(price) >= 100000) {
+            const lakhs = price / 100000; // Convert to lakhs (1 lakh = 100,000)
+            if (Math.abs(lakhs) >= 1000) {
+                // If >= 1000 lakhs, show in crores (1 crore = 100 lakhs)
+                const crores = lakhs / 100;
+                return crores.toFixed(2) + ' Cr';
+            }
+            return lakhs.toFixed(2) + ' L';
+        }
+        // For smaller values (Underlying Price, PCR), show normally
+        return price.toFixed(2);
+    };
+    
     currentChart = LightweightCharts.createChart(mainDiv, {
         layout: {background: {color: '#fff'}, textColor: '#333'},
         grid: {vertLines: {color: '#e5e7eb'}, horzLines: {color: '#e5e7eb'}},
         width: mainDiv.clientWidth,
         height: 320,
         timeScale: {timeVisible: true, secondsVisible: false},
+        localization: {
+            priceFormatter: priceFormatter
+        },
         rightPriceScale: {
             visible: true,
             scaleMargins: {top: 0.1, bottom: 0.1}
@@ -94,8 +116,7 @@ function renderChart(data) {
     });
     
     // Metric (left scale for vega, right for money)
-    const metricPriceScale = data[0].metric_label.includes('Money') ? 'right' : 'left';
-    const isMoneyMetric = data[0].metric_label.includes('Money');
+    const metricPriceScale = isMoneyMetric ? 'right' : 'left';
     
     const s4 = currentChart.addLineSeries({
         color: '#9c27b0', 
@@ -105,9 +126,14 @@ function renderChart(data) {
             type: 'custom',
             formatter: (price) => {
                 if (isMoneyMetric) {
-                    // Convert to Crores for Money metric
-                    const crores = price / 10000000;
-                    return crores.toFixed(2) + ' Cr';
+                    // Convert to lakhs for Money metric
+                    const lakhs = price / 100000;
+                    if (lakhs >= 1000) {
+                        // If >= 1000 lakhs, show in crores
+                        const crores = lakhs / 100;
+                        return crores.toFixed(2) + ' Cr';
+                    }
+                    return lakhs.toFixed(2) + ' L';
                 }
                 return price.toFixed(2);
             }
