@@ -3,7 +3,7 @@
      Multi-Panel: Price, OI, Volume, IV, PCR
      ============================== -->
 <div class="chart-section">
-    <h3 class="section-title">Price History (Last 90 Days)</h3>
+    <h3 class="section-title">Price History (Last 40 Days)</h3>
     <div class="price-chart-container" id="priceChart">
         <div class="chart-loading">
             <div class="loading-spinner"></div>
@@ -52,6 +52,7 @@ function renderComprehensiveChart(data) {
     const volume = sortedData.map(d => d.volume || 0);
     const iv = sortedData.map(d => d.iv || 0);
     const pcr = sortedData.map(d => d.pcr || 0);
+    const moneynessChange = sortedData.map(d => d.moneyness_change || 0);
     
     new Chart(ctx, {
         type: 'line',
@@ -106,6 +107,16 @@ function renderComprehensiveChart(data) {
                     tension: 0.1,
                     borderWidth: 2,
                     hidden: true,
+                },
+                {
+                    label: 'Moneyness Change',
+                    data: moneynessChange,
+                    borderColor: '#ec4899',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    yAxisID: 'y5',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    hidden: true,
                 }
             ]
         },
@@ -136,7 +147,11 @@ function renderComprehensiveChart(data) {
                                 label += ': ';
                             }
                             if (context.parsed.y !== null) {
-                                label += new Intl.NumberFormat('en-IN').format(context.parsed.y);
+                                if (context.dataset.label === 'Moneyness Change') {
+                                    label += context.parsed.y.toFixed(4);
+                                } else {
+                                    label += new Intl.NumberFormat('en-IN').format(context.parsed.y);
+                                }
                             }
                             return label;
                         }
@@ -198,6 +213,19 @@ function renderComprehensiveChart(data) {
                     title: {
                         display: true,
                         text: 'PCR'
+                    }
+                },
+                y5: {
+                    type: 'linear',
+                    display: false,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Moneyness Change',
+                        color: '#ec4899'
+                    },
+                    ticks: {
+                        color: '#ec4899'
                     }
                 }
             }

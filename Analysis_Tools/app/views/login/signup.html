@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | Derivatives Analysis Dashboard</title>
+  <title>Sign Up | Derivatives Analysis Dashboard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
@@ -12,14 +12,14 @@
     <!-- LEFT VISUAL PANEL -->
     <div class="login-visual">
       <div class="visual-content">
-        <h1>Trade Smarter with AI-Powered Insights</h1>
-        <p>Advanced derivatives analysis platform built for professional traders</p>
+        <h1>Start Your Trading Journey</h1>
+        <p>Join thousands of traders using our AI-powered platform</p>
         
         <div class="visual-features">
-          <div class="feature-item">Real-time Options Chain Analysis</div>
-          <div class="feature-item">AI-Driven Market Predictions</div>
-          <div class="feature-item">Advanced Greeks Calculations</div>
-          <div class="feature-item">Institutional-Grade Analytics</div>
+          <div class="feature-item">Advanced Options Analytics</div>
+          <div class="feature-item">Real-Time Market Data</div>
+          <div class="feature-item">Professional Trading Tools</div>
+          <div class="feature-item">Expert Market Insights</div>
         </div>
       </div>
       
@@ -81,8 +81,8 @@
       <div class="login-card">
         <div class="login-header">
           <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine Logo" class="login-logo"/>
-          <h1 class="login-title">Welcome Back</h1>
-          <p class="login-subtitle">Sign in to your derivatives analysis platform</p>
+          <h1 class="login-title">Create Account</h1>
+          <p class="login-subtitle">Start trading with advanced analytics</p>
         </div>
 
         {% with messages = get_flashed_messages(category_filter=['error']) %}
@@ -93,44 +93,85 @@
           {% endif %}
         {% endwith %}
 
-        <form method="post" class="login-form" action="{{ url_for('auth.login') }}">
+        {% with messages = get_flashed_messages(category_filter=['success']) %}
+          {% if messages %}
+            <div class="login-success">
+              <strong>✓</strong> {{ messages[0] }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" class="login-form" action="{{ url_for('auth.signup') }}">
           <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username">Username *</label>
             <input 
               id="username" 
               name="username" 
               type="text" 
               required 
               autofocus 
-              placeholder="Enter your username"
+              placeholder="Choose a unique username"
               autocomplete="username"
+              minlength="3"
             />
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="full_name">Full Name</label>
+            <input 
+              id="full_name" 
+              name="full_name" 
+              type="text" 
+              placeholder="Your full name (optional)"
+              autocomplete="name"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="Your email address (optional)"
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password *</label>
             <input 
               id="password" 
               name="password" 
               type="password" 
               required 
-              placeholder="Enter your password"
-              autocomplete="current-password"
+              placeholder="Create a strong password"
+              autocomplete="new-password"
+              minlength="6"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">Confirm Password *</label>
+            <input 
+              id="confirm_password" 
+              name="confirm_password" 
+              type="password" 
+              required 
+              placeholder="Re-enter your password"
+              autocomplete="new-password"
+              minlength="6"
             />
           </div>
 
           <button type="submit" class="login-button">
-            Sign In
+            Create Account
           </button>
         </form>
 
         <div class="login-footnote">
-          <p style="color: #7c7e8c; font-size: 13px; margin-bottom: 10px;">🔒 Secure access to your platform</p>
-          <p style="font-size: 13px; color: #a0a3b1;">
-            Test: <strong style="color: #5a5a5a;">admin</strong> / <strong style="color: #5a5a5a;">admin123</strong>
-          </p>
-          <p style="margin-top: 18px; font-size: 15px;">
-            Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up</a>
+          <p style="font-size: 15px;">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Sign In</a>
           </p>
         </div>
       </div>

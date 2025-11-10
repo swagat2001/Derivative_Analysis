@@ -1,7 +1,7 @@
-from flask import Flask
-# from flask import request, redirect, url_for, session
+from flask import Flask, redirect, url_for, session, request
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.stock_controller import stock_bp
+from .controllers.auth_controller import auth_bp
 from datetime import datetime
 import os
 
@@ -13,7 +13,12 @@ def create_app():
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
     app.secret_key = os.environ.get("APP_SECRET_KEY", "dev-secret-key-change-me")
 
+    # Initialize authentication system (creates users table and default admin)
+    from .models.auth_model import ensure_initialized
+    ensure_initialized()
+
     # Register blueprints
+    app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(stock_bp)
     
@@ -33,6 +38,29 @@ def create_app():
     
     app.jinja_env.filters['format_expiry'] = format_expiry_date
     
-    # Auth not integrated yet: blueprint unregistered, no global guard
+    # =============================================================
+    # AUTHENTICATION MIDDLEWARE
+    # =============================================================
+    @app.before_request
+    def require_login():
+        # Allow access to login, signup, logout, and static files
+        if request.endpoint in ['auth.login', 'auth.signup', 'auth.logout', 'static']:
+            return None
+        
+        # Check if user is logged in
+        if 'user' not in session:
+            return redirect(url_for('auth.login'))
+        
+        return None
+    
+    # Make user info available to all templates
+    @app.context_processor
+    def inject_user():
+        from .models.auth_model import get_user_display_name
+        username = session.get('user')
+        return {
+            'current_user': username,
+            'user_display_name': get_user_display_name(username) if username else None
+        }
 
     return app

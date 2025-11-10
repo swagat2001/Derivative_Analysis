@@ -1,5 +1,6 @@
 let currentChart = null;
 let currentRSIChart = null;
+let resizeHandler = null; // Store resize handler to remove it later
 
 function openChartModal(el) {
     const modal = document.getElementById('chartModal');
@@ -7,6 +8,20 @@ function openChartModal(el) {
     const loading = document.getElementById('chartLoading');
     const canvas = document.getElementById('chartCanvas');
     const legend = document.getElementById('chartLegend');
+    
+    // Clean up any existing charts and handlers before opening new modal
+    if (resizeHandler) {
+        window.removeEventListener('resize', resizeHandler);
+        resizeHandler = null;
+    }
+    if (currentChart) {
+        currentChart.remove();
+        currentChart = null;
+    }
+    if (currentRSIChart) {
+        currentRSIChart.remove();
+        currentRSIChart = null;
+    }
     
     modal.style.display = 'block';
     loading.style.display = 'flex';
@@ -255,15 +270,24 @@ function renderChart(data) {
         });
     }
     
-    // Handle resize
-    window.addEventListener('resize', () => {
+    // Handle resize - store handler so we can remove it later
+    resizeHandler = () => {
         if (currentChart) currentChart.applyOptions({width: mainDiv.clientWidth});
         if (currentRSIChart) currentRSIChart.applyOptions({width: mainDiv.clientWidth});
-    });
+    };
+    window.addEventListener('resize', resizeHandler);
 }
 
 function closeChartModal() {
     document.getElementById('chartModal').style.display = 'none';
+    
+    // Remove resize event listener to prevent memory leak
+    if (resizeHandler) {
+        window.removeEventListener('resize', resizeHandler);
+        resizeHandler = null;
+    }
+    
+    // Clean up charts
     if (currentChart) { 
         currentChart.remove(); 
         currentChart = null; 

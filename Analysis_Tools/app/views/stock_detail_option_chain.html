@@ -8,7 +8,8 @@
   <div class="table-container">
     <p style="margin:8px 0;font-size:13px;color:#6b7280;">
       ⚙️ Underlying: <b>{{ underlying if underlying else 'N/A' }}</b> |
-      🎯 ATM Strike: <b>{{ atm if atm else 'N/A' }}</b>
+      🎯 ATM Strike: <b>{{ atm if atm else 'N/A' }}</b> |
+      📈 Futures: <b>{{ "%.2f"|format(futures_price) if futures_price else 'N/A' }}</b>
     </p>
 
     <table class="option-chain-table">
@@ -18,7 +19,9 @@
           <th class="ce-th">OI Chg</th>
           <th class="ce-th">OI</th>
           <th class="ce-th">Price</th>
+          <th class="ce-th">Fair Price</th>
           <th class="strike-th">Strike Price</th>
+          <th class="pe-th">Fair Price</th>
           <th class="pe-th">Price</th>
           <th class="pe-th">OI</th>
           <th class="pe-th">OI Chg</th>
@@ -52,6 +55,17 @@
           {% set pe = strikes[strike].get('pe') %}
           {% set strike_val = strike|float %}
           {% set atm_val = atm|float %}
+          {% set futures_val = futures_price|float %}
+
+          {# Calculate Fair Price using FUTURES PRICE - Server Side #}
+          {# CALL Fair Price = Max(0, Futures - Strike) #}
+          {# PUT Fair Price = Max(0, Strike - Futures) #}
+          {% set ce_fair_price_raw = (futures_val - strike_val) if futures_val and strike_val else None %}
+          {% set pe_fair_price_raw = (strike_val - futures_val) if futures_val and strike_val else None %}
+          
+          {# Apply Max(0, value) to ensure non-negative #}
+          {% set ce_fair_price = [0, ce_fair_price_raw]|max if ce_fair_price_raw is not none else None %}
+          {% set pe_fair_price = [0, pe_fair_price_raw]|max if pe_fair_price_raw is not none else None %}
 
           <tr
             class="
@@ -98,8 +112,30 @@
             <!-- CE Price -->
             <td class="ce-td">{% if ce and ce.ClsPric %}{{ "%.2f"|format(ce.ClsPric) }}{% else %}-{% endif %}</td>
 
+            <!-- CE Fair Price (Max(0, Futures - Strike)) -->
+            <td class="ce-td" style="font-weight: 600;">
+              {% if ce_fair_price is not none %}
+                {% if ce_fair_price > 0 %}
+                  <span class="pos">{{ "%.2f"|format(ce_fair_price) }}</span>
+                {% else %}
+                  <span style="color: #9ca3af;">0.00</span>
+                {% endif %}
+              {% else %}-{% endif %}
+            </td>
+
             <!-- Strike -->
             <td class="strike-td {% if strike_val == atm_val %}atm-strike{% endif %}">{{ strike|int }}</td>
+
+            <!-- PE Fair Price (Max(0, Strike - Futures)) -->
+            <td class="pe-td" style="font-weight: 600;">
+              {% if pe_fair_price is not none %}
+                {% if pe_fair_price > 0 %}
+                  <span class="pos">{{ "%.2f"|format(pe_fair_price) }}</span>
+                {% else %}
+                  <span style="color: #9ca3af;">0.00</span>
+                {% endif %}
+              {% else %}-{% endif %}
+            </td>
 
             <!-- PE Price -->
             <td class="pe-td">{% if pe and pe.ClsPric %}{{ "%.2f"|format(pe.ClsPric) }}{% else %}-{% endif %}</td>

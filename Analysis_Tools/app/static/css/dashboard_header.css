@@ -51,6 +51,13 @@
   letter-spacing: -0.5px;
 }
 
+/* Right Section (Indices + User) */
+.header-right-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
 /* Indices Section */
 .header-indices {
   display: flex;
@@ -84,6 +91,50 @@
   color: #059669;
 }
 
+/* User Section */
+.header-user-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 16px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.logout-button {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #b14141 0%, #a31313 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(163, 19, 19, 0.2);
+}
+
+.logout-button:hover {
+  background: linear-gradient(135deg, #a31313 0%, #8b0f0f 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(163, 19, 19, 0.3);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .header-indices {
@@ -93,6 +144,20 @@
   .index-item {
     min-width: 70px;
     padding: 3px 8px;
+  }
+
+  .header-user-section {
+    gap: 8px;
+    padding-left: 12px;
+  }
+
+  .user-name {
+    font-size: 12px;
+  }
+
+  .logout-button {
+    padding: 5px 12px;
+    font-size: 11px;
   }
 }
 
@@ -107,7 +172,25 @@
     height: auto;
   }
   
+  .header-right-section {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
   .header-indices {
     margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .header-user-section {
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+    padding-left: 0;
+    padding-top: 8px;
+    width: 100%;
+    justify-content: center;
   }
 }

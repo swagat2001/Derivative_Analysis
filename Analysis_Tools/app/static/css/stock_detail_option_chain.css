@@ -39,7 +39,7 @@
 }
 
 .option-chain-table th {
-    padding: 12px;
+    padding: 12px 8px;
     text-align: center;
     font-weight: 600;
     font-size: 12px;
@@ -50,11 +50,13 @@
 .ce-th {
     background: #ecfdf5;
     color: #166534;
+    text-align: center !important;
 }
 
 .pe-th {
     background: #fef2f2;
     color: #991b1b;
+    text-align: center !important;
 }
 
 .strike-th {
@@ -62,6 +64,7 @@
     color: #78350f;
     border-left: 3px solid #facc15;
     border-right: 3px solid #facc15;
+    text-align: center !important;
 }
 
 /* ==============================
@@ -81,8 +84,8 @@
 }
 
 .ce-td, .pe-td, .strike-td {
-    padding: 10px 12px;
-    text-align: right;
+    padding: 10px 8px;
+    text-align: center;
     vertical-align: middle;
 }
 
@@ -97,62 +100,75 @@
 }
 
 /* ==============================
-   🎯 ATM ROW — SOLID YELLOW DIVIDER
+   🎯 ATM ROW — GOLDMINE MAROON HIGHLIGHT
    ============================== */
 
 .atm-row {
-    background: #f5eab6 !important;
+    background: #fef2f2 !important;
     font-weight: 600;
-    border-top: 1px dashed #ffdd89;
-    border-bottom: 1px dashed #ffdd89;
+    border-top: 2px solid #8B2432;
+    border-bottom: 2px solid #8B2432;
     transition: background 0.3s ease;
 }
 
 .atm-strike {
-    background: #ffdd89 !important;
-    color: #fff !important;
+    background: #8B2432 !important;
+    color: #ffffff !important;
     font-weight: 800;
-    border-left: 3px solid #ffdd89;
-    border-right: 3px solid #ffdd89;
+    border-left: 3px solid #8B2432;
+    border-right: 3px solid #8B2432;
 }
 
 .atm-row:hover {
-    background: #f9e98c !important;
+    background: #fee2e2 !important;
+}
+
+/* Make ATM row text more visible */
+.atm-row td {
+    color: #1f2937 !important;
+    font-weight: 600 !important;
 }
 
 /* ==============================
-   🎨 OTM / ITM ZONE LOGIC (Symmetric)
+   🎨 OTM / ITM ZONE LOGIC - LIGHT GOLDEN INSTEAD OF GREY
    ============================== */
 
-/* ✅ Above ATM — Calls are OTM (gray), Puts are ITM (white) */
+/* ✅ Above ATM — Calls are OTM (light golden), Puts are ITM (white) */
 .otm-call td.ce-td {
     background: #ffffff !important; /* white */
-    color: #111827 !important;
+    color: #1f2937 !important;
+    font-weight: 500;
 }
 .otm-call td.pe-td {
-    background: #bbbfc7 !important; /* gray */
-    color: #374151 !important;
+    background: #fef9e7 !important; /* light golden - improved visibility */
+    color: #1f2937 !important;
+    font-weight: 500;
 }
 
 
-/* ✅ Below ATM — Calls are ITM (white), Puts are OTM (gray) */
+/* ✅ Below ATM — Calls are ITM (light golden), Puts are OTM (white) */
 .otm-put td.ce-td {
-    background: #bbbfc7 !important; /* gray */
-    color: #374151 !important;
-    
+    background: #fef9e7 !important; /* light golden - improved visibility */
+    color: #1f2937 !important;
+    font-weight: 500;
 }
 .otm-put td.pe-td {
     background: #ffffff !important; /* white */
-    color: #111827 !important;
+    color: #1f2937 !important;
+    font-weight: 500;
 }
 
-/* Keep ATM row isolated */
+/* Keep ATM row isolated with distinct styling */
 .atm-row td {
-    background: #f5eab6 !important;
+    background: #fef2f2 !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
 }
+
 .atm-row td.strike-td {
-    background: #ffdd89 !important;
-    color: #fff !important;
+    background: #8B2432 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
 }
 
 /* Smooth transitions */
@@ -168,12 +184,12 @@
    ============================== */
 
 .pos {
-    color: #22c55e !important;
+    color: #16a34a !important;
     font-weight: 700;
 }
 
 .neg {
-    color: #ef4444 !important;
+    color: #dc2626 !important;
     font-weight: 700;
 }
 

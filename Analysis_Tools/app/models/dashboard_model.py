@@ -4,32 +4,23 @@
 #  Filters stocks based on stock list.xlsx
 # =============================================================
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 import pandas as pd
 import json
-from urllib.parse import quote_plus
+from .db_config import engine, get_stock_list_from_excel
+from functools import lru_cache
 
 # =============================================================
-# DATABASE CONNECTION
+# DATABASE CONNECTION (imported from shared db_config)
 # =============================================================
 
-db_user = 'postgres'
-db_password = 'Gallop@3104'
-db_host = 'localhost'
-db_port = '5432'
-db_name = 'BhavCopy_Database'
-
-db_password_enc = quote_plus(db_password)
-engine = create_engine(
-    f'postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}'
-)
-
 # =============================================================
-# 1️⃣ AVAILABLE DATES
+# 1️⃣ AVAILABLE DATES (with caching)
 # =============================================================
 
-def get_available_dates():
-    """Fetch distinct biz_date values for dropdown."""
+@lru_cache(maxsize=1)
+def _get_available_dates_cached():
+    """Internal cached function for dates."""
     try:
         query = text("""
             SELECT DISTINCT biz_date::text AS date
@@ -37,10 +28,19 @@ def get_available_dates():
             ORDER BY date DESC;
         """)
         df = pd.read_sql(query, con=engine)
-        return df['date'].tolist()
+        return tuple(df['date'].tolist())  # Convert to tuple for caching
     except Exception as e:
         print(f"[ERROR] get_available_dates(): {e}")
-        return []
+        return tuple()
+
+def get_available_dates():
+    """Fetch distinct biz_date values for dropdown (with caching)."""
+    return list(_get_available_dates_cached())
+
+def clear_date_cache():
+    """Clear date cache - useful when new data is added to database."""
+    _get_available_dates_cached.cache_clear()
+    print("[INFO] Dashboard date cache cleared")
 
 # =============================================================
 # 2️⃣ DASHBOARD DATA (TOTAL / OTM / ITM) with Excel Filter
@@ -50,23 +50,11 @@ def get_dashboard_data(selected_date, mtype="TOTAL"):
     """
     Loads pre-calculated dashboard data from options_dashboard_cache
     for given date and moneyness_type.
-    Filters stocks based on stock list.xlsx
+    Filters stocks based on stock list.xlsx (with caching)
     """
     try:
-        # Load allowed stocks from Excel
-        excel_path = r"C:\Users\Admin\Desktop\Derivative_Analysis\stock list.xlsx"
-        allowed_stocks = []
-        
-        try:
-            stock_df = pd.read_excel(excel_path)
-            # Try column 'A' first, then first column
-            if 'A' in stock_df.columns:
-                allowed_stocks = [str(s).strip().upper() for s in stock_df['A'].dropna().tolist()]
-            elif stock_df.shape[1] > 0:
-                allowed_stocks = [str(s).strip().upper() for s in stock_df.iloc[:, 0].dropna().tolist()]
-            print(f"[INFO] Loaded {len(allowed_stocks)} stocks from Excel filter")
-        except Exception as e:
-            print(f"[WARNING] Could not load stock list Excel: {e}. Showing all stocks.")
+        # Load allowed stocks from Excel (cached)
+        allowed_stocks = get_stock_list_from_excel()
         
         query = text("""
             SELECT data_json

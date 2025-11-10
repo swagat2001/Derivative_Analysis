@@ -10,7 +10,9 @@ from ..models.stock_model import (
     get_stock_chart_data,
     generate_oi_chart
 )
+from ..controllers.dashboard_controller import get_live_indices
 import json
+import pandas as pd
 
 stock_bp = Blueprint('stock', __name__)
 
@@ -52,9 +54,11 @@ def stock_detail(ticker):
         stats = get_stock_stats(ticker, selected_date, selected_expiry)
 
         # ==============================
-        # 🔍 Detect Underlying Price
+        # 🔍 Detect Underlying Price & Futures Price
         # ==============================
         underlying = None
+        futures_price = None
+        
         if data:
             for row in data:
                 if row.get("UndrlygPric"):
@@ -67,36 +71,66 @@ def stock_detail(ticker):
                     underlying = row["underlying"]
                     break
 
-        # Safely clean underlying string (e.g. "5,298.00 ")
+        # Get futures price for selected expiry from expiry_data
+        if selected_expiry and expiry_data:
+            for exp_row in expiry_data:
+                if exp_row.get('expiry') == selected_expiry:
+                    futures_price = exp_row.get('price')
+                    break
+        
+        # Fallback to underlying if futures price not found
+        if futures_price is None:
+            futures_price = underlying
+
+        # Safely clean underlying and futures price strings (e.g. "5,298.00 ")
         if underlying:
             try:
                 underlying = float(str(underlying).replace(",", "").strip())
             except Exception:
                 underlying = None
+        
+        if futures_price:
+            try:
+                futures_price = float(str(futures_price).replace(",", "").strip())
+            except Exception:
+                futures_price = underlying
 
         # ==============================
         # 🎯 Find ATM Strike (Closest to Underlying)
         # ==============================
         atm = None
         if data and underlying:
-            strike_prices = sorted({float(row["StrkPric"]) for row in data if row.get("StrkPric")})
-            if strike_prices:
-                # Find strike with smallest distance from underlying
-                atm = min(strike_prices, key=lambda x: abs(x - underlying))
+            try:
+                # FIX #6: Add error handling for None/NaN values
+                strike_prices = sorted({
+                    float(row["StrkPric"]) 
+                    for row in data 
+                    if row.get("StrkPric") is not None 
+                    and pd.notna(row.get("StrkPric"))
+                })
+                if strike_prices:
+                    # Find strike with smallest distance from underlying
+                    atm = min(strike_prices, key=lambda x: abs(x - underlying))
+            except (ValueError, TypeError) as e:
+                print(f"[WARNING] Error calculating ATM strike: {e}")
+                atm = None
 
         # ==============================
         # 📈 Compute Average IV
         # ==============================
+        # FIX #5: Only override avg_iv if stats doesn't have it or if we have better data from option chain
         if data:
-            iv_values = [row.get('IV') for row in data if row.get('IV') and row['IV'] > 0]
+            iv_values = [row.get('IV') for row in data if row.get('IV') is not None and row['IV'] > 0]
             if iv_values:
                 avg_iv = sum(iv_values) / len(iv_values)
                 if avg_iv < 1:
                     avg_iv *= 100
-                stats['avg_iv'] = round(avg_iv, 2)
-            else:
+                # Only override if stats doesn't have avg_iv or if our calculation is more accurate
+                if 'avg_iv' not in stats or stats.get('avg_iv', 0) == 0:
+                    stats['avg_iv'] = round(avg_iv, 2)
+            elif 'avg_iv' not in stats:
                 stats['avg_iv'] = 0
-        else:
+        elif 'avg_iv' not in stats:
             stats['avg_iv'] = 0
 
     # ==============================
@@ -104,7 +138,8 @@ def stock_detail(ticker):
     # ==============================
     chart_data = None
     if selected_date and selected_expiry:
-        oi_chart_dict = generate_oi_chart(ticker, selected_date, selected_expiry)
+        # Pass data and expiry_data to avoid redundant queries
+        oi_chart_dict = generate_oi_chart(ticker, selected_date, selected_expiry, data=data, expiry_data=expiry_data)
         if oi_chart_dict:
             chart_data = json.dumps(oi_chart_dict)
 
@@ -122,8 +157,10 @@ def stock_detail(ticker):
         selected_date=selected_date,
         selected_expiry=selected_expiry,
         chart_data=chart_data,
-        underlying=underlying,  # ✅ numeric float
+        underlying=underlying,  # ✅ spot price (for display)
+        futures_price=futures_price,  # ✅ futures price for selected expiry (for Fair Price calculation)
         atm=atm,                # ✅ correct closest strike
+        indices=get_live_indices()  # ✅ Add indices for header
     )
 
 
