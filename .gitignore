@@ -50,7 +50,7 @@ Database/*.sqlite
 # Data Files
 BhavCopy_Backup2/
 *.csv
-# *.xlsx
+*.xlsx
 *.xls
 
 # Reports

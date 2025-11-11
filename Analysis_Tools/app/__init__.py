@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, session, request
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.stock_controller import stock_bp
 from .controllers.auth_controller import auth_bp
+from .controllers.screener_controller import screener_bp
 from datetime import datetime
 import os
 
@@ -21,6 +22,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(stock_bp)
+    app.register_blueprint(screener_bp)
     
     # Add custom Jinja2 filter for expiry date formatting
     def format_expiry_date(date_str):
@@ -37,6 +39,20 @@ def create_app():
             return date_str
     
     app.jinja_env.filters['format_expiry'] = format_expiry_date
+    
+    # Custom filter for number formatting with commas
+    def format_number(value, decimals=0):
+        """Format number with commas and optional decimals."""
+        try:
+            num = float(value)
+            if decimals == 0:
+                return f"{int(num):,}"
+            else:
+                return f"{num:,.{decimals}f}"
+        except (ValueError, TypeError):
+            return str(value)
+    
+    app.jinja_env.filters['format_number'] = format_number
     
     # =============================================================
     # AUTHENTICATION MIDDLEWARE
