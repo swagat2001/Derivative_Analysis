@@ -1,6 +1,7 @@
-/* ============================ */
-/* DASHBOARD CONTROLS STYLES */
-/* ============================ */
+/* =============================================================
+   DASHBOARD CONTROLS - CLEAN & MINIMAL DESIGN
+   Inspired by screener.in - Simple, Professional, No Clutter
+   ============================================================= */
 
 .dashboard-controls {
   position: sticky;
@@ -9,161 +10,205 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
-  padding: 10px 20px;
-  margin: 76px 10px 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  gap: 20px;
+  background: #ffffff;
+  padding: 14px 24px;
+  margin: 76px 20px 12px 20px;
+  border-bottom: 2px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
-/* Left Section - Date Controls */
-.controls-left {
+/* =============================================================
+   DATE SECTION - LEFT SIDE
+   ============================================================= */
+.date-section {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.date-icon {
-  font-size: 16px;
-}
-
-.date-label {
-  font-weight: 600;
-  font-size: 13px;
-  color: #374151;
 }
 
 .date-form {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
   margin: 0;
 }
 
+.date-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin-right: 4px;
+}
+
 .date-select {
   font-size: 13px;
-  padding: 6px 12px;
+  font-weight: 500;
+  padding: 8px 14px;
   border: 1px solid #d1d5db;
   border-radius: 4px;
-  background-color: white;
-  color: #111827;
+  background: #ffffff;
+  color: #2c2c2c;
   cursor: pointer;
-  min-width: 130px;
+  min-width: 160px;
+  transition: all 0.2s ease;
+}
+
+.date-select:hover {
+  border-color: #8B2432;
+  background: #fafafa;
 }
 
 .date-select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  border-color: #8B2432;
+  box-shadow: 0 0 0 2px rgba(139, 36, 50, 0.1);
 }
 
 .btn-load {
-  background-color: #2563eb;
+  background: #8B2432;
   color: white;
   font-size: 13px;
   font-weight: 600;
-  padding: 6px 18px;
+  padding: 8px 20px;
   border-radius: 4px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-load:hover {
-  background-color: #1d4ed8;
+  background: #6B1826;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(139, 36, 50, 0.3);
 }
 
-/* Right Section - Filter Buttons */
-.controls-right {
+.btn-load:active {
+  transform: translateY(0);
+}
+
+/* =============================================================
+   BUTTON GROUP - RIGHT SIDE (CLEAN TABS)
+   ============================================================= */
+.button-group {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
 }
 
-.btn-filter {
+/* Base button style - Simple tabs */
+.button-group a {
   font-size: 13px;
   font-weight: 600;
-  padding: 7px 18px;
+  padding: 8px 18px;
   border-radius: 4px;
   text-decoration: none;
-  border: 2px solid #d1d5db;
-  background-color: #f3f4f6;
-  color: #374151;
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid transparent;
   transition: all 0.2s ease;
   cursor: pointer;
   display: inline-block;
 }
 
-.btn-filter:hover {
-  background-color: #e5e7eb;
-  border-color: #9ca3af;
+.button-group a:hover {
+  color: #8B2432;
+  background: #fafafa;
 }
 
-/* Active States for Each Button */
-.btn-total {
-  background-color: #f3f4f6;
-  color: #374151;
-  border-color: #374151;
-}
-
-.btn-total.active {
-  background-color: #f3f4f6;
-  color: #374151;
-  border-color: #374151;
-  font-weight: 700;
-}
-
-.btn-otm {
-  background-color: #f3f4f6;
-  color: #374151;
-  border-color: #d1d5db;
-}
-
-.btn-otm.active {
-  background-color: white;
-  color: #374151;
-  border-color: #374151;
-  font-weight: 700;
-}
-
-.btn-itm {
-  background-color: #f3f4f6;
-  color: #374151;
-  border-color: #d1d5db;
-}
-
+/* Active state - Simple underline style */
+.btn-total.active,
+.btn-otm.active,
 .btn-itm.active {
-  background-color: white;
-  color: #374151;
-  border-color: #374151;
+  color: #8B2432;
+  background: #fff;
+  border-bottom: 2px solid #8B2432;
   font-weight: 700;
 }
 
-/* Export Button */
+/* Screener button - Subtle maroon */
+.btn-screener {
+  background: #8B2432 !important;
+  color: white !important;
+  border: 1px solid #8B2432 !important;
+}
+
+.btn-screener:hover {
+  background: #6B1826 !important;
+  border-color: #6B1826 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(139, 36, 50, 0.3);
+}
+
+/* Export button - Clean green */
 .btn-export {
-  background-color: #059669;
+  background: #16a34a;
   color: white;
-  border-color: #059669;
+  border: 1px solid #16a34a;
 }
 
 .btn-export:hover {
-  background-color: #047857;
-  border-color: #047857;
+  background: #15803d;
+  border-color: #15803d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
 }
 
-/* Responsive */
+/* =============================================================
+   RESPONSIVE DESIGN
+   ============================================================= */
 @media (max-width: 768px) {
   .dashboard-controls {
     flex-direction: column;
-    gap: 12px;
-    padding: 12px;
+    gap: 14px;
+    padding: 14px 16px;
+    margin: 76px 12px 12px 12px;
   }
   
-  .controls-right {
+  .date-section {
     width: 100%;
-    justify-content: center;
+  }
+
+  .date-form {
+    width: 100%;
+  }
+
+  .date-select {
+    flex: 1;
+  }
+  
+  .button-group {
+    width: 100%;
+    justify-content: flex-start;
     flex-wrap: wrap;
+  }
+
+  .button-group a {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-controls {
+    padding: 12px;
+    margin: 76px 8px 12px 8px;
+  }
+
+  .date-label {
+    display: none;
+  }
+
+  .date-select {
+    font-size: 12px;
+    padding: 7px 12px;
+  }
+
+  .btn-load {
+    padding: 7px 16px;
+    font-size: 12px;
+  }
+
+  .button-group a {
+    padding: 6px 12px;
+    font-size: 11px;
   }
 }

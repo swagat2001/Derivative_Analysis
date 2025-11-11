@@ -6,8 +6,10 @@
 
     <!-- Left Section (Logo) -->
     <div class="header-logo">
-      <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" 
-           alt="Goldmine Logo" class="logo-img">
+      <a href="{{ url_for('dashboard.dashboard') }}" class="logo-link" title="Go to Dashboard">
+        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" 
+             alt="Goldmine Logo" class="logo-img">
+      </a>
     </div>
 
     <!-- Center Title -->

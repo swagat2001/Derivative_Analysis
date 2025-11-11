@@ -30,6 +30,23 @@
   align-items: center;
 }
 
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.logo-link:active {
+  transform: scale(0.98);
+}
+
 .logo-img {
   width: 150px;
   height: 40px;
