@@ -1,0 +1,410 @@
+<!-- ============================= -->
+<!-- SCREENER: MONEYNESS SECTION -->
+<!-- ============================= -->
+<section class="screener-section">
+  <h2 class="section-title">💰 Moneyness Changes</h2>
+  
+  <div class="cards-grid">
+    <!-- CALL OPTIONS - ALL -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 Call Moneyness Gainers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_call_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 Call Moneyness Losers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_call_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CALL OPTIONS - ITM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 ITM Call Moneyness Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_call_itm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 ITM Call Moneyness Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_call_itm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CALL OPTIONS - OTM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 OTM Call Moneyness Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_call_otm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 OTM Call Moneyness Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_call_otm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PUT OPTIONS - ALL -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 Put Moneyness Gainers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_put_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 Put Moneyness Losers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_put_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PUT OPTIONS - ITM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 ITM Put Moneyness Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_put_itm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 ITM Put Moneyness Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_put_itm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PUT OPTIONS - OTM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 OTM Put Moneyness Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_put_otm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 OTM Put Moneyness Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.moneyness_put_otm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] | join(', ') }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

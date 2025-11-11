@@ -45,6 +45,18 @@ def get_live_indices():
 def dashboard():
     try:
         dates = get_available_dates()
+        
+        # Handle empty dates gracefully
+        if not dates:
+            return render_template(
+                "dashboard.html",
+                data=[],
+                dates=[],
+                selected_date=None,
+                mtype="TOTAL",
+                indices=get_live_indices()
+            )
+        
         selected_date = request.args.get("date", dates[0])
         mtype = request.args.get("mtype", "TOTAL")
         data = get_dashboard_data(selected_date, mtype)
@@ -58,6 +70,9 @@ def dashboard():
             indices=get_live_indices()
         )
     except Exception as e:
+        print(f"[ERROR] Dashboard route failed: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": f"Dashboard rendering failed: {str(e)}"}), 500
 
     

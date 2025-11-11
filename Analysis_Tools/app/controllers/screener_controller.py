@@ -80,6 +80,10 @@ def screener():
         screener_data['moneyness_put_itm_losers'] = sorted(all_data['moneyness']['PE']['ITM'], key=lambda x: x['change'])[:10]
         screener_data['moneyness_put_otm_losers'] = sorted(all_data['moneyness']['PE']['OTM'], key=lambda x: x['change'])[:10]
         
+        # Future Moneyness Gainers and Losers (NEW)
+        screener_data['future_moneyness_gainers'] = all_data['moneyness']['FUT']['ALL'][:10]
+        screener_data['future_moneyness_losers'] = sorted(all_data['moneyness']['FUT']['ALL'], key=lambda x: x['change'])[:10]
+        
         # IV Gainers
         screener_data['iv_call_gainers'] = all_data['iv']['CE']['ALL'][:10]
         screener_data['iv_call_itm_gainers'] = all_data['iv']['CE']['ITM'][:10]
@@ -100,6 +104,56 @@ def screener():
         screener_data['future_oi_gainers'] = all_data['oi']['FUT']['ALL'][:10]
         screener_data['future_oi_losers'] = sorted(all_data['oi']['FUT']['ALL'], key=lambda x: x['change'])[:10]
         
+        # Build ticker occurrence map for hover tooltip
+        # Map internal keys to human-friendly section names
+        section_names = {
+            'oi_call_gainers': 'Top 10 OI Call Gainers (All)',
+            'oi_call_itm_gainers': 'Top 10 ITM Call OI Gainers',
+            'oi_call_otm_gainers': 'Top 10 OTM Call OI Gainers',
+            'oi_put_gainers': 'Top 10 OI Put Gainers (All)',
+            'oi_put_itm_gainers': 'Top 10 ITM Put OI Gainers',
+            'oi_put_otm_gainers': 'Top 10 OTM Put OI Gainers',
+            'oi_call_losers': 'Top 10 OI Call Losers (All)',
+            'oi_call_itm_losers': 'Top 10 ITM Call OI Losers',
+            'oi_call_otm_losers': 'Top 10 OTM Call OI Losers',
+            'oi_put_losers': 'Top 10 OI Put Losers (All)',
+            'oi_put_itm_losers': 'Top 10 ITM Put OI Losers',
+            'oi_put_otm_losers': 'Top 10 OTM Put OI Losers',
+            'moneyness_call_gainers': 'Top 10 Moneyness Call Gainers',
+            'moneyness_call_itm_gainers': 'Top 10 ITM Call Moneyness Gainers',
+            'moneyness_call_otm_gainers': 'Top 10 OTM Call Moneyness Gainers',
+            'moneyness_put_gainers': 'Top 10 Moneyness Put Gainers',
+            'moneyness_put_itm_gainers': 'Top 10 ITM Put Moneyness Gainers',
+            'moneyness_put_otm_gainers': 'Top 10 OTM Put Moneyness Gainers',
+            'moneyness_call_losers': 'Top 10 Moneyness Call Losers',
+            'moneyness_call_itm_losers': 'Top 10 ITM Call Moneyness Losers',
+            'moneyness_call_otm_losers': 'Top 10 OTM Call Moneyness Losers',
+            'moneyness_put_losers': 'Top 10 Moneyness Put Losers',
+            'moneyness_put_itm_losers': 'Top 10 ITM Put Moneyness Losers',
+            'moneyness_put_otm_losers': 'Top 10 OTM Put Moneyness Losers',
+            'future_oi_gainers': 'Top 10 Future OI Gainers',
+            'future_oi_losers': 'Top 10 Future OI Losers',
+            'future_moneyness_gainers': 'Top 10 Future Moneyness Gainers',
+            'future_moneyness_losers': 'Top 10 Future Moneyness Losers'
+        }
+
+        # Build ticker occurrence count for hover tooltip (simplified)
+        ticker_map = {}
+        for key, display in section_names.items():
+            items = screener_data.get(key, [])
+            for idx, item in enumerate(items, 1):
+                tk = item.get('ticker')
+                if not tk:
+                    continue
+                # Just count appearances instead of listing all sections
+                if tk not in ticker_map:
+                    ticker_map[tk] = 0
+                ticker_map[tk] += 1
+        
+        # Convert count to readable string
+        ticker_map = {k: f"Appears in {v} list(s)" for k, v in ticker_map.items()}
+
+        
         print(f"[INFO] Screener data prepared, rendering template...")
         
         return render_template(
@@ -107,7 +161,8 @@ def screener():
             dates=dates,
             selected_date=selected_date,
             indices=get_live_indices(),
-            screener_data=screener_data
+            screener_data=screener_data,
+            ticker_map=ticker_map
         )
         
     except Exception as e:

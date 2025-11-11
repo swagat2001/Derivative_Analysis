@@ -19,19 +19,17 @@
 <!-- ============================= -->
 <!-- 🌐 Universal Header -->
 <!-- ============================= -->
-{% include 'dashboard_header.html' %}
+{% include 'dashboard/dashboard_header.html' %}
 
 <!-- ============================= -->
 <!-- 🎛️ Stock Detail Controls Bar -->
 <!-- ============================= -->
-{% include 'stock_detail_controls_bar.html' %}
+{% include 'stock_detail/stock_detail_controls_bar.html' %}
 
 <!-- ============================= -->
 <!-- 📌 Symbol Header -->
 <!-- ============================= -->
-<div class="symbol-header">
-  <h2>Symbol : <span class="symbol-name">{{ ticker }}</span></h2>
-</div>
+{% include 'stock_detail/stock_detail_header.html' %}
 
 <!-- ============================= -->
 <!-- 📈 Stock Detail Section -->
@@ -47,30 +45,30 @@
     <div class="left-side">
       <!-- 📅 Expiry Summary Table -->
       <div class="card">
-        {% include 'stock_detail_expiry.html' %}
+        {% include 'stock_detail/stock_detail_expiry.html' %}
       </div>
       
       <!-- 📊 Stats Table -->
       <div class="card">
-        {% include 'stock_detail_stats.html' %}
+        {% include 'stock_detail/stock_detail_stats.html' %}
       </div>
     </div>
 
     <!-- RIGHT SIDE: Gauges -->
     <div class="right-side">
       <div class="card">
-        {% include 'stock_detail_gauges.html' %}
+        {% include 'stock_detail/stock_detail_gauges.html' %}
       </div>
     </div>
   </div>
 
   <!-- 📈 Price Chart -->
-  {% include 'stock_detail_chart.html' %}
+  {% include 'stock_detail/stock_detail_chart.html' %}
 
   <!-- 📘 Option Chain Table -->
-  {% include 'stock_detail_option_chain.html' %}
+  {% include 'stock_detail/stock_detail_option_chain.html' %}
 
-  {% include 'stock_detail_oi_charts.html' %}
+  {% include 'stock_detail/stock_detail_oi_charts.html' %}
 
   {% else %}
   <p class="no-data">No stock details found for {{ ticker }} on {{ selected_date }}</p>
@@ -79,15 +77,9 @@
 </div>
 
 <!-- ============================= -->
-<!-- 📜 Minimal JavaScript -->
-<!-- Header shrink on scroll -->
+<!-- 📜 JavaScript -->
 <!-- ============================= -->
-<script>
-window.addEventListener('scroll', function() {
-  const header = document.querySelector('.dashboard-header');
-  if (window.scrollY > 50) header.classList.add('shrink');
-  else header.classList.remove('shrink');
-});
-</script>
+<script src="{{ url_for('static', filename='js/stock_detail_gauges.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stock_detail_oi_charts.js') }}"></script>
 
 {% endblock %}
