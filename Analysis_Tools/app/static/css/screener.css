@@ -216,7 +216,9 @@
    CARD TABLE - CLEAN DATA PRESENTATION
    ============================================================= */
 .card-table {
-  overflow-x: auto;
+  width: 100%;
+  display: block;
+  overflow-x: hidden;
   background: var(--bg-white);
 }
 
@@ -250,9 +252,41 @@
   font-weight: 700;
   font-size: 12px;
   color: var(--goldmine-maroon);
-  white-space: nowrap;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+}
+
+/* Rank column header - fixed width */
+.card-table th:first-child {
+  width: 5%;
+  text-align: center;
+  padding: 14px 12px;
+  white-space: nowrap;
+}
+
+/* Symbol column header */
+.card-table th:nth-child(2) {
+  width: 35%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Underlying Price column header */
+.card-table th:nth-child(3) {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Change/Percentage column header */
+.card-table th:nth-child(4),
+.card-table th:last-child {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
 }
 
 .card-table tbody tr {
@@ -274,14 +308,41 @@
   font-weight: 500;
 }
 
-/* Rank column */
+/* Rank column - fixed width */
 .card-table td:first-child {
   font-weight: 700;
   color: var(--goldmine-gold) !important;
   text-align: center;
-  width: 60px;
+  width: 5%;
   font-size: 15px;
   background: linear-gradient(to right, var(--goldmine-gold-pale) 0%, transparent 100%);
+  padding: 14px 12px;
+  white-space: nowrap;
+}
+
+/* Symbol column - flexible */
+.card-table td:nth-child(2) {
+  width: 35%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Underlying Price column */
+.card-table td:nth-child(3) {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Change/Percentage column */
+.card-table td:nth-child(4),
+.card-table td:last-child {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
 }
 
 /* =============================================================

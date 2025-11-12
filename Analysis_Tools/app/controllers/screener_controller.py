@@ -137,7 +137,7 @@ def screener():
             'future_moneyness_losers': 'Top 10 Future Moneyness Losers'
         }
 
-        # Build ticker occurrence count for hover tooltip (simplified)
+        # Build ticker occurrence map for hover tooltip (list of sections)
         ticker_map = {}
         for key, display in section_names.items():
             items = screener_data.get(key, [])
@@ -145,13 +145,13 @@ def screener():
                 tk = item.get('ticker')
                 if not tk:
                     continue
-                # Just count appearances instead of listing all sections
+                # Add section name to ticker's list
                 if tk not in ticker_map:
-                    ticker_map[tk] = 0
-                ticker_map[tk] += 1
+                    ticker_map[tk] = []
+                ticker_map[tk].append(display)
         
-        # Convert count to readable string
-        ticker_map = {k: f"Appears in {v} list(s)" for k, v in ticker_map.items()}
+        # Format tooltip text with newlines for readability
+        ticker_map = {k: '\n'.join(v) for k, v in ticker_map.items()}
 
         
         print(f"[INFO] Screener data prepared, rendering template...")
