@@ -1,9 +1,8 @@
 """
-SCREENER CACHE BUILDER
-======================
-Pre-calculates all screener data (OI, Moneyness, IV changes) and stores in a cache table
-This is run daily as part of the update_database.py pipeline
-Results are fetched in <0.5 seconds instead of 10+ seconds
+SCREENER CACHE BUILDER - CORRECTED WITH STRIKE PRICES + BULL/BEAR CLASSIFICATION
+================================================================================
+Pre-calculates all screener data (OI, Moneyness, IV changes) with strike prices
+Added: Bullish/Bearish classification injected and final_signal attached to cache rows
 """
 
 from sqlalchemy import create_engine, inspect, text
@@ -21,23 +20,88 @@ db_name = 'BhavCopy_Database'
 db_password_enc = quote_plus(db_password)
 engine = create_engine(f'postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}')
 
+# ==================================================================================
+# BULLISH / BEARISH CATEGORY DEFINITIONS (reference)
+# Note: we will derive category names programmatically per-row (see build below)
+# ==================================================================================
+
+BULLISH_CATEGORIES = [
+    "CALL_IV_GAINERS_ALL", "CALL_IV_GAINERS_ITM", "CALL_IV_GAINERS_OTM",
+    "CALL_MONEYNESS_GAINERS_ALL", "CALL_MONEYNESS_GAINERS_ITM", "CALL_MONEYNESS_GAINERS_OTM",
+    "PUT_IV_LOSERS_ALL", "PUT_IV_LOSERS_ITM", "PUT_IV_LOSERS_OTM",
+    "PUT_MONEYNESS_LOSERS_ALL", "PUT_MONEYNESS_LOSERS_ITM", "PUT_MONEYNESS_LOSERS_OTM",
+    "FUT_OI_GAINERS_ALL",
+    "CALL_OI_GAINERS_ALL", "CALL_OI_GAINERS_ITM", "CALL_OI_GAINERS_OTM",
+    "PUT_OI_LOSERS_ALL", "PUT_OI_LOSERS_ITM", "PUT_OI_LOSERS_OTM"
+]
+
+BEARISH_CATEGORIES = [
+    "CALL_IV_LOSERS_ALL", "CALL_IV_LOSERS_ITM", "CALL_IV_LOSERS_OTM",
+    "CALL_MONEYNESS_LOSERS_ALL", "CALL_MONEYNESS_LOSERS_ITM", "CALL_MONEYNESS_LOSERS_OTM",
+    "PUT_IV_GAINERS_ALL", "PUT_IV_GAINERS_ITM", "PUT_IV_GAINERS_OTM",
+    "PUT_MONEYNESS_GAINERS_ALL", "PUT_MONEYNESS_GAINERS_ITM", "PUT_MONEYNESS_GAINERS_OTM",
+    "FUT_OI_LOSERS_ALL",
+    "CALL_OI_LOSERS_ALL", "CALL_OI_LOSERS_ITM", "CALL_OI_LOSERS_OTM",
+    "PUT_OI_GAINERS_ALL", "PUT_OI_GAINERS_ITM", "PUT_OI_GAINERS_OTM"
+]
+
+# ==================================================================================
+# FINAL CLASSIFICATION LOGIC
+# ==================================================================================
+def classify_final_signal(ticker, bullish_dict, bearish_dict):
+    """
+    Final binary rule:
+      - If bullish_signals > bearish_signals => BULLISH
+      - Else => BEARISH (ties go to BEARISH per your manager rule)
+    """
+    bull = bullish_dict.get(ticker, 0)
+    bear = bearish_dict.get(ticker, 0)
+    return "BULLISH" if bull > bear else "BEARISH"
+
 # =============================================================
-# CREATE SCREENER CACHE TABLE
+# CREATE SCREENER CACHE TABLE WITH STRIKE PRICE
 # =============================================================
 def create_screener_cache_table():
-    """Create the screener_cache table if it doesn't exist"""
+    """Create the screener_cache table if it doesn't exist - with strike_price column"""
     try:
+        # First check if table exists and add strike_price column if missing
+        check_query = """
+        DO $$ 
+        BEGIN
+            IF EXISTS (SELECT 1 FROM information_schema.tables 
+                      WHERE table_schema = 'public' 
+                      AND table_name = 'screener_cache') THEN
+                
+                -- Add strike_price column if it doesn't exist
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                              WHERE table_schema = 'public' 
+                              AND table_name = 'screener_cache' 
+                              AND column_name = 'strike_price') THEN
+                    ALTER TABLE public.screener_cache ADD COLUMN strike_price NUMERIC;
+                END IF;
+            END IF;
+        END $$;
+        """
+        
+        with engine.begin() as conn:
+            conn.execute(text(check_query))
+        
+        # Create table with strike_price column
         create_query = """
         CREATE TABLE IF NOT EXISTS public.screener_cache (
             id SERIAL PRIMARY KEY,
             cache_date DATE NOT NULL,
             metric_type VARCHAR(50) NOT NULL,
             option_type VARCHAR(10) NOT NULL,
-            moneyness_filter VARCHAR(10) NOT NULL,
+            moneyness_filter VARCHAR(50) NOT NULL,
             rank INT NOT NULL,
             ticker VARCHAR(50) NOT NULL,
+            strike_price NUMERIC,
             underlying_price NUMERIC NOT NULL,
             change NUMERIC NOT NULL,
+            bullish_count INT DEFAULT 0,
+            bearish_count INT DEFAULT 0,
+            final_signal VARCHAR(10) DEFAULT 'BEARISH',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         
@@ -52,7 +116,7 @@ def create_screener_cache_table():
         with engine.begin() as conn:
             conn.execute(text(create_query))
         
-        print("✅ Screener cache table created/verified")
+        print("✅ Screener cache table created/verified with strike_price column")
         return True
     
     except Exception as e:
@@ -60,7 +124,7 @@ def create_screener_cache_table():
         return False
 
 # =============================================================
-# CALCULATE SCREENER DATA
+# HELPER FUNCTIONS
 # =============================================================
 def get_prev_date(selected_date: str, all_dates: list):
     """Get previous trading date"""
@@ -92,10 +156,13 @@ def get_all_tables(engine):
         print(f"❌ Error getting tables: {e}")
         return []
 
+# =============================================================
+# CALCULATE SCREENER DATA WITH STRIKE PRICES - CORRECTED
+# =============================================================
 def calculate_screener_data_for_date(selected_date: str, all_dates: list):
     """
-    Calculate all screener data for a given date
-    Returns a list of rows to insert into screener_cache
+    Calculate all screener data for a given date INCLUDING strike prices
+    CORRECTED: Proper loop structure, strike_price in base_data
     """
     try:
         prev_date = get_prev_date(selected_date, all_dates)
@@ -106,8 +173,6 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
         all_tables = get_all_tables(engine)
         if not all_tables:
             return []
-        
-        cache_rows = []
         
         # Initialize result structure to collect all data
         result = {
@@ -207,15 +272,19 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                 # Get latest underlying price for this ticker
                 latest_underlying = df['UndrlygPric'].iloc[-1] if not df['UndrlygPric'].empty else df['UndrlygPric'].max()
                 
-                # Process FUTURES (OptnTp IS NULL)
+                # ========================================================
+                # SECTION 1: Process FUTURES (OptnTp IS NULL)
+                # ========================================================
                 df_fut = df[df['OptnTp'].isna()].copy()
                 if not df_fut.empty:
+                    # ✅ FIX: Add strike_price to base_data_fut
                     base_data_fut = {
                         'ticker': ticker,
-                        'underlying_price': float(latest_underlying) if pd.notna(latest_underlying) else 0.0
+                        'underlying_price': float(latest_underlying) if pd.notna(latest_underlying) else 0.0,
+                        'strike_price': 0.0  # Futures don't have strikes
                     }
                     
-                    # OI changes for futures - Calculate percentage change properly
+                    # OI changes for futures
                     if 'current_oi' in df_fut.columns and 'prev_oi' in df_fut.columns:
                         total_curr_oi_fut = df_fut['current_oi'].sum()
                         total_prev_oi_fut = df_fut['prev_oi'].sum()
@@ -223,7 +292,7 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         if pd.notna(oi_fut):
                             result['oi']['FUT']['ALL'].append({**base_data_fut, 'change': float(oi_fut)})
                     
-                    # Moneyness changes for futures - Calculate as percentage change of total value
+                    # Moneyness changes for futures
                     if 'current_oi' in df_fut.columns and 'current_ltp' in df_fut.columns:
                         df_fut['curr_value'] = df_fut['current_oi'] * df_fut['current_ltp']
                         df_fut['prev_value'] = df_fut['prev_oi'] * df_fut['prev_ltp']
@@ -233,7 +302,7 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         if pd.notna(moneyness_fut):
                             result['moneyness']['FUT']['ALL'].append({**base_data_fut, 'change': float(moneyness_fut)})
                     
-                    # IV changes for futures - Weighted by OI
+                    # IV changes for futures
                     if 'iv_change' in df_fut.columns and 'current_oi' in df_fut.columns:
                         if df_fut['current_oi'].sum() != 0:
                             iv_fut = (df_fut['iv_change'] * df_fut['current_oi']).sum() / df_fut['current_oi'].sum()
@@ -242,11 +311,20 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         if pd.notna(iv_fut):
                             result['iv']['FUT']['ALL'].append({**base_data_fut, 'change': float(iv_fut)})
                 
-                # Process each option type
+                # ========================================================
+                # SECTION 2: Process OPTIONS (CE and PE) with strike prices
+                # ========================================================
                 for opt_type in ['CE', 'PE']:
                     df_opt = df[df['OptnTp'] == opt_type].copy()
                     if df_opt.empty:
                         continue
+                    
+                    # ✅ FIX: Get strike price with highest OI for this option type
+                    if not df_opt.empty and 'current_oi' in df_opt.columns:
+                        max_oi_idx = df_opt['current_oi'].idxmax()
+                        max_oi_strike = float(df_opt.loc[max_oi_idx, 'StrkPric']) if pd.notna(df_opt.loc[max_oi_idx, 'StrkPric']) else 0.0
+                    else:
+                        max_oi_strike = 0.0
                     
                     # Filter ITM/OTM
                     if opt_type == 'CE':
@@ -256,15 +334,15 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         df_itm = df_opt[df_opt['strike_diff'] < 0].copy()
                         df_otm = df_opt[df_opt['strike_diff'] > 0].copy()
                     
-                    # Aggregate data
+                    # ✅ FIX: Aggregate data with strike_price
                     base_data = {
                         'ticker': ticker,
-                        'underlying_price': float(latest_underlying) if pd.notna(latest_underlying) else 0.0
+                        'underlying_price': float(latest_underlying) if pd.notna(latest_underlying) else 0.0,
+                        'strike_price': max_oi_strike  # Add strike price
                     }
                     
                     # OI changes - Calculate TOTAL OI change, then convert to percentage
                     if 'current_oi' in df_opt.columns and 'prev_oi' in df_opt.columns:
-                        # Calculate total OI for current and previous dates
                         total_curr_oi_all = df_opt['current_oi'].sum()
                         total_prev_oi_all = df_opt['prev_oi'].sum()
                         total_curr_oi_itm = df_itm['current_oi'].sum() if not df_itm.empty else 0
@@ -272,7 +350,6 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         total_curr_oi_otm = df_otm['current_oi'].sum() if not df_otm.empty else 0
                         total_prev_oi_otm = df_otm['prev_oi'].sum() if not df_otm.empty else 0
                         
-                        # Calculate percentage change properly: (current - previous) / previous * 100
                         oi_all = ((total_curr_oi_all - total_prev_oi_all) / total_prev_oi_all * 100) if total_prev_oi_all != 0 else 0
                         oi_itm = ((total_curr_oi_itm - total_prev_oi_itm) / total_prev_oi_itm * 100) if total_prev_oi_itm != 0 else 0
                         oi_otm = ((total_curr_oi_otm - total_prev_oi_otm) / total_prev_oi_otm * 100) if total_prev_oi_otm != 0 else 0
@@ -284,18 +361,15 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         if pd.notna(oi_otm) and oi_otm != 0:
                             result['oi'][opt_type]['OTM'].append({**base_data, 'change': float(oi_otm)})
                     
-                    # Moneyness changes - Calculate as percentage change of total value (OI × Price)
+                    # Moneyness changes
                     if 'current_oi' in df_opt.columns and 'current_ltp' in df_opt.columns:
-                        # Calculate total notional value (OI × LTP) for current and previous
                         df_opt['curr_value'] = df_opt['current_oi'] * df_opt['current_ltp']
                         df_opt['prev_value'] = df_opt['prev_oi'] * df_opt['prev_ltp']
                         
-                        # Calculate for ALL
                         total_curr_value_all = df_opt['curr_value'].sum()
                         total_prev_value_all = df_opt['prev_value'].sum()
                         money_all = ((total_curr_value_all - total_prev_value_all) / total_prev_value_all * 100) if total_prev_value_all != 0 else 0
                         
-                        # Calculate for ITM
                         if not df_itm.empty:
                             df_itm['curr_value'] = df_itm['current_oi'] * df_itm['current_ltp']
                             df_itm['prev_value'] = df_itm['prev_oi'] * df_itm['prev_ltp']
@@ -305,7 +379,6 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         else:
                             money_itm = 0
                         
-                        # Calculate for OTM
                         if not df_otm.empty:
                             df_otm['curr_value'] = df_otm['current_oi'] * df_otm['current_ltp']
                             df_otm['prev_value'] = df_otm['prev_oi'] * df_otm['prev_ltp']
@@ -322,9 +395,8 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         if pd.notna(money_otm) and money_otm != 0:
                             result['moneyness'][opt_type]['OTM'].append({**base_data, 'change': float(money_otm)})
                     
-                    # IV changes - Calculate weighted average IV change
+                    # IV changes
                     if 'iv_change' in df_opt.columns and 'current_oi' in df_opt.columns:
-                        # Weight IV change by OI to get more meaningful result
                         if df_opt['current_oi'].sum() != 0:
                             iv_all = (df_opt['iv_change'] * df_opt['current_oi']).sum() / df_opt['current_oi'].sum()
                         else:
@@ -348,16 +420,26 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                             result['iv'][opt_type]['OTM'].append({**base_data, 'change': float(iv_otm)})
             
             except Exception as e:
-                print(f"      ⚠️  Error processing {table_name}: {str(e)[:50]}")
+                print(f"      ⚠️  Error processing {table_name}: {str(e)[:200]}")
                 continue
         
-        # Sort all results and build cache rows
+        # ========================================================
+        # SECTION 3: Build cache rows (AFTER all tables processed)
+        # ========================================================
+        cache_rows = []
+        
         for metric_type in ['oi', 'moneyness', 'iv']:
             for opt_type in ['CE', 'PE', 'FUT']:
                 if opt_type == 'FUT':
-                    result[metric_type][opt_type]['ALL'].sort(key=lambda x: x['change'], reverse=True)
-                    # Add all results (gainers)
-                    for rank, item in enumerate(result[metric_type][opt_type]['ALL'][:10], 1):
+                    all_data = result[metric_type][opt_type]['ALL']
+                    
+                    gainers = [x for x in all_data if x['change'] > 0]
+                    gainers.sort(key=lambda x: x['change'], reverse=True)
+                    
+                    losers = [x for x in all_data if x['change'] < 0]
+                    losers.sort(key=lambda x: x['change'])
+                    
+                    for rank, item in enumerate(gainers[:10], 1):
                         cache_rows.append({
                             'cache_date': selected_date,
                             'metric_type': metric_type,
@@ -366,11 +448,10 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                             'rank': rank,
                             'ticker': item['ticker'],
                             'underlying_price': item['underlying_price'],
+                            'strike_price': item.get('strike_price', 0),
                             'change': item['change']
                         })
                     
-                    # Add losers (reversed)
-                    losers = sorted(result[metric_type][opt_type]['ALL'], key=lambda x: x['change'])
                     for rank, item in enumerate(losers[:10], 1):
                         cache_rows.append({
                             'cache_date': selected_date,
@@ -380,14 +461,27 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                             'rank': rank,
                             'ticker': item['ticker'],
                             'underlying_price': item['underlying_price'],
+                            'strike_price': item.get('strike_price', 0),
                             'change': item['change']
                         })
+                
                 else:
                     for filter_type in ['ALL', 'ITM', 'OTM']:
-                        result[metric_type][opt_type][filter_type].sort(key=lambda x: x['change'], reverse=True)
+                        if filter_type not in result[metric_type][opt_type]:
+                            continue
+                            
+                        all_data = result[metric_type][opt_type][filter_type]
                         
-                        # Add gainers
-                        for rank, item in enumerate(result[metric_type][opt_type][filter_type][:10], 1):
+                        if not all_data:
+                            continue
+                        
+                        gainers = [x for x in all_data if x['change'] > 0]
+                        gainers.sort(key=lambda x: x['change'], reverse=True)
+                        
+                        losers = [x for x in all_data if x['change'] < 0]
+                        losers.sort(key=lambda x: x['change'])
+                        
+                        for rank, item in enumerate(gainers[:10], 1):
                             cache_rows.append({
                                 'cache_date': selected_date,
                                 'metric_type': metric_type,
@@ -396,11 +490,10 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                                 'rank': rank,
                                 'ticker': item['ticker'],
                                 'underlying_price': item['underlying_price'],
+                                'strike_price': item.get('strike_price', 0),
                                 'change': item['change']
                             })
                         
-                        # Add losers
-                        losers = sorted(result[metric_type][opt_type][filter_type], key=lambda x: x['change'])
                         for rank, item in enumerate(losers[:10], 1):
                             cache_rows.append({
                                 'cache_date': selected_date,
@@ -410,11 +503,93 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                                 'rank': rank,
                                 'ticker': item['ticker'],
                                 'underlying_price': item['underlying_price'],
+                                'strike_price': item.get('strike_price', 0),
                                 'change': item['change']
                             })
         
+        # ========================================================
+        # SECTION 4: Build bullish/bearish counts & final signal
+        # ========================================================
+        try:
+            bullish_dict = {}
+            bearish_dict = {}
+            
+            # metric -> token map
+            metric_map = {'OI': 'OI', 'IV': 'IV', 'MONEYNESS': 'MONEYNESS'}
+            
+            for row in cache_rows:
+                metric_type = str(row.get('metric_type', '')).upper()      # 'oi', 'iv', 'moneyness'
+                option_type = str(row.get('option_type', '')).upper()      # 'CE' / 'PE' / 'FUT'
+                moneyness_filter = str(row.get('moneyness_filter', '')).upper()  # 'ALL', 'ITM', 'ITM_LOSERS', etc.
+                change = row.get('change', 0)
+                ticker = row.get('ticker')
+                if not ticker:
+                    continue
+                
+                # Determine direction
+                direction = 'GAINERS' if (change is not None and change > 0) else 'LOSERS'
+                
+                # Metric label
+                metric_label = metric_type.upper()
+                if metric_label == 'OI':
+                    metric_label_token = 'OI'
+                elif metric_label == 'IV':
+                    metric_label_token = 'IV'
+                else:
+                    metric_label_token = 'MONEYNESS'
+                
+                # Normalize moneyness token: if filter endswith '_LOSERS', remove suffix for token position
+                # Our desired canonical naming is: <OPTION>_<METRIC>_<DIRECTION>_<BUCKET>
+                # Where BUCKET is ONE OF: ALL / ITM / OTM
+                bucket = moneyness_filter
+                # If bucket contains '_LOSERS' (like 'ALL_LOSERS' or 'ITM_LOSERS') remove suffix for naming
+                if bucket.endswith('_LOSERS'):
+                    bucket_base = bucket.replace('_LOSERS', '')
+                else:
+                    bucket_base = bucket
+                
+                # For FUT, bucket_base should be 'ALL'
+                if option_type == 'FUT':
+                    bucket_base = 'ALL'
+                
+                # Build canonical category
+                canonical = f"{option_type}_{metric_label_token}_{direction}_{bucket_base}"
+                canonical = canonical.replace(' ', '_')
+                
+                # Now count towards bullish or bearish depending on membership
+                if canonical in BULLISH_CATEGORIES:
+                    bullish_dict[ticker] = bullish_dict.get(ticker, 0) + 1
+                if canonical in BEARISH_CATEGORIES:
+                    bearish_dict[ticker] = bearish_dict.get(ticker, 0) + 1
+                
+                # Additional heuristic mapping: (cover cases where list used reversed sign logic)
+                # e.g., PUT_IV_LOSERS_ALL is bullish (IV down on puts == bullish) — already handled above
+                # If no exact match found, try alternate canonical forms (swap direction) and check membership
+                if canonical not in BULLISH_CATEGORIES and canonical not in BEARISH_CATEGORIES:
+                    # Try alternate: sometimes metric naming used CALL_IV_GAINERS_ALL vs 'CE_IV_GAINERS_ALL'
+                    alt_opt = 'CALL' if option_type == 'CE' else ('PUT' if option_type == 'PE' else option_type)
+                    alt_canonical = f"{alt_opt}_{metric_label_token}_{direction}_{bucket_base}"
+                    if alt_canonical in BULLISH_CATEGORIES:
+                        bullish_dict[ticker] = bullish_dict.get(ticker, 0) + 1
+                    if alt_canonical in BEARISH_CATEGORIES:
+                        bearish_dict[ticker] = bearish_dict.get(ticker, 0) + 1
+            
+            # compute final signals
+            final_signals = {}
+            all_tickers = set(list(bullish_dict.keys()) + list(bearish_dict.keys()))
+            for t in all_tickers:
+                final_signals[t] = classify_final_signal(t, bullish_dict, bearish_dict)
+            
+            # attach counts and final signal to each cache row (so db insert will include)
+            for row in cache_rows:
+                row['bullish_count'] = int(bullish_dict.get(row.get('ticker'), 0) or 0)
+                row['bearish_count'] = int(bearish_dict.get(row.get('ticker'), 0) or 0)
+                row['final_signal'] = final_signals.get(row.get('ticker'), 'BEARISH')
+        except Exception as e:
+            print(f"⚠️ Error computing final signals: {e}")
+        
         return cache_rows
-    
+
     except Exception as e:
         print(f"❌ Error calculating screener data: {e}")
         import traceback
@@ -431,10 +606,10 @@ def precalculate_screener_cache():
     """
     try:
         print("\n" + "="*80)
-        print("SCREENER CACHE: PRE-CALCULATING DATA FOR FAST PAGE LOADS")
+        print("SCREENER CACHE: PRE-CALCULATING DATA WITH STRIKE PRICES")
         print("="*80 + "\n")
         
-        # Create cache table if it doesn't exist
+        # Create/update cache table
         if not create_screener_cache_table():
             return False
         
@@ -485,6 +660,11 @@ def precalculate_screener_cache():
             if cache_rows:
                 # Insert into database
                 df_cache = pd.DataFrame(cache_rows)
+                # ensure columns exist in df before writing
+                expected_cols = ['cache_date','metric_type','option_type','moneyness_filter','rank','ticker','strike_price','underlying_price','change','bullish_count','bearish_count','final_signal']
+                for c in expected_cols:
+                    if c not in df_cache.columns:
+                        df_cache[c] = None
                 df_cache.to_sql('screener_cache', con=engine, if_exists='append', index=False)
                 print(f"✅ ({len(cache_rows)} rows)")
                 total_rows_inserted += len(cache_rows)

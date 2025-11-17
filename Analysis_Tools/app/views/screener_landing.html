@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Screener{% endblock %}
+
+{% block page_css %}
+<style>
+    .screener-landing {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .landing-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .landing-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+    }
+
+    .landing-header p {
+        font-size: 16px;
+        color: #666;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .option-card {
+        background: #2a2e39;
+        border-radius: 12px;
+        padding: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        border: 2px solid transparent;
+    }
+
+    .option-card:hover {
+        transform: translateY(-5px);
+        border-color: #8B2432;
+        box-shadow: 0 10px 30px rgba(139, 36, 50, 0.3);
+    }
+
+    .option-card h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .option-card h2::after {
+        content: '→';
+        font-size: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .option-card:hover h2::after {
+        transform: translateX(5px);
+    }
+
+    .option-card p {
+        font-size: 14px;
+        color: #aaa;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .option-icon {
+        width: 48px;
+        height: 48px;
+        background: #8B2432;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .options-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="screener-landing">
+    <div class="landing-header">
+        <h1>Screener Analysis</h1>
+        <p>Choose your analysis type</p>
+    </div>
+
+    <div class="options-grid">
+        <!-- Top Gainers & Losers -->
+        <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="option-card">
+            <div class="option-icon">📊</div>
+            <h2>Top Gainers & Losers</h2>
+            <p>
+                Comprehensive view of top 10 gainers and losers across 40 different categories including 
+                OI changes, IV changes, Moneyness changes for Calls, Puts and Futures with PDF export functionality.
+            </p>
+        </a>
+
+        <!-- Signal Analysis -->
+        <a href="{{ url_for('signal_analysis.signal_analysis') }}" class="option-card">
+            <div class="option-icon">🎯</div>
+            <h2>Signal Analysis</h2>
+            <p>
+                Advanced bullish and bearish signal classification based on multi-factor analysis. 
+                Filter and analyze stocks showing strong directional signals with detailed breakdowns.
+            </p>
+        </a>
+    </div>
+</div>
+{% endblock %}

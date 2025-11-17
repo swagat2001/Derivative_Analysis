@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Stock Selection - Derivatives Dashboard{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_search.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Stock Search/Selection Page -->
+<div class="stock-search-container">
+  
+  <!-- Page Header -->
+  <div class="stock-search-header">
+    <h1>Select a Stock to View Details</h1>
+  </div>
+
+  <!-- Stock Selection Controls -->
+  <div class="stock-search-controls">
+    
+    <!-- Date Selector -->
+    <div class="date-section">
+      <label for="searchDate" class="label">📅 Select Date:</label>
+      <select id="searchDate" class="date-select">
+        {% for d in dates %}
+          <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Stock Symbol Selector -->
+    <div class="symbol-section">
+      <label for="stockSymbol" class="label">📊 Select Stock Symbol:</label>
+      <select id="stockSymbol" class="symbol-select">
+        <option value="">-- Choose a Stock --</option>
+        {% if all_symbols %}
+          {% for symbol in all_symbols %}
+            <option value="{{ symbol }}">{{ symbol }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="action-section">
+      <form id="stockSelectionForm" method="GET" class="selection-form">
+        <input type="hidden" name="ticker" id="tickerInput" value="">
+        <input type="hidden" name="date" id="dateInput" value="{{ selected_date }}">
+        <button type="submit" class="btn-view-detail" disabled>
+          View Stock Detail
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Help Text -->
+  <div class="stock-search-info">
+    <p>Select a date and stock symbol above to view the stock option chain analysis and details.</p>
+  </div>
+
+</div>
+
+<!-- Inline Script to handle stock selection -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const stockSelect = document.getElementById('stockSymbol');
+  const dateSelect = document.getElementById('searchDate');
+  const submitBtn = document.querySelector('.btn-view-detail');
+  const tickerInput = document.getElementById('tickerInput');
+  const dateInput = document.getElementById('dateInput');
+  const form = document.getElementById('stockSelectionForm');
+
+  // Enable button only when stock is selected
+  stockSelect.addEventListener('change', function() {
+    submitBtn.disabled = this.value === '';
+    if (this.value !== '') {
+      tickerInput.value = this.value;
+    }
+  });
+
+  // Update date input when date changes
+  dateSelect.addEventListener('change', function() {
+    dateInput.value = this.value;
+  });
+
+  // Handle form submission - redirect to stock detail
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (stockSelect.value) {
+      const ticker = stockSelect.value;
+      const date = dateSelect.value;
+      window.location.href = `/stock/${ticker}?date=${date}`;
+    }
+  });
+
+  // Allow double-click to navigate
+  stockSelect.addEventListener('dblclick', function() {
+    if (this.value) {
+      const ticker = this.value;
+      const date = dateSelect.value;
+      window.location.href = `/stock/${ticker}?date=${date}`;
+    }
+  });
+});
+</script>
+
+{% endblock %}

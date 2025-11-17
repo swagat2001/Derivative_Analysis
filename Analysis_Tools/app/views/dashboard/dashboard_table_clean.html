@@ -1,9 +1,17 @@
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_table.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_chart_modal.css') }}">
 
 <div class="table-wrapper">
+  <!-- Filter Buttons - Will align with DataTables controls -->
+  <div class="table-filter-buttons">
+    <a href="/?date={{ selected_date }}&mtype=TOTAL" class="btn-filter-total {% if mtype=='TOTAL' %}active{% endif %}">TOTAL</a>
+    <a href="/?date={{ selected_date }}&mtype=OTM" class="btn-filter-otm {% if mtype=='OTM' %}active{% endif %}">OTM</a>
+    <a href="/?date={{ selected_date }}&mtype=ITM" class="btn-filter-itm {% if mtype=='ITM' %}active{% endif %}">ITM</a>
+  </div>
+  
   <div class="table-container">
     <table id="derivativesTable" class="derivatives-table display nowrap" style="width:100%">
       <thead>
@@ -78,10 +86,10 @@
             {{ row.call_vega_neg_pct }}
           </td>
           
-          <!-- Call ΔTV -->
+          <!-- Call ATV -->
           <td>{{ "%.2f"|format(row.call_total_tradval or 0) }}</td>
           
-          <!-- Call ΔMoney (CLICKABLE) -->
+          <!-- Call AMoney (CLICKABLE) -->
           <td class="money-clickable" 
               onclick="openChartModal(this)" 
               data-stock="{{ row.stock }}" 
@@ -131,10 +139,10 @@
             {{ row.put_vega_neg_pct }}
           </td>
           
-          <!-- Put ΔTV -->
+          <!-- Put ATV -->
           <td>{{ "%.2f"|format(row.put_total_tradval or 0) }}</td>
           
-          <!-- Put ΔMoney (CLICKABLE) -->
+          <!-- Put AMoney (CLICKABLE) -->
           <td class="money-clickable" 
               onclick="openChartModal(this)" 
               data-stock="{{ row.stock }}" 

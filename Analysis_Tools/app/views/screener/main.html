@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Goldmine Derivatives Report</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+
+/* ==============================
+   A4 PAGE SETUP (PDF-SAFE)
+   ============================== */
+@page {
+    size: A4;
+    margin: 0px;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: DejaVu Sans, sans-serif;
+    background-color: #000000;
+}
+
+/* MAIN A4 PAGE TABLE */
+.main-table {
+    width: 595pt;
+    height: 842pt;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background-color: #000000;
+}
+
+/* HEADINGS */
+.title-large {
+    font-weight: bold;
+    font-size: 32px;
+    color: #FFD700;
+    letter-spacing: 10px;
+}
+.title-white {
+    font-weight: bold;
+    font-size: 26px;
+    color: #FFFFFF;
+}
+.subtitle {
+    padding-top: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #FF4D4D;
+}
+
+/* DESCRIPTION */
+.description {
+    color: #CCCCCC;
+    font-size: 18px;
+    line-height: 22px;
+    padding: 15px;
+    border-left: 3px solid #FFD700;
+    border-right: 3px solid #FFD700;
+    background-color: #1A1A1A;
+}
+
+/* REPORT TABLE */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #0A0A0A;
+}
+.report-table td {
+    border: 2px solid #FFD700;
+    padding: 5px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: bold;
+}
+.icon-col {
+    width: 40px;
+    text-align: center;
+    color: #FFD700;
+    font-size: 20px;
+}
+.section-heading {
+    font-size: 22px;
+    font-weight: bold;
+    color: #FF4D4D;
+}
+
+/* FOOTER */
+.footer-section {
+    background-color: #660000;
+    padding: 15px;
+    color: #FFFFFF;
+    font-size: 16px;
+    border-top: 2px solid #FFD700;
+    border-bottom: 2px solid #FFD700;
+}
+.footer-heading {
+    font-size: 20px;
+    font-weight: bold;
+    color: #FFD700;
+}
+.footer-text {
+    font-size: 16px;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 12px 0;
+    background-color: #000000;
+}
+
+</style>
+</head>
+
+<body>
+<table class="main-table">
+
+<!-- TOP HEADING + LOGO -->
+<tr>
+    <td width="16%" align="center" style="padding-top: 25px;">
+        <img src="{{cover_logo_url}}" width="150" alt="logo" />
+    </td>
+    <td width="84%" valign="top" style="padding: 25px;">
+        <div class="title-large" align="left">AI-POWERED</div>
+        <div class="title-white" align="left">DERIVATIVES ANALYSIS</div>
+        <div class="subtitle" align="left">
+            ANALYZED EOD DATA OF : <span style="color:#FFFFFF;">{{cover_date}}</span>
+        </div>
+    </td>
+</tr>
+
+<!-- BULL IMAGE -->
+<tr>
+    <td colspan="2" style="padding-top: 2px;">
+        <img src="{{cover_bull_url}}" width="900" height="400" style="display:block;" />
+    </td>
+</tr>
+
+<!-- DESCRIPTION TEXT -->
+<tr>
+    <td colspan="2">
+        <div class="description">
+            This comprehensive report leverages our AI-powered platform to identify key
+            market opportunities in derivatives trading. Our analytics scan thousands of
+            options contracts to bring you actionable insights.
+        </div>
+    </td>
+</tr>
+
+<!-- REPORT INCLUDES TABLE -->
+<tr>
+    <td colspan="2">
+        <table class="report-table">
+            <tr>
+                <td class="icon-col">&#10003;</td>
+                <td class="section-heading" align="left">REPORT INCLUDES</td>
+            </tr>
+            <tr><td class="icon-col">&#10003;</td><td align="left">OPEN INTEREST CHANGES ANALYSIS</td></tr>
+            <tr><td class="icon-col">&#10003;</td><td align="left">MONEYNESS-BASED OPPORTUNITIES</td></tr>
+            <tr><td class="icon-col">&#10003;</td><td align="left">IMPLIED VOLATILITY MOVEMENTS</td></tr>
+            <tr><td class="icon-col">&#10003;</td><td align="left">FUTURES MARKET INTELLIGENCE</td></tr>
+            <tr><td class="icon-col">&#10003;</td><td align="left">TOP 10 GAINERS AND LOSERS BY CATEGORY</td></tr>
+        </table>
+    </td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+    <td colspan="2" class="footer-section">
+        <div class="footer-heading" align="left">Corporate Office:</div>
+        <div align="left">
+            “Goldmine House”, 4 Niranjan Nirakar Society,<br />
+            Near Shreyas Overbridge, Ahmedabad - 380007
+        </div>
+        <br />
+        <div class="footer-heading" align="left">Registered Office:</div>
+        <div align="left">
+            Unit no. 1110-1111, 11th Floor, Block 53-E, Dalal Street Building,<br />
+            (BSE Tower), Gift City, Gandhinagar - 382355 Gujarat
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td colspan="2" class="footer-text">
+        079 26688230 &nbsp; | &nbsp; info@goldmine.co.in &nbsp; |
+        <img src="{{tag_facebook}}" width="15" />
+        <img src="{{tag_instagram}}" width="15" />
+        <img src="{{tag_linkedin}}" width="15" />
+        <img src="{{tag_youtube}}" width="15" />
+        &nbsp;/goldminestocks
+    </td>
+</tr>
+
+</table>
+</body>
+</html>

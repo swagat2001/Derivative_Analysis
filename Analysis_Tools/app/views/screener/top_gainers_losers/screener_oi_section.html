@@ -15,6 +15,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -31,6 +32,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -48,6 +50,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -64,6 +67,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -82,6 +86,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -98,6 +103,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -115,6 +121,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -131,6 +138,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -149,6 +157,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -165,6 +174,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -182,6 +192,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -198,6 +209,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -216,6 +228,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -232,6 +245,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -249,6 +263,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -265,6 +280,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -283,6 +299,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -299,6 +316,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -316,6 +334,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -332,6 +351,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -350,6 +370,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -366,6 +387,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -383,6 +405,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>OI Change (%)</th>
           </tr>
@@ -399,6 +422,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>

@@ -3,70 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Derivatives Dashboard{% endblock %}</title>
+  <title>{% block title %}Goldmine Derivatives{% endblock %}</title>
 
-  <!-- Component-specific CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_header.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_controls.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_table.css') }}">
   <!-- Global Poppins Font -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  
+  <!-- Universal Header CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/universal_header.css') }}">
+  
+  <!-- Page-specific CSS -->
+  {% block page_css %}{% endblock %}
 </head>
 
 <body>
-  {% block content %}
-  <!-- Page content goes here -->
-  {% endblock %}
+  <!-- Universal Header (same across all pages) -->
+  {% include 'components/universal_header.html' %}
 
-  <!-- ✅ Move JS here so DOM is ready -->
-  <script src="{{ url_for('static', filename='js/dashboard_header_live.js') }}"></script>
-</body>
-</html>
+  <!-- Page Content -->
+  <main class="page-content">
+    {% block content %}
+    <!-- Page content goes here -->
+    {% endblock %}
+  </main>
 
- <!-- Include Socket.IO client -->
-<!--script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
-<script>
-const socket = io.connect("http://127.0.0.1:5000"); // Flask backend
-
-let prev = {}; // store previous values for color change
-
-socket.on("connect", () => {
-  console.log("✅ Connected to live data stream");
-});
-
-// Receive live tick updates
-socket.on("new_tick", (data) => {
-  console.log("🎯 Live update:", data);
-  updateLiveValues(data);
-});
-
-function updateLiveValues(data) {
-  const fields = ["NIFTY", "BANKNIFTY", "GOLD", "SILVER"];
-
-  fields.forEach((field, i) => {
-    const valueElement = document.querySelector(`.index-item:nth-child(${i + 1}) .index-value`);
-    if (!valueElement || !data[field]) return;
-
-    const newValue = parseFloat(data[field]);
-    const oldValue = prev[field];
-
-    // Update text
-    valueElement.textContent = newValue.toFixed(2);
-
-    // Color flash animation
-    if (oldValue !== undefined) {
-      if (newValue > oldValue) valueElement.style.color = "green";
-      else if (newValue < oldValue) valueElement.style.color = "red";
-      else valueElement.style.color = "black";
-    }
-
-    prev[field] = newValue;
-  });
-}
-</script-->
-
-
+  <!-- Page-specific JavaScript -->
+  {% block page_js %}{% endblock %}
+  <!-- Universal Header JS -->
+  <script src="{{ url_for('static', filename='js/universal_header.js') }}"></script>
 
 </body>
 </html>

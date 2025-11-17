@@ -13,17 +13,17 @@ IMPROVEMENTS:
 
 from flask import Blueprint, render_template, request, jsonify, send_file
 from flask_caching import Cache
-from ..models.screener_model import get_all_screener_data
-from ..models.dashboard_model import get_available_dates
-from ..models.stock_model import get_filtered_tickers
-from ..controllers.dashboard_controller import get_live_indices
+from ....models.screener_model import get_all_screener_data
+from ....models.dashboard_model import get_available_dates
+from ....models.stock_model import get_filtered_tickers
+from ....controllers.dashboard_controller import get_live_indices
 from io import BytesIO
 from datetime import datetime, timedelta
 import os
 import base64
 import html as html_lib
 
-screener_bp = Blueprint('screener', __name__)
+gainers_losers_bp = Blueprint('gainers_losers', __name__, url_prefix='/screener/top-gainers-losers')
 
 # Initialize cache
 cache = Cache(config={
@@ -229,8 +229,8 @@ def build_ticker_map(screener_data):
 # MAIN SCREENER PAGE
 # ========================================================================
 
-@screener_bp.route('/screener')
-def screener():
+@gainers_losers_bp.route('/')
+def top_gainers_losers():
     """Display screener page - now uses cached data"""
     try:
         dates = get_available_dates()
@@ -243,7 +243,7 @@ def screener():
         
         if not screener_data:
             return render_template(
-                "screener.html",
+                "screener/top_gainers_losers/index.html",
                 dates=dates,
                 selected_date=selected_date,
                 indices=get_live_indices(),
@@ -262,7 +262,7 @@ def screener():
 
         
         return render_template(
-            "screener.html",
+            "screener/top_gainers_losers/index.html",
             dates=dates,
             selected_date=selected_date,
             indices=get_live_indices(),
@@ -326,7 +326,7 @@ def create_screener_pdf(screener_data, selected_date):
         # PATHS (Using correct paths from your project structure)
         # ============================================================
         print("[INFO] 🗂️  Setting up paths...")
-        base_views = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\views\screener"
+        base_views = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\views\screener\top_gainers_losers"
         cover_path = os.path.join(base_views, "screener_cover_a4.html")
         table_path = os.path.join(base_views, "screener_table_pages.html")
         asset = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\static\image"
@@ -673,7 +673,7 @@ def create_screener_pdf(screener_data, selected_date):
 # PDF EXPORT - NOW USES CACHED DATA
 # ========================================================================
 
-@screener_bp.route('/screener/export-pdf')
+@gainers_losers_bp.route('/export-pdf')
 def export_screener_pdf():
     """Export PDF - reuses cached data"""
     try:

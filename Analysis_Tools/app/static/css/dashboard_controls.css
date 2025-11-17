@@ -12,9 +12,32 @@
   align-items: center;
   background: #ffffff;
   padding: 14px 24px;
-  margin: 76px 20px 12px 20px;
+  margin: 0 20px 12px 20px;
   border-bottom: 2px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+/* Dashboard Title - Centered */
+.dashboard-title-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.dashboard-title {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  margin: 0 !important;
+  letter-spacing: -0.5px;
+  text-align: center !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  padding: 0 !important;
+  padding-left: 0 !important;
 }
 
 /* =============================================================
@@ -23,6 +46,7 @@
 .date-section {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .date-form {
@@ -92,6 +116,7 @@
   display: flex;
   gap: 4px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* Base button style - Simple tabs */
@@ -107,6 +132,7 @@
   transition: all 0.2s ease;
   cursor: pointer;
   display: inline-block;
+  white-space: nowrap;
 }
 
 .button-group a:hover {
@@ -155,6 +181,17 @@
 /* =============================================================
    RESPONSIVE DESIGN
    ============================================================= */
+@media (max-width: 1024px) {
+  .dashboard-title-center {
+    display: none;
+  }
+  
+  .dashboard-controls {
+    justify-content: flex-start;
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-controls {
     flex-direction: column;
@@ -185,6 +222,10 @@
     padding: 7px 14px;
     font-size: 12px;
   }
+  
+  .dashboard-title-center {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -210,5 +251,9 @@
   .button-group a {
     padding: 6px 12px;
     font-size: 11px;
+  }
+  
+  .dashboard-title-center {
+    display: none;
   }
 }

@@ -3,9 +3,8 @@
 <!-- ============================= -->
 <section class="screener-section">
   <h2 class="section-title">📈 Implied Volatility Changes</h2>
-  
+
   <div class="cards-grid">
-    <!-- CALL OPTIONS - ALL -->
     <div class="screener-card">
       <div class="card-header">
         <div class="card-title">🟢 Top 10 Call IV Gainers (All)</div>
@@ -15,6 +14,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -31,6 +31,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -48,6 +49,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -64,6 +66,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -72,7 +75,6 @@
       </table>
     </div>
 
-    <!-- CALL OPTIONS - ITM -->
     <div class="screener-card">
       <div class="card-header">
         <div class="card-title">🟢 Top 10 ITM Call IV Gainers</div>
@@ -82,6 +84,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -98,6 +101,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -115,6 +119,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -131,6 +136,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -139,7 +145,6 @@
       </table>
     </div>
 
-    <!-- CALL OPTIONS - OTM -->
     <div class="screener-card">
       <div class="card-header">
         <div class="card-title">🟢 Top 10 OTM Call IV Gainers</div>
@@ -149,6 +154,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -165,6 +171,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -182,6 +189,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -198,6 +206,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -206,7 +215,6 @@
       </table>
     </div>
 
-    <!-- PUT OPTIONS - ALL -->
     <div class="screener-card">
       <div class="card-header">
         <div class="card-title">🟢 Top 10 Put IV Gainers (All)</div>
@@ -216,6 +224,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -232,6 +241,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -249,6 +259,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -265,6 +276,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -273,7 +285,6 @@
       </table>
     </div>
 
-    <!-- PUT OPTIONS - ITM -->
     <div class="screener-card">
       <div class="card-header">
         <div class="card-title">🟢 Top 10 ITM Put IV Gainers</div>
@@ -283,6 +294,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -299,6 +311,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -316,6 +329,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -332,6 +346,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -340,7 +355,6 @@
       </table>
     </div>
 
-    <!-- PUT OPTIONS - OTM -->
     <div class="screener-card">
       <div class="card-header">
         <div class="card-title">🟢 Top 10 OTM Put IV Gainers</div>
@@ -350,6 +364,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -366,6 +381,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="positive">+{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -383,6 +399,7 @@
           <tr>
             <th>#</th>
             <th>Symbol</th>
+            <th>Strike</th>
             <th>Underlying Price</th>
             <th>IV Change (%)</th>
           </tr>
@@ -399,6 +416,7 @@
                 {{ item.ticker }}
               </a>
             </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
             <td>{{ "%.2f" | format(item.underlying_price) }}</td>
             <td class="negative">{{ "%.2f" | format(item.change) }}%</td>
           </tr>
@@ -406,5 +424,6 @@
         </tbody>
       </table>
     </div>
+
   </div>
 </section>

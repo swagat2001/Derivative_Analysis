@@ -19,7 +19,7 @@
 <!-- ============================= -->
 <!-- 🌐 Universal Header -->
 <!-- ============================= -->
-{% include 'dashboard/dashboard_header.html' %}
+<!-- Header is already included via base.html -->
 
 <!-- ============================= -->
 <!-- 🎛️ Stock Detail Controls Bar -->
@@ -79,6 +79,9 @@
 <!-- ============================= -->
 <!-- 📜 JavaScript -->
 <!-- ============================= -->
+<!-- TradingView Lightweight Charts for OI Analysis -->
+<script src="https://unpkg.com/lightweight-charts@4.0.0/dist/lightweight-charts.standalone.production.js"></script>
+
 <script src="{{ url_for('static', filename='js/stock_detail_gauges.js') }}"></script>
 <script src="{{ url_for('static', filename='js/stock_detail_oi_charts.js') }}"></script>
 

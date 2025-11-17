@@ -1,0 +1,439 @@
+/* =============================================================================
+   UNIVERSAL HEADER - GOLDMINE DERIVATIVES PLATFORM
+   Clean, minimal, professional header inspired by screener.in
+   Fixed across all pages with maroon brand identity
+   ============================================================================= */
+
+/* =============================================================================
+   HEADER CONTAINER - FIXED POSITIONING
+   ============================================================================= */
+.universal-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(139, 36, 50, 0.06);
+  z-index: 9999;
+}
+
+.header-container {
+  max-width: 100%;
+  height: 100%;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+/* =============================================================================
+   LEFT: LOGO
+   ============================================================================= */
+.header-logo {
+  flex-shrink: 0;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.logo-link:hover {
+  opacity: 0.85;
+}
+
+.logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* =============================================================================
+   CENTER: NAVIGATION
+   ============================================================================= */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #5a5a5a;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #8B2432;
+  background: #fafafa;
+}
+
+/* Active state - maroon underline */
+.nav-link.active {
+  color: #8B2432;
+  border-bottom: 2px solid #8B2432;
+  border-radius: 0;
+  font-weight: 700;
+}
+
+/* =============================================================================
+   RIGHT: LIVE TICKER + SEARCH + USER
+   ============================================================================= */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   LIVE INDICES TICKER (HIDDEN - Not needed per client requirements)
+   ============================================================================= */
+.live-ticker {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+.ticker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ticker-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ticker-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: #059669;
+}
+
+.ticker-separator {
+  font-size: 12px;
+  color: #d1d5db;
+  font-weight: 300;
+}
+
+/* =============================================================================
+   SEARCH FUNCTIONALITY
+   ============================================================================= */
+.header-search {
+  position: relative;
+}
+
+.search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  color: #5a5a5a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.search-btn:hover {
+  background: #f9fafb;
+  color: #8B2432;
+  border-color: #8B2432;
+}
+
+.search-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Search Dropdown */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  z-index: 10000;
+  display: none; /* Hidden by default */
+}
+
+/* Show dropdown when 'open' class is present */
+.search-dropdown.open {
+  display: block;
+}
+
+.search-form {
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c2c2c;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #8B2432;
+  box-shadow: 0 0 0 3px rgba(139, 36, 50, 0.1);
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* =============================================================================
+   USER MENU
+   ============================================================================= */
+.header-user {
+  position: relative;
+  border-left: 1px solid #e5e7eb;
+  padding-left: 20px;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  color: #2c2c2c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.user-btn:hover {
+  background: #f9fafb;
+  border-color: #8B2432;
+  color: #8B2432;
+}
+
+.user-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* User Dropdown */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  z-index: 10000;
+}
+
+.logout-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #2c2c2c;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.logout-link:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.logout-link svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+@media (max-width: 1200px) {
+  .header-container {
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  .header-nav {
+    gap: 0;
+  }
+
+  .nav-link {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .header-right {
+    gap: 14px;
+  }
+
+  .live-ticker {
+    padding: 4px 10px;
+    gap: 10px;
+  }
+
+  .ticker-label {
+    font-size: 8px;
+  }
+
+  .ticker-value {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .universal-header {
+    height: auto;
+  }
+
+  .header-container {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .header-logo {
+    order: 1;
+  }
+
+  .header-nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0;
+  }
+
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .header-right {
+    order: 2;
+    margin-left: auto;
+    gap: 10px;
+  }
+
+  .live-ticker {
+    display: none; /* Hide on mobile to save space */
+  }
+
+  .header-user {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .user-btn {
+    padding: 6px 10px;
+  }
+
+  .user-name {
+    display: none; /* Show only icon on mobile */
+  }
+
+  .search-dropdown {
+    width: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    padding: 10px 12px;
+  }
+
+  .logo-img {
+    height: 30px;
+  }
+
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .search-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-btn {
+    padding: 6px;
+  }
+
+  .search-dropdown {
+    width: 200px;
+    right: -50px;
+  }
+}
+
+/* =============================================================================
+   BODY PADDING ADJUSTMENT (for fixed header)
+   ============================================================================= */
+body {
+  padding-top: 60px; /* Match header height */
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 100px; /* Adjust for wrapped header on mobile */
+  }
+}

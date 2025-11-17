@@ -1,5 +1,5 @@
 # controllers/stock_controller.py
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from ..models.stock_model import (
     get_available_dates,
     get_all_tickers,
@@ -15,6 +15,32 @@ import json
 import pandas as pd
 
 stock_bp = Blueprint('stock', __name__)
+
+# ==============================
+# � Stock Search/Selection Page
+# ==============================
+@stock_bp.route('/stock-search')
+def stock_search():
+    """
+    Stock search page - allows user to select a stock symbol
+    """
+    try:
+        dates = get_available_dates()
+        all_symbols = get_filtered_tickers()
+        selected_date = request.args.get('date', dates[0] if dates else None)
+        
+        return render_template(
+            'stock_search.html',
+            dates=dates,
+            selected_date=selected_date,
+            all_symbols=all_symbols,
+            stock_list=get_filtered_tickers()
+        )
+    except Exception as e:
+        print(f"[ERROR] Stock search route failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Stock search failed: {str(e)}"}), 500
 
 @stock_bp.route('/stock/<ticker>')
 def stock_detail(ticker):
@@ -149,6 +175,7 @@ def stock_detail(ticker):
     return render_template(
         'stock_detail.html',
         ticker=ticker,
+        stock_symbol=ticker,  # For header navigation
         all_symbols=all_symbols,
         data=data,
         expiry_data=expiry_data,
@@ -160,7 +187,8 @@ def stock_detail(ticker):
         underlying=underlying,  # ✅ spot price (for display)
         futures_price=futures_price,  # ✅ futures price for selected expiry (for Fair Price calculation)
         atm=atm,                # ✅ correct closest strike
-        indices=get_live_indices()  # ✅ Add indices for header
+        indices=get_live_indices(),  # ✅ Add indices for header
+        stock_list=get_filtered_tickers()  # ✅ Add stock list for search
     )
 
 

@@ -16,13 +16,3 @@
   <p class="no-data">No OI data available</p>
   {% endif %}
 </div>
-
-<!-- ==============================
-     Script loading
-     ============================== -->
-
-<!-- ✅ Load TradingView Lightweight Charts (external CDN) -->
-<script src="https://unpkg.com/lightweight-charts@4.0.0/dist/lightweight-charts.standalone.production.js"></script>
-
-<!-- ✅ Load local chart logic -->
-<script src="{{ url_for('static', filename='js/stock_detail_oi_charts.js') }}" defer></script>

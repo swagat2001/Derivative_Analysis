@@ -30,3 +30,6 @@ openpyxl>=3.1.2
 flask-socketio>=5.3.6
 python-socketio>=5.11.2
 matplotlib>=3.8.0
+reportlab
+playwright 
+PyPDF2

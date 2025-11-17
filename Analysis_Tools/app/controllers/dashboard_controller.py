@@ -39,6 +39,19 @@ def get_live_indices():
 
 
 # --------------------------------------------------------------------
+# 🔍 Helper: Get stock list for search dropdown
+# --------------------------------------------------------------------
+def get_stock_list():
+    """Get filtered stock list for search dropdown in header"""
+    try:
+        from ..models.stock_model import get_filtered_tickers
+        return get_filtered_tickers()
+    except Exception as e:
+        print(f"[ERROR] get_stock_list(): {e}")
+        return []
+
+
+# --------------------------------------------------------------------
 # 📊 Dashboard route
 # --------------------------------------------------------------------
 @dashboard_bp.route('/')
@@ -54,7 +67,9 @@ def dashboard():
                 dates=[],
                 selected_date=None,
                 mtype="TOTAL",
-                indices=get_live_indices()
+                indices=get_live_indices(),
+                stock_list=get_stock_list(),
+                stock_symbol=None
             )
         
         selected_date = request.args.get("date", dates[0])
@@ -67,7 +82,9 @@ def dashboard():
             dates=dates,
             selected_date=selected_date,
             mtype=mtype,
-            indices=get_live_indices()
+            indices=get_live_indices(),
+            stock_list=get_stock_list(),
+            stock_symbol=None
         )
     except Exception as e:
         print(f"[ERROR] Dashboard route failed: {e}")

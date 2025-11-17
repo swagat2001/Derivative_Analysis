@@ -1,45 +1,42 @@
-<!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_table.css') }}">
 <div class="table-wrapper">
   <div class="table-container">
-    <table id="derivativesTable" class="derivatives-table display nowrap" style="width:100%">
+    <table id="derivativesTable" class="derivatives-table dataTable">
       <thead>
-        <tr class="header-row-1">
+        <tr>
           <th rowspan="2" class="col-stock">Stock</th>
-          <th colspan="2" class="col-group">Call Δ+</th>
-          <th colspan="2" class="col-group">Call Δ–</th>
-          <th colspan="2" class="col-group">Call Vega+</th>
-          <th colspan="2" class="col-group">Call Vega–</th>
-          <th rowspan="2" class="col-single">Call ATV</th>
-          <th rowspan="2" class="col-single">Call AMoney</th>
+          <th colspan="2">Call Δ+</th>
+          <th colspan="2">Call Δ−</th>
+          <th colspan="2">Call Vega+</th>
+          <th colspan="2">Call Vega−</th>
+          <th rowspan="2">Call ATV</th>
+          <th rowspan="2">Call AMoney</th>
           <th rowspan="2" class="col-center">Close</th>
           <th rowspan="2" class="col-center">RSI</th>
-          <th colspan="2" class="col-group">Put Δ+</th>
-          <th colspan="2" class="col-group">Put Δ–</th>
-          <th colspan="2" class="col-group">Put Vega+</th>
-          <th colspan="2" class="col-group">Put Vega–</th>
-          <th rowspan="2" class="col-single">Put ATV</th>
-          <th rowspan="2" class="col-single">Put AMoney</th>
+          <th colspan="2">Put Δ+</th>
+          <th colspan="2">Put Δ−</th>
+          <th colspan="2">Put Vega+</th>
+          <th colspan="2">Put Vega−</th>
+          <th rowspan="2">Put ATV</th>
+          <th rowspan="2">Put AMoney</th>
         </tr>
-        <tr class="header-row-2">
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
-          <th class="col-sub">Strike</th><th class="col-sub">%</th>
+        <tr>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
+          <th>Strike</th><th>%</th>
         </tr>
       </thead>
       <tbody>
         {% for row in data %}
         <tr>
-          <td class="cell-stock">
-            <a href="/stock/{{ row.stock }}?date={{ selected_date }}" class="stock-link">{{ row.stock }}</a>
-          </td>
+          <td class="cell-stock"><a href="{{ url_for('stock_bp.stock_detail', stock=row.stock) }}">{{ row.stock }}</a></td>
           <td>{{ row.call_delta_pos_strike }}</td>
           <td>{{ row.call_delta_pos_pct }}</td>
           <td>{{ row.call_delta_neg_strike }}</td>
@@ -48,10 +45,10 @@
           <td>{{ row.call_vega_pos_pct }}</td>
           <td>{{ row.call_vega_neg_strike }}</td>
           <td>{{ row.call_vega_neg_pct }}</td>
-          <td>{{ "%.2f"|format(row.call_total_tradval or 0) }}</td>
-          <td>{{ "%.2f"|format(row.call_total_money or 0) }}</td>
-          <td class="cell-center">{{ "%.2f"|format(row.closing_price or 0) }}</td>
-          <td class="cell-center">{{ "%.2f"|format(row.rsi or 0) }}</td>
+          <td>{{ "{:.2f}".format(row.call_total_trad_val or 0) }}</td>
+          <td>{{ "{:.2f}".format(row.call_total_money or 0) }}</td>
+          <td class="col-center">{{ "{:.2f}".format(row.closing_price or 0) }}</td>
+          <td class="col-center">{{ "{:.2f}".format(row.rsi or 0) }}</td>
           <td>{{ row.put_delta_pos_strike }}</td>
           <td>{{ row.put_delta_pos_pct }}</td>
           <td>{{ row.put_delta_neg_strike }}</td>
@@ -60,15 +57,14 @@
           <td>{{ row.put_vega_pos_pct }}</td>
           <td>{{ row.put_vega_neg_strike }}</td>
           <td>{{ row.put_vega_neg_pct }}</td>
-          <td>{{ "%.2f"|format(row.put_total_tradval or 0) }}</td>
-          <td>{{ "%.2f"|format(row.put_total_money or 0) }}</td>
+          <td>{{ "{:.2f}".format(row.put_total_trad_val or 0) }}</td>
+          <td>{{ "{:.2f}".format(row.put_total_money or 0) }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-  </div>
 </div>
-
+</div>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
