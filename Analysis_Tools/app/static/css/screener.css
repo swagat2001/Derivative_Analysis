@@ -30,7 +30,7 @@
    CONTAINER - CLEAN LAYOUT
    ============================================================= */
 .screener-container {
-  padding: 90px 32px 48px 32px;
+  padding: 10px 32px 48px 32px;
   max-width: 1600px;
   margin: 0 auto;
   background: linear-gradient(to bottom, #ffffff 0%, var(--bg-cream) 100%);
@@ -64,7 +64,7 @@
   align-items: center;
   background: var(--bg-white);
   padding: 6px 24px;
-  margin-bottom: 36px;
+  margin-bottom: 2px;
   border: 1px solid var(--border-light);
   border-left: 4px solid var(--goldmine-maroon);
   box-shadow: 0 2px 8px rgba(139, 36, 50, 0.08);
@@ -114,8 +114,8 @@
    ============================================================= */
 .screener-header {
   text-align: left;
-  padding: 0 0 28px 0;
-  margin-bottom: 40px;
+  padding: 0 0 2px 0;
+  margin-bottom: 2px;
   border-bottom: 3px solid var(--goldmine-maroon);
   position: relative;
 }
@@ -434,13 +434,13 @@
   }
   
   .screener-container {
-    padding: 90px 20px 40px 20px;
+    padding: 9px 20px 40px 20px;
   }
 }
 
 @media (max-width: 768px) {
   .screener-container {
-    padding: 90px 16px 32px 16px;
+    padding: 9px 16px 32px 16px;
   }
   
   .screener-header h1 {
