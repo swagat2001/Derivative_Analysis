@@ -520,9 +520,10 @@ def create_screener_pdf(screener_data, selected_date):
             H += "</table>"
             return H
         
-        def make_signal_analysis_table(signals_data, max_rows=100):
+        def make_signal_analysis_table(signals_data, rows_per_page=28):
             """
-            Generate Signal Analysis HTML table for PDF (static, 4 columns only)
+            Generate Signal Analysis HTML table for PDF with automatic pagination
+            Splits into multiple pages if data exceeds rows_per_page
             
             signals_data: dict from get_signal_data_formatted() with structure:
             {
@@ -534,50 +535,119 @@ def create_screener_pdf(screener_data, selected_date):
                     'bearish_categories': [list]
                 }
             }
+            
+            Returns: Complete HTML with <div class="content"> wrappers and page breaks
             """
             if not isinstance(signals_data, dict):
                 signals_data = {}
             
-            # Sort by signal strength (bullish - bearish), descending
-            sorted_signals = sorted(
-                signals_data.items(),
-                key=lambda x: x[1]['bullish_count'] - x[1]['bearish_count'],
-                reverse=True
-            )
-            
-            # Limit rows
-            sorted_signals = sorted_signals[:max_rows]
-            
-            H = ""
+            # Separate BULLISH and BEARISH (exclude NEUTRAL)
+            bullish_signals = []
+            bearish_signals = []
+
+            for ticker, data in signals_data.items():
+                signal = data.get('signal', 'NEUTRAL')
+                if signal == 'BULLISH':
+                    bullish_signals.append((ticker, data))
+                elif signal == 'BEARISH':
+                    bearish_signals.append((ticker, data))
+                # NEUTRAL signals are ignored
+
+            # Sort BULLISH by strength (bullish_count descending)
+            bullish_signals.sort(key=lambda x: x[1]['bullish_count'], reverse=True)
+
+            # Sort BEARISH by strength (bearish_count descending)
+            bearish_signals.sort(key=lambda x: x[1]['bearish_count'], reverse=True)
+
+            # Combine: All BULLISH first, then all BEARISH
+            sorted_signals = bullish_signals + bearish_signals
+
             
             if not sorted_signals:
-                H += "<tr><td colspan='4' style='text-align:center; padding:8px; color:#999;'>No signal data available</td></tr>"
-            else:
-                for i, (ticker, data) in enumerate(sorted_signals, 1):
+                return """<div class="content">
+            <h2>Signal Analysis Summary</h2>
+            <table class="signal-analysis-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 15%;">Symbol</th>
+                        <th style="width: 12%;">Signal</th>
+                        <th style="width: 15%;">Strength</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan='4' style='text-align:center; padding:8px; color:#999;'>No signal data available</td></tr>
+                </tbody>
+            </table>
+        </div>"""
+            
+            # Calculate number of pages needed
+            total_rows = len(sorted_signals)
+            total_pages = (total_rows + rows_per_page - 1) // rows_per_page
+            
+            print(f"[INFO] Signal Analysis: {total_rows} rows → {total_pages} page(s)")
+            
+            html_output = ""
+            
+            for page_num in range(total_pages):
+                start_idx = page_num * rows_per_page
+                end_idx = min(start_idx + rows_per_page, total_rows)
+                page_data = sorted_signals[start_idx:end_idx]
+                
+                # Start page
+                html_output += '<div class="content">\n'
+                
+                # Page title
+                if page_num == 0:
+                    html_output += '    <h2>Signal Analysis Summary</h2>\n'
+                
+                # Table header
+                html_output += '''    <table class="signal-analysis-table">
+                        <thead>
+                            <tr style="background: #333; color: white;">
+                                <th style="width: 5%; background: #333; color: white; padding: 6px; border: 1px solid #ddd;">#</th>
+                                <th style="width: 15%; background: #333; color: white; padding: 6px; border: 1px solid #ddd;">Symbol</th>
+                                <th style="width: 12%; background: #333; color: white; padding: 6px; border: 1px solid #ddd;">Signal</th>
+                                <th style="width: 15%; background: #333; color: white; padding: 6px; border: 1px solid #ddd;">Strength</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        '''
+                
+                # Table rows
+                for idx, (ticker, data) in enumerate(page_data):
+                    global_row_num = start_idx + idx + 1
                     signal = data.get('signal', 'NEUTRAL')
                     bullish_count = data.get('bullish_count', 0)
                     bearish_count = data.get('bearish_count', 0)
                     
-                    # Signal badge color
+                    # Badge class
+                    badge_class = 'bullish' if signal == 'BULLISH' else ('bearish' if signal == 'BEARISH' else 'neutral')
+                    
+                    # Row background based on signal type
                     if signal == 'BULLISH':
-                        badge_class = 'bullish'
+                        bg = "#d4edda"  # Light green for bullish
                     elif signal == 'BEARISH':
-                        badge_class = 'bearish'
+                        bg = "#f8d7da"  # Light red for bearish
                     else:
-                        badge_class = 'neutral'
-                    
-                    # Row background
-                    bg = "#f8f9fa" if i % 2 == 0 else "white"
-                    
-                    H += f"<tr style='background:{bg};'>"
-                    H += f"<td style='padding:6px; border:1px solid #e0e0e0; text-align:center;'>{i}</td>"
-                    H += f"<td style='padding:6px; border:1px solid #e0e0e0;'><strong>{html_lib.escape(ticker)}</strong></td>"
-                    H += f"<td style='padding:6px; border:1px solid #e0e0e0;'><span class='signal-badge {badge_class}'>{signal}</span></td>"
-                    H += f"<td style='padding:6px; border:1px solid #e0e0e0;'><div class='signal-strength'><span class='bull'>🟢 {bullish_count}</span><span class='bear'>🔴 {bearish_count}</span></div></td>"
-                    H += "</tr>"
-            
-            return H
+                        bg = "#fff3cd"  # Light yellow for neutral (shouldn't appear now)
 
+                    
+                    html_output += f"            <tr style='background:{bg};'>\n"
+                    html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0; text-align:center;'>{global_row_num}</td>\n"
+                    html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><strong>{html_lib.escape(ticker)}</strong></td>\n"
+                    html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><span class='signal-badge {badge_class}'>{signal}</span></td>\n"
+                    html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><div class='signal-strength'><span class='bull'>🟢 {bullish_count}</span><span class='bear'>🔴 {bearish_count}</span></div></td>\n"
+                    html_output += "            </tr>\n"
+                
+                # Close table and content div
+                html_output += '        </tbody>\n    </table>\n</div>\n'
+                
+                # Add page break if not last page
+                if page_num < total_pages - 1:
+                    html_output += '\n<div style="page-break-before: always;"></div>\n\n'
+            
+            return html_output
 
 
 
@@ -660,14 +730,22 @@ def create_screener_pdf(screener_data, selected_date):
         signal_analysis_data = get_signals(selected_date)
 
         if signal_analysis_data:
-            signal_analysis_rows = make_signal_analysis_table(signal_analysis_data, max_rows=100)
-            print(f"[INFO]   ✓ Generated {len(signal_analysis_data)} signal analysis rows")
+            signal_analysis_html = make_signal_analysis_table(signal_analysis_data, rows_per_page=27)
+            print(f"[INFO]   ✓ Signal Analysis table generated")
         else:
-            signal_analysis_rows = "<tr><td colspan='5' style='text-align:center; padding:8px; color:#999;'>No signal analysis data available</td></tr>"
+            signal_analysis_html = """<div class="content">
+            <h2>Signal Analysis Summary</h2>
+            <table class="signal-analysis-table">
+                <tbody>
+                    <tr><td colspan='4' style='text-align:center; padding:8px; color:#999;'>No signal analysis data available</td></tr>
+                </tbody>
+            </table>
+        </div>"""
             print("[WARN]   No signal analysis data found")
 
         # Replace placeholder in HTML
-        tables_html = tables_html.replace('{{signal_analysis_rows}}', signal_analysis_rows)
+        tables_html = tables_html.replace('{{signal_analysis_placeholder}}', signal_analysis_html)
+
         print("[INFO] ✓ Signal Analysis table inserted")
 
 
