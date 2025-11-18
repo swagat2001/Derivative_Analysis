@@ -10,7 +10,9 @@ from ....models.dashboard_model import get_available_dates
 from ....models.stock_model import get_filtered_tickers
 from ....controllers.dashboard_controller import get_live_indices
 
+
 signal_analysis_bp = Blueprint('signal_analysis', __name__, url_prefix='/screener/signal-analysis')
+
 
 # Initialize cache
 cache = Cache(config={
@@ -200,13 +202,65 @@ def get_signal_data_formatted(selected_date):
         return None
 
 
+def _apply_sorting(signals, sort_by, sort_order, signal_filter):
+    """
+    Apply sorting to signals based on column and order
+    
+    Args:
+        signals: dict of signal data
+        sort_by: 'symbol' or 'strength'
+        sort_order: 'asc' or 'desc'
+        signal_filter: 'all', 'bullish', 'bearish', 'neutral'
+    
+    Returns:
+        Sorted dict
+    """
+    if sort_by == 'symbol':
+        # Sort by ticker name (alphabetically)
+        sorted_signals = dict(sorted(
+            signals.items(),
+            key=lambda x: x[0].lower(),
+            reverse=(sort_order == 'desc')
+        ))
+    elif sort_by == 'strength':
+        # Sort based on active filter
+        def get_sort_value(item):
+            ticker, data = item
+            if signal_filter == 'bullish':
+                # Sort by bullish count only
+                return data['bullish_count']
+            elif signal_filter == 'bearish':
+                # Sort by bearish count only
+                return data['bearish_count']
+            else:
+                # For 'all' and 'neutral' - sort by net score
+                return data['bullish_count'] - data['bearish_count']
+        
+        sorted_signals = dict(sorted(
+            signals.items(),
+            key=get_sort_value,
+            reverse=(sort_order == 'desc')
+        ))
+    else:
+        # Default: sort by net strength (bullish - bearish), descending
+        sorted_signals = dict(sorted(
+            signals.items(),
+            key=lambda x: x[1]['bullish_count'] - x[1]['bearish_count'],
+            reverse=True
+        ))
+    
+    return sorted_signals
+
+
 @signal_analysis_bp.route('/')
 def signal_analysis():
     """Display signal analysis page"""
     try:
         dates = get_available_dates()
         selected_date = request.args.get("date", dates[0] if dates else None)
-        signal_filter = request.args.get("filter", "all")  # all, bullish, bearish
+        signal_filter = request.args.get("filter", "all")  # all, bullish, bearish, neutral
+        sort_by = request.args.get("sort", "strength")  # symbol, strength
+        sort_order = request.args.get("order", "desc")  # asc, desc
         
         if not selected_date:
             return jsonify({"error": "No dates available"}), 404
@@ -224,12 +278,8 @@ def signal_analysis():
         elif signal_filter == "neutral":
             signals = {k: v for k, v in signals.items() if v['signal'] == 'NEUTRAL'}
         
-        # Sort by signal strength (bullish count - bearish count)
-        sorted_signals = dict(sorted(
-            signals.items(),
-            key=lambda x: x[1]['bullish_count'] - x[1]['bearish_count'],
-            reverse=True
-        ))
+        # Apply sorting
+        sorted_signals = _apply_sorting(signals, sort_by, sort_order, signal_filter)
         
         return render_template(
             "screener/signal_analysis/index.html",
@@ -238,6 +288,8 @@ def signal_analysis():
             indices=get_live_indices(),
             signals=sorted_signals,
             signal_filter=signal_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
             stock_list=get_filtered_tickers(),
             stock_symbol=None
         )
@@ -246,4 +298,4 @@ def signal_analysis():
         print(f"[ERROR] signal_analysis(): {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({"error": f"Signal analysis failed: {str(e)}"}) , 500
+        return jsonify({"error": f"Signal analysis failed: {str(e)}"}), 500
