@@ -101,6 +101,11 @@
         color: #721c24;
     }
 
+    .signal-badge.neutral {
+        background: #fff3cd;
+        color: #856404;
+    }
+
     .signal-score {
         display: flex;
         gap: 15px;
@@ -184,6 +189,10 @@
         color: #dc3545;
     }
 
+    .stat-card.neutral .value {
+        color: #f39c12;
+    }
+
     .date-control {
         margin-bottom: 5px;
         padding: 8px;
@@ -222,6 +231,7 @@
     <!-- Statistics Summary -->
     {% set bullish_count = signals.values()|selectattr('signal', 'equalto', 'BULLISH')|list|length %}
     {% set bearish_count = signals.values()|selectattr('signal', 'equalto', 'BEARISH')|list|length %}
+    {% set neutral_count = signals.values()|selectattr('signal', 'equalto', 'NEUTRAL')|list|length %}
     
     <div class="stats-summary">
         <div class="stat-card">
@@ -235,6 +245,10 @@
         <div class="stat-card bearish">
             <div class="value">{{ bearish_count }}</div>
             <div class="label">Bearish Signals</div>
+        </div>
+        <div class="stat-card neutral">
+            <div class="value">{{ neutral_count }}</div>
+            <div class="label">Neutral Signals</div>
         </div>
     </div>
 
@@ -253,6 +267,10 @@
             <a href="?date={{ selected_date }}&filter=bearish" 
                class="filter-btn {% if signal_filter == 'bearish' %}active{% endif %}">
                 Bearish
+            </a>
+            <a href="?date={{ selected_date }}&filter=neutral" 
+               class="filter-btn {% if signal_filter == 'neutral' %}active{% endif %}">
+                Neutral
             </a>
         </div>
     </div>

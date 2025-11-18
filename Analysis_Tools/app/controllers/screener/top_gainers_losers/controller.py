@@ -77,14 +77,19 @@ def _compute_final_signals_from_db_rows(screener_data):
             if t:
                 bearish_cnt[t] = bearish_cnt.get(t, 0) + 1
 
-    # final classification
+    # final classification - handle ties as NEUTRAL
     finals = {}
     all_tickers = set(list(bullish_cnt.keys()) + list(bearish_cnt.keys()))
 
     for t in all_tickers:
         b = bullish_cnt.get(t, 0)
         s = bearish_cnt.get(t, 0)
-        finals[t] = "BULLISH" if b > s else "BEARISH"
+        if b > s:
+            finals[t] = "BULLISH"
+        elif s > b:
+            finals[t] = "BEARISH"
+        else:
+            finals[t] = "NEUTRAL"  # Equal counts = neutral
 
     return finals
 

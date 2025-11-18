@@ -111,9 +111,14 @@ def _compute_final_signals_with_breakdown(screener_data):
                 signals[ticker]['bearish_count'] += 1
                 signals[ticker]['bearish_categories'].append(sec_name)
 
-    # Final classification
+    # Final classification - handle ties as NEUTRAL
     for ticker, data in signals.items():
-        data['signal'] = 'BULLISH' if data['bullish_count'] > data['bearish_count'] else 'BEARISH'
+        if data['bullish_count'] > data['bearish_count']:
+            data['signal'] = 'BULLISH'
+        elif data['bearish_count'] > data['bullish_count']:
+            data['signal'] = 'BEARISH'
+        else:
+            data['signal'] = 'NEUTRAL'  # Equal counts = neutral
 
     return signals
 
@@ -216,6 +221,8 @@ def signal_analysis():
             signals = {k: v for k, v in signals.items() if v['signal'] == 'BULLISH'}
         elif signal_filter == "bearish":
             signals = {k: v for k, v in signals.items() if v['signal'] == 'BEARISH'}
+        elif signal_filter == "neutral":
+            signals = {k: v for k, v in signals.items() if v['signal'] == 'NEUTRAL'}
         
         # Sort by signal strength (bullish count - bearish count)
         sorted_signals = dict(sorted(
