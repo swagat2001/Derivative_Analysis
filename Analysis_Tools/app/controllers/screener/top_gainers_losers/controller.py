@@ -519,6 +519,66 @@ def create_screener_pdf(screener_data, selected_date):
 
             H += "</table>"
             return H
+        
+        def make_signal_analysis_table(signals_data, max_rows=100):
+            """
+            Generate Signal Analysis HTML table for PDF (static, 4 columns only)
+            
+            signals_data: dict from get_signal_data_formatted() with structure:
+            {
+                'ticker': {
+                    'signal': 'BULLISH' or 'BEARISH' or 'NEUTRAL',
+                    'bullish_count': int,
+                    'bearish_count': int,
+                    'bullish_categories': [list],
+                    'bearish_categories': [list]
+                }
+            }
+            """
+            if not isinstance(signals_data, dict):
+                signals_data = {}
+            
+            # Sort by signal strength (bullish - bearish), descending
+            sorted_signals = sorted(
+                signals_data.items(),
+                key=lambda x: x[1]['bullish_count'] - x[1]['bearish_count'],
+                reverse=True
+            )
+            
+            # Limit rows
+            sorted_signals = sorted_signals[:max_rows]
+            
+            H = ""
+            
+            if not sorted_signals:
+                H += "<tr><td colspan='4' style='text-align:center; padding:8px; color:#999;'>No signal data available</td></tr>"
+            else:
+                for i, (ticker, data) in enumerate(sorted_signals, 1):
+                    signal = data.get('signal', 'NEUTRAL')
+                    bullish_count = data.get('bullish_count', 0)
+                    bearish_count = data.get('bearish_count', 0)
+                    
+                    # Signal badge color
+                    if signal == 'BULLISH':
+                        badge_class = 'bullish'
+                    elif signal == 'BEARISH':
+                        badge_class = 'bearish'
+                    else:
+                        badge_class = 'neutral'
+                    
+                    # Row background
+                    bg = "#f8f9fa" if i % 2 == 0 else "white"
+                    
+                    H += f"<tr style='background:{bg};'>"
+                    H += f"<td style='padding:6px; border:1px solid #e0e0e0; text-align:center;'>{i}</td>"
+                    H += f"<td style='padding:6px; border:1px solid #e0e0e0;'><strong>{html_lib.escape(ticker)}</strong></td>"
+                    H += f"<td style='padding:6px; border:1px solid #e0e0e0;'><span class='signal-badge {badge_class}'>{signal}</span></td>"
+                    H += f"<td style='padding:6px; border:1px solid #e0e0e0;'><div class='signal-strength'><span class='bull'>🟢 {bullish_count}</span><span class='bear'>🔴 {bearish_count}</span></div></td>"
+                    H += "</tr>"
+            
+            return H
+
+
 
 
         # Generate all 40 tables (26 for Options + 4 for Futures)
@@ -587,6 +647,29 @@ def create_screener_pdf(screener_data, selected_date):
         tables_html = tables_html.replace('{{final_signal_table}}', final_signals_html)
 
         print("[INFO] ✓ Tables HTML prepared (40 tables + final signals table)")
+        
+        # ============================================================
+        # INSERT SIGNAL ANALYSIS TABLE
+        # ============================================================
+        print("[INFO] 📊 Generating Signal Analysis table...")
+
+        # Import signal analysis data function
+        from ..signal_analysis.controller import get_signal_data_formatted as get_signals
+
+        # Fetch signal analysis data for the same date
+        signal_analysis_data = get_signals(selected_date)
+
+        if signal_analysis_data:
+            signal_analysis_rows = make_signal_analysis_table(signal_analysis_data, max_rows=100)
+            print(f"[INFO]   ✓ Generated {len(signal_analysis_data)} signal analysis rows")
+        else:
+            signal_analysis_rows = "<tr><td colspan='5' style='text-align:center; padding:8px; color:#999;'>No signal analysis data available</td></tr>"
+            print("[WARN]   No signal analysis data found")
+
+        # Replace placeholder in HTML
+        tables_html = tables_html.replace('{{signal_analysis_rows}}', signal_analysis_rows)
+        print("[INFO] ✓ Signal Analysis table inserted")
+
 
         # ============================================================
         # STEP 3: RENDER TO PDF WITH PLAYWRIGHT

@@ -69,27 +69,28 @@ body {
 .report-table {
     width: 100%;
     border-collapse: collapse;
-    border: 2px solid #FFD700;
+    border: 1px solid #FFD700;
     background-color: #0A0A0A;
 }
 
 .report-table td {
-    border: 2px solid #FFD700;
-    padding: 5px;
+    border: 1px solid #FFD700;
+    padding: 4px; /* REDUCED from 5px */
     color: #FFFFFF;
-    font-size: 16px;
+    font-size: 15px; /* REDUCED from 16px */
     font-weight: bold;
+    line-height: 1.2; /* ADDED */
 }
 
 .icon-col {
     width: 50px;
     text-align: center;
     color: #FFD700;
-    font-size: 22px;
+    font-size: 20px; /* REDUCED from 22px */
 }
 
 .section-heading {
-    font-size: 24px;
+    font-size: 22px; /* REDUCED from 24px */
     font-weight: bold;
     color: #FF4D4D;
 }
@@ -97,26 +98,29 @@ body {
 /* FOOTER */
 .footer-section {
     background-color: #660000;
-    padding: 18px;
+    padding: 10px; /* REDUCED from 18px */
     color: #FFFFFF;
-    font-size: 18px;
+    font-size: 14px; /* REDUCED from 18px */
     border-top: 2px solid #FFD700;
     border-bottom: 2px solid #FFD700;
+    line-height: 1.2; /* ADDED */
 }
 
 .footer-heading {
-    font-size: 24px;
+    font-size: 18px; /* REDUCED from 24px */
     font-weight: bold;
     color: #FFD700;
+    margin-bottom: 2px; /* ADDED */
 }
 
 .footer-text {
-    font-size: 18px;
+    font-size: 16px; /* REDUCED from 18px */
     color: #FFFFFF;
     text-align: center;
-    padding: 15px 0;
+    padding: 10px 0; /* REDUCED from 15px */
     background-color: #000000;
 }
+
 
 </style>
 
@@ -143,10 +147,9 @@ body {
   </tr>
   <tr> 
     <td colspan="2"> <table class="report-table">
-        <tr> 
-          <td class="icon-col">&#10003;</td>
-          <td align="left" class="section-heading"><strong>REPORT INCLUDES</strong></td>
-        </tr>
+       <tr> 
+          <td colspan="2" align="center" class="section-heading"><strong>REPORT INCLUDES</strong></td>
+        </tr>   
         <tr> 
           <td class="icon-col">&#10003;</td>
           <td align="left"><strong>OPEN INTEREST CHANGES ANALYSIS</strong></td>
@@ -166,6 +169,10 @@ body {
         <tr> 
           <td  class="icon-col">&#10003;</td>
           <td align="left"><strong>TOP 10 GAINERS AND LOSERS BY CATEGORY</strong></td>
+        </tr>
+        <tr> 
+          <td class="icon-col">&#10003;</td>
+          <td align="left"><strong>PROPRIETARY STOCKS SCREENER</strong></td>
         </tr>
       </table></td>
   </tr>
