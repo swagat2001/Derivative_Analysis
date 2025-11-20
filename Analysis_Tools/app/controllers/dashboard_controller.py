@@ -137,8 +137,9 @@ def export_dashboard():
             summary_sheet["A6"].font = summary_sheet["A6"].font.copy(bold=True)
 
             # Write index values
+            indices = get_live_indices()
             row = 7
-            for key, val in api_live_indices.items():
+            for key, val in indices.items():
                 summary_sheet[f"A{row}"] = key
                 summary_sheet[f"B{row}"] = val
                 row += 1
