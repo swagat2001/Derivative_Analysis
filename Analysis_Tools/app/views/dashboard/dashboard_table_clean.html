@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_table.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_controls.css') }}">
 
 <!-- Dashboard Controls -->
 <div class="dashboard-controls">
@@ -49,95 +50,7 @@
   </div>
 </div>
 
-<style>
-.dashboard-controls {
-  background: white;
-  padding: 15px 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.control-row {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.control-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.control-group label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-}
-
-.control-group select {
-  padding: 8px 12px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  background: white;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.control-group select:focus {
-  outline: none;
-  border-color: #8B2432;
-}
-
-.btn-group {
-  display: flex;
-  gap: 5px;
-}
-
-.filter-btn {
-  padding: 8px 20px;
-  border: 2px solid #ddd;
-  background: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.filter-btn:hover {
-  border-color: #8B2432;
-  color: #8B2432;
-}
-
-.filter-btn.active {
-  background: #8B2432;
-  color: white;
-  border-color: #8B2432;
-}
-
-.btn-export {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #28a745;
-  color: white;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: background 0.2s;
-}
-
-.btn-export:hover {
-  background: #218838;
-}
-</style>
-
+<!-- Table -->
 <div class="table-wrapper">
   <div class="table-container">
     <table id="derivativesTable" class="derivatives-table dataTable">
@@ -171,37 +84,86 @@
         </tr>
       </thead>
       <tbody>
-        {% for row in data %}
-        <tr>
-          <td class="cell-stock"><a href="{{ url_for('stock.stock_detail', ticker=row.stock) }}">{{ row.stock }}</a></td>
-          <td>{{ row.call_delta_pos_strike }}</td>
-          <td>{{ row.call_delta_pos_pct }}</td>
-          <td>{{ row.call_delta_neg_strike }}</td>
-          <td>{{ row.call_delta_neg_pct }}</td>
-          <td>{{ row.call_vega_pos_strike }}</td>
-          <td>{{ row.call_vega_pos_pct }}</td>
-          <td>{{ row.call_vega_neg_strike }}</td>
-          <td>{{ row.call_vega_neg_pct }}</td>
-          <td>{{ "{:.2f}".format(row.call_total_trad_val or 0) }}</td>
-          <td>{{ "{:.2f}".format(row.call_total_money or 0) }}</td>
-          <td class="col-center">{{ "{:.2f}".format(row.closing_price or 0) }}</td>
-          <td class="col-center">{{ "{:.2f}".format(row.rsi or 0) }}</td>
-          <td>{{ row.put_delta_pos_strike }}</td>
-          <td>{{ row.put_delta_pos_pct }}</td>
-          <td>{{ row.put_delta_neg_strike }}</td>
-          <td>{{ row.put_delta_neg_pct }}</td>
-          <td>{{ row.put_vega_pos_strike }}</td>
-          <td>{{ row.put_vega_pos_pct }}</td>
-          <td>{{ row.put_vega_neg_strike }}</td>
-          <td>{{ row.put_vega_neg_pct }}</td>
-          <td>{{ "{:.2f}".format(row.put_total_trad_val or 0) }}</td>
-          <td>{{ "{:.2f}".format(row.put_total_money or 0) }}</td>
-        </tr>
-        {% endfor %}
+        {% if data %}
+          {% for row in data %}
+          <tr>
+            <td class="cell-stock"><a href="{{ url_for('stock.stock_detail', ticker=row.stock) }}">{{ row.stock }}</a></td>
+            <td>{{ row.call_delta_pos_strike }}</td>
+            <td>{{ row.call_delta_pos_pct }}</td>
+            <td>{{ row.call_delta_neg_strike }}</td>
+            <td>{{ row.call_delta_neg_pct }}</td>
+            <td>{{ row.call_vega_pos_strike }}</td>
+            <td class="money-clickable" 
+                data-stock="{{ row.stock }}" 
+                data-option-type="call" 
+                data-metric="vega" 
+                data-strike="{{ row.call_vega_pos_strike }}" 
+                data-date="{{ selected_date }}">
+              {{ row.call_vega_pos_pct }}
+            </td>
+            <td>{{ row.call_vega_neg_strike }}</td>
+            <td class="money-clickable" 
+                data-stock="{{ row.stock }}" 
+                data-option-type="call" 
+                data-metric="vega" 
+                data-strike="{{ row.call_vega_neg_strike }}" 
+                data-date="{{ selected_date }}">
+              {{ row.call_vega_neg_pct }}
+            </td>
+            <td>{{ "{:.2f}".format(row.call_total_trad_val or 0) }}</td>
+            <td class="money-clickable" 
+                data-stock="{{ row.stock }}" 
+                data-option-type="call" 
+                data-metric="money" 
+                data-strike="N/A" 
+                data-date="{{ selected_date }}">
+              {{ "{:.2f}".format(row.call_total_money or 0) }}
+            </td>
+            <td class="col-center">{{ "{:.2f}".format(row.closing_price or 0) }}</td>
+            <td class="col-center">{{ "{:.2f}".format(row.rsi or 0) }}</td>
+            <td>{{ row.put_delta_pos_strike }}</td>
+            <td>{{ row.put_delta_pos_pct }}</td>
+            <td>{{ row.put_delta_neg_strike }}</td>
+            <td>{{ row.put_delta_neg_pct }}</td>
+            <td>{{ row.put_vega_pos_strike }}</td>
+            <td class="money-clickable" 
+                data-stock="{{ row.stock }}" 
+                data-option-type="put" 
+                data-metric="vega" 
+                data-strike="{{ row.put_vega_pos_strike }}" 
+                data-date="{{ selected_date }}">
+              {{ row.put_vega_pos_pct }}
+            </td>
+            <td>{{ row.put_vega_neg_strike }}</td>
+            <td class="money-clickable" 
+                data-stock="{{ row.stock }}" 
+                data-option-type="put" 
+                data-metric="vega" 
+                data-strike="{{ row.put_vega_neg_strike }}" 
+                data-date="{{ selected_date }}">
+              {{ row.put_vega_neg_pct }}
+            </td>
+            <td>{{ "{:.2f}".format(row.put_total_trad_val or 0) }}</td>
+            <td class="money-clickable" 
+                data-stock="{{ row.stock }}" 
+                data-option-type="put" 
+                data-metric="money" 
+                data-strike="N/A" 
+                data-date="{{ selected_date }}">
+              {{ "{:.2f}".format(row.put_total_money or 0) }}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="23" style="text-align: center; padding: 20px;">No data available</td>
+          </tr>
+        {% endif %}
       </tbody>
     </table>
+  </div>
 </div>
-</div>
+
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>

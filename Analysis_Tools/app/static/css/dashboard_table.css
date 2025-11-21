@@ -38,7 +38,7 @@
     0 10px 40px rgba(139, 36, 50, 0.15),
     0 0 0 1px rgba(139, 36, 50, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  margin: 20px;
+  margin: 20px 0; /* Remove left/right margin */
   padding: 28px;
   position: relative;
   overflow: hidden;
@@ -122,6 +122,7 @@
    ============================================================= */
 .derivatives-table {
   width: 100% !important;
+  table-layout: auto; /* Changed from fixed to auto for better column sizing */
   border-collapse: separate;
   border-spacing: 0;
   font-size: 12px;
@@ -234,13 +235,21 @@
   border-bottom: none;
 }
 
+/* Stock column header - wider */
+.col-stock {
+  min-width: 140px !important;
+  width: 140px !important;
+}
+
 /* =============================================================
    STOCK COLUMN - SPECIAL HIGHLIGHTING
    ============================================================= */
 .cell-stock {
   font-weight: 700;
   text-align: left;
-  padding-left: 16px;
+  padding-left: 16px !important;
+  min-width: 140px !important;
+  width: 140px !important;
   background: linear-gradient(to right, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
   position: relative;
 }
@@ -308,16 +317,16 @@
 }
 
 /* =============================================================
-   CLICKABLE MONEY CELLS - INTERACTIVE
+   CLICKABLE MONEY CELLS - INTERACTIVE (ONLY tbody td)
    ============================================================= */
-.money-clickable {
+tbody td.money-clickable {
   cursor: pointer;
   position: relative;
   font-weight: 600;
   transition: all 0.2s ease;
 }
 
-.money-clickable:hover {
+tbody td.money-clickable:hover {
   background: linear-gradient(135deg, #8B2432 0%, #D4AF37 100%) !important;
   color: white !important;
   transform: scale(1.05);
@@ -325,7 +334,7 @@
   z-index: 10;
 }
 
-.money-clickable:active {
+tbody td.money-clickable:active {
   transform: scale(0.98);
 }
 

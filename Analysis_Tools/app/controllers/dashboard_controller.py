@@ -69,16 +69,34 @@ def dashboard():
                 mtype="TOTAL",
                 indices=get_live_indices(),
                 stock_list=get_stock_list(),
-                stock_symbol=None
+                stock_symbol=None,
+                page=1,
+                per_page=20,
+                total_records=0,
+                total_pages=0,
+                sort_column='stock',
+                sort_direction='asc'
             )
         
+        # Get filter parameters
         selected_date = request.args.get("date", dates[0])
         mtype = request.args.get("mtype", "TOTAL")
-        data = get_dashboard_data(selected_date, mtype)
+        
+        # Get pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        
+        # Get sorting parameters
+        sort_column = request.args.get('sort', 'stock')
+        sort_direction = request.args.get('dir', 'asc')
+        
+        # Fetch all data (DON'T paginate for client-side DataTables)
+        all_data = get_dashboard_data(selected_date, mtype)
+        data_list = [dict(row) for row in all_data]
 
         return render_template(
             "dashboard.html",
-            data=data,
+            data=data_list,  # Send ALL data for client-side DataTables
             dates=dates,
             selected_date=selected_date,
             mtype=mtype,
@@ -91,6 +109,125 @@ def dashboard():
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Dashboard rendering failed: {str(e)}"}), 500
+
+
+# --------------------------------------------------------------------
+# 📊 Server-Side DataTables API Endpoint
+# --------------------------------------------------------------------
+@dashboard_bp.route('/api/dashboard_data')
+def api_dashboard_data():
+    """
+    Server-side processing endpoint for DataTables.
+    Handles pagination, sorting, and filtering on the server.
+    """
+    try:
+        # Get DataTables parameters
+        draw = request.args.get('draw', type=int, default=1)
+        start = request.args.get('start', type=int, default=0)
+        length = request.args.get('length', type=int, default=20)
+        
+        # Get filter parameters
+        selected_date = request.args.get('date')
+        mtype = request.args.get('mtype', 'TOTAL')
+        
+        # Get sorting parameters
+        order_column = request.args.get('order[0][column]', type=int, default=0)
+        order_dir = request.args.get('order[0][dir]', default='asc')
+        
+        # Fetch all data from database
+        all_data = get_dashboard_data(selected_date, mtype)
+        total_records = len(all_data)
+        
+        # Apply sorting
+        column_map = {
+            0: 'stock',
+            1: 'call_delta_pos_strike',
+            2: 'call_delta_pos_pct',
+            3: 'call_delta_neg_strike',
+            4: 'call_delta_neg_pct',
+            5: 'call_vega_pos_strike',
+            6: 'call_vega_pos_pct',
+            7: 'call_vega_neg_strike',
+            8: 'call_vega_neg_pct',
+            9: 'call_total_trad_val',
+            10: 'call_total_money',
+            11: 'closing_price',
+            12: 'rsi',
+            13: 'put_delta_pos_strike',
+            14: 'put_delta_pos_pct',
+            15: 'put_delta_neg_strike',
+            16: 'put_delta_neg_pct',
+            17: 'put_vega_pos_strike',
+            18: 'put_vega_pos_pct',
+            19: 'put_vega_neg_strike',
+            20: 'put_vega_neg_pct',
+            21: 'put_total_trad_val',
+            22: 'put_total_money'
+        }
+        
+        sort_column = column_map.get(order_column, 'stock')
+        reverse = (order_dir == 'desc')
+        
+        # Convert to list of dicts for sorting
+        data_list = [dict(row) for row in all_data]
+        
+        # Sort data
+        try:
+            data_list.sort(key=lambda x: x.get(sort_column) or '', reverse=reverse)
+        except:
+            pass  # If sorting fails, keep original order
+        
+        # Apply pagination
+        paginated_data = data_list[start:start + length]
+        
+        # Format data for DataTables
+        formatted_data = []
+        for row in paginated_data:
+            formatted_data.append([
+                f'<a href="/stock/{row["stock"]}">{row["stock"]}</a>',
+                row.get('call_delta_pos_strike', ''),
+                row.get('call_delta_pos_pct', ''),
+                row.get('call_delta_neg_strike', ''),
+                row.get('call_delta_neg_pct', ''),
+                row.get('call_vega_pos_strike', ''),
+                row.get('call_vega_pos_pct', ''),
+                row.get('call_vega_neg_strike', ''),
+                row.get('call_vega_neg_pct', ''),
+                f'{row.get("call_total_trad_val", 0):.2f}',
+                f'{row.get("call_total_money", 0):.2f}',
+                f'{row.get("closing_price", 0):.2f}',
+                f'{row.get("rsi", 0):.2f}',
+                row.get('put_delta_pos_strike', ''),
+                row.get('put_delta_pos_pct', ''),
+                row.get('put_delta_neg_strike', ''),
+                row.get('put_delta_neg_pct', ''),
+                row.get('put_vega_pos_strike', ''),
+                row.get('put_vega_pos_pct', ''),
+                row.get('put_vega_neg_strike', ''),
+                row.get('put_vega_neg_pct', ''),
+                f'{row.get("put_total_trad_val", 0):.2f}',
+                f'{row.get("put_total_money", 0):.2f}'
+            ])
+        
+        # Return DataTables JSON response
+        return jsonify({
+            'draw': draw,
+            'recordsTotal': total_records,
+            'recordsFiltered': total_records,
+            'data': formatted_data
+        })
+        
+    except Exception as e:
+        print(f"[ERROR] API dashboard_data failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'draw': request.args.get('draw', type=int, default=1),
+            'recordsTotal': 0,
+            'recordsFiltered': 0,
+            'data': [],
+            'error': str(e)
+        }), 500
 
     
     

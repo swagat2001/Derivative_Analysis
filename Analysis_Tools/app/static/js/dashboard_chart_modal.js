@@ -279,7 +279,9 @@ function renderChart(data) {
 }
 
 function closeChartModal() {
-    document.getElementById('chartModal').style.display = 'none';
+    const modal = document.getElementById('chartModal');
+    if (!modal) return;
+    modal.style.display = 'none';
     
     // Remove resize event listener to prevent memory leak
     if (resizeHandler) {
@@ -298,10 +300,20 @@ function closeChartModal() {
     }
 }
 
-window.onclick = e => { 
+// Close modal on outside click
+window.addEventListener('click', (e) => { 
     if (e.target.id === 'chartModal') closeChartModal(); 
-};
+});
 
-document.addEventListener('keydown', e => { 
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => { 
     if (e.key === 'Escape') closeChartModal(); 
+});
+
+// Ensure modal is hidden on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('chartModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 });
