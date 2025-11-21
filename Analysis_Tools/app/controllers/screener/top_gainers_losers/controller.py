@@ -393,8 +393,23 @@ def create_screener_pdf(screener_data, selected_date):
         with open(cover_path, "r", encoding="utf-8") as f:
             cover_html = f.read()
 
+        # Calculate signal statistics
+        final_signals = screener_data.get('final_signals', {})
+        total_stocks = len(final_signals)
+        bullish_count = sum(1 for sig in final_signals.values() if sig == 'BULLISH')
+        bearish_count = sum(1 for sig in final_signals.values() if sig == 'BEARISH')
+        neutral_count = sum(1 for sig in final_signals.values() if sig == 'NEUTRAL')
+        
+        print(f"[INFO] Signal Stats: Total={total_stocks}, Bullish={bullish_count}, Bearish={bearish_count}, Neutral={neutral_count}")
+
         # Replace date
         cover_html = cover_html.replace('{{DATE_PLACEHOLDER}}', cover_date)
+        
+        # Replace signal statistics
+        cover_html = cover_html.replace('{{ total_stocks }}', str(total_stocks))
+        cover_html = cover_html.replace('{{ bullish_count }}', str(bullish_count))
+        cover_html = cover_html.replace('{{ bearish_count }}', str(bearish_count))
+        cover_html = cover_html.replace('{{ neutral_count }}', str(neutral_count))
         
         # Replace image paths with base64
         cover_html = cover_html.replace('src="../../static/image/screener_cover_page_logo.png"', f'src="{logo_b64}"')
