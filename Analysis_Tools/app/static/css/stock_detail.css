@@ -1,0 +1,56 @@
+/* ============================ */
+/* STOCK DETAIL PAGE STYLES */
+/* ============================ */
+
+.stock-detail-container {
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ============================ */
+/* MAIN GRID LAYOUT */
+/* ============================ */
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    gap: 20px;
+    margin-bottom: 30px;
+    align-items: start;
+}
+
+.left-side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+}
+
+.right-side {
+    display: flex;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-data {
+    text-align: center;
+    padding: 60px;
+    color: #999;
+    font-size: 18px;
+}
+
+/* ============================ */
+/* RESPONSIVE DESIGN */
+/* ============================ */
+
+@media (max-width: 1200px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+}

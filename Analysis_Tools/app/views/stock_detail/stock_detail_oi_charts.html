@@ -1,0 +1,18 @@
+<!-- ==============================
+     OI ANALYSIS CHARTS
+     Interactive TradingView-based OI Visualization
+     ============================== -->
+<div class="oi-charts-section">
+  <h3 class="section-title">OI Analysis (Interactive)</h3>
+
+  {% if chart_data %}
+  <!-- Chart container with embedded JSON -->
+  <div
+    id="oi-chart-container"
+    class="chart-container"
+    data-chart='{{ chart_data | safe }}'>
+  </div>
+  {% else %}
+  <p class="no-data">No OI data available</p>
+  {% endif %}
+</div>

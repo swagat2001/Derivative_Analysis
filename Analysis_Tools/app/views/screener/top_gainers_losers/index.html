@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Important Screener{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_export.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Header is already included via base.html -->
+{% include 'screener/top_gainers_losers/screener_controls.html' %}
+
+<div class="screener-container">
+  
+  {% include 'screener/top_gainers_losers/screener_header.html' %}
+  
+  {% if selected_date and screener_data %}
+    
+    {% include 'screener/top_gainers_losers/screener_oi_section.html' %}
+    {% include 'screener/top_gainers_losers/screener_moneyness_section.html' %}
+    {% include 'screener/top_gainers_losers/screener_iv_section.html' %}
+    {% include 'screener/top_gainers_losers/screener_futures_section.html' %}
+
+    <!-- ===============================
+         FINAL BULLISH/BEARISH SIGNAL BOX
+         =============================== -->
+    {% include 'screener/top_gainers_losers/final_signal_section.html' %}
+
+  {% else %}
+    <div class="no-data">
+      <p>Please select a date to view screener data.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block page_js %}
+<script src="{{ url_for('static', filename='js/screener.js') }}"></script>
+{% endblock %}

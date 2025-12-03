@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Derivatives Dashboard{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_chart_modal.css') }}">
+{% endblock %}
+
+{% block content %}
+
+{% include 'dashboard/dashboard_table_clean.html' %}
+{% include 'dashboard/dashboard_chart_modal.html' %}
+
+<script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard_chart_modal.js') }}"></script>
+
+{% endblock %}

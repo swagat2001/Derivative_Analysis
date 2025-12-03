@@ -1,0 +1,577 @@
+/* =============================================================
+   SCREENER PAGE - PREMIUM AI TRADING PLATFORM DESIGN
+   Clean, Professional UI with Goldmine Brand Identity
+   Using ONLY: Maroon (#8B2432) & Gold (#D4AF37)
+   Inspired by screener.in's clean data-focused layout
+   ============================================================= */
+
+/* =============================================================
+   ROOT VARIABLES - GOLDMINE BRAND ONLY
+   ============================================================= */
+:root {
+  --goldmine-maroon: #8B2432;
+  --goldmine-maroon-dark: #6B1826;
+  --goldmine-maroon-light: #A03040;
+  --goldmine-gold: #D4AF37;
+  --goldmine-gold-light: #E5C158;
+  --goldmine-gold-pale: #F5E6C8;
+  
+  /* Neutral colors derived from brand */
+  --bg-white: #ffffff;
+  --bg-cream: #FFFCF5;
+  --bg-light: #FFF8F0;
+  --text-primary: #2c2c2c;
+  --text-secondary: #5a5a5a;
+  --border-light: #e8d5d8;
+  --border-gold: #d4af3730;
+}
+
+/* =============================================================
+   CONTAINER - CLEAN LAYOUT
+   ============================================================= */
+.screener-container {
+  padding: 10px 32px 48px 32px;
+  max-width: 1600px;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #ffffff 0%, var(--bg-cream) 100%);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Subtle brand watermark effect */
+.screener-container::before {
+  content: '';
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(139, 36, 50, 0.03) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =============================================================
+   CONTROLS BAR - CLEAN & STICKY
+   ============================================================= */
+.screener-controls {
+  position: sticky;
+  top: 66px;
+  z-index: 1050;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: var(--bg-white);
+  padding: 6px 24px;
+  margin-bottom: 2px;
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--goldmine-maroon);
+  box-shadow: 0 2px 8px rgba(139, 36, 50, 0.08);
+  border-radius: 4px;
+}
+
+.screener-controls .control-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.screener-controls label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--goldmine-maroon);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.screener-controls select {
+  font-size: 14px;
+  padding: 10px 16px;
+  border: 2px solid var(--border-light);
+  border-radius: 4px;
+  background: var(--bg-white);
+  color: var(--text-primary);
+  min-width: 220px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.screener-controls select:hover {
+  border-color: var(--goldmine-gold);
+  background: var(--bg-light);
+}
+
+.screener-controls select:focus {
+  outline: none;
+  border-color: var(--goldmine-maroon);
+  box-shadow: 0 0 0 3px rgba(139, 36, 50, 0.1);
+}
+
+/* =============================================================
+   PAGE HEADER - BOLD BRAND IDENTITY
+   ============================================================= */
+.screener-header {
+  text-align: left;
+  padding: 0 0 2px 0;
+  margin-bottom: 2px;
+  border-bottom: 3px solid var(--goldmine-maroon);
+  position: relative;
+}
+
+.screener-header::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 120px;
+  height: 3px;
+  background: var(--goldmine-gold);
+}
+
+.screener-header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--goldmine-maroon);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.8px;
+}
+
+.screener-header p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* =============================================================
+   SECTIONS - CLEAR HIERARCHY
+   ============================================================= */
+.screener-section {
+  margin-bottom: 64px;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--goldmine-maroon);
+  margin-bottom: 24px;
+  padding: 12px 20px;
+  background: linear-gradient(to right, var(--goldmine-gold-pale) 0%, transparent 100%);
+  border-left: 5px solid var(--goldmine-gold);
+  letter-spacing: -0.4px;
+}
+
+/* =============================================================
+   CARDS GRID - SIDE BY SIDE COMPARISON
+   ============================================================= */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+/* =============================================================
+   SCREENER CARD - PROFESSIONAL DATA CARD
+   ============================================================= */
+.screener-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(139, 36, 50, 0.06);
+}
+
+.screener-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(139, 36, 50, 0.12);
+  border-color: var(--goldmine-gold);
+}
+
+/* =============================================================
+   CARD TITLE - BRANDED HEADER
+   ============================================================= */
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bg-white);
+  margin: 0;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--goldmine-maroon) 0%, var(--goldmine-maroon-dark) 100%);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.card-title::before {
+  content: '▸';
+  color: var(--goldmine-gold);
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+/* =============================================================
+   CARD TABLE - CLEAN DATA PRESENTATION
+   ============================================================= */
+.card-table {
+  width: 100%;
+  display: block;
+  overflow-x: hidden;
+  background: var(--bg-white);
+}
+
+.card-table::-webkit-scrollbar {
+  height: 6px;
+}
+
+.card-table::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+.card-table::-webkit-scrollbar-thumb {
+  background: var(--goldmine-maroon);
+  border-radius: 3px;
+}
+
+.card-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.card-table thead {
+  background: var(--bg-light);
+  border-bottom: 2px solid var(--goldmine-gold);
+}
+
+.card-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--goldmine-maroon);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Rank column header - fixed width */
+.card-table th:first-child {
+  width: 5%;
+  text-align: center;
+  padding: 14px 12px;
+  white-space: nowrap;
+}
+
+/* Symbol column header */
+.card-table th:nth-child(2) {
+  width: 35%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Underlying Price column header */
+.card-table th:nth-child(3) {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Change/Percentage column header */
+.card-table th:nth-child(4),
+.card-table th:last-child {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+.card-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.card-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.card-table tbody tr:hover {
+  background: var(--bg-light);
+}
+
+.card-table td {
+  padding: 14px 16px;
+  color: var(--text-primary) !important;
+  font-weight: 500;
+}
+
+/* Rank column - fixed width */
+.card-table td:first-child {
+  font-weight: 700;
+  color: var(--goldmine-gold) !important;
+  text-align: center;
+  width: 5%;
+  font-size: 15px;
+  background: linear-gradient(to right, var(--goldmine-gold-pale) 0%, transparent 100%);
+  padding: 14px 12px;
+  white-space: nowrap;
+}
+
+/* Symbol column - flexible */
+.card-table td:nth-child(2) {
+  width: 35%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Underlying Price column */
+.card-table td:nth-child(3) {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* Change/Percentage column */
+.card-table td:nth-child(4),
+.card-table td:last-child {
+  width: 30%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 14px 16px;
+}
+
+/* =============================================================
+   SYMBOL LINK - BRANDED INTERACTIVE
+   ============================================================= */
+.symbol-link {
+  color: var(--goldmine-maroon) !important;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.symbol-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--goldmine-maroon) 0%, var(--goldmine-gold) 100%);
+  transition: width 0.3s ease;
+}
+
+.symbol-link:hover {
+  color: var(--goldmine-gold) !important;
+}
+
+.symbol-link:hover::after {
+  width: 100%;
+}
+
+/* =============================================================
+   POSITIVE / NEGATIVE COLORS
+   ============================================================= */
+.positive {
+  color: #16a34a !important;
+  font-weight: 700;
+}
+
+.negative {
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+
+/* =============================================================
+   NO DATA STATE
+   ============================================================= */
+.no-data {
+  text-align: center;
+  padding: 80px 40px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+  background: var(--bg-white);
+  border: 2px dashed var(--border-light);
+  border-radius: 4px;
+}
+
+.no-data::before {
+  content: '📊';
+  display: block;
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+/* =============================================================
+   TOOLTIP
+   ============================================================= */
+.symbol-tooltip {
+  font-size: 13px;
+  line-height: 1.6;
+  pointer-events: none;
+  background: var(--goldmine-maroon) !important;
+  color: white !important;
+  border: 1px solid var(--goldmine-gold) !important;
+  box-shadow: 0 4px 12px rgba(139, 36, 50, 0.3) !important;
+}
+
+/* =============================================================
+   RESPONSIVE DESIGN
+   ============================================================= */
+@media (max-width: 1200px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .screener-container {
+    padding: 9px 20px 40px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .screener-container {
+    padding: 9px 16px 32px 16px;
+  }
+  
+  .screener-header h1 {
+    font-size: 28px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    padding: 10px 16px;
+  }
+
+  .screener-card {
+    margin-bottom: 20px;
+  }
+  
+  .card-table {
+    font-size: 12px;
+  }
+
+  .card-table th {
+    font-size: 11px;
+    padding: 12px 12px;
+  }
+
+  .card-table td {
+    padding: 12px 12px;
+  }
+
+  .card-title {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .screener-controls {
+    padding: 14px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .screener-header h1 {
+    font-size: 24px;
+  }
+
+  .card-table th,
+  .card-table td {
+    padding: 10px 10px;
+    font-size: 11px;
+  }
+
+  .card-title {
+    font-size: 12px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+}
+
+
+/* =============================================================
+   FINAL SIGNAL SECTION - PREMIUM BRANDED BLOCK
+   ============================================================= */
+
+.final-signal-section {
+    width: 100%;
+    margin: 20px auto 10px auto;
+    padding: 15px;
+    border: 2px solid var(--goldmine-maroon);
+    border-radius: 8px;
+    background: var(--bg-light);
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.08);
+}
+
+.final-signal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--goldmine-maroon);
+    margin-bottom: 12px;
+    text-align: left;
+    padding-left: 4px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+/* Table layout */
+.final-signal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+/* Header row */
+.final-signal-table thead th {
+    background: var(--goldmine-maroon);
+    color: white;
+    padding: 10px;
+    border: 1px solid var(--border-light);
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Rows */
+.final-signal-table td {
+    padding: 10px;
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Alternating row color */
+.final-signal-row:nth-child(even) {
+    background: var(--bg-cream);
+}
+
+/* Bullish / Bearish color coding */
+.signal-bullish {
+    color: #16a34a;
+    font-weight: 800;
+}
+
+.signal-bearish {
+    color: #dc2626;
+    font-weight: 800;
+}
+
+/* No signal row */
+.no-final-signals {
+    text-align: center;
+    padding: 18px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}

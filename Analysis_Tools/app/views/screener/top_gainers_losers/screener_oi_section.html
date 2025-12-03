@@ -1,0 +1,434 @@
+<!-- ============================= -->
+<!-- SCREENER: OI SECTION -->
+<!-- ============================= -->
+<section class="screener-section">
+  <h2 class="section-title">📊 Open Interest Changes</h2>
+  
+  <div class="cards-grid">
+    <!-- CALL OPTIONS - ALL -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 Call OI Gainers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_call_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" 
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 Call OI Losers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_call_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CALL OPTIONS - ITM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 ITM Call OI Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_call_itm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 ITM Call OI Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_call_itm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CALL OPTIONS - OTM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 OTM Call OI Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_call_otm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 OTM Call OI Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_call_otm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PUT OPTIONS - ALL -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 Put OI Gainers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_put_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 Put OI Losers (All)</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_put_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PUT OPTIONS - ITM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 ITM Put OI Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_put_itm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 ITM Put OI Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_put_itm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PUT OPTIONS - OTM -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 OTM Put OI Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_put_otm_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 OTM Put OI Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Strike</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.oi_put_otm_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.0f" | format(item.strike_price) if item.strike_price else 'N/A' }}</td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,104 @@
+/* ==========================================================
+   OI CHARTS — TRADINGVIEW STYLE
+   ========================================================== */
+
+.oi-charts-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 15px;
+}
+
+.chart-container {
+  position: relative;
+  min-height: 400px;
+}
+
+.tv-chart-block {
+  position: relative;
+  height: 350px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.chart-inline-title {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #374151;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.chart-inline-legend {
+  position: absolute;
+  top: 10px;
+  right: 35px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.legend-item.inactive {
+  opacity: 0.4;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.oi-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+#strike-hover-label {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 14px;
+}

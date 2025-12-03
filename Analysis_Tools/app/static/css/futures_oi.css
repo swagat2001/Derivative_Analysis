@@ -1,0 +1,307 @@
+/* =============================================================
+   FUTURES OI ANALYSIS PAGE - GOLDMINE BRAND IDENTITY
+   ============================================================= */
+
+/* Container */
+.futures-oi-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px 32px 48px 32px;
+    background: linear-gradient(to bottom, #ffffff 0%, #FFFCF5 100%);
+    min-height: 100vh;
+}
+
+/* Header */
+.futures-oi-header {
+    text-align: left;
+    padding: 0 0 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #8B2432;
+    position: relative;
+}
+
+.futures-oi-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 120px;
+    height: 3px;
+    background: #D4AF37;
+}
+
+.futures-oi-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #8B2432;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.futures-oi-header p {
+    font-size: 15px;
+    color: #5a5a5a;
+    margin: 0;
+}
+
+/* Controls */
+.futures-oi-controls {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background: #ffffff;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e8d5d8;
+    border-left: 4px solid #8B2432;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.08);
+}
+
+.futures-oi-controls label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #8B2432;
+    margin-right: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.futures-oi-controls select {
+    font-size: 14px;
+    padding: 10px 16px;
+    border: 2px solid #e8d5d8;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #2c2c2c;
+    min-width: 200px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.futures-oi-controls select:hover {
+    border-color: #D4AF37;
+}
+
+.futures-oi-controls select:focus {
+    outline: none;
+    border-color: #8B2432;
+    box-shadow: 0 0 0 3px rgba(139, 36, 50, 0.1);
+}
+
+/* Expiry Section */
+.expiry-section {
+    margin-bottom: 40px;
+}
+
+.expiry-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #8B2432;
+    margin-bottom: 16px;
+    padding: 10px 16px;
+    background: linear-gradient(to right, #F5E6C8 0%, transparent 100%);
+    border-left: 4px solid #D4AF37;
+    letter-spacing: -0.3px;
+}
+
+.expiry-title .expiry-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #8B2432;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* Table Card */
+.expiry-table-card {
+    background: #ffffff;
+    border: 1px solid #e8d5d8;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.06);
+}
+
+/* Table */
+.expiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.expiry-table thead {
+    background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%);
+}
+
+.expiry-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #D4AF37;
+}
+
+.expiry-table th:first-child {
+    width: 5%;
+    text-align: center;
+}
+
+.expiry-table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.expiry-table tbody tr:hover {
+    background: #FFF8F0;
+}
+
+.expiry-table tbody tr:nth-child(even) {
+    background: #FFFCF5;
+}
+
+.expiry-table tbody tr:nth-child(even):hover {
+    background: #FFF8F0;
+}
+
+.expiry-table td {
+    padding: 12px 16px;
+    color: #2c2c2c;
+    font-weight: 500;
+}
+
+.expiry-table td:first-child {
+    font-weight: 700;
+    color: #D4AF37;
+    text-align: center;
+    background: linear-gradient(to right, #F5E6C8 0%, transparent 100%);
+}
+
+/* Symbol link */
+.expiry-table .ticker-link {
+    color: #8B2432;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s ease;
+}
+
+.expiry-table .ticker-link:hover {
+    color: #D4AF37;
+    text-decoration: underline;
+}
+
+/* Signal badge */
+.signal-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.signal-badge.bullish {
+    background: #d4edda;
+    color: #155724;
+}
+
+.signal-badge.bearish {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.signal-badge.neutral {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Percentile indicator */
+.percentile-bar {
+    display: inline-block;
+    width: 60px;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.percentile-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.percentile-bar-fill.low {
+    background: #dc3545;
+}
+
+.percentile-bar-fill.medium {
+    background: #ffc107;
+}
+
+.percentile-bar-fill.high {
+    background: #28a745;
+}
+
+.percentile-value {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* Positive/Negative colors */
+.positive {
+    color: #16a34a !important;
+    font-weight: 700;
+}
+
+.negative {
+    color: #dc2626 !important;
+    font-weight: 700;
+}
+
+/* No data message */
+.no-data-message {
+    text-align: center;
+    padding: 40px;
+    color: #5a5a5a;
+    font-size: 14px;
+    background: #FFFCF5;
+    border: 2px dashed #e8d5d8;
+    border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .futures-oi-container {
+        padding: 15px 20px 40px 20px;
+    }
+    
+    .expiry-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .futures-oi-header h1 {
+        font-size: 24px;
+    }
+    
+    .expiry-title {
+        font-size: 18px;
+    }
+    
+    .expiry-table th,
+    .expiry-table td {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+}

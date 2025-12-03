@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Goldmine Derivatives{% endblock %}</title>
+
+  <!-- Global Poppins Font -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  
+  <!-- Universal Header CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/universal_header.css') }}">
+  
+  <!-- Page-specific CSS -->
+  {% block page_css %}{% endblock %}
+</head>
+
+<body>
+  <!-- Universal Header (same across all pages) -->
+  {% include 'components/universal_header.html' %}
+
+  <!-- Page Content -->
+  <main class="page-content">
+    {% block content %}
+    <!-- Page content goes here -->
+    {% endblock %}
+  </main>
+
+  <!-- Page-specific JavaScript -->
+  {% block page_js %}{% endblock %}
+  <!-- Universal Header JS -->
+  <script src="{{ url_for('static', filename='js/universal_header.js') }}"></script>
+
+</body>
+</html>

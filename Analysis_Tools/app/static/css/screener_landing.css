@@ -1,0 +1,131 @@
+/* =============================================================
+   SCREENER LANDING PAGE - GOLDMINE BRAND IDENTITY
+   ============================================================= */
+
+.screener-landing {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.landing-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.landing-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #8B2432;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.landing-header p {
+    font-size: 16px;
+    color: #5a5a5a;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.option-card {
+    background: linear-gradient(135deg, #2a2e39 0%, #1a1d24 100%);
+    border-radius: 12px;
+    padding: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #D4AF37;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    border-color: #8B2432;
+    box-shadow: 0 10px 30px rgba(139, 36, 50, 0.3);
+}
+
+.option-card:hover::before {
+    transform: scaleY(1);
+}
+
+.option-card h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.option-card h2::after {
+    content: '→';
+    font-size: 18px;
+    color: #D4AF37;
+    transition: transform 0.3s ease;
+    margin-left: auto;
+}
+
+.option-card:hover h2::after {
+    transform: translateX(5px);
+}
+
+.option-card p {
+    font-size: 14px;
+    color: #aaaaaa;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.option-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    border: 2px solid #D4AF37;
+}
+
+@media (max-width: 900px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .landing-header h1 {
+        font-size: 28px;
+    }
+    
+    .option-card {
+        padding: 24px;
+    }
+    
+    .option-card h2 {
+        font-size: 18px;
+    }
+}

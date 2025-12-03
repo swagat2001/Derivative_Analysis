@@ -1,0 +1,554 @@
+/* =============================================================
+   TECHNICAL SCREENER PAGE - GOLDMINE BRAND IDENTITY
+   Brand Colors: Maroon (#8B2432) & Gold (#D4AF37)
+   ============================================================= */
+
+/* Container */
+.technical-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px 32px 48px 32px;
+    background: linear-gradient(to bottom, #ffffff 0%, #FFFCF5 100%);
+    min-height: 100vh;
+}  /* ADD THIS CLOSING BRACE */
+
+.technical-header {
+    text-align: left;
+    padding: 0 0 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #8B2432;
+    position: relative;
+}  /* ADD THIS CLOSING BRACE */
+
+.technical-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 120px;
+    height: 3px;
+    background: #D4AF37;
+}
+
+.technical-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #8B2432;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.technical-header p {
+    font-size: 15px;
+    color: #5a5a5a;
+    margin: 0;
+}
+
+/* Controls */
+.technical-controls {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background: #ffffff;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e8d5d8;
+    border-left: 4px solid #8B2432;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.08);
+}
+
+.technical-controls label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #8B2432;
+    margin-right: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.technical-controls select {
+    font-size: 14px;
+    padding: 10px 16px;
+    border: 2px solid #e8d5d8;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #2c2c2c;
+    min-width: 200px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.technical-controls select:hover {
+    border-color: #D4AF37;
+}
+
+.technical-controls select:focus {
+    outline: none;
+    border-color: #8B2432;
+    box-shadow: 0 0 0 3px rgba(139, 36, 50, 0.1);
+}
+
+/* Section */
+.tech-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #8B2432;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background: linear-gradient(to right, #F5E6C8 0%, transparent 100%);
+    border-left: 4px solid #D4AF37;
+    letter-spacing: -0.3px;
+}
+
+/* Cards Grid */
+.tech-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+/* Table Card */
+.tech-card {
+    background: #ffffff;
+    border: 1px solid #e8d5d8;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.06);
+    transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(139, 36, 50, 0.12);
+    border-color: #D4AF37;
+}
+
+.tech-card-full {
+    grid-column: span 2;
+}
+
+.tech-card-header {
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%);
+    color: #ffffff;
+}
+
+.tech-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tech-card-title::before {
+    content: '▸';
+    color: #D4AF37;
+    margin-right: 8px;
+}
+
+/* Tech Table */
+.tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tech-table thead {
+    background: #FFF8F0;
+    border-bottom: 2px solid #D4AF37;
+}
+
+.tech-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    color: #8B2432;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.tech-table th:first-child {
+    width: 5%;
+    text-align: center;
+}
+
+.tech-table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.tech-table tbody tr:hover {
+    background: #FFF8F0;
+}
+
+.tech-table td {
+    padding: 10px 14px;
+    color: #2c2c2c;
+    font-weight: 500;
+}
+
+.tech-table td:first-child {
+    font-weight: 700;
+    color: #D4AF37;
+    text-align: center;
+}
+
+/* Ticker link */
+.tech-table .ticker-link {
+    color: #8B2432;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.tech-table .ticker-link:hover {
+    color: #D4AF37;
+    text-decoration: underline;
+}
+
+/* Signal badge */
+.signal-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.signal-badge.bullish {
+    background: #d4edda;
+    color: #155724;
+}
+
+.signal-badge.bearish {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.signal-badge.neutral {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* RSI value styling */
+.rsi-value {
+    font-weight: 700;
+}
+
+.rsi-value.overbought {
+    color: #16a34a;
+}
+
+.rsi-value.oversold {
+    color: #dc2626;
+}
+
+/* Positive/Negative colors */
+.positive {
+    color: #16a34a !important;
+    font-weight: 700;
+}
+
+.negative {
+    color: #dc2626 !important;
+    font-weight: 700;
+}
+
+/* =============================================================
+   HEATMAP SECTION
+   ============================================================= */
+
+.heatmap-section {
+    margin-top: 40px;
+}
+
+.heatmap-container {
+    background: #ffffff;
+    border: 1px solid #e8d5d8;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.06);
+}
+
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    margin-top: 16px;
+}
+
+.heatmap-cell {
+    padding: 10px 6px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.08);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.heatmap-cell .ticker {
+    font-weight: 700;
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.heatmap-cell .value {
+    font-size: 10px;
+    opacity: 0.9;
+}
+
+/* =============================================================
+   RSI HEATMAP - 6 Categories (Client Requirement)
+   >80 = Overbought (Purple)
+   60-80 = Strong Bullish (Dark Green)
+   50-60 = Mild Bullish (Light Green)
+   40-50 = Mild Bearish (Orange)
+   20-40 = Strong Bearish (Dark Red)
+   <20 = Oversold (Maroon)
+   ============================================================= */
+.heatmap-cell.rsi-overbought {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: #ffffff;
+}
+
+.heatmap-cell.rsi-strong-bullish {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #ffffff;
+}
+
+.heatmap-cell.rsi-mild-bullish {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    color: #1a1a1a;
+}
+
+.heatmap-cell.rsi-mild-bearish {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    color: #1a1a1a;
+}
+
+.heatmap-cell.rsi-strong-bearish {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #ffffff;
+}
+
+.heatmap-cell.rsi-oversold {
+    background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%);
+    color: #ffffff;
+}
+
+/* Legend colors for RSI - 6 categories */
+.legend-color.rsi-overbought { background: #7c3aed; }
+.legend-color.rsi-strong-bullish { background: #16a34a; }
+.legend-color.rsi-mild-bullish { background: #4ade80; }
+.legend-color.rsi-mild-bearish { background: #fb923c; }
+.legend-color.rsi-strong-bearish { background: #dc2626; }
+.legend-color.rsi-oversold { background: #8B2432; }
+
+/* =============================================================
+   MACD HEATMAP - 3 Colors
+   ============================================================= */
+.heatmap-cell.macd-bullish {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #ffffff;
+}
+
+.heatmap-cell.macd-neutral {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #2c2c2c;
+}
+
+.heatmap-cell.macd-bearish {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #ffffff;
+}
+
+/* Legend colors for MACD */
+.legend-color.macd-bullish { background: #16a34a; }
+.legend-color.macd-neutral { background: #fbbf24; }
+.legend-color.macd-bearish { background: #dc2626; }
+
+/* =============================================================
+   SMA HEATMAP - 3 Colors
+   ============================================================= */
+.heatmap-cell.sma-bullish {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #ffffff;
+}
+
+.heatmap-cell.sma-neutral {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #2c2c2c;
+}
+
+.heatmap-cell.sma-bearish {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #ffffff;
+}
+
+/* Legend colors for SMA */
+.legend-color.sma-bullish { background: #16a34a; }
+.legend-color.sma-neutral { background: #fbbf24; }
+.legend-color.sma-bearish { background: #dc2626; }
+
+/* =============================================================
+   ADX HEATMAP - 3 Colors
+   ============================================================= */
+.heatmap-cell.adx-strong {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #ffffff;
+}
+
+.heatmap-cell.adx-neutral {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #2c2c2c;
+}
+
+.heatmap-cell.adx-weak {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #ffffff;
+}
+
+/* Legend colors for ADX */
+.legend-color.adx-strong { background: #16a34a; }
+.legend-color.adx-neutral { background: #fbbf24; }
+.legend-color.adx-weak { background: #dc2626; }
+
+/* =============================================================
+   HEATMAP LEGEND - With Counts and Toggle
+   ============================================================= */
+.heatmap-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px;
+    background: #FFFCF5;
+    border-radius: 4px;
+    border: 1px solid #e8d5d8;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #5a5a5a;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.legend-item:hover {
+    background: #fff;
+    border-color: #D4AF37;
+}
+
+.legend-item.active {
+    background: #fff;
+    border-color: #8B2432;
+    box-shadow: 0 2px 4px rgba(139, 36, 50, 0.1);
+}
+
+.legend-item:not(.active) {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.legend-color {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-count {
+    background: #8B2432;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 2px;
+}
+
+/* No data message */
+.no-data-message {
+    text-align: center;
+    padding: 40px;
+    color: #5a5a5a;
+    font-size: 14px;
+    background: #FFFCF5;
+    border: 2px dashed #e8d5d8;
+    border-radius: 4px;
+}
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================= */
+@media (max-width: 1200px) {
+    .technical-container {
+        padding: 15px 20px 40px 20px;
+    }
+    
+    .tech-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tech-card-full {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .technical-header h1 {
+        font-size: 24px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+    }
+    
+    .tech-table th,
+    .tech-table td {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    
+    .heatmap-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+    
+    .heatmap-legend {
+        gap: 6px;
+    }
+    
+    .legend-item {
+        font-size: 9px;
+        padding: 4px 6px;
+    }
+    
+    .legend-count {
+        font-size: 8px;
+        padding: 1px 4px;
+    }
+}

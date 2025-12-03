@@ -1,0 +1,36 @@
+# NSE Options Analysis Dashboard - Requirements
+# For Python 3.13.9
+# =============================================
+
+# Core Dependencies
+pandas>=2.1.0
+numpy>=1.26.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+
+# Technical Analysis (for RSI calculation)
+pandas-ta>=0.3.14b
+
+# Web Framework (for dashboard_server.py)
+flask>=3.0.0
+werkzeug>=3.0.0
+flask-cors>=4.0.0
+
+# Options Greeks Calculation (for update_database.py)
+py-vollib>=1.0.1
+scipy>=1.11.0
+
+# Date/Time Handling
+python-dateutil>=2.8.0
+
+# Additional utilities
+pytz>=2023.3
+yfinance
+openpyxl>=3.1.2
+flask-socketio>=5.3.6
+python-socketio>=5.11.2
+matplotlib>=3.8.0
+reportlab
+playwright 
+PyPDF2
+flask_caching

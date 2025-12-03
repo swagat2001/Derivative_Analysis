@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Signal Analysis{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
+<style>
+    .signal-container { max-width: 1400px; margin: 2px auto; padding: 2px; }
+    .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .signal-header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; }
+    .filter-buttons { display: flex; gap: 10px; }
+    .filter-btn { padding: 8px 20px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-decoration: none; color: #333; }
+    .filter-btn:hover { border-color: #8B2432; color: #8B2432; }
+    .filter-btn.active { background: #8B2432; color: white; border-color: #8B2432; }
+    .signals-table { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .signals-table table { width: 100%; border-collapse: collapse; }
+    .signals-table th { background: #2a2e39; color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 13px; user-select: none; }
+    .signals-table th.sortable { cursor: pointer; }
+    .signals-table th.sortable:hover { background: #353a47; }
+    .signals-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    .signals-table tr:hover { background: #f8f9fa; }
+    .sort-indicator { font-size: 12px; margin-left: 5px; opacity: 0.7; }
+    .signal-badge { padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 12px; }
+    .signal-badge.bullish { background: #d4edda; color: #155724; }
+    .signal-badge.bearish { background: #f8d7da; color: #721c24; }
+    .signal-badge.neutral { background: #fff3cd; color: #856404; }
+    .signal-score { display: flex; gap: 15px; font-size: 12px; }
+    .signal-score .bull { color: #28a745; font-weight: 600; }
+    .signal-score .bear { color: #dc3545; font-weight: 600; }
+    .expand-btn { background: none; border: none; color: #8B2432; cursor: pointer; font-size: 12px; text-decoration: underline; }
+    .details-row { display: none; background: #f8f9fa; }
+    .details-content { padding: 15px; font-size: 12px; }
+    .category-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+    .category-item { padding: 4px 8px; background: white; border-radius: 4px; font-size: 11px; }
+    .stats-summary { display: flex; gap: 20px; margin-bottom: 2px; padding: 5px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .stat-card { flex: 1; text-align: center; }
+    .stat-card .value { font-size: 32px; font-weight: 700; }
+    .stat-card .label { font-size: 13px; color: #666; }
+    .stat-card.bullish .value { color: #28a745; }
+    .stat-card.bearish .value { color: #dc3545; }
+    .stat-card.neutral .value { color: #f39c12; }
+    .date-control { margin-bottom: 5px; padding: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .date-control select { padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="signal-container">
+
+    <div class="date-control">
+        <label>Select Date:</label>
+        <select onchange="window.location.href='/screener/signal-analysis?date='+this.value+'&filter={{ signal_filter }}&sort={{ sort_by }}&order={{ sort_order }}';">
+            {% for d in dates %}
+            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% set bullish_count = signals.values()|selectattr('signal','equalto','BULLISH')|list|length %}
+    {% set bearish_count = signals.values()|selectattr('signal','equalto','BEARISH')|list|length %}
+    {% set neutral_count = signals.values()|selectattr('signal','equalto','NEUTRAL')|list|length %}
+
+    <div class="stats-summary">
+        <div class="stat-card"><div class="value">{{ signals|length }}</div><div class="label">Total Stocks</div></div>
+        <div class="stat-card bullish"><div class="value">{{ bullish_count }}</div><div class="label">Bullish Signals</div></div>
+        <div class="stat-card bearish"><div class="value">{{ bearish_count }}</div><div class="label">Bearish Signals</div></div>
+        <div class="stat-card neutral"><div class="value">{{ neutral_count }}</div><div class="label">Neutral Signals</div></div>
+    </div>
+
+    <div class="signal-header">
+        <h1>Signal Analysis</h1>
+        <div class="filter-buttons">
+            <a href="?date={{ selected_date }}&filter=all&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='all' %}active{% endif %}">All</a>
+            <a href="?date={{ selected_date }}&filter=bullish&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='bullish' %}active{% endif %}">Bullish</a>
+            <a href="?date={{ selected_date }}&filter=bearish&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='bearish' %}active{% endif %}">Bearish</a>
+            <a href="?date={{ selected_date }}&filter=neutral&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='neutral' %}active{% endif %}">Neutral</a>
+        </div>
+    </div>
+
+    <div class="signals-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="sortable">
+                        <a href="?date={{ selected_date }}&filter={{ signal_filter }}&sort=symbol&order={% if sort_by == 'symbol' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" style="color: white; text-decoration: none; display: block;">
+                            Symbol
+                            {% if sort_by == 'symbol' %}
+                                <span class="sort-indicator">{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}</span>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Signal</th>
+                    <th class="sortable">
+                        <a href="?date={{ selected_date }}&filter={{ signal_filter }}&sort=strength&order={% if sort_by == 'strength' and sort_order == 'desc' %}asc{% else %}desc{% endif %}" style="color: white; text-decoration: none; display: block;">
+                            Signal Strength
+                            {% if sort_by == 'strength' %}
+                                <span class="sort-indicator">{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}</span>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticker, data in signals.items() %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><strong>{{ ticker }}</strong></td>
+                    <td><span class="signal-badge {{ data.signal|lower }}">{{ data.signal }}</span></td>
+                    <td>
+                        <div class="signal-score">
+                            <span class="bull">🟢 {{ data.bullish_count }}</span>
+                            <span class="bear">🔴 {{ data.bearish_count }}</span>
+                        </div>
+                    </td>
+                    <td><button class="expand-btn" onclick="toggleDetails('details-{{ loop.index }}')">View Breakdown</button></td>
+                </tr>
+                <tr class="details-row" id="details-{{ loop.index }}">
+                    <td colspan="5">
+                        <div class="details-content">
+                            <strong style="color:#28a745;">Bullish Categories ({{ data.bullish_count }})</strong>
+                            <div class="category-list">
+                                {% for c in data.bullish_categories %}
+                                    <div class="category-item">{{ c }}</div>
+                                {% endfor %}
+                            </div>
+                            <div style="margin-top:15px;">
+                                <strong style="color:#dc3545;">Bearish Categories ({{ data.bearish_count }})</strong>
+                                <div class="category-list">
+                                    {% for c in data.bearish_categories %}
+                                        <div class="category-item">{{ c }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function toggleDetails(id) {
+    var row = document.getElementById(id);
+    if (row.style.display === 'table-row') {
+        row.style.display = 'none';
+    } else {
+        row.style.display = 'table-row';
+    }
+}
+</script>
+{% endblock %}

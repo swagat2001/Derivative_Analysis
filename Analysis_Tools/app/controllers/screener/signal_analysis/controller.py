@@ -1,0 +1,301 @@
+"""
+Signal Analysis Controller
+Handles bullish/bearish signal display with filtering and detailed breakdown
+"""
+
+from flask import Blueprint, render_template, request, jsonify
+from flask_caching import Cache
+from ....models.screener_model import get_all_screener_data
+from ....models.dashboard_model import get_available_dates
+from ....models.stock_model import get_filtered_tickers
+from ....controllers.dashboard_controller import get_live_indices
+
+
+signal_analysis_bp = Blueprint('signal_analysis', __name__, url_prefix='/screener/signal-analysis')
+
+
+# Initialize cache
+cache = Cache(config={
+    'CACHE_TYPE': 'simple',
+    'CACHE_DEFAULT_TIMEOUT': 3600
+})
+
+
+def _compute_final_signals_with_breakdown(screener_data):
+    """
+    Compute final signals WITH detailed breakdown of why each ticker is classified
+    Returns: {
+        'ticker': {
+            'signal': 'BULLISH' or 'BEARISH',
+            'bullish_count': int,
+            'bearish_count': int,
+            'bullish_categories': [list of categories],
+            'bearish_categories': [list of categories]
+        }
+    }
+    """
+    
+    bullish_sections = {
+        'iv_call_gainers': 'IV Call Gainers (ALL)',
+        'iv_call_itm_gainers': 'IV Call Gainers (ITM)',
+        'iv_call_otm_gainers': 'IV Call Gainers (OTM)',
+        'iv_put_losers': 'IV Put Losers (ALL)',
+        'iv_put_itm_losers': 'IV Put Losers (ITM)',
+        'iv_put_otm_losers': 'IV Put Losers (OTM)',
+        'oi_call_gainers': 'OI Call Gainers (ALL)',
+        'oi_call_itm_gainers': 'OI Call Gainers (ITM)',
+        'oi_call_otm_gainers': 'OI Call Gainers (OTM)',
+        'oi_put_losers': 'OI Put Losers (ALL)',
+        'oi_put_itm_losers': 'OI Put Losers (ITM)',
+        'oi_put_otm_losers': 'OI Put Losers (OTM)',
+        'moneyness_call_gainers': 'Moneyness Call Gainers (ALL)',
+        'moneyness_call_itm_gainers': 'Moneyness Call Gainers (ITM)',
+        'moneyness_call_otm_gainers': 'Moneyness Call Gainers (OTM)',
+        'moneyness_put_losers': 'Moneyness Put Losers (ALL)',
+        'moneyness_put_itm_losers': 'Moneyness Put Losers (ITM)',
+        'moneyness_put_otm_losers': 'Moneyness Put Losers (OTM)',
+        'future_oi_gainers': 'Future OI Gainers'
+    }
+
+    bearish_sections = {
+        'iv_call_losers': 'IV Call Losers (ALL)',
+        'iv_call_itm_losers': 'IV Call Losers (ITM)',
+        'iv_call_otm_losers': 'IV Call Losers (OTM)',
+        'iv_put_gainers': 'IV Put Gainers (ALL)',
+        'iv_put_itm_gainers': 'IV Put Gainers (ITM)',
+        'iv_put_otm_gainers': 'IV Put Gainers (OTM)',
+        'oi_call_losers': 'OI Call Losers (ALL)',
+        'oi_call_itm_losers': 'OI Call Losers (ITM)',
+        'oi_call_otm_losers': 'OI Call Losers (OTM)',
+        'oi_put_gainers': 'OI Put Gainers (ALL)',
+        'oi_put_itm_gainers': 'OI Put Gainers (ITM)',
+        'oi_put_otm_gainers': 'OI Put Gainers (OTM)',
+        'moneyness_call_losers': 'Moneyness Call Losers (ALL)',
+        'moneyness_call_itm_losers': 'Moneyness Call Losers (ITM)',
+        'moneyness_call_otm_losers': 'Moneyness Call Losers (OTM)',
+        'moneyness_put_gainers': 'Moneyness Put Gainers (ALL)',
+        'moneyness_put_itm_gainers': 'Moneyness Put Gainers (ITM)',
+        'moneyness_put_otm_gainers': 'Moneyness Put Gainers (OTM)',
+        'future_oi_losers': 'Future OI Losers'
+    }
+
+    signals = {}
+
+    # Track bullish membership
+    for sec_key, sec_name in bullish_sections.items():
+        for row in screener_data.get(sec_key, []):
+            ticker = row.get("ticker")
+            if ticker:
+                if ticker not in signals:
+                    signals[ticker] = {
+                        'signal': 'BEARISH',
+                        'bullish_count': 0,
+                        'bearish_count': 0,
+                        'bullish_categories': [],
+                        'bearish_categories': []
+                    }
+                signals[ticker]['bullish_count'] += 1
+                signals[ticker]['bullish_categories'].append(sec_name)
+
+    # Track bearish membership
+    for sec_key, sec_name in bearish_sections.items():
+        for row in screener_data.get(sec_key, []):
+            ticker = row.get("ticker")
+            if ticker:
+                if ticker not in signals:
+                    signals[ticker] = {
+                        'signal': 'BEARISH',
+                        'bullish_count': 0,
+                        'bearish_count': 0,
+                        'bullish_categories': [],
+                        'bearish_categories': []
+                    }
+                signals[ticker]['bearish_count'] += 1
+                signals[ticker]['bearish_categories'].append(sec_name)
+
+    # Final classification - handle ties as NEUTRAL
+    for ticker, data in signals.items():
+        if data['bullish_count'] > data['bearish_count']:
+            data['signal'] = 'BULLISH'
+        elif data['bearish_count'] > data['bullish_count']:
+            data['signal'] = 'BEARISH'
+        else:
+            data['signal'] = 'NEUTRAL'  # Equal counts = neutral
+
+    return signals
+
+
+@cache.memoize(timeout=3600)
+def get_signal_data_formatted(selected_date):
+    """Get formatted data for signal analysis"""
+    try:
+        # Get raw screener data
+        all_data = get_all_screener_data(selected_date)
+        
+        if not all_data:
+            return None
+        
+        # Build simplified structure for signal computation
+        screener_data = {}
+        
+        # OI - Calls (6)
+        screener_data['oi_call_gainers'] = all_data['oi']['CE']['ALL'][:10]
+        screener_data['oi_call_itm_gainers'] = all_data['oi']['CE']['ITM'][:10]
+        screener_data['oi_call_otm_gainers'] = all_data['oi']['CE']['OTM'][:10]
+        screener_data['oi_call_losers'] = all_data['oi']['CE']['ALL_LOSERS'][:10]
+        screener_data['oi_call_itm_losers'] = all_data['oi']['CE']['ITM_LOSERS'][:10]
+        screener_data['oi_call_otm_losers'] = all_data['oi']['CE']['OTM_LOSERS'][:10]
+        
+        # OI - Puts (6)
+        screener_data['oi_put_gainers'] = all_data['oi']['PE']['ALL'][:10]
+        screener_data['oi_put_itm_gainers'] = all_data['oi']['PE']['ITM'][:10]
+        screener_data['oi_put_otm_gainers'] = all_data['oi']['PE']['OTM'][:10]
+        screener_data['oi_put_losers'] = all_data['oi']['PE']['ALL_LOSERS'][:10]
+        screener_data['oi_put_itm_losers'] = all_data['oi']['PE']['ITM_LOSERS'][:10]
+        screener_data['oi_put_otm_losers'] = all_data['oi']['PE']['OTM_LOSERS'][:10]
+        
+        # Moneyness - Calls (6)
+        screener_data['moneyness_call_gainers'] = all_data['moneyness']['CE']['ALL'][:10]
+        screener_data['moneyness_call_itm_gainers'] = all_data['moneyness']['CE']['ITM'][:10]
+        screener_data['moneyness_call_otm_gainers'] = all_data['moneyness']['CE']['OTM'][:10]
+        screener_data['moneyness_call_losers'] = all_data['moneyness']['CE']['ALL_LOSERS'][:10]
+        screener_data['moneyness_call_itm_losers'] = all_data['moneyness']['CE']['ITM_LOSERS'][:10]
+        screener_data['moneyness_call_otm_losers'] = all_data['moneyness']['CE']['OTM_LOSERS'][:10]
+        
+        # Moneyness - Puts (6)
+        screener_data['moneyness_put_gainers'] = all_data['moneyness']['PE']['ALL'][:10]
+        screener_data['moneyness_put_itm_gainers'] = all_data['moneyness']['PE']['ITM'][:10]
+        screener_data['moneyness_put_otm_gainers'] = all_data['moneyness']['PE']['OTM'][:10]
+        screener_data['moneyness_put_losers'] = all_data['moneyness']['PE']['ALL_LOSERS'][:10]
+        screener_data['moneyness_put_itm_losers'] = all_data['moneyness']['PE']['ITM_LOSERS'][:10]
+        screener_data['moneyness_put_otm_losers'] = all_data['moneyness']['PE']['OTM_LOSERS'][:10]
+        
+        # IV - Calls (6)
+        screener_data['iv_call_gainers'] = all_data['iv']['CE']['ALL'][:10]
+        screener_data['iv_call_itm_gainers'] = all_data['iv']['CE']['ITM'][:10]
+        screener_data['iv_call_otm_gainers'] = all_data['iv']['CE']['OTM'][:10]
+        screener_data['iv_call_losers'] = all_data['iv']['CE']['ALL_LOSERS'][:10]
+        screener_data['iv_call_itm_losers'] = all_data['iv']['CE']['ITM_LOSERS'][:10]
+        screener_data['iv_call_otm_losers'] = all_data['iv']['CE']['OTM_LOSERS'][:10]
+        
+        # IV - Puts (6)
+        screener_data['iv_put_gainers'] = all_data['iv']['PE']['ALL'][:10]
+        screener_data['iv_put_itm_gainers'] = all_data['iv']['PE']['ITM'][:10]
+        screener_data['iv_put_otm_gainers'] = all_data['iv']['PE']['OTM'][:10]
+        screener_data['iv_put_losers'] = all_data['iv']['PE']['ALL_LOSERS'][:10]
+        screener_data['iv_put_itm_losers'] = all_data['iv']['PE']['ITM_LOSERS'][:10]
+        screener_data['iv_put_otm_losers'] = all_data['iv']['PE']['OTM_LOSERS'][:10]
+        
+        # Futures (2)
+        screener_data['future_oi_gainers'] = all_data['oi']['FUT']['ALL'][:10]
+        screener_data['future_oi_losers'] = all_data['oi']['FUT']['ALL_LOSERS'][:10]
+
+        # Compute signals with breakdown
+        signals = _compute_final_signals_with_breakdown(screener_data)
+        
+        return signals
+        
+    except Exception as e:
+        print(f"[ERROR] get_signal_data_formatted: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+
+def _apply_sorting(signals, sort_by, sort_order, signal_filter):
+    """
+    Apply sorting to signals based on column and order
+    
+    Args:
+        signals: dict of signal data
+        sort_by: 'symbol' or 'strength'
+        sort_order: 'asc' or 'desc'
+        signal_filter: 'all', 'bullish', 'bearish', 'neutral'
+    
+    Returns:
+        Sorted dict
+    """
+    if sort_by == 'symbol':
+        # Sort by ticker name (alphabetically)
+        sorted_signals = dict(sorted(
+            signals.items(),
+            key=lambda x: x[0].lower(),
+            reverse=(sort_order == 'desc')
+        ))
+    elif sort_by == 'strength':
+        # Sort based on active filter
+        def get_sort_value(item):
+            ticker, data = item
+            if signal_filter == 'bullish':
+                # Sort by bullish count only
+                return data['bullish_count']
+            elif signal_filter == 'bearish':
+                # Sort by bearish count only
+                return data['bearish_count']
+            else:
+                # For 'all' and 'neutral' - sort by net score
+                return data['bullish_count'] - data['bearish_count']
+        
+        sorted_signals = dict(sorted(
+            signals.items(),
+            key=get_sort_value,
+            reverse=(sort_order == 'desc')
+        ))
+    else:
+        # Default: sort by net strength (bullish - bearish), descending
+        sorted_signals = dict(sorted(
+            signals.items(),
+            key=lambda x: x[1]['bullish_count'] - x[1]['bearish_count'],
+            reverse=True
+        ))
+    
+    return sorted_signals
+
+
+@signal_analysis_bp.route('/')
+def signal_analysis():
+    """Display signal analysis page"""
+    try:
+        dates = get_available_dates()
+        selected_date = request.args.get("date", dates[0] if dates else None)
+        signal_filter = request.args.get("filter", "all")  # all, bullish, bearish, neutral
+        sort_by = request.args.get("sort", "strength")  # symbol, strength
+        sort_order = request.args.get("order", "desc")  # asc, desc
+        
+        if not selected_date:
+            return jsonify({"error": "No dates available"}), 404
+        
+        signals = get_signal_data_formatted(selected_date)
+        
+        if not signals:
+            signals = {}
+        
+        # Apply filter
+        if signal_filter == "bullish":
+            signals = {k: v for k, v in signals.items() if v['signal'] == 'BULLISH'}
+        elif signal_filter == "bearish":
+            signals = {k: v for k, v in signals.items() if v['signal'] == 'BEARISH'}
+        elif signal_filter == "neutral":
+            signals = {k: v for k, v in signals.items() if v['signal'] == 'NEUTRAL'}
+        
+        # Apply sorting
+        sorted_signals = _apply_sorting(signals, sort_by, sort_order, signal_filter)
+        
+        return render_template(
+            "screener/signal_analysis/index.html",
+            dates=dates,
+            selected_date=selected_date,
+            indices=get_live_indices(),
+            signals=sorted_signals,
+            signal_filter=signal_filter,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            stock_list=get_filtered_tickers(),
+            stock_symbol=None
+        )
+        
+    except Exception as e:
+        print(f"[ERROR] signal_analysis(): {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Signal analysis failed: {str(e)}"}), 500

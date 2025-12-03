@@ -1,0 +1,63 @@
+<!-- ==============================
+     DASHBOARD HEADER COMPONENT
+     ============================== -->
+<header class="dashboard-header">
+  <div class="header-container">
+
+    <!-- Left Section (Logo) -->
+    <div class="header-logo">
+      <a href="{{ url_for('dashboard.dashboard') }}" class="logo-link" title="Go to Dashboard">
+        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" 
+             alt="Goldmine Logo" class="logo-img">
+      </a>
+    </div>
+
+    <!-- Center Title -->
+    <div class="header-title">
+      <h2 class="title-text">Derivatives Analysis Dashboard</h2>
+    </div>
+
+    <!-- Right Section (Indices + User/Logout) -->
+    <div class="header-right-section">
+      <div class="header-indices">
+        <div class="index-item">
+          <span class="index-label">NIFTY</span>
+          <span id="nifty-value" class="index-value">
+            {{ "%.2f"|format(indices['NIFTY']) if indices and indices['NIFTY'] is not none else '--' }}
+          </span>
+        </div>
+        <div class="index-item">
+          <span class="index-label">BANKNIFTY</span>
+          <span id="banknifty-value" class="index-value">
+            {{ "%.2f"|format(indices['BANKNIFTY']) if indices and indices['BANKNIFTY'] is not none else '--' }}
+          </span>
+        </div>
+        <div class="index-item">
+          <span class="index-label">GOLD</span>
+          <span id="gold-value" class="index-value">
+            {{ "%.2f"|format(indices['GOLD']) if indices and indices['GOLD'] is not none else '--' }}
+          </span>
+        </div>
+        <div class="index-item">
+          <span class="index-label">SILVER</span>
+          <span id="silver-value" class="index-value">
+            {{ "%.2f"|format(indices['SILVER']) if indices and indices['SILVER'] is not none else '--' }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- User Info & Logout -->
+      <div class="header-user-section">
+        {% if current_user %}
+        <div class="user-info">
+          <span class="user-name">👤 {{ user_display_name or current_user }}</span>
+        </div>
+        <a href="{{ url_for('auth.logout') }}" class="logout-button" title="Logout">
+          🚪 Logout
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</header>

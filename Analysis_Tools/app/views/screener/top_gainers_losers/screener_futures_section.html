@@ -1,0 +1,142 @@
+<!-- ============================= -->
+<!-- SCREENER: FUTURES SECTION -->
+<!-- ============================= -->
+<section class="screener-section">
+  <h2 class="section-title">📦 Futures Analysis</h2>
+  
+  <div class="cards-grid">
+    <!-- FUTURES OI -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 Future OI Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.future_oi_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 Future OI Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>OI Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.future_oi_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FUTURES MONEYNESS -->
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🟢 Top 10 Future Moneyness Gainers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.future_moneyness_gainers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screener-card">
+      <div class="card-header">
+        <div class="card-title">🔴 Top 10 Future Moneyness Losers</div>
+      </div>
+      <table class="card-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Symbol</th>
+            <th>Underlying Price</th>
+            <th>Moneyness Change (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in screener_data.future_moneyness_losers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="/stock/{{ item.ticker }}" class="symbol-link"
+                 data-ticker="{{ item.ticker }}"
+                 data-toggle="tooltip" 
+                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+                {{ item.ticker }}
+              </a>
+            </td>
+            <td>{{ "%.2f" | format(item.underlying_price) }}</td>
+            <td class="{{ 'positive' if item.change >= 0 else 'negative' }}">{{ "%+.2f" | format(item.change) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,73 @@
+<!-- ============================== -->
+<!-- 📊 STOCK DETAIL STATISTICS COMPONENT -->
+<!-- ============================== -->
+<div class="stats-section">
+
+  {% if stats %}
+  <!-- Metrics Grid - 2 Columns -->
+  <div class="stats-grid-two-col">
+    <!-- Row 1 -->
+    <div class="stat-card">
+      <div class="stat-label">Total CE OI</div>
+      <div class="stat-value stat-call">{{ stats.total_ce_oi }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total CE OI Chg</div>
+      <div class="stat-value">{{ stats.total_ce_oi_chg }}</div>
+    </div>
+    
+    <!-- Row 2 -->
+    <div class="stat-card">
+      <div class="stat-label">Total PE OI</div>
+      <div class="stat-value stat-put">{{ stats.total_pe_oi }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total PE OI Chg</div>
+      <div class="stat-value">{{ stats.total_pe_oi_chg }}</div>
+    </div>
+    
+    <!-- Row 3 -->
+    <div class="stat-card">
+      <div class="stat-label">Diff PE-CE OI</div>
+      <div class="stat-value {% if stats.diff_pe_ce_oi and stats.diff_pe_ce_oi|replace(' Cr', '')|replace(' L', '')|float < 0 %}negative{% endif %}">{{ stats.diff_pe_ce_oi }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Diff PE-CE OI Chg</div>
+      <div class="stat-value {% if stats.diff_pe_ce_oi_chg and stats.diff_pe_ce_oi_chg|replace(' Cr', '')|replace(' L', '')|float < 0 %}negative{% endif %}">{{ stats.diff_pe_ce_oi_chg }}</div>
+    </div>
+    
+    <!-- Row 4 -->
+    <div class="stat-card">
+      <div class="stat-label">Trend OI</div>
+      <div class="stat-value trend-{{ stats.trend_oi|lower if stats.trend_oi else 'neutral' }}">{{ stats.trend_oi }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Trend OI Chg</div>
+      <div class="stat-value trend-{{ stats.trend_oi_chg|lower if stats.trend_oi_chg else 'neutral' }}">{{ stats.trend_oi_chg }}</div>
+    </div>
+    
+    <!-- Row 5 -->
+    <div class="stat-card">
+      <div class="stat-label">Max CE OI Strike</div>
+      <div class="stat-value">{{ stats.max_ce_oi_strike }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Max PE OI Strike</div>
+      <div class="stat-value">{{ stats.max_pe_oi_strike }}</div>
+    </div>
+    
+    <!-- Row 6 -->
+    <div class="stat-card">
+      <div class="stat-label">Max CE OI Chg Strike</div>
+      <div class="stat-value">{{ stats.max_ce_oi_chg_strike }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Max PE OI Chg Strike</div>
+      <div class="stat-value">{{ stats.max_pe_oi_chg_strike }}</div>
+    </div>
+  </div>
+
+  {% else %}
+  <p class="no-data-message">No statistics available</p>
+  {% endif %}
+</div>

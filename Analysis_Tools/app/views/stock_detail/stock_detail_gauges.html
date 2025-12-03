@@ -1,0 +1,96 @@
+<!-- ============================== -->
+<!-- ⚙️ GAUGES COMPONENT -->
+<!-- Pure Server-Side Rendered SVG -->
+<!-- NO JavaScript Dependency -->
+<!-- ============================== -->
+<div class="gauges-section">
+  <h3 class="section-title">Key Metrics</h3>
+  
+  {% if stats %}
+  <div class="gauges-grid">
+    <!-- PCR Gauge -->
+    <div class="gauge-card">
+      <div class="gauge-label">PCR (Open Interest)</div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 120 120" width="120" height="120">
+          <!-- Background Circle -->
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
+          
+          <!-- Value Arc -->
+          {% set pcr_value = stats.pcr_oi|float if stats.pcr_oi else 0 %}
+          {% set pcr_min = 0 %}
+          {% set pcr_max = 2 %}
+          {% set pcr_percentage = ((pcr_value - pcr_min) / (pcr_max - pcr_min)) if (pcr_max - pcr_min) > 0 else 0 %}
+          {% set pcr_percentage = [pcr_percentage, 0]|max %}
+          {% set pcr_percentage = [pcr_percentage, 1]|min %}
+          {% set pcr_circumference = 314 %}
+          {% set pcr_offset = pcr_circumference - (pcr_circumference * pcr_percentage) %}
+          
+          <circle 
+            cx="60" cy="60" r="50" 
+            fill="none" 
+            stroke="#667eea" 
+            stroke-width="12" 
+            stroke-linecap="round"
+            stroke-dasharray="{{ pcr_circumference }}"
+            stroke-dashoffset="{{ pcr_offset }}"
+            transform="rotate(-90 60 60)"
+          />
+          
+          <!-- Center Value Text -->
+          <text x="60" y="66" text-anchor="middle" font-size="24" font-weight="700" fill="#2c3e50">
+            {{ "%.2f"|format(pcr_value) }}
+          </text>
+        </svg>
+      </div>
+      <div class="gauge-range">
+        <span>0.00</span>
+        <span>2.00</span>
+      </div>
+    </div>
+
+    <!-- IV Gauge -->
+    <div class="gauge-card">
+      <div class="gauge-label">IV (Implied Volatility)</div>
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 120 120" width="120" height="120">
+          <!-- Background Circle -->
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
+          
+          <!-- Value Arc -->
+          {% set iv_value = stats.avg_iv|float if stats.avg_iv else 0 %}
+          {% set iv_min = 0 %}
+          {% set iv_max = 100 %}
+          {% set iv_percentage = ((iv_value - iv_min) / (iv_max - iv_min)) if (iv_max - iv_min) > 0 else 0 %}
+          {% set iv_percentage = [iv_percentage, 0]|max %}
+          {% set iv_percentage = [iv_percentage, 1]|min %}
+          {% set iv_circumference = 314 %}
+          {% set iv_offset = iv_circumference - (iv_circumference * iv_percentage) %}
+          
+          <circle 
+            cx="60" cy="60" r="50" 
+            fill="none" 
+            stroke="#10B981" 
+            stroke-width="12" 
+            stroke-linecap="round"
+            stroke-dasharray="{{ iv_circumference }}"
+            stroke-dashoffset="{{ iv_offset }}"
+            transform="rotate(-90 60 60)"
+          />
+          
+          <!-- Center Value Text -->
+          <text x="60" y="66" text-anchor="middle" font-size="24" font-weight="700" fill="#2c3e50">
+            {{ "%.2f"|format(iv_value) }}
+          </text>
+        </svg>
+      </div>
+      <div class="gauge-range">
+        <span>0</span>
+        <span>100</span>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="no-data-message">No gauge data available</p>
+  {% endif %}
+</div>

@@ -1,0 +1,26 @@
+<div class="stock-controls-bar">
+    <div class="control-group">
+        <label for="symbolSelect">Select Symbol</label>
+        <select id="symbolSelect" name="symbol" onchange="window.location.href='/stock/'+this.value+'?date='+document.getElementById('dateSelect').value">
+            {% for symbol in all_symbols %}
+            <option value="{{ symbol }}" {% if symbol == ticker %}selected{% endif %}>{{ symbol }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="control-group">
+        <label for="expirySelect">Expiry Date</label>
+        <select id="expirySelect" name="expiry" onchange="window.location.href='/stock/{{ ticker }}?date='+document.getElementById('dateSelect').value+'&expiry='+this.value">
+            {% for exp in expiry_data %}
+            <option value="{{ exp.expiry }}" {% if exp.expiry == selected_expiry %}selected{% endif %}>{{ exp.expiry|format_expiry }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="control-group">
+        <label for="dateSelect">Select Date</label>
+        <select id="dateSelect" name="date" data-expiry="{{ selected_expiry or '' }}" onchange="var url='/stock/{{ ticker }}?date='+this.value; if(this.dataset.expiry){url+='&expiry='+this.dataset.expiry;} window.location.href=url;">
+            {% for d in dates %}
+            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

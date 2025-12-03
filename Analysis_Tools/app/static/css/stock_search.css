@@ -1,0 +1,170 @@
+/* ===============================================
+   STOCK SEARCH PAGE STYLES
+   Stock selection and symbol picker interface
+   =============================================== */
+
+.stock-search-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* ===============================================
+   PAGE HEADER
+   =============================================== */
+.stock-search-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.stock-search-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* ===============================================
+   SEARCH CONTROLS
+   =============================================== */
+.stock-search-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Control Sections */
+.date-section,
+.symbol-section,
+.action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* Select Dropdowns */
+.date-select,
+.symbol-select {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1f2937;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-select:hover,
+.symbol-select:hover {
+  border-color: #8B2432;
+  background: #fafafa;
+}
+
+.date-select:focus,
+.symbol-select:focus {
+  outline: none;
+  border-color: #8B2432;
+  box-shadow: 0 0 0 3px rgba(139, 36, 50, 0.1);
+}
+
+/* Button */
+.selection-form {
+  margin: 0;
+  padding: 0;
+}
+
+.btn-view-detail {
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #8B2432;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-view-detail:hover:not(:disabled) {
+  background: #6b1b26;
+  box-shadow: 0 4px 12px rgba(139, 36, 50, 0.3);
+}
+
+.btn-view-detail:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-view-detail:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===============================================
+   INFO TEXT
+   =============================================== */
+.stock-search-info {
+  text-align: center;
+  margin-top: 32px;
+  padding: 20px;
+  background: #f0f9ff;
+  border-left: 4px solid #8B2432;
+  border-radius: 4px;
+}
+
+.stock-search-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* ===============================================
+   RESPONSIVE
+   =============================================== */
+@media (max-width: 768px) {
+  .stock-search-container {
+    padding: 24px 16px;
+  }
+
+  .stock-search-header h1 {
+    font-size: 24px;
+  }
+
+  .stock-search-controls {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .date-select,
+  .symbol-select {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .btn-view-detail {
+    padding: 10px 24px;
+    font-size: 14px;
+  }
+}

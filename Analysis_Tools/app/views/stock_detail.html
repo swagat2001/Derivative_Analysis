@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ ticker }} Option Chain Analysis{% endblock %}
+
+{% block content %}
+
+<!-- ============================= -->
+<!-- 🔗 Component & Page Styles -->
+<!-- ============================= -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_controls_bar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_expiry.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_stats.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_chart.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_option_chain.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_gauges.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail_oi_charts.css') }}">
+
+<!-- ============================= -->
+<!-- 🌐 Universal Header -->
+<!-- ============================= -->
+<!-- Header is already included via base.html -->
+
+<!-- ============================= -->
+<!-- 🎛️ Stock Detail Controls Bar -->
+<!-- ============================= -->
+{% include 'stock_detail/stock_detail_controls_bar.html' %}
+
+<!-- ============================= -->
+<!-- 📌 Symbol Header -->
+<!-- ============================= -->
+{% include 'stock_detail/stock_detail_header.html' %}
+
+<!-- ============================= -->
+<!-- 📈 Stock Detail Section -->
+<!-- ============================= -->
+<div class="stock-detail-container" data-ticker="{{ ticker }}" data-date="{{ selected_date }}">
+
+  {% if data %}
+
+  <!-- 🧱 Main Grid Layout: Expiry Table + Stats (Left) | Gauges (Right) -->
+  <div class="main-grid">
+    
+    <!-- LEFT SIDE: Expiry Table + Stats Stacked -->
+    <div class="left-side">
+      <!-- 📅 Expiry Summary Table -->
+      <div class="card">
+        {% include 'stock_detail/stock_detail_expiry.html' %}
+      </div>
+      
+      <!-- 📊 Stats Table -->
+      <div class="card">
+        {% include 'stock_detail/stock_detail_stats.html' %}
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Gauges -->
+    <div class="right-side">
+      <div class="card">
+        {% include 'stock_detail/stock_detail_gauges.html' %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 📈 Price Chart -->
+  {% include 'stock_detail/stock_detail_chart.html' %}
+
+  <!-- 📘 Option Chain Table -->
+  {% include 'stock_detail/stock_detail_option_chain.html' %}
+
+  {% include 'stock_detail/stock_detail_oi_charts.html' %}
+
+  {% else %}
+  <p class="no-data">No stock details found for {{ ticker }} on {{ selected_date }}</p>
+  {% endif %}
+
+</div>
+
+<!-- ============================= -->
+<!-- 📜 JavaScript -->
+<!-- ============================= -->
+<!-- TradingView Lightweight Charts for OI Analysis -->
+<script src="https://unpkg.com/lightweight-charts@4.0.0/dist/lightweight-charts.standalone.production.js"></script>
+
+<script src="{{ url_for('static', filename='js/stock_detail_gauges.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stock_detail_oi_charts.js') }}"></script>
+
+{% endblock %}

@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Futures OI Analysis{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/futures_oi.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="futures-oi-container">
+
+    <div class="futures-oi-header">
+        <h1>📦 Futures OI Analysis</h1>
+        <p>Open Interest analysis across Current Month, Next Month, and Far Month expiries</p>
+    </div>
+
+    <div class="futures-oi-controls">
+        <label>Select Date:</label>
+        <select onchange="window.location.href='/screener/futures-oi?date='+this.value;">
+            {% for d in dates %}
+            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if futures_data and (futures_data.CME or futures_data.NME or futures_data.FME) %}
+    
+    <!-- CME Section -->
+    <div class="expiry-section">
+        <div class="expiry-title">
+            Current Month Expiry (CME)
+            <span class="expiry-badge">{{ futures_data.CME|length }} Stocks</span>
+        </div>
+        
+        {% if futures_data.CME %}
+        <div class="expiry-table-card">
+            <table class="expiry-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Stock</th>
+                        <th>Underlying Price</th>
+                        <th>Expiry Date</th>
+                        <th>Expiry Price</th>
+                        <th>Expiry OI</th>
+                        <th>OI 20P</th>
+                        <th>Price 20P</th>
+                        <th>Signal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in futures_data.CME %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
+                        <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                        <td>{{ item.expiry_date }}</td>
+                        <td>₹{{ "%.2f"|format(item.expiry_price) }}</td>
+                        <td>{{ item.expiry_oi|int|format_number }}</td>
+                        <td>
+                            <span class="percentile-bar">
+                                <span class="percentile-bar-fill {% if item.oi_percentile >= 70 %}high{% elif item.oi_percentile >= 40 %}medium{% else %}low{% endif %}" style="width: {{ item.oi_percentile }}%;"></span>
+                            </span>
+                            <span class="percentile-value">{{ "%.1f"|format(item.oi_percentile) }}%</span>
+                        </td>
+                        <td>
+                            <span class="percentile-bar">
+                                <span class="percentile-bar-fill {% if item.price_percentile >= 70 %}high{% elif item.price_percentile >= 40 %}medium{% else %}low{% endif %}" style="width: {{ item.price_percentile }}%;"></span>
+                            </span>
+                            <span class="percentile-value">{{ "%.1f"|format(item.price_percentile) }}%</span>
+                        </td>
+                        <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-data-message">No CME data available for this date</div>
+        {% endif %}
+    </div>
+
+    <!-- NME Section -->
+    <div class="expiry-section">
+        <div class="expiry-title">
+            Next Month Expiry (NME)
+            <span class="expiry-badge">{{ futures_data.NME|length }} Stocks</span>
+        </div>
+        
+        {% if futures_data.NME %}
+        <div class="expiry-table-card">
+            <table class="expiry-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Stock</th>
+                        <th>Underlying Price</th>
+                        <th>Expiry Date</th>
+                        <th>Expiry Price</th>
+                        <th>Expiry OI</th>
+                        <th>OI 20P</th>
+                        <th>Price 20P</th>
+                        <th>Signal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in futures_data.NME %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
+                        <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                        <td>{{ item.expiry_date }}</td>
+                        <td>₹{{ "%.2f"|format(item.expiry_price) }}</td>
+                        <td>{{ item.expiry_oi|int|format_number }}</td>
+                        <td>
+                            <span class="percentile-bar">
+                                <span class="percentile-bar-fill {% if item.oi_percentile >= 70 %}high{% elif item.oi_percentile >= 40 %}medium{% else %}low{% endif %}" style="width: {{ item.oi_percentile }}%;"></span>
+                            </span>
+                            <span class="percentile-value">{{ "%.1f"|format(item.oi_percentile) }}%</span>
+                        </td>
+                        <td>
+                            <span class="percentile-bar">
+                                <span class="percentile-bar-fill {% if item.price_percentile >= 70 %}high{% elif item.price_percentile >= 40 %}medium{% else %}low{% endif %}" style="width: {{ item.price_percentile }}%;"></span>
+                            </span>
+                            <span class="percentile-value">{{ "%.1f"|format(item.price_percentile) }}%</span>
+                        </td>
+                        <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-data-message">No NME data available for this date</div>
+        {% endif %}
+    </div>
+
+    <!-- FME Section -->
+    <div class="expiry-section">
+        <div class="expiry-title">
+            Far Month Expiry (FME)
+            <span class="expiry-badge">{{ futures_data.FME|length }} Stocks</span>
+        </div>
+        
+        {% if futures_data.FME %}
+        <div class="expiry-table-card">
+            <table class="expiry-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Stock</th>
+                        <th>Underlying Price</th>
+                        <th>Expiry Date</th>
+                        <th>Expiry Price</th>
+                        <th>Expiry OI</th>
+                        <th>OI 20P</th>
+                        <th>Price 20P</th>
+                        <th>Signal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in futures_data.FME %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
+                        <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                        <td>{{ item.expiry_date }}</td>
+                        <td>₹{{ "%.2f"|format(item.expiry_price) }}</td>
+                        <td>{{ item.expiry_oi|int|format_number }}</td>
+                        <td>
+                            <span class="percentile-bar">
+                                <span class="percentile-bar-fill {% if item.oi_percentile >= 70 %}high{% elif item.oi_percentile >= 40 %}medium{% else %}low{% endif %}" style="width: {{ item.oi_percentile }}%;"></span>
+                            </span>
+                            <span class="percentile-value">{{ "%.1f"|format(item.oi_percentile) }}%</span>
+                        </td>
+                        <td>
+                            <span class="percentile-bar">
+                                <span class="percentile-bar-fill {% if item.price_percentile >= 70 %}high{% elif item.price_percentile >= 40 %}medium{% else %}low{% endif %}" style="width: {{ item.price_percentile }}%;"></span>
+                            </span>
+                            <span class="percentile-value">{{ "%.1f"|format(item.price_percentile) }}%</span>
+                        </td>
+                        <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-data-message">No FME data available for this date</div>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div class="no-data-message">
+        No Futures OI data available for the selected date.<br>
+        Please run the database update to generate cache data.
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

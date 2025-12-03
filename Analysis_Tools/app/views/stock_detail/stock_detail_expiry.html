@@ -1,0 +1,38 @@
+<!-- ==============================
+     STOCK DETAIL EXPIRY COMPONENT
+     ============================== -->
+<div class="expiry-section">
+    <h3 class="section-title">Expiry Summary</h3>
+    {% if expiry_data %}
+    <table class="expiry-table">
+        <thead>
+            <tr>
+                <th>Expiry Date</th>
+                <th>Price</th>
+                <th>Price Chg</th>
+                <th>Volume</th>
+                <th>OI</th>
+                <th>OI Chg</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in expiry_data %}
+            <tr>
+                <td>{{ exp.expiry }}</td>
+                <td>{{ "%.2f"|format(exp.price) }}</td>
+                <td class="{% if exp.price_chg > 0 %}positive{% elif exp.price_chg < 0 %}negative{% endif %}">
+                    {{ "%+.2f%%"|format(exp.price_chg) }}
+                </td>
+                <td>{{ "{:,.0f}".format(exp.volume) }}</td>
+                <td>{{ "{:,.0f}".format(exp.oi) }}</td>
+                <td class="{% if exp.oi_chg > 0 %}positive{% elif exp.oi_chg < 0 %}negative{% endif %}">
+                    {{ "%+.0f"|format(exp.oi_chg) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data-message">No expiry data available</p>
+    {% endif %}
+</div>
