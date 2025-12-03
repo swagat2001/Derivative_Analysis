@@ -134,3 +134,186 @@ def get_screener_data(selected_date: str, metric_type: str, option_type: str, mo
         return all_data[metric_key][option_type].get(moneyness_filter, [])[:10]
     
     return []
+
+
+# =============================================================
+# FUTURES OI SCREENER FUNCTIONS
+# =============================================================
+
+def get_available_dates_for_new_screeners():
+    """Get available dates from screener cache tables"""
+    try:
+        query = text("""
+            SELECT DISTINCT cache_date 
+            FROM screener_futures_oi_cache 
+            ORDER BY cache_date DESC
+        """)
+        df = pd.read_sql(query, engine)
+        return [str(d) for d in df['cache_date'].tolist()]
+    except Exception as e:
+        print(f"Error getting dates: {e}")
+        return []
+
+
+def get_futures_oi_screeners(selected_date):
+    """
+    Get Futures OI screener data organized by categories
+    Returns dict with 8 categories of top 10 stocks each
+    """
+    try:
+        query = text("""
+            SELECT 
+                stock_name,
+                underlying_price,
+                cme_expiry_date,
+                cme_expiry_price,
+                cme_oi,
+                cme_oi_change,
+                cme_exposure,
+                cme_exposure_percentile,
+                nme_expiry_date,
+                nme_expiry_price,
+                nme_oi,
+                nme_oi_change,
+                nme_exposure,
+                nme_exposure_percentile,
+                fme_expiry_date,
+                fme_expiry_price,
+                fme_oi,
+                fme_oi_change,
+                fme_exposure,
+                fme_exposure_percentile,
+                cumulative_oi,
+                cum_oi_percentile
+            FROM screener_futures_oi_cache
+            WHERE cache_date = :date
+            ORDER BY stock_name
+        """)
+        
+        with engine.connect() as conn:
+            result = conn.execute(query, {"date": selected_date})
+            rows = result.fetchall()
+        
+        if not rows:
+            return {}
+        
+        # Convert to list of dicts
+        data = []
+        for row in rows:
+            data.append({
+                'stock_name': row[0],
+                'underlying_price': float(row[1]) if row[1] else 0,
+                'cme_expiry_date': str(row[2]) if row[2] else None,
+                'cme_expiry_price': float(row[3]) if row[3] else 0,
+                'cme_oi': int(row[4]) if row[4] else 0,
+                'cme_oi_change': int(row[5]) if row[5] else 0,
+                'cme_exposure': float(row[6]) if row[6] else 0,
+                'cme_exposure_percentile': float(row[7]) if row[7] else 0,
+                'nme_expiry_date': str(row[8]) if row[8] else None,
+                'nme_expiry_price': float(row[9]) if row[9] else 0,
+                'nme_oi': int(row[10]) if row[10] else 0,
+                'nme_oi_change': int(row[11]) if row[11] else 0,
+                'nme_exposure': float(row[12]) if row[12] else 0,
+                'nme_exposure_percentile': float(row[13]) if row[13] else 0,
+                'fme_expiry_date': str(row[14]) if row[14] else None,
+                'fme_expiry_price': float(row[15]) if row[15] else 0,
+                'fme_oi': int(row[16]) if row[16] else 0,
+                'fme_oi_change': int(row[17]) if row[17] else 0,
+                'fme_exposure': float(row[18]) if row[18] else 0,
+                'fme_exposure_percentile': float(row[19]) if row[19] else 0,
+                'cumulative_oi': int(row[20]) if row[20] else 0,
+                'cum_oi_percentile': float(row[21]) if row[21] else 0
+            })
+        
+        # Organize into 8 categories
+        result = {
+            'cme_exposure_gainers': sorted([d for d in data], key=lambda x: x['cme_exposure_percentile'], reverse=True)[:10],
+            'cme_exposure_losers': sorted([d for d in data], key=lambda x: x['cme_exposure_percentile'])[:10],
+            'nme_exposure_gainers': sorted([d for d in data], key=lambda x: x['nme_exposure_percentile'], reverse=True)[:10],
+            'nme_exposure_losers': sorted([d for d in data], key=lambda x: x['nme_exposure_percentile'])[:10],
+            'fme_exposure_gainers': sorted([d for d in data], key=lambda x: x['fme_exposure_percentile'], reverse=True)[:10],
+            'fme_exposure_losers': sorted([d for d in data], key=lambda x: x['fme_exposure_percentile'])[:10],
+            'top_cumulative_oi': sorted([d for d in data], key=lambda x: x['cum_oi_percentile'], reverse=True)[:10],
+            'bottom_cumulative_oi': sorted([d for d in data], key=lambda x: x['cum_oi_percentile'])[:10]
+        }
+        
+        return result
+        
+    except Exception as e:
+        print(f"Error in get_futures_oi_screeners: {e}")
+        import traceback
+        traceback.print_exc()
+        return {}
+
+
+def get_technical_indicators_screeners(selected_date):
+    """
+    Get Technical Indicators screener data organized by categories
+    Returns dict with 10 categories
+    """
+    try:
+        query = text("""
+            SELECT 
+                stock_name,
+                close_price,
+                rsi,
+                macd,
+                macd_signal,
+                sma_20,
+                sma_50,
+                bb_upper,
+                bb_lower,
+                adx,
+                composite_score,
+                strength_percentile
+            FROM screener_technical_cache
+            WHERE cache_date = :date
+            ORDER BY stock_name
+        """)
+        
+        with engine.connect() as conn:
+            result = conn.execute(query, {"date": selected_date})
+            rows = result.fetchall()
+        
+        if not rows:
+            return {}
+        
+        # Convert to list of dicts
+        data = []
+        for row in rows:
+            data.append({
+                'stock_name': row[0],
+                'close_price': float(row[1]) if row[1] else 0,
+                'rsi': float(row[2]) if row[2] else 0,
+                'macd': float(row[3]) if row[3] else 0,
+                'macd_signal': float(row[4]) if row[4] else 0,
+                'sma_20': float(row[5]) if row[5] else 0,
+                'sma_50': float(row[6]) if row[6] else 0,
+                'bb_upper': float(row[7]) if row[7] else 0,
+                'bb_lower': float(row[8]) if row[8] else 0,
+                'adx': float(row[9]) if row[9] else 0,
+                'composite_score': float(row[10]) if row[10] else 0,
+                'strength_percentile': float(row[11]) if row[11] else 0
+            })
+        
+        # Organize into categories
+        result = {
+            'strongest_signals': sorted([d for d in data], key=lambda x: x['strength_percentile'], reverse=True)[:10],
+            'weakest_signals': sorted([d for d in data], key=lambda x: x['strength_percentile'])[:10],
+            'rsi_overbought': sorted([d for d in data if d['rsi'] > 70], key=lambda x: x['rsi'], reverse=True)[:10],
+            'rsi_oversold': sorted([d for d in data if d['rsi'] < 30], key=lambda x: x['rsi'])[:10],
+            'macd_bullish': sorted([d for d in data if d['macd'] > d['macd_signal']], key=lambda x: abs(d['macd'] - d['macd_signal']), reverse=True)[:10],
+            'macd_bearish': sorted([d for d in data if d['macd'] < d['macd_signal']], key=lambda x: abs(d['macd'] - d['macd_signal']), reverse=True)[:10],
+            'above_sma': sorted([d for d in data if d['close_price'] > d['sma_50']], key=lambda x: (x['close_price'] - x['sma_50']) / x['sma_50'], reverse=True)[:10],
+            'below_sma': sorted([d for d in data if d['close_price'] < d['sma_50']], key=lambda x: (x['sma_50'] - x['close_price']) / x['sma_50'], reverse=True)[:10],
+            'strong_trend': sorted([d for d in data], key=lambda x: x['adx'], reverse=True)[:10],
+            'weak_trend': sorted([d for d in data], key=lambda x: x['adx'])[:10]
+        }
+        
+        return result
+        
+    except Exception as e:
+        print(f"Error in get_technical_indicators_screeners: {e}")
+        import traceback
+        traceback.print_exc()
+        return {}

@@ -9,7 +9,7 @@ from ....models.screener_model import get_technical_indicators_screeners, get_av
 from ....models.stock_model import get_filtered_tickers
 from ....controllers.dashboard_controller import get_live_indices
 
-technical_bp = Blueprint('technical_screener', __name__, url_prefix='/screener/technical-indicators')
+technical_screener_bp = Blueprint('technical_screener', __name__, url_prefix='/screener/technical-indicators')
 
 # Initialize cache
 cache = Cache(config={
@@ -30,7 +30,7 @@ def get_technical_data_formatted(selected_date):
         return None
 
 
-@technical_bp.route('/')
+@technical_screener_bp.route('/')
 def technical_screener():
     """
     Main technical indicators screener page
@@ -81,7 +81,7 @@ def technical_screener():
         return jsonify({"error": f"Screener failed: {str(e)}"}), 500
 
 
-@technical_bp.route('/api/data')
+@technical_screener_bp.route('/api/data')
 def api_technical_data():
     """
     API endpoint for AJAX data fetching
