@@ -197,8 +197,8 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                             "ChngInOpnIntrst",
                             "LastPric",
                             CASE 
-                                WHEN "UndrlygPric" IS NOT NULL AND "StrkPric" IS NOT NULL AND "UndrlygPric" != 0
-                                THEN (("UndrlygPric" - "StrkPric") / "UndrlygPric")
+                                WHEN "UndrlygPric" IS NOT NULL AND "StrkPric" IS NOT NULL AND "UndrlygPric"::NUMERIC != 0
+                                THEN (("UndrlygPric"::NUMERIC - "StrkPric"::NUMERIC) / "UndrlygPric"::NUMERIC)
                                 ELSE NULL
                             END AS moneyness_curr,
                             "iv" AS iv_curr
@@ -213,8 +213,8 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                             "OpnIntrst" AS prev_oi,
                             "LastPric" AS prev_ltp,
                             CASE 
-                                WHEN "UndrlygPric" IS NOT NULL AND "StrkPric" IS NOT NULL AND "UndrlygPric" != 0
-                                THEN (("UndrlygPric" - "StrkPric") / "UndrlygPric")
+                                WHEN "UndrlygPric" IS NOT NULL AND "StrkPric" IS NOT NULL AND "UndrlygPric"::NUMERIC != 0
+                                THEN (("UndrlygPric"::NUMERIC - "StrkPric"::NUMERIC) / "UndrlygPric"::NUMERIC)
                                 ELSE NULL
                             END AS moneyness_prev,
                             "iv" AS iv_prev
@@ -230,21 +230,21 @@ def calculate_screener_data_for_date(selected_date: str, all_dates: list):
                         c."LastPric" AS current_ltp,
                         -- Calculate OI percentage change properly
                         CASE 
-                            WHEN COALESCE(p.prev_oi, 0) != 0 
-                            THEN ((c."OpnIntrst" - COALESCE(p.prev_oi, c."OpnIntrst")) / COALESCE(p.prev_oi, c."OpnIntrst")) * 100
+                            WHEN COALESCE(p.prev_oi::NUMERIC, 0) != 0 
+                            THEN ((c."OpnIntrst"::NUMERIC - COALESCE(p.prev_oi::NUMERIC, c."OpnIntrst"::NUMERIC)) / COALESCE(p.prev_oi::NUMERIC, c."OpnIntrst"::NUMERIC)) * 100
                             ELSE 0
                         END AS oi_change,
-                        (c."OpnIntrst" * c."LastPric") - (COALESCE(p.prev_oi, c."OpnIntrst") * COALESCE(p.prev_ltp, c."LastPric")) AS moneyness_change,
+                        (c."OpnIntrst"::NUMERIC * c."LastPric"::NUMERIC) - (COALESCE(p.prev_oi::NUMERIC, c."OpnIntrst"::NUMERIC) * COALESCE(p.prev_ltp::NUMERIC, c."LastPric"::NUMERIC)) AS moneyness_change,
                         -- Calculate IV percentage change properly
                         CASE 
-                            WHEN COALESCE(p.iv_prev, 0) != 0 
-                            THEN ((c.iv_curr - COALESCE(p.iv_prev, c.iv_curr)) / COALESCE(p.iv_prev, c.iv_curr)) * 100
+                            WHEN COALESCE(p.iv_prev::NUMERIC, 0) != 0 
+                            THEN ((c.iv_curr::NUMERIC - COALESCE(p.iv_prev::NUMERIC, c.iv_curr::NUMERIC)) / COALESCE(p.iv_prev::NUMERIC, c.iv_curr::NUMERIC)) * 100
                             ELSE 0
                         END AS iv_change,
                         c.moneyness_curr,
                         c.iv_curr,
-                        COALESCE(p.prev_oi, c."OpnIntrst") AS prev_oi,
-                        COALESCE(p.prev_ltp, c."LastPric") AS prev_ltp
+                        COALESCE(p.prev_oi::NUMERIC, c."OpnIntrst"::NUMERIC) AS prev_oi,
+                        COALESCE(p.prev_ltp::NUMERIC, c."LastPric"::NUMERIC) AS prev_ltp
                     FROM curr_data c
                     LEFT JOIN prev_data p ON 
                         (c."StrkPric" = p."StrkPric" OR (c."StrkPric" IS NULL AND p."StrkPric" IS NULL))
