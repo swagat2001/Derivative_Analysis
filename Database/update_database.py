@@ -470,7 +470,7 @@ def calculate_greeks():
                         axis=1
                     )
 
-                    # Calculate Greeks
+                    # Calculate Greeks - ALL 6 INCLUDING GAMMA AND RHO
                     def safe_greeks(row):
                         try:
                             if ("O" in str(row.get("FinInstrmTp", "")) and 
@@ -486,13 +486,13 @@ def calculate_greeks():
                                     rate=0.06,
                                     opt_type=str(row.get("OptnTp", "")).lower()
                                 )
-                                return pd.Series([g["Delta"], g["Vega"], g["Theta"], g["IV"]])
+                                return pd.Series([g["Delta"], g["Gamma"], g["Vega"], g["Theta"], g["Rho"], g["IV"]])
                             else:
-                                return pd.Series([0, 0, 0, 0])
+                                return pd.Series([0, 0, 0, 0, 0, 0])
                         except:
-                            return pd.Series([0, 0, 0, 0])
+                            return pd.Series([0, 0, 0, 0, 0, 0])
 
-                    df[["delta", "vega", "theta", "iv"]] = df.apply(safe_greeks, axis=1)
+                    df[["delta", "gamma", "vega", "theta", "rho", "iv"]] = df.apply(safe_greeks, axis=1)
 
                     # Write to derived table
                     derived_table = f"{table_name}_DERIVED"
@@ -506,8 +506,10 @@ def calculate_greeks():
                             "chg_oi" NUMERIC,
                             "chg_price" NUMERIC,
                             "delta" NUMERIC,
+                            "gamma" NUMERIC,
                             "vega" NUMERIC,
                             "theta" NUMERIC,
+                            "rho" NUMERIC,
                             "iv" NUMERIC
                         );
                         """

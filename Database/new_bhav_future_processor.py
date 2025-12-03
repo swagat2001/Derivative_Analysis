@@ -177,7 +177,7 @@ for date_idx, date_to_process in enumerate(dates_to_process, 1):
                 continue
 
             # ===========================================
-            # 🛡 Safe conversions
+            # 🛡 Safe conversions - FIX: Convert dates to DATE only (no time)
             # ===========================================
             numeric_cols = [
                 "UndrlygPric", "StrkPric", "OpnIntrst", "ChngInOpnIntrst",
@@ -187,10 +187,11 @@ for date_idx, date_to_process in enumerate(dates_to_process, 1):
                 if col in df.columns:
                     df[col] = pd.to_numeric(df[col], errors="coerce")
 
+            # FIX: Use .dt.date to remove time component
             if "FininstrmActlXpryDt" in df.columns:
-                df["FininstrmActlXpryDt"] = pd.to_datetime(df["FininstrmActlXpryDt"], errors="coerce")
+                df["FininstrmActlXpryDt"] = pd.to_datetime(df["FininstrmActlXpryDt"], errors="coerce").dt.date
             if "BizDt" in df.columns:
-                df["BizDt"] = pd.to_datetime(df["BizDt"], errors="coerce")
+                df["BizDt"] = pd.to_datetime(df["BizDt"], errors="coerce").dt.date
 
             # ===========================================
             # 📈 Derived Columns
@@ -209,34 +210,40 @@ for date_idx, date_to_process in enumerate(dates_to_process, 1):
             )
 
             # ===========================================
-            # 📊 Greeks with Safe Handling
+            # 📊 Greeks with Safe Handling - NOW INCLUDING GAMMA AND RHO
             # ===========================================
             def safe_greeks(row):
                 try:
                     if "O" in str(row.get("FinInstrmTp", "")) and pd.notna(row["LastPric"]) and pd.notna(row["StrkPric"]) and row["LastPric"] > 0:
+                        # Convert date back to datetime for Greeks calculation
+                        expiry_dt = datetime.combine(row.get("FininstrmActlXpryDt"), datetime.min.time()) if isinstance(row.get("FininstrmActlXpryDt"), datetime.date) else row.get("FininstrmActlXpryDt")
+                        bizdt = datetime.combine(row.get("BizDt"), datetime.min.time()) if isinstance(row.get("BizDt"), datetime.date) else row.get("BizDt")
+                        
                         g = greeks(
                             premium=float(row["LastPric"]),
-                            expiry=row.get("FininstrmActlXpryDt"),
-                            cd=row.get("BizDt"),
+                            expiry=expiry_dt,
+                            cd=bizdt,
                             asset_price=row.get("UndrlygPric", np.nan),
                             strike_price=row.get("StrkPric", np.nan),
                             intrest_rate=0.06,
                             instrument_type=str(row.get("OptnTp", "")).lower()
                         )
-                        return pd.Series([g["Delta"], g["Vega"], g["Theta"], g["IV"]])
+                        # FIXED: Return all 6 Greeks including Gamma and Rho
+                        return pd.Series([g["Delta"], g["Gamma"], g["Vega"], g["Theta"], g["Rho"], g["IV"]])
                     else:
-                        return pd.Series([0, 0, 0, 0])
+                        return pd.Series([0, 0, 0, 0, 0, 0])
                 except Exception:
-                    return pd.Series([0, 0, 0, 0])
+                    return pd.Series([0, 0, 0, 0, 0, 0])
 
-            df[["delta", "vega", "theta", "iv"]] = df.apply(safe_greeks, axis=1)
+            # FIXED: Now storing all 6 values
+            df[["delta", "gamma", "vega", "theta", "rho", "iv"]] = df.apply(safe_greeks, axis=1)
 
             # ===========================================
             # 💾 Save to Derived Table
             # ===========================================
             derived_table = f"{table_name}_DERIVED"
 
-            # Create derived table if it doesn't exist
+            # Create derived table if it doesn't exist - FIXED: Added gamma and rho columns
             if not engine.dialect.has_table(engine.connect(), derived_table, schema="public"):
                 create_query = f"""
                 CREATE TABLE public."{derived_table}" (
@@ -267,8 +274,10 @@ for date_idx, date_to_process in enumerate(dates_to_process, 1):
                     "chg_oi" NUMERIC,
                     "chg_price" NUMERIC,
                     "delta" NUMERIC,
+                    "gamma" NUMERIC,
                     "vega" NUMERIC,
                     "theta" NUMERIC,
+                    "rho" NUMERIC,
                     "iv" NUMERIC
                 );
                 """
