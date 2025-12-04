@@ -38,6 +38,73 @@ def get_futures_data_formatted(selected_date):
         return None
 
 
+def transform_futures_data(screener_data):
+    """Transform screener data structure to match template expectations"""
+    if not screener_data:
+        return {}
+    
+    # Group all stocks by ticker first, then organize by expiry type
+    all_tickers = {}
+    
+    # Collect all unique tickers from all categories
+    for category_data in screener_data.values():
+        for item in category_data:
+            ticker = item.get('stock_name', '')
+            if ticker and ticker not in all_tickers:
+                all_tickers[ticker] = item
+    
+    # Now organize by expiry type (CME, NME, FME)
+    cme_data = []
+    nme_data = []
+    fme_data = []
+    
+    for ticker, data in all_tickers.items():
+        # Create CME entry
+        if data.get('cme_expiry_date'):
+            cme_data.append({
+                'ticker': ticker,
+                'underlying_price': data.get('underlying_price', 0),
+                'expiry_date': data.get('cme_expiry_date'),
+                'expiry_price': data.get('cme_expiry_price', 0),
+                'expiry_oi': data.get('cme_oi', 0),
+                'oi_percentile': data.get('cme_exposure_percentile', 0),
+                'price_percentile': data.get('cme_exposure_percentile', 0),
+                'signal': 'BULLISH' if data.get('cme_exposure_percentile', 0) > 70 else ('BEARISH' if data.get('cme_exposure_percentile', 0) < 30 else 'NEUTRAL')
+            })
+        
+        # Create NME entry
+        if data.get('nme_expiry_date'):
+            nme_data.append({
+                'ticker': ticker,
+                'underlying_price': data.get('underlying_price', 0),
+                'expiry_date': data.get('nme_expiry_date'),
+                'expiry_price': data.get('nme_expiry_price', 0),
+                'expiry_oi': data.get('nme_oi', 0),
+                'oi_percentile': data.get('nme_exposure_percentile', 0),
+                'price_percentile': data.get('nme_exposure_percentile', 0),
+                'signal': 'BULLISH' if data.get('nme_exposure_percentile', 0) > 70 else ('BEARISH' if data.get('nme_exposure_percentile', 0) < 30 else 'NEUTRAL')
+            })
+        
+        # Create FME entry
+        if data.get('fme_expiry_date'):
+            fme_data.append({
+                'ticker': ticker,
+                'underlying_price': data.get('underlying_price', 0),
+                'expiry_date': data.get('fme_expiry_date'),
+                'expiry_price': data.get('fme_expiry_price', 0),
+                'expiry_oi': data.get('fme_oi', 0),
+                'oi_percentile': data.get('fme_exposure_percentile', 0),
+                'price_percentile': data.get('fme_exposure_percentile', 0),
+                'signal': 'BULLISH' if data.get('fme_exposure_percentile', 0) > 70 else ('BEARISH' if data.get('fme_exposure_percentile', 0) < 30 else 'NEUTRAL')
+            })
+    
+    return {
+        'CME': sorted(cme_data, key=lambda x: x['oi_percentile'], reverse=True),
+        'NME': sorted(nme_data, key=lambda x: x['oi_percentile'], reverse=True),
+        'FME': sorted(fme_data, key=lambda x: x['oi_percentile'], reverse=True)
+    }
+
+
 @futures_oi_bp.route('/')
 def futures_oi_screener():
     """
@@ -47,10 +114,10 @@ def futures_oi_screener():
         dates = get_available_dates_for_new_screeners()
         if not dates:
             return render_template(
-                'screener/futures_oi.html',
+                'screener/futures_oi/index.html',
                 dates=[],
                 selected_date=None,
-                screener_data={},
+                futures_data={},
                 indices=get_live_indices(),
                 stock_list=get_filtered_tickers(),
                 stock_symbol=None,
@@ -58,19 +125,20 @@ def futures_oi_screener():
             )
         
         selected_date = request.args.get('date', dates[0])
-        screener_data = get_futures_data_formatted(selected_date)
+        raw_data = get_futures_data_formatted(selected_date)
+        futures_data = transform_futures_data(raw_data)
         
-        print(f"[DEBUG] Route received screener_data keys: {list(screener_data.keys()) if screener_data else 'NONE'}")
-        if screener_data:
-            for key in list(screener_data.keys())[:3]:
-                print(f"[DEBUG]   {key}: {len(screener_data[key])} items")
+        print(f"[DEBUG] Transformed futures_data keys: {list(futures_data.keys()) if futures_data else 'NONE'}")
+        if futures_data:
+            for key in list(futures_data.keys())[:3]:
+                print(f"[DEBUG]   {key}: {len(futures_data[key])} items")
         
-        if not screener_data:
+        if not futures_data:
             return render_template(
-                'screener/futures_oi.html',
+                'screener/futures_oi/index.html',
                 dates=dates,
                 selected_date=selected_date,
-                screener_data={},
+                futures_data={},
                 indices=get_live_indices(),
                 stock_list=get_filtered_tickers(),
                 stock_symbol=None,
@@ -78,10 +146,10 @@ def futures_oi_screener():
             )
         
         return render_template(
-            'screener/futures_oi.html',
+            'screener/futures_oi/index.html',
             dates=dates,
             selected_date=selected_date,
-            screener_data=screener_data,
+            futures_data=futures_data,
             indices=get_live_indices(),
             stock_list=get_filtered_tickers(),
             stock_symbol=None
@@ -104,15 +172,16 @@ def api_futures_oi_data():
         if not selected_date:
             return jsonify({"error": "Date parameter required"}), 400
         
-        screener_data = get_futures_data_formatted(selected_date)
+        raw_data = get_futures_data_formatted(selected_date)
+        futures_data = transform_futures_data(raw_data)
         
-        if not screener_data:
+        if not futures_data:
             return jsonify({"error": "No data available"}), 404
         
         return jsonify({
             "success": True,
             "date": selected_date,
-            "data": screener_data
+            "data": futures_data
         })
         
     except Exception as e:
