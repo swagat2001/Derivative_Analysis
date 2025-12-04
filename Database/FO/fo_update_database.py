@@ -564,7 +564,8 @@ def main():
         
         # Step 4: Pre-calculate screener cache data (OPTIONAL)
         try:
-            from screener_cache import precalculate_screener_cache
+            import screener_cache
+            precalculate_screener_cache = screener_cache.precalculate_screener_cache
             print("\n" + "="*80)
             print("STEP 4: PRE-CALCULATING SCREENER CACHE (OPTIONAL)")
             print("="*80 + "\n")
@@ -578,7 +579,8 @@ def main():
         
         # Step 4b: Pre-calculate Futures OI cache (OPTIONAL)
         try:
-            from futures_oi_cache import precalculate_futures_oi_cache
+            import futures_oi_cache
+            precalculate_futures_oi_cache = futures_oi_cache.precalculate_futures_oi_cache
             print("\n" + "="*80)
             print("STEP 4b: PRE-CALCULATING FUTURES OI CACHE (OPTIONAL)")
             print("="*80 + "\n")
@@ -592,7 +594,8 @@ def main():
         
         # Step 4c: Pre-calculate Technical Screener cache (OPTIONAL)
         try:
-            from technical_screener_cache import precalculate_technical_screener_cache
+            import technical_screener_cache
+            precalculate_technical_screener_cache = technical_screener_cache.precalculate_technical_screener_cache
             print("\n" + "="*80)
             print("STEP 4c: PRE-CALCULATING TECHNICAL SCREENER CACHE (OPTIONAL)")
             print("="*80 + "\n")
@@ -610,10 +613,12 @@ def main():
             print("STEP 5: PRE-CALCULATING DASHBOARD DATA (OPTIONAL)")
             print("="*80 + "\n")
             
-            analysis_tools_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Analysis_Tools')
-            if os.path.exists(analysis_tools_path):
-                sys.path.insert(0, analysis_tools_path)
-                from precalculate_data import create_precalculated_tables, precalculate_all_dates
+            # Import from same directory
+            import precalculate_data
+            create_precalculated_tables = precalculate_data.create_precalculated_tables
+            precalculate_all_dates = precalculate_data.precalculate_all_dates
+            
+            if True:  # Always try
                 
                 create_precalculated_tables()
                 precalculate_all_dates()
