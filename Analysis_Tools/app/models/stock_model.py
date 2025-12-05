@@ -347,7 +347,7 @@ def _get_stock_detail_data_cached(ticker: str, selected_date: str, selected_expi
         # The query above already filters by expiry when selected_expiry is provided
 
         # normalize column types
-        numeric_cols = ["StrkPric", "OpnIntrst", "TtlTradgVol", "ClsPric", "UndrlygPric", "LastPric",
+        numeric_cols = ["StrkPric", "OpnIntrst", "ChngInOpnIntrst", "TtlTradgVol", "ClsPric", "UndrlygPric", "LastPric",
                         "Delta", "Vega", "Gamma", "Theta"]
         for c in numeric_cols:
             if c in df_curr.columns:
@@ -412,7 +412,7 @@ def _get_stock_detail_data_cached(ticker: str, selected_date: str, selected_expi
                 r.get('StrkPric'),
                 r.get('OptnTp'),
                 int(r.get('OpnIntrst')) if pd.notna(r.get('OpnIntrst')) else None,
-                r.get('ChngInOpnIntrst'),
+                int(r.get('ChngInOpnIntrst')) if pd.notna(r.get('ChngInOpnIntrst')) else None,
                 int(r.get('TtlTradgVol')) if pd.notna(r.get('TtlTradgVol')) else None,
                 float(r.get('ClsPric')) if pd.notna(r.get('ClsPric')) else None,
                 float(r.get('UndrlygPric')) if pd.notna(r.get('UndrlygPric')) else None,
@@ -565,7 +565,7 @@ def _get_stock_expiry_data_cached(ticker: str, selected_date: str, table_name: s
         q_vol = text(f'''
             SELECT 
                 "FininstrmActlXpryDt"::text as expiry,
-                SUM("TtlTradgVol") as volume
+                SUM(CAST("TtlTradgVol" AS BIGINT)) as volume
             FROM public."{table_name}"
             WHERE "BizDt" = :bizdt
             AND "FininstrmActlXpryDt" IS NOT NULL
@@ -680,10 +680,10 @@ def _get_stock_stats_cached(ticker: str, selected_date: str, selected_expiry: st
         
         q = text(f'''
             SELECT
-                SUM(CASE WHEN "OptnTp" = 'CE' THEN "OpnIntrst" ELSE 0 END) AS total_ce_oi,
-                SUM(CASE WHEN "OptnTp" = 'PE' THEN "OpnIntrst" ELSE 0 END) AS total_pe_oi,
-                SUM(CASE WHEN "OptnTp" = 'CE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_ce_oi_chg,
-                SUM(CASE WHEN "OptnTp" = 'PE' THEN "ChngInOpnIntrst" ELSE 0 END) AS total_pe_oi_chg,
+                SUM(CASE WHEN "OptnTp" = 'CE' THEN CAST("OpnIntrst" AS BIGINT) ELSE 0 END) AS total_ce_oi,
+                SUM(CASE WHEN "OptnTp" = 'PE' THEN CAST("OpnIntrst" AS BIGINT) ELSE 0 END) AS total_pe_oi,
+                SUM(CASE WHEN "OptnTp" = 'CE' THEN CAST("ChngInOpnIntrst" AS BIGINT) ELSE 0 END) AS total_ce_oi_chg,
+                SUM(CASE WHEN "OptnTp" = 'PE' THEN CAST("ChngInOpnIntrst" AS BIGINT) ELSE 0 END) AS total_pe_oi_chg,
                 AVG(CASE WHEN "iv" IS NOT NULL AND "OptnTp" IN ('CE','PE') THEN "iv" ELSE NULL END) AS avg_iv
             FROM public."{table_name}"
             WHERE {query_filter}
@@ -730,26 +730,26 @@ def _get_stock_stats_cached(ticker: str, selected_date: str, selected_expiry: st
                 WITH ce_oi AS (
                     SELECT "StrkPric", "OpnIntrst", "ChngInOpnIntrst"
                     FROM public."{table_name}"
-                    WHERE {query_filter} AND "OptnTp" = 'CE' AND "OpnIntrst" > 0
-                    ORDER BY "OpnIntrst" DESC LIMIT 1
+                    WHERE {query_filter} AND "OptnTp" = 'CE' AND CAST("OpnIntrst" AS BIGINT) > 0
+                    ORDER BY CAST("OpnIntrst" AS BIGINT) DESC LIMIT 1
                 ),
                 ce_oi_chg AS (
                     SELECT "StrkPric", "ChngInOpnIntrst"
                     FROM public."{table_name}"
-                    WHERE {query_filter} AND "OptnTp" = 'CE' AND "ChngInOpnIntrst" != 0
-                    ORDER BY ABS("ChngInOpnIntrst") DESC LIMIT 1
+                    WHERE {query_filter} AND "OptnTp" = 'CE' AND CAST("ChngInOpnIntrst" AS BIGINT) != 0
+                    ORDER BY ABS(CAST("ChngInOpnIntrst" AS BIGINT)) DESC LIMIT 1
                 ),
                 pe_oi AS (
                     SELECT "StrkPric", "OpnIntrst", "ChngInOpnIntrst"
                     FROM public."{table_name}"
-                    WHERE {query_filter} AND "OptnTp" = 'PE' AND "OpnIntrst" > 0
-                    ORDER BY "OpnIntrst" DESC LIMIT 1
+                    WHERE {query_filter} AND "OptnTp" = 'PE' AND CAST("OpnIntrst" AS BIGINT) > 0
+                    ORDER BY CAST("OpnIntrst" AS BIGINT) DESC LIMIT 1
                 ),
                 pe_oi_chg AS (
                     SELECT "StrkPric", "ChngInOpnIntrst"
                     FROM public."{table_name}"
-                    WHERE {query_filter} AND "OptnTp" = 'PE' AND "ChngInOpnIntrst" != 0
-                    ORDER BY ABS("ChngInOpnIntrst") DESC LIMIT 1
+                    WHERE {query_filter} AND "OptnTp" = 'PE' AND CAST("ChngInOpnIntrst" AS BIGINT) != 0
+                    ORDER BY ABS(CAST("ChngInOpnIntrst" AS BIGINT)) DESC LIMIT 1
                 )
                 SELECT 
                     (SELECT "StrkPric" FROM ce_oi) as max_ce_oi_strike,
@@ -760,10 +760,10 @@ def _get_stock_stats_cached(ticker: str, selected_date: str, selected_expiry: st
             df_strikes = pd.read_sql(q_strikes, con=engine, params=params)
             
             if not df_strikes.empty:
-                max_ce_oi_strike = int(df_strikes.iloc[0]['max_ce_oi_strike']) if pd.notna(df_strikes.iloc[0]['max_ce_oi_strike']) else None
-                max_ce_oi_chg_strike = int(df_strikes.iloc[0]['max_ce_oi_chg_strike']) if pd.notna(df_strikes.iloc[0]['max_ce_oi_chg_strike']) else None
-                max_pe_oi_strike = int(df_strikes.iloc[0]['max_pe_oi_strike']) if pd.notna(df_strikes.iloc[0]['max_pe_oi_strike']) else None
-                max_pe_oi_chg_strike = int(df_strikes.iloc[0]['max_pe_oi_chg_strike']) if pd.notna(df_strikes.iloc[0]['max_pe_oi_chg_strike']) else None
+                max_ce_oi_strike = int(float(df_strikes.iloc[0]['max_ce_oi_strike'])) if pd.notna(df_strikes.iloc[0]['max_ce_oi_strike']) else None
+                max_ce_oi_chg_strike = int(float(df_strikes.iloc[0]['max_ce_oi_chg_strike'])) if pd.notna(df_strikes.iloc[0]['max_ce_oi_chg_strike']) else None
+                max_pe_oi_strike = int(float(df_strikes.iloc[0]['max_pe_oi_strike'])) if pd.notna(df_strikes.iloc[0]['max_pe_oi_strike']) else None
+                max_pe_oi_chg_strike = int(float(df_strikes.iloc[0]['max_pe_oi_chg_strike'])) if pd.notna(df_strikes.iloc[0]['max_pe_oi_chg_strike']) else None
 
         # Return as tuple for caching (raw values before formatting)
         return (
