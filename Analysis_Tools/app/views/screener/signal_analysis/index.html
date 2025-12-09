@@ -55,9 +55,10 @@
         </select>
     </div>
 
-    {% set bullish_count = signals.values()|selectattr('signal','equalto','BULLISH')|list|length %}
-    {% set bearish_count = signals.values()|selectattr('signal','equalto','BEARISH')|list|length %}
-    {% set neutral_count = signals.values()|selectattr('signal','equalto','NEUTRAL')|list|length %}
+    {% set bullish_count = signals|selectattr('signal','equalto','BULLISH')|list|length %}
+    {% set bearish_count = signals|selectattr('signal','equalto','BEARISH')|list|length %}
+    {% set neutral_count = signals|selectattr('signal','equalto','NEUTRAL')|list|length %}
+
 
     <div class="stats-summary">
         <div class="stat-card"><div class="value">{{ signals|length }}</div><div class="label">Total Stocks</div></div>
@@ -102,15 +103,15 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ticker, data in signals.items() %}
+                {% for item in signals %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td><strong>{{ ticker }}</strong></td>
-                    <td><span class="signal-badge {{ data.signal|lower }}">{{ data.signal }}</span></td>
+                    <td><strong>{{ item.ticker }}</strong></td>
+                    <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
                     <td>
                         <div class="signal-score">
-                            <span class="bull">🟢 {{ data.bullish_count }}</span>
-                            <span class="bear">🔴 {{ data.bearish_count }}</span>
+                            <span class="bull">🟢 {{ item.bullish_count }}</span>
+                            <span class="bear">🔴 {{ item.bearish_count }}</span>
                         </div>
                     </td>
                     <td><button class="expand-btn" onclick="toggleDetails('details-{{ loop.index }}')">View Breakdown</button></td>
@@ -118,16 +119,16 @@
                 <tr class="details-row" id="details-{{ loop.index }}">
                     <td colspan="5">
                         <div class="details-content">
-                            <strong style="color:#28a745;">Bullish Categories ({{ data.bullish_count }})</strong>
+                            <strong style="color:#28a745;">Bullish Categories ({{ item.bullish_count }})</strong>
                             <div class="category-list">
-                                {% for c in data.bullish_categories %}
+                                {% for c in item.bullish_categories %}
                                     <div class="category-item">{{ c }}</div>
                                 {% endfor %}
                             </div>
                             <div style="margin-top:15px;">
-                                <strong style="color:#dc3545;">Bearish Categories ({{ data.bearish_count }})</strong>
+                                <strong style="color:#dc3545;">Bearish Categories ({{ item.bearish_count }})</strong>
                                 <div class="category-list">
-                                    {% for c in data.bearish_categories %}
+                                    {% for c in item.bearish_categories %}
                                         <div class="category-item">{{ c }}</div>
                                     {% endfor %}
                                 </div>

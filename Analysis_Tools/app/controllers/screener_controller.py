@@ -18,6 +18,7 @@ from ..models.dashboard_model import get_available_dates
 from ..models.stock_model import get_filtered_tickers
 from ..models.technical_screener_model import get_heatmap_data
 from ..controllers.dashboard_controller import get_live_indices
+from ..controllers.screener.signal_analysis.controller import get_signal_data_formatted as get_signal_analysis_data
 from io import BytesIO
 from datetime import datetime, timedelta
 import os
@@ -39,7 +40,19 @@ cache = Cache(config={
 
 
 def _compute_final_signals_from_db_rows(screener_data):
-    """Pure membership-based bullish/bearish scoring"""
+    """
+    Compute bullish/bearish/neutral signals with signed scores.
+    
+    Score = bullish_count - bearish_count
+    - Positive score (+): BULLISH signal
+    - Negative score (-): BEARISH signal
+    - Zero score (0): NEUTRAL signal
+    
+    Returns: {ticker: {'signal': 'BULLISH'/'BEARISH'/'NEUTRAL', 
+                       'bullish_count': int, 
+                       'bearish_count': int, 
+                       'score': int}}
+    """
 
     bullish_sections = [
         'iv_call_gainers', 'iv_call_itm_gainers', 'iv_call_otm_gainers',
@@ -48,7 +61,7 @@ def _compute_final_signals_from_db_rows(screener_data):
         'oi_put_losers', 'oi_put_itm_losers', 'oi_put_otm_losers',
         'moneyness_call_gainers', 'moneyness_call_itm_gainers', 'moneyness_call_otm_gainers',
         'moneyness_put_losers', 'moneyness_put_itm_losers', 'moneyness_put_otm_losers',
-        'future_oi_gainers'
+        'future_oi_gainers'  # REMOVED future_moneyness_gainers to match signal_analysis
     ]
 
     bearish_sections = [
@@ -58,7 +71,7 @@ def _compute_final_signals_from_db_rows(screener_data):
         'oi_put_gainers', 'oi_put_itm_gainers', 'oi_put_otm_gainers',
         'moneyness_call_losers', 'moneyness_call_itm_losers', 'moneyness_call_otm_losers',
         'moneyness_put_gainers', 'moneyness_put_itm_gainers', 'moneyness_put_otm_gainers',
-        'future_oi_losers'
+        'future_oi_losers'  # REMOVED future_moneyness_losers to match signal_analysis
     ]
 
     bullish_cnt = {}
@@ -78,14 +91,32 @@ def _compute_final_signals_from_db_rows(screener_data):
             if t:
                 bearish_cnt[t] = bearish_cnt.get(t, 0) + 1
 
-    # final classification
+    # final classification with score
+        # final classification with score
     finals = {}
     all_tickers = set(list(bullish_cnt.keys()) + list(bearish_cnt.keys()))
 
     for t in all_tickers:
-        b = bullish_cnt.get(t, 0)
-        s = bearish_cnt.get(t, 0)
-        finals[t] = "BULLISH" if b > s else "BEARISH"
+        bull = bullish_cnt.get(t, 0)
+        bear = bearish_cnt.get(t, 0)
+        
+        # Calculate signed score: positive for bullish, negative for bearish
+        score = bull - bear
+        
+        # Determine signal based on score
+        if score > 0:
+            signal = "BULLISH"
+        elif score < 0:
+            signal = "BEARISH"
+        else:
+            signal = "NEUTRAL"  # When bullish_count == bearish_count
+        
+        finals[t] = {
+            'signal': signal,
+            'bullish_count': bull,
+            'bearish_count': bear,
+            'score': score  # Positive = Bullish, Negative = Bearish, 0 = Neutral
+        }
 
     return finals
 
@@ -404,9 +435,23 @@ def screener():
         ticker_map = build_ticker_map(screener_data)
         
         # pass final_signals to template for UI display
-        final_signals = screener_data.get('final_signals', {})
-        print("FINAL SIGNALS UI →", final_signals)
-
+        final_signals_dict = screener_data.get('final_signals', {})
+    
+        # Convert dict to sorted list (highest score first)
+        final_signals_list = []
+        for ticker, data in final_signals_dict.items():
+            final_signals_list.append({
+                'ticker': ticker,
+                'signal': data.get('signal', 'NEUTRAL'),
+                'bullish_count': data.get('bullish_count', 0),
+                'bearish_count': data.get('bearish_count', 0),
+                'score': data.get('score', 0)
+            })
+        
+        # Sort by score descending (highest to lowest)
+        final_signals_sorted = sorted(final_signals_list, key=lambda x: x['score'], reverse=True)
+        
+        print("FINAL SIGNALS UI (sorted) →", final_signals_sorted[:5])
         
         return render_template(
             "screener.html",
@@ -417,8 +462,10 @@ def screener():
             ticker_map=ticker_map,
             stock_list=get_filtered_tickers(),
             stock_symbol=None,
-            final_signals=final_signals
+            final_signals=final_signals_sorted  # Now passing sorted list
         )
+
+        
         
     except Exception as e:
         print(f"[ERROR] screener(): {e}")
@@ -435,6 +482,38 @@ def screener():
 def create_screener_pdf(screener_data, selected_date):
     """
     Generate PDF using Playwright (Chrome rendering)
+    
+    # DEBUG: Print what screener_data contains
+    print("="*70)
+    print("[PDF DEBUG] create_screener_pdf called")
+    print("="*70)
+    print(f"screener_data keys: {list(screener_data.keys()) if screener_data else 'None'}")
+    
+    if screener_data and 'final_signals' in screener_data:
+        fs = screener_data['final_signals']
+        print(f"[PDF DEBUG] screener_data HAS 'final_signals' with {len(fs)} tickers")
+        
+        # Convert to list and sort by score
+        fs_list = []
+        for ticker, data in fs.items():
+            if isinstance(data, dict):
+                score = data.get('score', data.get('bullish_count', 0) - data.get('bearish_count', 0))
+                fs_list.append({
+                    'ticker': ticker,
+                    'bullish': data.get('bullish_count', 0),
+                    'bearish': data.get('bearish_count', 0),
+                    'score': score
+                })
+        
+        fs_list.sort(key=lambda x: x['score'], reverse=True)
+        print("[PDF DEBUG] Top 5 from screener_data['final_signals']:")
+        for i, item in enumerate(fs_list[:5], 1):
+            print(f"  {i}. {item['ticker']}: {item['bullish']} green, {item['bearish']} red, score={item['score']}")
+    else:
+        print("[PDF DEBUG] screener_data does NOT have 'final_signals'")
+    
+    print("="*70)
+
     - Loads cover HTML
     - Loads tables HTML (40 tables with footer)
     - Converts images to base64
@@ -625,38 +704,88 @@ def create_screener_pdf(screener_data, selected_date):
         # final signals table generator (placed AFTER all 40 tables and BEFORE disclaimer)
         def make_final_signal_table(final_signals, max_rows=50):
             """
-            final_signals: dict {ticker: 'BULLISH'|'BEARISH'}
-            Sorted: All BULLISH first (alphabetical), then BEARISH (alphabetical).
+            final_signals: dict {ticker: {'signal': 'BULLISH'|'BEARISH'|'NEUTRAL', 
+                                        'bullish_count': int, 
+                                        'bearish_count': int, 
+                                        'score': int}}
+            
+            Score is signed: positive for bullish, negative for bearish, 0 for neutral
+            Sorted: By score descending (highest positive to lowest negative)
+                Shows: Strongest BULLISH → NEUTRAL → Strongest BEARISH
             """
             if not isinstance(final_signals, dict):
                 final_signals = {}
 
-            # Convert to list and sort
-            bulls = sorted([t for t, s in final_signals.items() if s == 'BULLISH'])
-            bears = sorted([t for t, s in final_signals.items() if s == 'BEARISH'])
+            # Convert to list with scores and sort by score descending
+            signal_list = []
+            for ticker, data in final_signals.items():
+                if isinstance(data, dict):
+                    signal_list.append({
+                        'ticker': ticker,
+                        'signal': data.get('signal', 'BEARISH'),
+                        'bullish_count': data.get('bullish_count', 0),
+                        'bearish_count': data.get('bearish_count', 0),
+                        'score': data.get('score', 0)
+                    })
+                else:
+                    # Fallback for old format (string signal)
+                    signal_list.append({
+                        'ticker': ticker,
+                        'signal': data if data in ['BULLISH', 'BEARISH'] else 'BEARISH',
+                        'bullish_count': 0,
+                        'bearish_count': 0,
+                        'score': 0
+                    })
 
-            combined = bulls + bears
-            combined = combined[:max_rows]
+            # ⭐ ADD THIS LINE - Sort by score descending (highest first)
+            signal_list = sorted(signal_list, key=lambda x: x['score'], reverse=True)
 
-            H = "<div style='font-size:10pt; font-weight:bold; margin:8px 0;'>Final Bullish / Bearish Signals</div>"
+            
+            # Sort by score descending (highest to lowest)
+            signal_list = sorted(signal_list, key=lambda x: x['score'], reverse=True)
+            signal_list = signal_list[:max_rows]
+
+            H = "<div style='font-size:10pt; font-weight:bold; margin:8px 0;'>Final Bullish / Bearish Signals (Sorted by Score)</div>"
             H += "<table style='width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:8pt;'>"
             H += "<tr style='background:#222; color:white;'>"
             H += "<th style='padding:6px; border:1px solid #ccc; text-align:left;'>#</th>"
             H += "<th style='padding:6px; border:1px solid #ccc; text-align:left;'>Symbol</th>"
-            H += "<th style='padding:6px; border:1px solid #ccc; text-align:left;'>Signal</th>"
+            H += "<th style='padding:6px; border:1px solid #ccc; text-align:center;'>Signal</th>"
+            H += "<th style='padding:6px; border:1px solid #ccc; text-align:center;'>Bullish</th>"
+            H += "<th style='padding:6px; border:1px solid #ccc; text-align:center;'>Bearish</th>"
+            H += "<th style='padding:6px; border:1px solid #ccc; text-align:center;'>Score</th>"
             H += "</tr>"
 
-            if not combined:
-                H += "<tr><td colspan='3' style='text-align:center; padding:8px; color:#999;'>No final signals available</td></tr>"
+            if not signal_list:
+                H += "<tr><td colspan='6' style='text-align:center; padding:8px; color:#999;'>No final signals available</td></tr>"
             else:
-                for i, tk in enumerate(combined, 1):
-                    sig = 'BULLISH' if tk in bulls else 'BEARISH'
-                    color = "#28a745" if sig == 'BULLISH' else "#dc3545"
+                for i, item in enumerate(signal_list, 1):
+                    sig = item['signal']
+                    # Color coding for signals
+                    if sig == 'BULLISH':
+                        color = "#28a745"  # Green
+                    elif sig == 'BEARISH':
+                        color = "#dc3545"  # Red
+                    else:  # NEUTRAL
+                        color = "#666"     # Gray
+                    
                     bg = "#f7f7f7" if i % 2 == 0 else "white"
+                    
+                    # Score color (matches sign)
+                    if item['score'] > 0:
+                        score_color = "#28a745"
+                    elif item['score'] < 0:
+                        score_color = "#dc3545"
+                    else:
+                        score_color = "#666"
+                    
                     H += f"<tr style='background:{bg};'>"
                     H += f"<td style='padding:6px; border:1px solid #ddd;'>{i}</td>"
-                    H += f"<td style='padding:6px; border:1px solid #ddd;'>{html_lib.escape(tk)}</td>"
-                    H += f"<td style='padding:6px; border:1px solid #ddd; color:{color}; font-weight:bold;'>{sig}</td>"
+                    H += f"<td style='padding:6px; border:1px solid #ddd;'>{html_lib.escape(item['ticker'])}</td>"
+                    H += f"<td style='padding:6px; border:1px solid #ddd; color:{color}; font-weight:bold; text-align:center;'>{sig}</td>"
+                    H += f"<td style='padding:6px; border:1px solid #ddd; text-align:center;'>{item['bullish_count']}</td>"
+                    H += f"<td style='padding:6px; border:1px solid #ddd; text-align:center;'>{item['bearish_count']}</td>"
+                    H += f"<td style='padding:6px; border:1px solid #ddd; color:{score_color}; font-weight:bold; text-align:center;'>{item['score']}</td>"
                     H += "</tr>"
 
             H += "</table>"
@@ -725,7 +854,81 @@ def create_screener_pdf(screener_data, selected_date):
             tables_html = tables_html.replace(placeholder, value)
 
         # Insert final signals table AFTER all 40 tables and BEFORE disclaimer
-        final_signals_html = make_final_signal_table(screener_data.get('final_signals', {}), max_rows=200)
+        # BYPASS cache - recalculate using signal_analysis logic directly!
+        print("[PDF DEBUG] Calculating signals using signal_analysis logic (NO CACHE)")
+        
+        # Import the calculation function directly
+        from ..controllers.screener.signal_analysis.controller import _compute_final_signals_with_breakdown
+        
+        # Build data structure the same way signal_analysis does (38 sections only)
+        sig_data = {}
+        sig_data['oi_call_gainers'] = safe('oi_call_gainers')
+        sig_data['oi_call_itm_gainers'] = safe('oi_call_itm_gainers')
+        sig_data['oi_call_otm_gainers'] = safe('oi_call_otm_gainers')
+        sig_data['oi_call_losers'] = safe('oi_call_losers')
+        sig_data['oi_call_itm_losers'] = safe('oi_call_itm_losers')
+        sig_data['oi_call_otm_losers'] = safe('oi_call_otm_losers')
+        sig_data['oi_put_gainers'] = safe('oi_put_gainers')
+        sig_data['oi_put_itm_gainers'] = safe('oi_put_itm_gainers')
+        sig_data['oi_put_otm_gainers'] = safe('oi_put_otm_gainers')
+        sig_data['oi_put_losers'] = safe('oi_put_losers')
+        sig_data['oi_put_itm_losers'] = safe('oi_put_itm_losers')
+        sig_data['oi_put_otm_losers'] = safe('oi_put_otm_losers')
+        sig_data['moneyness_call_gainers'] = safe('moneyness_call_gainers')
+        sig_data['moneyness_call_itm_gainers'] = safe('moneyness_call_itm_gainers')
+        sig_data['moneyness_call_otm_gainers'] = safe('moneyness_call_otm_gainers')
+        sig_data['moneyness_call_losers'] = safe('moneyness_call_losers')
+        sig_data['moneyness_call_itm_losers'] = safe('moneyness_call_itm_losers')
+        sig_data['moneyness_call_otm_losers'] = safe('moneyness_call_otm_losers')
+        sig_data['moneyness_put_gainers'] = safe('moneyness_put_gainers')
+        sig_data['moneyness_put_itm_gainers'] = safe('moneyness_put_itm_gainers')
+        sig_data['moneyness_put_otm_gainers'] = safe('moneyness_put_otm_gainers')
+        sig_data['moneyness_put_losers'] = safe('moneyness_put_losers')
+        sig_data['moneyness_put_itm_losers'] = safe('moneyness_put_itm_losers')
+        sig_data['moneyness_put_otm_losers'] = safe('moneyness_put_otm_losers')
+        sig_data['iv_call_gainers'] = safe('iv_call_gainers')
+        sig_data['iv_call_itm_gainers'] = safe('iv_call_itm_gainers')
+        sig_data['iv_call_otm_gainers'] = safe('iv_call_otm_gainers')
+        sig_data['iv_call_losers'] = safe('iv_call_losers')
+        sig_data['iv_call_itm_losers'] = safe('iv_call_itm_losers')
+        sig_data['iv_call_otm_losers'] = safe('iv_call_otm_losers')
+        sig_data['iv_put_gainers'] = safe('iv_put_gainers')
+        sig_data['iv_put_itm_gainers'] = safe('iv_put_itm_gainers')
+        sig_data['iv_put_otm_gainers'] = safe('iv_put_otm_gainers')
+        sig_data['iv_put_losers'] = safe('iv_put_losers')
+        sig_data['iv_put_itm_losers'] = safe('iv_put_itm_losers')
+        sig_data['iv_put_otm_losers'] = safe('iv_put_otm_losers')
+        sig_data['future_oi_gainers'] = safe('future_oi_gainers')
+        sig_data['future_oi_losers'] = safe('future_oi_losers')
+        # NOTE: NO future_moneyness sections!
+        
+        # Calculate using signal_analysis logic
+        signal_analysis_data = _compute_final_signals_with_breakdown(sig_data)
+        print(f"[PDF DEBUG] Calculated {len(signal_analysis_data)} signals")
+        
+        if signal_analysis_data:
+            # Convert to PDF format
+            pdf_signals = {}
+            for ticker, data in signal_analysis_data.items():
+                score = data['bullish_count'] - data['bearish_count']
+                pdf_signals[ticker] = {
+                    'signal': data['signal'],
+                    'bullish_count': data['bullish_count'],
+                    'bearish_count': data['bearish_count'],
+                    'score': score
+                }
+            
+            # Sort and print top 5
+            sorted_signals = sorted(pdf_signals.items(), key=lambda x: x[1]['score'], reverse=True)
+            print("[PDF DEBUG] Top 5 signals for PDF:")
+            for i, (ticker, data) in enumerate(sorted_signals[:5], 1):
+                print(f"  {i}. {ticker}: {data['bullish_count']} green, {data['bearish_count']} red, score={data['score']}")
+            
+            final_signals_html = make_final_signal_table(pdf_signals, max_rows=200)
+        else:
+            print("[PDF DEBUG] No signals calculated")
+            final_signals_html = "<div>No signals available</div>"
+        
         tables_html = tables_html.replace('{{signal_analysis_placeholder}}', final_signals_html)
 
         # Generate and insert technical heatmap section

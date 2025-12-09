@@ -202,54 +202,53 @@ def get_signal_data_formatted(selected_date):
         return None
 
 
-def _apply_sorting(signals, sort_by, sort_order, signal_filter):
+def _apply_sorting(signals_list, sort_by, sort_order, signal_filter):
     """
-    Apply sorting to signals based on column and order
+    Apply sorting to signals list based on column and order
     
     Args:
-        signals: dict of signal data
+        signals_list: list of signal dictionaries
         sort_by: 'symbol' or 'strength'
         sort_order: 'asc' or 'desc'
         signal_filter: 'all', 'bullish', 'bearish', 'neutral'
     
     Returns:
-        Sorted dict
+        Sorted list
     """
     if sort_by == 'symbol':
         # Sort by ticker name (alphabetically)
-        sorted_signals = dict(sorted(
-            signals.items(),
-            key=lambda x: x[0].lower(),
+        signals_list.sort(
+            key=lambda x: x['ticker'].lower(),
             reverse=(sort_order == 'desc')
-        ))
+        )
     elif sort_by == 'strength':
         # Sort based on active filter
-        def get_sort_value(item):
-            ticker, data = item
-            if signal_filter == 'bullish':
-                # Sort by bullish count only
-                return data['bullish_count']
-            elif signal_filter == 'bearish':
-                # Sort by bearish count only
-                return data['bearish_count']
-            else:
-                # For 'all' and 'neutral' - sort by net score
-                return data['bullish_count'] - data['bearish_count']
-        
-        sorted_signals = dict(sorted(
-            signals.items(),
-            key=get_sort_value,
-            reverse=(sort_order == 'desc')
-        ))
+        if signal_filter == 'bullish':
+            # Sort by bullish count only
+            signals_list.sort(
+                key=lambda x: x['bullish_count'],
+                reverse=(sort_order == 'desc')
+            )
+        elif signal_filter == 'bearish':
+            # Sort by bearish count only
+            signals_list.sort(
+                key=lambda x: x['bearish_count'],
+                reverse=(sort_order == 'desc')
+            )
+        else:
+            # For 'all' and 'neutral' - sort by net score
+            signals_list.sort(
+                key=lambda x: x['score'],
+                reverse=(sort_order == 'desc')
+            )
     else:
-        # Default: sort by net strength (bullish - bearish), descending
-        sorted_signals = dict(sorted(
-            signals.items(),
-            key=lambda x: x[1]['bullish_count'] - x[1]['bearish_count'],
+        # Default: sort by net strength (score), descending
+        signals_list.sort(
+            key=lambda x: x['score'],
             reverse=True
-        ))
+        )
     
-    return sorted_signals
+    return signals_list
 
 
 @signal_analysis_bp.route('/')
@@ -258,35 +257,51 @@ def signal_analysis():
     try:
         dates = get_available_dates()
         selected_date = request.args.get("date", dates[0] if dates else None)
-        signal_filter = request.args.get("filter", "all")  # all, bullish, bearish, neutral
-        sort_by = request.args.get("sort", "strength")  # symbol, strength
-        sort_order = request.args.get("order", "desc")  # asc, desc
+        signal_filter = request.args.get("filter", "all")
+        sort_by = request.args.get("sort", "strength")
+        sort_order = request.args.get("order", "desc")
         
         if not selected_date:
             return jsonify({"error": "No dates available"}), 404
         
-        signals = get_signal_data_formatted(selected_date)
+        signals_dict = get_signal_data_formatted(selected_date)
         
-        if not signals:
-            signals = {}
+        if not signals_dict:
+            signals_dict = {}
+        
+        # Convert dict to list with score calculation
+        signals_list = []
+        for ticker, data in signals_dict.items():
+            score = data['bullish_count'] - data['bearish_count']
+            
+            signals_list.append({
+                'ticker': ticker,
+                'signal': data['signal'],
+                'bullish_count': data['bullish_count'],
+                'bearish_count': data['bearish_count'],
+                'score': score,
+                'bullish_categories': data['bullish_categories'],
+                'bearish_categories': data['bearish_categories']
+            })
         
         # Apply filter
         if signal_filter == "bullish":
-            signals = {k: v for k, v in signals.items() if v['signal'] == 'BULLISH'}
+            signals_list = [s for s in signals_list if s['signal'] == 'BULLISH']
         elif signal_filter == "bearish":
-            signals = {k: v for k, v in signals.items() if v['signal'] == 'BEARISH'}
+            signals_list = [s for s in signals_list if s['signal'] == 'BEARISH']
         elif signal_filter == "neutral":
-            signals = {k: v for k, v in signals.items() if v['signal'] == 'NEUTRAL'}
+            signals_list = [s for s in signals_list if s['signal'] == 'NEUTRAL']
+        
         
         # Apply sorting
-        sorted_signals = _apply_sorting(signals, sort_by, sort_order, signal_filter)
+        signals_list = _apply_sorting(signals_list, sort_by, sort_order, signal_filter)
         
         return render_template(
             "screener/signal_analysis/index.html",
             dates=dates,
             selected_date=selected_date,
             indices=get_live_indices(),
-            signals=sorted_signals,
+            signals=signals_list,
             signal_filter=signal_filter,
             sort_by=sort_by,
             sort_order=sort_order,

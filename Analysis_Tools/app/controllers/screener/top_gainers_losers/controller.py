@@ -717,26 +717,33 @@ def create_screener_pdf(screener_data, selected_date):
             if not isinstance(signals_data, dict):
                 signals_data = {}
             
-            # Separate BULLISH and BEARISH (exclude NEUTRAL)
-            bullish_signals = []
-            bearish_signals = []
-
+            # Separate BULLISH and BEARISH, then sort each by strength
+            bullish_list = []
+            bearish_list = []
+            
             for ticker, data in signals_data.items():
                 signal = data.get('signal', 'NEUTRAL')
+                bullish_count = data.get('bullish_count', 0)
+                bearish_count = data.get('bearish_count', 0)
+                score = bullish_count - bearish_count
+                
                 if signal == 'BULLISH':
-                    bullish_signals.append((ticker, data))
+                    bullish_list.append((ticker, data, score))
                 elif signal == 'BEARISH':
-                    bearish_signals.append((ticker, data))
-                # NEUTRAL signals are ignored
-
-            # Sort BULLISH by strength (bullish_count descending)
-            bullish_signals.sort(key=lambda x: x[1]['bullish_count'], reverse=True)
-
-            # Sort BEARISH by strength (bearish_count descending)
-            bearish_signals.sort(key=lambda x: x[1]['bearish_count'], reverse=True)
-
+                    bearish_list.append((ticker, data, score))
+                # NEUTRAL signals are excluded
+            
+            # Sort BULLISH by score descending (highest positive scores first)
+            bullish_list.sort(key=lambda x: x[2], reverse=True)
+            
+            # Sort BEARISH by score ascending (most negative scores first, i.e., strongest bearish)
+            bearish_list.sort(key=lambda x: x[2])
+            
             # Combine: All BULLISH first, then all BEARISH
-            sorted_signals = bullish_signals + bearish_signals
+            combined = bullish_list + bearish_list
+            
+            # Remove score from tuple (keep only ticker and data)
+            sorted_signals = [(ticker, data) for ticker, data, score in combined]
 
             
             if not sorted_signals:
