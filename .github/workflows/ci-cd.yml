@@ -40,7 +40,7 @@ jobs:
 
       - run: bandit -r Analysis_Tools/ Database/ -f json -o bandit-report.json || true
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: bandit-report.json
@@ -117,7 +117,7 @@ jobs:
           echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> deployment/VERSION
           cd deployment && tar -czf ../derivative-analysis-${GITHUB_SHA::7}.tar.gz .
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: deployment-package
           path: derivative-analysis-*.tar.gz
@@ -132,7 +132,7 @@ jobs:
       name: development
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: deployment-package
 
@@ -147,7 +147,7 @@ jobs:
       name: production
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: deployment-package
 
