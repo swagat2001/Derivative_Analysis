@@ -7,7 +7,7 @@
     <!-- Left Section (Logo) -->
     <div class="header-logo">
       <a href="{{ url_for('dashboard.dashboard') }}" class="logo-link" title="Go to Dashboard">
-        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" 
+        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}"
              alt="Goldmine Logo" class="logo-img">
       </a>
     </div>
@@ -45,7 +45,7 @@
           </span>
         </div>
       </div>
-      
+
       <!-- User Info & Logout -->
       <div class="header-user-section">
         {% if current_user %}

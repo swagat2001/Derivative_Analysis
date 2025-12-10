@@ -342,6 +342,6 @@ For issues or questions:
 
 ---
 
-**Version**: 3.0  
-**Last Updated**: 2024  
+**Version**: 3.0
+**Last Updated**: 2024
 **Maintained By**: Options Analysis Team

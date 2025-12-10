@@ -10,12 +10,12 @@
       {% endfor %}
     </select>
   </div>
-  
+
   <!-- PDF Export Button -->
   {% if selected_date and screener_data %}
   <div class="control-group">
-    <a href="{{ url_for('gainers_losers.export_screener_pdf', date=selected_date) }}" 
-       class="btn-export-pdf" 
+    <a href="{{ url_for('gainers_losers.export_screener_pdf', date=selected_date) }}"
+       class="btn-export-pdf"
        title="Download Screener Report as PDF">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

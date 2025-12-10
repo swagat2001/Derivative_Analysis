@@ -3,34 +3,41 @@ Authentication model with database integration.
 Handles user authentication, password hashing, and user management.
 """
 
-import os
 import hashlib
+import os
 from typing import Optional, Tuple
-from sqlalchemy import text, create_engine
 from urllib.parse import quote_plus
+
+from sqlalchemy import create_engine, text
+
 from .db_config import engine  # Use shared engine from db_config
 
 # =============================================================
 # PASSWORD HASHING
 # =============================================================
 
+
 def hash_password(password: str) -> str:
     """Hash password using SHA256 with salt."""
     salt = os.environ.get("APP_SECRET_KEY", "dev-secret-key-change-me")
     return hashlib.sha256((password + salt).encode()).hexdigest()
 
+
 def verify_password(password: str, hashed: str) -> bool:
     """Verify password against hash."""
     return hash_password(password) == hashed
+
 
 # =============================================================
 # DATABASE INITIALIZATION
 # =============================================================
 
+
 def init_users_table():
     """Create users table if it doesn't exist."""
     try:
-        create_table_query = text("""
+        create_table_query = text(
+            """
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
@@ -42,23 +49,25 @@ def init_users_table():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_login TIMESTAMP
             )
-        """)
-        
+        """
+        )
+
         with engine.begin() as conn:
             conn.execute(create_table_query)
-        
+
         print("[INFO] Users table initialized successfully")
         return True
     except Exception as e:
         print(f"[ERROR] Failed to initialize users table: {e}")
         return False
 
+
 def create_default_admin():
     """Create default admin user if it doesn't exist."""
     try:
         default_username = os.environ.get("APP_ADMIN_USER", "admin")
         default_password = os.environ.get("APP_ADMIN_PASS", "admin123")
-        
+
         # Check if admin exists
         check_query = text("SELECT id FROM users WHERE username = :username")
         with engine.connect() as conn:
@@ -66,89 +75,103 @@ def create_default_admin():
             if result.fetchone():
                 print(f"[INFO] Admin user '{default_username}' already exists")
                 return True
-        
+
         # Create admin user
         password_hash = hash_password(default_password)
-        insert_query = text("""
+        insert_query = text(
+            """
             INSERT INTO users (username, password_hash, role, full_name, is_active)
             VALUES (:username, :password_hash, :role, :full_name, :is_active)
-        """)
-        
+        """
+        )
+
         with engine.begin() as conn:
-            conn.execute(insert_query, {
-                "username": default_username,
-                "password_hash": password_hash,
-                "role": "admin",
-                "full_name": "Administrator",
-                "is_active": True
-            })
-        
+            conn.execute(
+                insert_query,
+                {
+                    "username": default_username,
+                    "password_hash": password_hash,
+                    "role": "admin",
+                    "full_name": "Administrator",
+                    "is_active": True,
+                },
+            )
+
         print(f"[INFO] Default admin user created: {default_username} / {default_password}")
         return True
     except Exception as e:
         print(f"[ERROR] Failed to create default admin: {e}")
         return False
 
+
 # =============================================================
 # USER AUTHENTICATION
 # =============================================================
+
 
 def validate_user(username: str, password: str) -> bool:
     """Validate user credentials against database."""
     if not username or not password:
         return False
-    
+
     try:
-        query = text("""
-            SELECT password_hash, is_active 
-            FROM users 
+        query = text(
+            """
+            SELECT password_hash, is_active
+            FROM users
             WHERE username = :username
-        """)
-        
+        """
+        )
+
         with engine.connect() as conn:
             result = conn.execute(query, {"username": username})
             row = result.fetchone()
-            
+
             if not row:
                 return False
-            
+
             stored_hash, is_active = row
-            
+
             if not is_active:
                 return False
-            
+
             if verify_password(password, stored_hash):
                 # Update last login
-                update_query = text("""
-                    UPDATE users 
-                    SET last_login = CURRENT_TIMESTAMP 
+                update_query = text(
+                    """
+                    UPDATE users
+                    SET last_login = CURRENT_TIMESTAMP
                     WHERE username = :username
-                """)
+                """
+                )
                 with engine.begin() as update_conn:
                     update_conn.execute(update_query, {"username": username})
                 return True
-            
+
             return False
     except Exception as e:
         print(f"[ERROR] Authentication error: {e}")
         return False
 
+
 def get_user(username: str) -> Optional[dict]:
     """Get user information by username."""
     try:
-        query = text("""
+        query = text(
+            """
             SELECT id, username, role, full_name, email, is_active, created_at, last_login
-            FROM users 
+            FROM users
             WHERE username = :username
-        """)
-        
+        """
+        )
+
         with engine.connect() as conn:
             result = conn.execute(query, {"username": username})
             row = result.fetchone()
-            
+
             if not row:
                 return None
-            
+
             return {
                 "id": row[0],
                 "username": row[1],
@@ -157,11 +180,12 @@ def get_user(username: str) -> Optional[dict]:
                 "email": row[4],
                 "is_active": row[5],
                 "created_at": row[6],
-                "last_login": row[7]
+                "last_login": row[7],
             }
     except Exception as e:
         print(f"[ERROR] Failed to get user: {e}")
         return None
+
 
 def get_user_display_name(username: str) -> Optional[str]:
     """Get user's display name (full_name or username)."""
@@ -170,57 +194,66 @@ def get_user_display_name(username: str) -> Optional[str]:
         return user.get("full_name") or user.get("username")
     return None
 
-def create_user(username: str, password: str, role: str = "user", full_name: str = None, email: str = None) -> Tuple[bool, str]:
+
+def create_user(
+    username: str, password: str, role: str = "user", full_name: str = None, email: str = None
+) -> Tuple[bool, str]:
     """Create a new user. Returns (success, message)."""
     try:
         # Check if user exists
         if get_user(username):
             return False, "Username already exists"
-        
+
         # Hash password
         password_hash = hash_password(password)
-        
+
         # Insert user
-        insert_query = text("""
+        insert_query = text(
+            """
             INSERT INTO users (username, password_hash, role, full_name, email, is_active)
             VALUES (:username, :password_hash, :role, :full_name, :email, :is_active)
-        """)
-        
+        """
+        )
+
         with engine.begin() as conn:
-            conn.execute(insert_query, {
-                "username": username,
-                "password_hash": password_hash,
-                "role": role,
-                "full_name": full_name,
-                "email": email,
-                "is_active": True
-            })
-        
+            conn.execute(
+                insert_query,
+                {
+                    "username": username,
+                    "password_hash": password_hash,
+                    "role": role,
+                    "full_name": full_name,
+                    "email": email,
+                    "is_active": True,
+                },
+            )
+
         return True, "User created successfully"
     except Exception as e:
         print(f"[ERROR] Failed to create user: {e}")
         return False, f"Failed to create user: {str(e)}"
 
+
 def update_user_password(username: str, new_password: str) -> bool:
     """Update user password."""
     try:
         password_hash = hash_password(new_password)
-        update_query = text("""
-            UPDATE users 
-            SET password_hash = :password_hash 
+        update_query = text(
+            """
+            UPDATE users
+            SET password_hash = :password_hash
             WHERE username = :username
-        """)
-        
+        """
+        )
+
         with engine.begin() as conn:
-            conn.execute(update_query, {
-                "username": username,
-                "password_hash": password_hash
-            })
-        
+            conn.execute(update_query, {"username": username, "password_hash": password_hash})
+
         return True
     except Exception as e:
         print(f"[ERROR] Failed to update password: {e}")
         return False
+
 
 # =============================================================
 # INITIALIZE ON MODULE IMPORT
@@ -229,6 +262,7 @@ def update_user_password(username: str, new_password: str) -> bool:
 # Initialize users table and create default admin on first import
 _init_done = False
 
+
 def ensure_initialized():
     """Ensure users table and default admin are created."""
     global _init_done
@@ -236,6 +270,7 @@ def ensure_initialized():
         init_users_table()
         create_default_admin()
         _init_done = True
+
 
 # Auto-initialize on import
 ensure_initialized()

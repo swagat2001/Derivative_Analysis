@@ -1,0 +1,35 @@
+[Unit]
+Description=Derivative Analysis - NSE Options Dashboard
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=appuser
+Group=appuser
+WorkingDirectory=/opt/derivative-analysis/current
+Environment="PATH=/opt/derivative-analysis/venv/bin"
+ExecStart=/opt/derivative-analysis/venv/bin/python run.py
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+
+# Resource limits
+MemoryLimit=4G
+CPUQuota=200%
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/derivative-analysis
+
+# Logging
+StandardOutput=append:/opt/derivative-analysis/logs/app.log
+StandardError=append:/opt/derivative-analysis/logs/error.log
+SyslogIdentifier=derivative-analysis
+
+[Install]
+WantedBy=multi-user.target

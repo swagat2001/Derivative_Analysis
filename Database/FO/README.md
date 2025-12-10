@@ -372,16 +372,16 @@ P (Put Price)        = LastPric for PUT options
 def greeks(premium, expiry, cd, asset_price, strike_price, intrest_rate, instrument_type):
     # Calculate time to expiry in years
     t = ((expiry - cd) / timedelta(days=1)) / 365
-    
+
     if t <= 0:
         return {"IV": 0, "Delta": 0, "Gamma": 0, "Rho": 0, "Theta": 0, "Vega": 0}
-    
+
     # Determine option type (C = call, P = put)
     flag = instrument_type[0].lower()  # 'c' or 'p'
-    
+
     # Calculate IV using reverse Black-Scholes
     imp_v = implied_volatility(premium, asset_price, strike_price, t, intrest_rate, flag)
-    
+
     # Calculate all Greeks
     return {
         "IV": imp_v,
@@ -435,9 +435,9 @@ NSE BhavCopy files contain:
 
 **Sample Columns:**
 ```
-BizDt, Sgmt, FinInstrmTp, TckrSymb, FininstrmActlXpryDt, StrkPric, OptnTp, 
-FinInstrmNm, OpnPric, HghPric, LwPric, ClsPric, LastPric, PrvsClsgPric, 
-UndrlygPric, SttlmPric, OpnIntrst, ChngInOpnIntrst, TtlTradgVol, TtlTrfVal, 
+BizDt, Sgmt, FinInstrmTp, TckrSymb, FininstrmActlXpryDt, StrkPric, OptnTp,
+FinInstrmNm, OpnPric, HghPric, LwPric, ClsPric, LastPric, PrvsClsgPric,
+UndrlygPric, SttlmPric, OpnIntrst, ChngInOpnIntrst, TtlTradgVol, TtlTrfVal,
 TtlNbOfTxsExctd, NewBrdLotQty
 ```
 
@@ -643,17 +643,17 @@ $$\text{RS} = \frac{\text{Average Gain (14 periods)}}{\text{Average Loss (14 per
 ```
 Step 1: Calculate price changes
    Change = Close_today - Close_yesterday
-   
+
 Step 2: Separate gains and losses
    Gains = All positive changes, Losses = All negative changes (absolute value)
-   
+
 Step 3: Calculate exponential moving averages (EMA)
    Avg Gain = EMA(14) of gains
    Avg Loss = EMA(14) of losses
-   
+
 Step 4: Calculate RS (Relative Strength)
    RS = Avg Gain / Avg Loss
-   
+
 Step 5: Calculate RSI
    RSI = 100 - (100 / (1 + RS))
 ```
@@ -796,7 +796,7 @@ Merge Call & Put by Strike
     ↓
 Calculate Changes:
   - Delta Change
-  - Vega Change  
+  - Vega Change
   - TradVal Change
   - Moneyness Change
     ↓
@@ -846,7 +846,7 @@ $$\text{OI}_{\%\text{change}} = \frac{\text{OI}_{\text{current}} - \text{OI}_{\t
 # For all options (ALL), ITM, and OTM combined
 total_curr_oi_all = df_opt['current_oi'].sum()
 total_prev_oi_all = df_opt['prev_oi'].sum()
-oi_all = ((total_curr_oi_all - total_prev_oi_all) / total_prev_oi_all * 100) 
+oi_all = ((total_curr_oi_all - total_prev_oi_all) / total_prev_oi_all * 100)
          if total_prev_oi_all != 0 else 0
 ```
 
@@ -887,7 +887,7 @@ df_opt['curr_value'] = df_opt['current_oi'] * df_opt['current_ltp']
 df_opt['prev_value'] = df_opt['prev_oi'] * df_opt['prev_ltp']
 total_curr_value_all = df_opt['curr_value'].sum()
 total_prev_value_all = df_opt['prev_value'].sum()
-money_all = ((total_curr_value_all - total_prev_value_all) / total_prev_value_all * 100) 
+money_all = ((total_curr_value_all - total_prev_value_all) / total_prev_value_all * 100)
             if total_prev_value_all != 0 else 0
 ```
 
@@ -924,8 +924,8 @@ $$\text{IV}_{\%\text{change}} = \frac{\text{IV}_{\text{current}} - \text{IV}_{\t
 **Code Location** (lines 310-318 in `screener_cache.py`):
 ```python
 # Calculate IV percentage change from database query (lines 139-143)
-CASE 
-    WHEN COALESCE(p.iv_prev, 0) != 0 
+CASE
+    WHEN COALESCE(p.iv_prev, 0) != 0
     THEN ((c.iv_curr - COALESCE(p.iv_prev, c.iv_curr)) / COALESCE(p.iv_prev, c.iv_curr)) * 100
     ELSE 0
 END AS iv_change
@@ -980,9 +980,9 @@ else:
 
 **Indices**:
 ```sql
-CREATE INDEX idx_screener_cache_date_metric 
+CREATE INDEX idx_screener_cache_date_metric
     ON screener_cache(cache_date, metric_type, option_type, moneyness_filter);
-CREATE INDEX idx_screener_cache_date 
+CREATE INDEX idx_screener_cache_date
     ON screener_cache(cache_date);
 ```
 
@@ -1034,7 +1034,7 @@ cache_date | metric_type | option_type | moneyness_filter | rank | ticker | unde
    - Inserts ~200-400 rows per date (10 ranks × 3 metrics × 3 option types × 3 moneyness filters)
 5. Returns total rows inserted
 
-**Performance**: 
+**Performance**:
 - Screener page loads in <0.5 seconds (vs 10+ without cache)
 - Processes 1 new date in ~2-5 seconds
 
@@ -1091,4 +1091,3 @@ Check script output for:
 - ❌ Errors (connection issues, data problems)
 
 Output format includes emojis and progress indicators for easy visual debugging.
-

@@ -1,1 +1,1 @@
-from .controller import technical_screener_bp, cache
+from .controller import cache, technical_screener_bp

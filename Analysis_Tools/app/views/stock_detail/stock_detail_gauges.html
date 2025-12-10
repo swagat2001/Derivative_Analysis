@@ -5,7 +5,7 @@
 <!-- ============================== -->
 <div class="gauges-section">
   <h3 class="section-title">Key Metrics</h3>
-  
+
   {% if stats %}
   <div class="gauges-grid">
     <!-- PCR Gauge -->
@@ -15,7 +15,7 @@
         <svg class="gauge-svg" viewBox="0 0 120 120" width="120" height="120">
           <!-- Background Circle -->
           <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
-          
+
           <!-- Value Arc -->
           {% set pcr_value = stats.pcr_oi|float if stats.pcr_oi else 0 %}
           {% set pcr_min = 0 %}
@@ -25,18 +25,18 @@
           {% set pcr_percentage = [pcr_percentage, 1]|min %}
           {% set pcr_circumference = 314 %}
           {% set pcr_offset = pcr_circumference - (pcr_circumference * pcr_percentage) %}
-          
-          <circle 
-            cx="60" cy="60" r="50" 
-            fill="none" 
-            stroke="#667eea" 
-            stroke-width="12" 
+
+          <circle
+            cx="60" cy="60" r="50"
+            fill="none"
+            stroke="#667eea"
+            stroke-width="12"
             stroke-linecap="round"
             stroke-dasharray="{{ pcr_circumference }}"
             stroke-dashoffset="{{ pcr_offset }}"
             transform="rotate(-90 60 60)"
           />
-          
+
           <!-- Center Value Text -->
           <text x="60" y="66" text-anchor="middle" font-size="24" font-weight="700" fill="#2c3e50">
             {{ "%.2f"|format(pcr_value) }}
@@ -56,7 +56,7 @@
         <svg class="gauge-svg" viewBox="0 0 120 120" width="120" height="120">
           <!-- Background Circle -->
           <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="12"/>
-          
+
           <!-- Value Arc -->
           {% set iv_value = stats.avg_iv|float if stats.avg_iv else 0 %}
           {% set iv_min = 0 %}
@@ -66,18 +66,18 @@
           {% set iv_percentage = [iv_percentage, 1]|min %}
           {% set iv_circumference = 314 %}
           {% set iv_offset = iv_circumference - (iv_circumference * iv_percentage) %}
-          
-          <circle 
-            cx="60" cy="60" r="50" 
-            fill="none" 
-            stroke="#10B981" 
-            stroke-width="12" 
+
+          <circle
+            cx="60" cy="60" r="50"
+            fill="none"
+            stroke="#10B981"
+            stroke-width="12"
             stroke-linecap="round"
             stroke-dasharray="{{ iv_circumference }}"
             stroke-dashoffset="{{ iv_offset }}"
             transform="rotate(-90 60 60)"
           />
-          
+
           <!-- Center Value Text -->
           <text x="60" y="66" text-anchor="middle" font-size="24" font-weight="700" fill="#2c3e50">
             {{ "%.2f"|format(iv_value) }}

@@ -4,8 +4,6 @@
 # import csv, os, time, threading
 
 
-
-
 # app = Flask(__name__)
 # app.config['SECRET_KEY'] = 'secret!'
 # socketio = SocketIO(app)  # Integrates Socket.IO into Flask
@@ -53,7 +51,6 @@
 
 # if __name__ == '__main__':
 #     socketio.run(app, debug=True)  # Use socketio.run instead of app.run
-
 
 
 from Analysis_Tools.app import create_app

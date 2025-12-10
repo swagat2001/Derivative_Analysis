@@ -6,14 +6,16 @@ NSE FO Bhavcopy Downloader
 - Normalizes all date columns
 """
 
-import urllib.request
 import os
+import shutil
 import socket
+import sys
+import urllib.request
 import zipfile
 from datetime import datetime, timedelta
-import shutil
-import sys
+
 import pandas as pd
+
 
 def download_file(url, output_folder):
     filename = os.path.basename(url)
@@ -22,10 +24,12 @@ def download_file(url, output_folder):
     print("Downloaded:", filename)
     return output_path
 
+
 def extract_files(zip_file, output_folder):
-    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+    with zipfile.ZipFile(zip_file, "r") as zip_ref:
         zip_ref.extractall(output_folder)
     print("Extracted:", zip_file)
+
 
 # ------------------- Setup Folders -------------------
 
@@ -46,7 +50,7 @@ if not os.path.exists(save_fo_eod):
 if os.path.isdir(save_fo_eod) and os.listdir(save_fo_eod):
     file_list = [f for f in os.listdir(save_fo_eod) if os.path.isfile(os.path.join(save_fo_eod, f))]
     last_date_str = max(f[:10] for f in file_list)
-    last_date = datetime.strptime(last_date_str, '%Y-%m-%d').date()
+    last_date = datetime.strptime(last_date_str, "%Y-%m-%d").date()
     today = datetime.now().date()
 
     if last_date == today:
@@ -57,8 +61,8 @@ if os.path.isdir(save_fo_eod) and os.listdir(save_fo_eod):
     end_date = today
 
 else:
-    start_date = datetime.strptime(input('Enter start date (YYYY-MM-DD): '), "%Y-%m-%d").date()
-    end_date = datetime.strptime(input('Enter end date (YYYY-MM-DD): '), "%Y-%m-%d").date()
+    start_date = datetime.strptime(input("Enter start date (YYYY-MM-DD): "), "%Y-%m-%d").date()
+    end_date = datetime.strptime(input("Enter end date (YYYY-MM-DD): "), "%Y-%m-%d").date()
 
 # ------------------- Generate Date List -------------------
 
@@ -118,16 +122,16 @@ for file in files:
 for filename in os.listdir(output_folder):
     if filename.endswith("-NSE-FO.csv"):
         file_path = os.path.join(output_folder, filename)
-        
+
         try:
             df = pd.read_csv(file_path)
 
             # Convert all date-like object columns to YYYY-MM-DD
             for col in df.columns:
-                if df[col].dtype == 'object':
+                if df[col].dtype == "object":
                     try:
-                        df[col] = pd.to_datetime(df[col], format='mixed', errors='raise')
-                        df[col] = df[col].dt.strftime('%Y-%m-%d')
+                        df[col] = pd.to_datetime(df[col], format="mixed", errors="raise")
+                        df[col] = df[col].dt.strftime("%Y-%m-%d")
                     except Exception:
                         continue  # Not a date column
 
@@ -149,4 +153,3 @@ for filename in os.listdir(output_folder):
 shutil.rmtree(output_folder)
 
 print("\n✅ All NSE FO bhavcopy files saved to:", save_fo_eod)
-

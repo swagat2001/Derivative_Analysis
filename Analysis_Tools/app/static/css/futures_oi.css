@@ -283,7 +283,7 @@
     .futures-oi-container {
         padding: 15px 20px 40px 20px;
     }
-    
+
     .expiry-table {
         display: block;
         overflow-x: auto;
@@ -294,11 +294,11 @@
     .futures-oi-header h1 {
         font-size: 24px;
     }
-    
+
     .expiry-title {
         font-size: 18px;
     }
-    
+
     .expiry-table th,
     .expiry-table td {
         padding: 10px 12px;

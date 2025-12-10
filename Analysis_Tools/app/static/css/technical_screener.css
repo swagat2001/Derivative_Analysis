@@ -509,11 +509,11 @@
     .technical-container {
         padding: 15px 20px 40px 20px;
     }
-    
+
     .tech-cards-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .tech-card-full {
         grid-column: span 1;
     }
@@ -523,30 +523,30 @@
     .technical-header h1 {
         font-size: 24px;
     }
-    
+
     .section-title {
         font-size: 18px;
     }
-    
+
     .tech-table th,
     .tech-table td {
         padding: 8px 10px;
         font-size: 11px;
     }
-    
+
     .heatmap-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
-    
+
     .heatmap-legend {
         gap: 6px;
     }
-    
+
     .legend-item {
         font-size: 9px;
         padding: 4px 6px;
     }
-    
+
     .legend-count {
         font-size: 8px;
         padding: 1px 4px;

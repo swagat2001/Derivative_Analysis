@@ -12,11 +12,11 @@
 {% include 'screener/top_gainers_losers/screener_controls.html' %}
 
 <div class="screener-container">
-  
+
   {% include 'screener/top_gainers_losers/screener_header.html' %}
-  
+
   {% if selected_date and screener_data %}
-    
+
     {% include 'screener/top_gainers_losers/screener_oi_section.html' %}
     {% include 'screener/top_gainers_losers/screener_moneyness_section.html' %}
     {% include 'screener/top_gainers_losers/screener_iv_section.html' %}

@@ -14,6 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
       customClass: 'symbol-tooltip'
     });
   });
-  
+
   console.log('[Screener] Tooltips initialized for', tooltipTriggerList.length, 'symbols');
 });

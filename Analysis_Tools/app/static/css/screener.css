@@ -15,7 +15,7 @@
   --goldmine-gold: #D4AF37;
   --goldmine-gold-light: #E5C158;
   --goldmine-gold-pale: #F5E6C8;
-  
+
   /* Neutral colors derived from brand */
   --bg-white: #ffffff;
   --bg-cream: #FFFCF5;
@@ -432,7 +432,7 @@
     grid-template-columns: 1fr;
     gap: 24px;
   }
-  
+
   .screener-container {
     padding: 9px 20px 40px 20px;
   }
@@ -442,7 +442,7 @@
   .screener-container {
     padding: 9px 16px 32px 16px;
   }
-  
+
   .screener-header h1 {
     font-size: 28px;
   }
@@ -455,7 +455,7 @@
   .screener-card {
     margin-bottom: 20px;
   }
-  
+
   .card-table {
     font-size: 12px;
   }

@@ -1,1 +1,1 @@
-from .controller import futures_oi_bp, cache
+from .controller import cache, futures_oi_bp

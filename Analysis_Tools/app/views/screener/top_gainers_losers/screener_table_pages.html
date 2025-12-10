@@ -7,7 +7,7 @@
             size: A4;
             margin: 8mm 10mm 5mm 8mm;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -15,7 +15,7 @@
             font-family: Arial, sans-serif;
             position: relative;
         }
-        
+
         .footer {
             position: fixed;
             bottom: 0mm;
@@ -30,12 +30,12 @@
             background: white;
             z-index: 1000;
         }
-        
+
         .content {
             padding: 3px 20px 5px 20px;
             margin-bottom: 0;
         }
-        
+
         h2 {
             font-size: 16pt;
             color: #8B2432;
@@ -43,19 +43,19 @@
             margin: 5px 0 5px 0;
             text-align: center;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 2px;
         }
-        
+
         .table-row td {
             width: 33%;
             vertical-align: top;
             padding: 4px;
         }
-        
+
         .table-row-2col td {
             width: 50%;
             vertical-align: top;
@@ -75,7 +75,7 @@
 <!-- PAGE 1: OPEN INTEREST -->
 <div class="content">
     <h2>Open Interest Changes Analysis</h2>
-    
+
     <table>
         <tr class="table-row">
             <td>{{oi_call_gainers_table}}</td>
@@ -83,7 +83,7 @@
             <td>{{oi_call_otm_gainers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{oi_call_losers_table}}</td>
@@ -91,7 +91,7 @@
             <td>{{oi_call_otm_losers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{oi_put_gainers_table}}</td>
@@ -99,7 +99,7 @@
             <td>{{oi_put_otm_gainers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{oi_put_losers_table}}</td>
@@ -114,7 +114,7 @@
 <!-- PAGE 2: MONEYNESS -->
 <div class="content">
     <h2>Moneyness Changes Analysis</h2>
-    
+
     <table>
         <tr class="table-row">
             <td>{{moneyness_call_gainers_table}}</td>
@@ -122,7 +122,7 @@
             <td>{{moneyness_call_otm_gainers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{moneyness_call_losers_table}}</td>
@@ -130,7 +130,7 @@
             <td>{{moneyness_call_otm_losers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{moneyness_put_gainers_table}}</td>
@@ -138,7 +138,7 @@
             <td>{{moneyness_put_otm_gainers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{moneyness_put_losers_table}}</td>
@@ -153,7 +153,7 @@
 <!-- PAGE 3: IMPLIED VOLATILITY -->
 <div class="content">
     <h2>Implied Volatility Changes</h2>
-    
+
     <table>
         <tr class="table-row">
             <td>{{iv_call_gainers_table}}</td>
@@ -161,7 +161,7 @@
             <td>{{iv_call_otm_gainers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{iv_call_losers_table}}</td>
@@ -169,7 +169,7 @@
             <td>{{iv_call_otm_losers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{iv_put_gainers_table}}</td>
@@ -177,7 +177,7 @@
             <td>{{iv_put_otm_gainers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 5px;">
         <tr class="table-row">
             <td>{{iv_put_losers_table}}</td>
@@ -192,14 +192,14 @@
 <!-- PAGE 4: FUTURES -->
 <div class="content">
     <h2>Futures Market Analysis</h2>
-    
+
     <table>
         <tr class="table-row-2col">
             <td>{{future_oi_gainers_table}}</td>
             <td>{{future_oi_losers_table}}</td>
         </tr>
     </table>
-    
+
     <table style="margin-top: 10px;">
         <tr class="table-row-2col">
             <td>{{future_moneyness_gainers_table}}</td>
@@ -223,43 +223,43 @@
 <!-- PAGE 7: DISCLAIMER PART 1 -->
 <div class="content" style="padding: 10px 15px 25mm 15px;">
     <h2 style="font-size:18pt; margin-bottom:10px;">DISCLAIMER / DISCLOSURE</h2>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         We, the Research Analyst, author of this report, associated with the Goldmine Stocks Pvt Ltd (hereinafter referred to as "Goldmine"), hereby certify that all of the views expressed in this report accurately reflect our views about the subject/Counter, which is based on publicly available data and information. But we do not guarantee that such information is accurate or complete and any opinions expressed in this report are subject to change without prior notice.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         This Document/Report/Recommendations is published in the capacity of Research Analyst by Goldmine Stocks Pvt. Limited (hereinafter referred to as "Goldmine") having SEBI Reg. no: INH000005625 for private circulation and only for information Purpose and Goldmine do not solicit any trading or Investment advice via this document. The securities and strategies discussed and opinions expressed, if any, in this report may not be suitable for all investors, who must make their own investment decisions, based on their own investment objectives, financial positions and needs of specific recipients.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Goldmine is a Full Broking services provider in financial market and SEBI Registered Stock Broker with National Stock Exchange of India Limited (NSE), Bombay Stock Exchange (BSE) and Multi Commodity Exchange of India (MCX). It is also having registration as a Depository Participant with NSDL & CDSL. (SEBI Reg. no: INZ000182938)
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Goldmine or its associate/relatives or Research Analysts or his/her associates or relatives has any financials interest in the subject companies: <strong>No</strong>
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Goldmine or its associate/relatives or Research Analysts or his/her associates or relatives have actual/beneficial ownership of 1% or more securities of the subject company at the end of the month immediately preceding the date of publication of the research report or the public appearance: <strong>No</strong>
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Goldmine or its associate/relatives or Research Analysts or his/her associates or relatives have any other material conflict of interest at the time of publication of the research report or at the time of public appearance: <strong>No</strong>
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Goldmine or its associates, Directors, employees and/or Research Analyst have not received any compensation or any other benefits, at any time or during the past twelve months, from the subject company covered by Analyst or third party in connection with the research report or for managing or co-managing public offering of securities or for brokerage services or for products or services other than brokerage services or from the subject company.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         It is confirmed that the subject company is or was not a client during twelve months preceding the date of distribution of the research report. It is also confirmed that Goldmine and/or Research Analysts has not been engaged in market making activity for the subject company and the Research Analysts has not served or is not serving as an officer, director or employee or advisory board member of the subject companies. The subject company is or was not a client during twelve months preceding the date of distribution of the research report.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         "Goldmine and its Associates, Directors, Research Analyst may have some other interests or holdings like 'Long or short positions' in securities recommended in this report as its ordinary course of business as a distinct and independent body." Apart from this, Goldmine or its associates or Research Analyst or his/her relatives do not have any other conflict or material conflict of interest at the time of publication of the research report with the company covered by Analysts. Goldmine may have issued other reports that are inconsistent or contrary to views issued in this report. (Here associates means M/s Goldmine Commodities Pvt Ltd & M/s Goldmine Vyapar Pvt Ltd is associate company of M/s Goldmine Stocks Pvt Ltd.)
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         This report or recommendations are not directed or intended for distribution or use by any person or entity that is a citizen or resident of or located in any locality, state, country or other jurisdiction, where such distribution, publication, availability or use would be contrary to law, regulation. The securities described herein may or may not be eligible for sale in all jurisdictions or to certain category of investors. The information given in this report is as of the date of this report and there can be no assurance that future results or events will be consistent with this information. This information is subject to change without any prior notice. Goldmine reserves the right to make modifications and alterations to this statement as may be required from time to time. Goldmine or any of its associates/group companies shall not be in any way responsible for any loss or damage that may arise to any person from any inadvertent error in the information contained in this report. Goldmine is committed to provide independent and transparent recommendation to its clients.
     </p>
@@ -272,35 +272,35 @@
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Neither Goldmine nor its associates, group companies, directors, employees, agents or representatives shall be liable for any damages whether direct, indirect, special or consequential including loss of revenue or lost profits that may arise from or in connection with the use of the information. Our proprietary trading and investment businesses may make investment decisions that are inconsistent with the recommendations expressed herein. Past performance is not necessarily a guide to future performance. The disclosures of interest statements incorporated in this report are provided solely to enhance the transparency and should not be treated as endorsement of the views expressed in the report.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         The person accessing this information specifically agrees to exempt Goldmine or any of its affiliates or employees from any and all responsibility/liability arising from such misuse and agrees not to hold Goldmine or any of its affiliates or employees responsible for any such misuse and further agrees not to hold Goldmine or any of its affiliates or employees from any/all losses, costs, damages, expenses that may be suffered by the person accessing this information due to any errors and delays.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         There were no instances of non-compliance by Goldmine on any matter related to capital markets, in significant & material disciplinary action during the last three years. Analyst Certification: The analyst for this report certifies that all the views expressed in this report accurately reflects his/her personal views about the subject company or companies and its or their securities, and no part of his or her compensation was, is or will be directly or indirectly related to specific recommendations or views expressed in this report.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         In terms of Regulation 19(vii) of the RA Regulations, we (Goldmine) shall disclose to our client that Goldmine does not use Artificial Intelligence (AI) tools/softwares etc. in providing research services.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         <strong>Investment in securities market is subject to market risks. Read all the related documents carefully before investing.</strong>
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         "Registration granted by SEBI, enlistment with BSE and certification from NISM in no way guarantee performance of the intermediary or provide any assurance of returns to investors."
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         The terms and conditions and the consent thereon are for the research services provided by the RA and RA cannot execute/carry out any trade (purchase/sell transaction) on behalf of the client. Thus, you are advised not to permit RA to execute any trade on your behalf.
     </p>
-    
+
     <p style="margin:4px 0; font-size:10pt; line-height:1.35; text-align:justify;">
         Any feedback or suggestions/query can be written to our official mail id: <strong>research@goldmine.co.in</strong>
     </p>
-    
+
     <p style="text-align:center; margin-top:15px; font-size:10pt;">
         <strong>Goldmine Stocks Pvt Ltd</strong><br>
         <strong>Research Analyst SEBI Reg. No: INH000005625 | BSE Enlistment No: 5273</strong>

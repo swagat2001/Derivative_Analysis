@@ -7,45 +7,47 @@ This script performs all 3 steps:
 """
 
 import os
+import re
+import shutil
+import socket
 import sys
 import urllib.request
 import zipfile
-import socket
-import shutil
-import pandas as pd
 from datetime import datetime, timedelta
-from sqlalchemy import create_engine, inspect, text
 from urllib.parse import quote_plus
+
 import numpy as np
-from py_vollib.black_scholes.implied_volatility import implied_volatility
+import pandas as pd
 from py_vollib.black_scholes.greeks.analytical import delta, gamma, rho, theta, vega
-import re
+from py_vollib.black_scholes.implied_volatility import implied_volatility
+from sqlalchemy import create_engine, inspect, text
 
 # ===========================================
 # 🔧 Configuration
 # ===========================================
-db_user = 'postgres'
-db_password = 'Gallop@3104'
-db_host = 'localhost'
-db_port = '5432'
-db_name = 'BhavCopy_Database'
+db_user = "postgres"
+db_password = "Gallop@3104"
+db_host = "localhost"
+db_port = "5432"
+db_name = "BhavCopy_Database"
 
 output_folder = "C:/data_fo"
 save_fo_eod = "C:/NSE_EOD_FO"
+
 
 # ===========================================
 # 📥 STEP 1: Download CSV Data
 # ===========================================
 def download_csv_data():
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("STEP 1: DOWNLOADING CSV DATA FROM NSE")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     # -------------------------------------------
     # 1️⃣  CONNECT TO DATABASE TO GET LATEST DATE
     # -------------------------------------------
     db_password_enc = quote_plus(db_password)
-    engine = create_engine(f'postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}')
+    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
     inspector = inspect(engine)
     base_tables = [t for t in inspector.get_table_names() if t.startswith("TBL_") and not t.endswith("_DERIVED")]
@@ -54,7 +56,7 @@ def download_csv_data():
 
     if base_tables:
         # Prefer NIFTY/BANKNIFTY if present
-        sample_table = next((t for t in ['TBL_NIFTY', 'TBL_BANKNIFTY'] if t in base_tables), base_tables[0])
+        sample_table = next((t for t in ["TBL_NIFTY", "TBL_BANKNIFTY"] if t in base_tables), base_tables[0])
 
         query = text(f'SELECT MAX("BizDt") AS last_dt FROM public."{sample_table}"')
         with engine.connect() as conn:
@@ -74,7 +76,7 @@ def download_csv_data():
         start_date = latest_db_date + timedelta(days=1)
     else:
         print("⚠ No data in database. Starting fresh download.")
-        start_date = datetime.strptime(input('Enter start date (YYYY-MM-DD): '), "%Y-%m-%d").date()
+        start_date = datetime.strptime(input("Enter start date (YYYY-MM-DD): "), "%Y-%m-%d").date()
 
     today = datetime.now().date()
     end_date = today
@@ -138,7 +140,7 @@ def download_csv_data():
     # -------------------------------------------
     for file in downloaded_files:
         try:
-            with zipfile.ZipFile(file, 'r') as z:
+            with zipfile.ZipFile(file, "r") as z:
                 z.extractall(output_folder)
             os.remove(file)
         except Exception as e:
@@ -150,44 +152,61 @@ def download_csv_data():
             date = file[22:30]
             date_obj = datetime.strptime(date, "%Y%m%d")
             new_name = date_obj.strftime("%Y-%m-%d") + "-NSE-FO.csv"
-            os.rename(os.path.join(output_folder, file),
-                      os.path.join(output_folder, new_name))
+            os.rename(os.path.join(output_folder, file), os.path.join(output_folder, new_name))
 
     # -------------------------------------------
     # 7️⃣  MOVE TO FINAL FOLDER
     # -------------------------------------------
     for filename in os.listdir(output_folder):
         if filename.endswith("-NSE-FO.csv"):
-            shutil.copy2(os.path.join(output_folder, filename),
-                         os.path.join(save_fo_eod, filename))
+            shutil.copy2(os.path.join(output_folder, filename), os.path.join(save_fo_eod, filename))
 
     shutil.rmtree(output_folder)
 
     print(f"\n✅ CSV download complete! Saved to {save_fo_eod}")
     return True
 
+
 # ===========================================
 # 📤 STEP 2: Upload to Database
 # ===========================================
 def upload_to_database():
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("STEP 2: UPLOADING CSV DATA TO DATABASE")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     db_password_enc = quote_plus(db_password)
-    engine = create_engine(f'postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}')
+    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
     # Expected CSV columns
     expected_columns = [
-        'BizDt','Sgmt','FinInstrmTp','TckrSymb','FininstrmActlXpryDt','StrkPric','OptnTp',
-        'FinInstrmNm','OpnPric','HghPric','LwPric','ClsPric','LastPric','PrvsClsgPric',
-        'UndrlygPric','SttlmPric','OpnIntrst','ChngInOpnIntrst','TtlTradgVol','TtlTrfVal',
-        'TtlNbOfTxsExctd','NewBrdLotQty'
+        "BizDt",
+        "Sgmt",
+        "FinInstrmTp",
+        "TckrSymb",
+        "FininstrmActlXpryDt",
+        "StrkPric",
+        "OptnTp",
+        "FinInstrmNm",
+        "OpnPric",
+        "HghPric",
+        "LwPric",
+        "ClsPric",
+        "LastPric",
+        "PrvsClsgPric",
+        "UndrlygPric",
+        "SttlmPric",
+        "OpnIntrst",
+        "ChngInOpnIntrst",
+        "TtlTradgVol",
+        "TtlTrfVal",
+        "TtlNbOfTxsExctd",
+        "NewBrdLotQty",
     ]
 
     # Helper: sanitize table names
     def sanitize_table_name(name):
-        clean = re.sub(r'\W+', '_', name).strip('_').upper()
+        clean = re.sub(r"\W+", "_", name).strip("_").upper()
         return f"TBL_{clean}" if clean else "TBL_UNKNOWN"
 
     # Get all ticker tables
@@ -281,7 +300,7 @@ def upload_to_database():
                     with engine.begin() as conn:
                         conn.execute(text(create_sql))
                     existing_tables.append(table_name)
-            
+
             # FIXED: Refresh inspector after creating new tables
             inspector = inspect(engine)
             existing_tables = inspector.get_table_names()
@@ -308,16 +327,17 @@ def upload_to_database():
     print(f"\n✅ Upload complete. {upload_count} file(s) uploaded.")
     return True
 
+
 # ===========================================
 # 🧮 STEP 3: Calculate Greeks
 # ===========================================
 def calculate_greeks():
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("STEP 3: CALCULATING GREEKS AND CREATING DERIVED TABLES")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     db_password_enc = quote_plus(db_password)
-    engine = create_engine(f'postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}')
+    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
     # ---------------------------------------------------------
     # Get pending BizDt that are in BASE tables but not in DERIVED
@@ -325,22 +345,24 @@ def calculate_greeks():
     def get_dates_to_process():
         try:
             inspector = inspect(engine)
-            base_tables = [t for t in inspector.get_table_names()
-                           if t.startswith("TBL_") and not t.endswith("_DERIVED")]
+            base_tables = [
+                t for t in inspector.get_table_names() if t.startswith("TBL_") and not t.endswith("_DERIVED")
+            ]
 
             if not base_tables:
                 return []
 
             # choose main index table
-            sample_table = next((t for t in ["TBL_NIFTY", "TBL_BANKNIFTY"]
-                                 if t in base_tables), base_tables[0])
+            sample_table = next((t for t in ["TBL_NIFTY", "TBL_BANKNIFTY"] if t in base_tables), base_tables[0])
 
-            query_base = text(f"""
+            query_base = text(
+                f"""
                 SELECT DISTINCT "BizDt"
                 FROM public."{sample_table}"
                 WHERE "BizDt" IS NOT NULL
                 ORDER BY "BizDt"
-            """)
+            """
+            )
 
             with engine.connect() as conn:
                 base_dates = pd.read_sql(query_base, conn)
@@ -351,12 +373,14 @@ def calculate_greeks():
             derived_table = f"{sample_table}_DERIVED"
 
             if derived_table in inspector.get_table_names():
-                query_derived = text(f"""
+                query_derived = text(
+                    f"""
                     SELECT DISTINCT "BizDt"
                     FROM public."{derived_table}"
                     WHERE "BizDt" IS NOT NULL
                     ORDER BY "BizDt"
-                """)
+                """
+                )
                 with engine.connect() as conn:
                     derived_dates = pd.read_sql(query_derived, conn)
                 derived_dates_set = set(derived_dates["BizDt"].astype(str))
@@ -381,8 +405,12 @@ def calculate_greeks():
             expiry = pd.to_datetime(expiry)
             cd = pd.to_datetime(cd)
 
-            t = ((datetime(expiry.year, expiry.month, expiry.day, 15, 30) -
-                  datetime(cd.year, cd.month, cd.day, 15, 30)).total_seconds()) / (365 * 24 * 3600)
+            t = (
+                (
+                    datetime(expiry.year, expiry.month, expiry.day, 15, 30)
+                    - datetime(cd.year, cd.month, cd.day, 15, 30)
+                ).total_seconds()
+            ) / (365 * 24 * 3600)
 
             if t <= 0:
                 return {"IV": 0, "Delta": 0, "Gamma": 0, "Rho": 0, "Theta": 0, "Vega": 0}
@@ -413,26 +441,27 @@ def calculate_greeks():
     print(f"📅 Found {len(dates_to_process)} date(s) to process\n")
 
     inspector = inspect(engine)
-    ticker_tables = [t for t in inspector.get_table_names()
-                     if t.startswith("TBL_") and not t.endswith("_DERIVED")]
+    ticker_tables = [t for t in inspector.get_table_names() if t.startswith("TBL_") and not t.endswith("_DERIVED")]
 
     with engine.connect() as conn:
         for idx, bizdt in enumerate(dates_to_process, 1):
             print(f"\n📅 Processing date {idx}/{len(dates_to_process)}: {bizdt}")
             print("-" * 80)
-            
+
             processed = 0
 
             for table_name in ticker_tables:
                 try:
                     ticker = table_name.replace("TBL_", "")
                     print(f"  {ticker:15s}...", end=" ")
-                    
-                    query = text(f'''
+
+                    query = text(
+                        f"""
                         SELECT *
                         FROM public."{table_name}"
                         WHERE "BizDt" = :d
-                    ''')
+                    """
+                    )
 
                     df = pd.read_sql(query, conn, params={"d": bizdt})
 
@@ -447,8 +476,14 @@ def calculate_greeks():
                         df["BizDt"] = pd.to_datetime(df["BizDt"], errors="coerce")
 
                     # force numeric conversion
-                    numeric_cols = ["UndrlygPric", "StrkPric", "OpnIntrst", "ChngInOpnIntrst",
-                                    "PrvsClsgPric", "LastPric"]
+                    numeric_cols = [
+                        "UndrlygPric",
+                        "StrkPric",
+                        "OpnIntrst",
+                        "ChngInOpnIntrst",
+                        "PrvsClsgPric",
+                        "LastPric",
+                    ]
                     for col in numeric_cols:
                         if col in df.columns:
                             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -459,24 +494,34 @@ def calculate_greeks():
 
                     # Division by zero protection
                     df["chg_oi"] = df.apply(
-                        lambda r: 0 if (r["OpnIntrst"] + r["y_oi"]) == 0
-                        else round(100 * ((r["y_oi"] - r["OpnIntrst"]) / ((r["OpnIntrst"] + r["y_oi"]) / 2)), 2),
-                        axis=1
+                        lambda r: 0
+                        if (r["OpnIntrst"] + r["y_oi"]) == 0
+                        else round(
+                            100 * ((r["y_oi"] - r["OpnIntrst"]) / ((r["OpnIntrst"] + r["y_oi"]) / 2)),
+                            2,
+                        ),
+                        axis=1,
                     )
 
                     df["chg_price"] = df.apply(
-                        lambda r: 0 if (r["PrvsClsgPric"] + r["LastPric"]) == 0
-                        else round(100 * ((r["PrvsClsgPric"] - r["LastPric"]) / ((r["PrvsClsgPric"] + r["LastPric"]) / 2)), 2),
-                        axis=1
+                        lambda r: 0
+                        if (r["PrvsClsgPric"] + r["LastPric"]) == 0
+                        else round(
+                            100 * ((r["PrvsClsgPric"] - r["LastPric"]) / ((r["PrvsClsgPric"] + r["LastPric"]) / 2)),
+                            2,
+                        ),
+                        axis=1,
                     )
 
                     # Calculate Greeks - ALL 6 INCLUDING GAMMA AND RHO
                     def safe_greeks(row):
                         try:
-                            if ("O" in str(row.get("FinInstrmTp", "")) and 
-                                pd.notna(row["LastPric"]) and
-                                pd.notna(row["StrkPric"]) and 
-                                row["LastPric"] > 0):
+                            if (
+                                "O" in str(row.get("FinInstrmTp", ""))
+                                and pd.notna(row["LastPric"])
+                                and pd.notna(row["StrkPric"])
+                                and row["LastPric"] > 0
+                            ):
                                 g = greeks(
                                     premium=float(row["LastPric"]),
                                     expiry=row.get("FininstrmActlXpryDt"),
@@ -484,9 +529,18 @@ def calculate_greeks():
                                     asset_price=row.get("UndrlygPric", np.nan),
                                     strike_price=row.get("StrkPric", np.nan),
                                     rate=0.06,
-                                    opt_type=str(row.get("OptnTp", "")).lower()
+                                    opt_type=str(row.get("OptnTp", "")).lower(),
                                 )
-                                return pd.Series([g["Delta"], g["Gamma"], g["Vega"], g["Theta"], g["Rho"], g["IV"]])
+                                return pd.Series(
+                                    [
+                                        g["Delta"],
+                                        g["Gamma"],
+                                        g["Vega"],
+                                        g["Theta"],
+                                        g["Rho"],
+                                        g["IV"],
+                                    ]
+                                )
                             else:
                                 return pd.Series([0, 0, 0, 0, 0, 0])
                         except:
@@ -524,51 +578,53 @@ def calculate_greeks():
 
                 except Exception as e:
                     print(f"❌ {str(e)[:50]}")
-            
+
             print(f"\n  📊 Date summary: {processed} tickers processed")
 
     print(f"\n✅ Greeks calculation complete!")
     return True
 
+
 # ===========================================
 # 🚀 MAIN EXECUTION
 # ===========================================
 def main():
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("             🚀 BHAVCOPY COMPLETE DATA PIPELINE")
-    print("="*80)
+    print("=" * 80)
     print("\nThis script will:")
     print("  1. Download latest CSV data from NSE")
     print("  2. Upload data to PostgreSQL database")
     print("  3. Calculate Greeks and create DERIVED tables")
-    print("\n" + "="*80)
-    
+    print("\n" + "=" * 80)
+
     try:
         # Step 1: Download CSV (continue even if no new data)
         download_result = download_csv_data()
         if download_result is False:  # Only stop on actual error
             print("\n❌ CSV download failed!")
             return False
-        
+
         # Step 2: Upload to database (continue even if no new data)
         upload_result = upload_to_database()
         if upload_result is False:  # Only stop on actual error
             print("\n❌ Database upload failed!")
             return False
-        
+
         # Step 3: Calculate Greeks (continue even if already processed)
         greeks_result = calculate_greeks()
         if greeks_result is False:  # Only stop on actual error
             print("\n❌ Greeks calculation failed!")
             return False
-        
+
         # Step 4: Pre-calculate screener cache data (OPTIONAL)
         try:
             import screener_cache
+
             precalculate_screener_cache = screener_cache.precalculate_screener_cache
-            print("\n" + "="*80)
+            print("\n" + "=" * 80)
             print("STEP 4: PRE-CALCULATING SCREENER CACHE (OPTIONAL)")
-            print("="*80 + "\n")
+            print("=" * 80 + "\n")
             precalculate_screener_cache()
             print("✓ Screener cache pre-calculated")
         except ImportError:
@@ -576,14 +632,15 @@ def main():
         except Exception as e:
             print(f"\n⚠️ Screener cache error: {e}")
             print("   Continuing with pipeline...")
-        
+
         # Step 4b: Pre-calculate Futures OI cache (OPTIONAL)
         try:
             import futures_oi_cache
+
             precalculate_futures_oi_cache = futures_oi_cache.precalculate_futures_oi_cache
-            print("\n" + "="*80)
+            print("\n" + "=" * 80)
             print("STEP 4b: PRE-CALCULATING FUTURES OI CACHE (OPTIONAL)")
-            print("="*80 + "\n")
+            print("=" * 80 + "\n")
             precalculate_futures_oi_cache()
             print("✓ Futures OI cache pre-calculated")
         except ImportError:
@@ -591,14 +648,15 @@ def main():
         except Exception as e:
             print(f"\n⚠️ Futures OI cache error: {e}")
             print("   Continuing with pipeline...")
-        
+
         # Step 4c: Pre-calculate Technical Screener cache (OPTIONAL)
         try:
             import technical_screener_cache
+
             precalculate_technical_screener_cache = technical_screener_cache.precalculate_technical_screener_cache
-            print("\n" + "="*80)
+            print("\n" + "=" * 80)
             print("STEP 4c: PRE-CALCULATING TECHNICAL SCREENER CACHE (OPTIONAL)")
-            print("="*80 + "\n")
+            print("=" * 80 + "\n")
             precalculate_technical_screener_cache()
             print("✓ Technical Screener cache pre-calculated")
         except ImportError:
@@ -606,20 +664,20 @@ def main():
         except Exception as e:
             print(f"\n⚠️ Technical Screener cache error: {e}")
             print("   Continuing with pipeline...")
-        
+
         # Step 5: Pre-calculate dashboard data (OPTIONAL)
         try:
-            print("\n" + "="*80)
+            print("\n" + "=" * 80)
             print("STEP 5: PRE-CALCULATING DASHBOARD DATA (OPTIONAL)")
-            print("="*80 + "\n")
-            
+            print("=" * 80 + "\n")
+
             # Import from same directory
             import precalculate_data
+
             create_precalculated_tables = precalculate_data.create_precalculated_tables
             precalculate_all_dates = precalculate_data.precalculate_all_dates
-            
+
             if True:  # Always try
-                
                 create_precalculated_tables()
                 precalculate_all_dates()
                 print("✓ Dashboard data pre-calculated")
@@ -630,21 +688,23 @@ def main():
         except Exception as e:
             print(f"\n⚠️ Dashboard data error: {e}")
             print("   Continuing with pipeline...")
-        
-        print("\n" + "="*80)
+
+        print("\n" + "=" * 80)
         print("             ✅ PIPELINE COMPLETE!")
-        print("="*80)
+        print("=" * 80)
         print("\n✓ All steps completed successfully")
         print("\nYour database is up to date!")
-        print("="*80 + "\n")
-        
+        print("=" * 80 + "\n")
+
         return True
-    
+
     except Exception as e:
         print(f"\n❌ Fatal Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     success = main()

@@ -157,7 +157,7 @@
   .header-indices {
     gap: 10px;
   }
-  
+
   .index-item {
     min-width: 70px;
     padding: 3px 8px;
@@ -184,11 +184,11 @@
     height: auto;
     padding: 10px 16px;
   }
-  
+
   .dashboard-header {
     height: auto;
   }
-  
+
   .header-right-section {
     flex-direction: column;
     gap: 12px;

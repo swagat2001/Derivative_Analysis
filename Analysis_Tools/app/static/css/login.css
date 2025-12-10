@@ -101,7 +101,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     radial-gradient(circle at 30% 40%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
     radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
   opacity: 0.6;
@@ -198,7 +198,7 @@
   max-width: 440px;
   background: #ffffff;
   border-radius: 20px;
-  box-shadow: 
+  box-shadow:
     0 20px 60px -15px rgba(139, 36, 50, 0.15),
     0 0 0 1px rgba(0, 0, 0, 0.03);
   padding: 48px 44px;
@@ -224,9 +224,9 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, 
-    var(--goldmine-maroon) 0%, 
-    var(--goldmine-maroon-light) 50%, 
+  background: linear-gradient(90deg,
+    var(--goldmine-maroon) 0%,
+    var(--goldmine-maroon-light) 50%,
     var(--goldmine-gold) 100%);
   border-radius: 20px 20px 0 0;
   z-index: 1;

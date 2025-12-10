@@ -19,15 +19,15 @@
     <!-- Moneyness Type Filter -->
     <div class="control-group">
       <div class="btn-group">
-        <button class="filter-btn {% if mtype == 'TOTAL' %}active{% endif %}" 
+        <button class="filter-btn {% if mtype == 'TOTAL' %}active{% endif %}"
                 onclick="window.location.href='/?date={{ selected_date }}&mtype=TOTAL'">
           TOTAL
         </button>
-        <button class="filter-btn {% if mtype == 'ITM' %}active{% endif %}" 
+        <button class="filter-btn {% if mtype == 'ITM' %}active{% endif %}"
                 onclick="window.location.href='/?date={{ selected_date }}&mtype=ITM'">
           ITM
         </button>
-        <button class="filter-btn {% if mtype == 'OTM' %}active{% endif %}" 
+        <button class="filter-btn {% if mtype == 'OTM' %}active{% endif %}"
                 onclick="window.location.href='/?date={{ selected_date }}&mtype=OTM'">
           OTM
         </button>
@@ -36,8 +36,8 @@
 
     <!-- Export Button -->
     <div class="control-group">
-      <a href="{{ url_for('dashboard.export_dashboard', date=selected_date, mtype=mtype) }}" 
-         class="btn-export" 
+      <a href="{{ url_for('dashboard.export_dashboard', date=selected_date, mtype=mtype) }}"
+         class="btn-export"
          title="Export to Excel">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -93,29 +93,29 @@
             <td>{{ row.call_delta_neg_strike }}</td>
             <td>{{ row.call_delta_neg_pct }}</td>
             <td>{{ row.call_vega_pos_strike }}</td>
-            <td class="money-clickable" 
-                data-stock="{{ row.stock }}" 
-                data-option-type="call" 
-                data-metric="vega" 
-                data-strike="{{ row.call_vega_pos_strike }}" 
+            <td class="money-clickable"
+                data-stock="{{ row.stock }}"
+                data-option-type="call"
+                data-metric="vega"
+                data-strike="{{ row.call_vega_pos_strike }}"
                 data-date="{{ selected_date }}">
               {{ row.call_vega_pos_pct }}
             </td>
             <td>{{ row.call_vega_neg_strike }}</td>
-            <td class="money-clickable" 
-                data-stock="{{ row.stock }}" 
-                data-option-type="call" 
-                data-metric="vega" 
-                data-strike="{{ row.call_vega_neg_strike }}" 
+            <td class="money-clickable"
+                data-stock="{{ row.stock }}"
+                data-option-type="call"
+                data-metric="vega"
+                data-strike="{{ row.call_vega_neg_strike }}"
                 data-date="{{ selected_date }}">
               {{ row.call_vega_neg_pct }}
             </td>
             <td>{{ "{:.2f}".format(row.call_total_tradval or 0) }}</td>
-            <td class="money-clickable" 
-                data-stock="{{ row.stock }}" 
-                data-option-type="call" 
-                data-metric="money" 
-                data-strike="N/A" 
+            <td class="money-clickable"
+                data-stock="{{ row.stock }}"
+                data-option-type="call"
+                data-metric="money"
+                data-strike="N/A"
                 data-date="{{ selected_date }}">
               {{ "{:.2f}".format(row.call_total_money or 0) }}
             </td>
@@ -126,29 +126,29 @@
             <td>{{ row.put_delta_neg_strike }}</td>
             <td>{{ row.put_delta_neg_pct }}</td>
             <td>{{ row.put_vega_pos_strike }}</td>
-            <td class="money-clickable" 
-                data-stock="{{ row.stock }}" 
-                data-option-type="put" 
-                data-metric="vega" 
-                data-strike="{{ row.put_vega_pos_strike }}" 
+            <td class="money-clickable"
+                data-stock="{{ row.stock }}"
+                data-option-type="put"
+                data-metric="vega"
+                data-strike="{{ row.put_vega_pos_strike }}"
                 data-date="{{ selected_date }}">
               {{ row.put_vega_pos_pct }}
             </td>
             <td>{{ row.put_vega_neg_strike }}</td>
-            <td class="money-clickable" 
-                data-stock="{{ row.stock }}" 
-                data-option-type="put" 
-                data-metric="vega" 
-                data-strike="{{ row.put_vega_neg_strike }}" 
+            <td class="money-clickable"
+                data-stock="{{ row.stock }}"
+                data-option-type="put"
+                data-metric="vega"
+                data-strike="{{ row.put_vega_neg_strike }}"
                 data-date="{{ selected_date }}">
               {{ row.put_vega_neg_pct }}
             </td>
             <td>{{ "{:.2f}".format(row.put_total_tradval or 0) }}</td>
-            <td class="money-clickable" 
-                data-stock="{{ row.stock }}" 
-                data-option-type="put" 
-                data-metric="money" 
-                data-strike="N/A" 
+            <td class="money-clickable"
+                data-stock="{{ row.stock }}"
+                data-option-type="put"
+                data-metric="money"
+                data-strike="N/A"
                 data-date="{{ selected_date }}">
               {{ "{:.2f}".format(row.put_total_money or 0) }}
             </td>

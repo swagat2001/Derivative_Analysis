@@ -28,9 +28,9 @@ $(document).ready(function () {
       $('#derivativesTable tbody tr').each(function() {
         $(this).find('td:eq(6), td:eq(8), td:eq(10), td:eq(18), td:eq(20), td:eq(22)').addClass('money-clickable');
       });
-      
+
       attachClickHandlers();
-      
+
       $('.dataTables_scrollBody').css({
         'overflow-x': 'hidden',
         'max-width': '100%'
@@ -53,9 +53,9 @@ $(document).ready(function () {
       $('#derivativesTable tbody tr').each(function() {
         $(this).find('td:eq(6), td:eq(8), td:eq(10), td:eq(18), td:eq(20), td:eq(22)').addClass('money-clickable');
       });
-      
+
       attachClickHandlers();
-      
+
       $('.dataTables_scrollBody').css({
         'overflow-x': 'hidden',
         'max-width': '100%'
@@ -75,7 +75,7 @@ $(document).ready(function () {
       });
     }
   });
-  
+
   $(window).on('resize', function() {
     $('.dataTables_scrollBody').css('overflow-x', 'hidden');
     $('.dataTables_scroll').css('overflow-x', 'hidden');
@@ -87,7 +87,7 @@ $(document).ready(function () {
 function attachClickHandlers() {
   // Remove old handlers first
   $('tbody td.money-clickable').off('click');
-  
+
   // Attach ONLY to tbody td cells
   $('tbody td.money-clickable').on('click', function() {
     openChartModal(this);

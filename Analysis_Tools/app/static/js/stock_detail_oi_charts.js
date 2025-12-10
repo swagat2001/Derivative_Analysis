@@ -5,7 +5,7 @@
    document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("oi-chart-container");
     if (!container) return;
-  
+
     let chartData;
     try {
       chartData = JSON.parse(container.dataset.chart || "{}");
@@ -13,18 +13,18 @@
       console.error("❌ Failed to parse chart data:", err);
       return;
     }
-  
+
     if (!chartData || !chartData.strikes) {
       console.warn("⚠️ No chart data found or invalid structure.");
       return;
     }
-  
+
     const ticker = chartData.meta?.ticker || "Unknown";
     const expiry = chartData.meta?.expiry || "Unknown";
     const strikes = chartData.strikes;
     const underlyingPrice = chartData.underlying_price;
     const futuresPrices = chartData.futures_prices || [];
-  
+
     // Helper to format large numbers (e.g. 25.3L, 10.2K) - preserves sign
     const formatValue = (v) => {
       if (isNaN(v)) return "-";
@@ -34,7 +34,7 @@
       if (absV >= 1000) return sign + (absV / 1000).toFixed(0) + " K";
       return v.toFixed(0);
     };
-  
+
     // Helper to find closest strike index for a given price
     const findClosestStrikeIndex = (price) => {
       if (!price || strikes.length === 0) return null;
@@ -49,12 +49,12 @@
       }
       return closestIndex;
     };
-  
+
     // Base chart config
     const baseOptions = {
       layout: { background: { color: "#fff" }, textColor: "#111827" },
       grid: { vertLines: { color: "#f3f4f6" }, horzLines: { color: "#f3f4f6" } },
-      crosshair: { 
+      crosshair: {
         mode: LightweightCharts.CrosshairMode.Normal,
         vertLine: { labelVisible: false },
         horzLine: { labelVisible: true }
@@ -67,7 +67,7 @@
         tickMarkFormatter: (index) => strikes[index] || "",
       }
     };
-  
+
     // ==============================
     // 🧩 Chart Block Creator
     // ==============================
@@ -75,18 +75,18 @@
       const block = document.createElement("div");
       block.className = "tv-chart-block";
       container.appendChild(block);
-  
+
       const chart = LightweightCharts.createChart(block, baseOptions);
-  
+
       // Calculate max value for bar height
       const maxValue = Math.max(...ceData.map(d => d.value), ...peData.map(d => d.value));
-  
+
       // Series
       const ceSeries = chart.addHistogramSeries({ color: legendItems[2].color });
       const peSeries = chart.addHistogramSeries({ color: legendItems[3].color });
       ceSeries.setData(ceData);
       peSeries.setData(peData);
-  
+
       // Max Lines
       const maxCELine = chart.addLineSeries({
         color: legendItems[0].color,
@@ -100,7 +100,7 @@
       });
       maxCELine.setData([maxCE]);
       maxPELine.setData([maxPE]);
-  
+
       // ✅ Add Underlying Price Vertical Line (DOM overlay)
       let underlyingBarSeries = null; // kept for seriesMap API compatibility via wrapper
       let underlyingBarIndex = null;
@@ -163,7 +163,7 @@
           underlyingBarSeries = createVerticalLineAt(underlyingIndex, spotColor, 'vline-spot');
         }
       }
-  
+
       // ✅ Add Futures Expiry Vertical Lines - 3 lines
       const futuresColors = ['#2196F3', '#9C27B0', '#4CAF50'];
       const futuresBarSeries = [];
@@ -184,21 +184,21 @@
           futuresBarSeries.push(null);
         }
       });
-  
+
       chart.timeScale().fitContent();
       // ensure all lines are positioned after fitContent establishes range
       const updateAllLines = () => verticalLines.forEach(v => v.updater());
       updateAllLines();
-  
+
       // Title
       const titleLabel = document.createElement("div");
       titleLabel.className = "chart-inline-title";
       titleLabel.innerText = title;
       block.appendChild(titleLabel);
-  
+
       // ✅ Build extended legend items (original + spot + futures)
       const extendedLegendItems = [...legendItems];
-      
+
       // Add Spot legend item
       if (underlyingPrice && underlyingBarSeries) {
         extendedLegendItems.push({
@@ -207,7 +207,7 @@
           color: spotColor
         });
       }
-  
+
       // Add Futures legend items
       futuresPrices.forEach((future, idx) => {
         if (future.price && futuresBarSeries[idx] !== null && futuresBarSeries[idx] !== undefined) {
@@ -219,7 +219,7 @@
           });
         }
       });
-  
+
       // Legend
       const legend = document.createElement("div");
       legend.className = "chart-inline-legend";
@@ -231,25 +231,25 @@
         legend.appendChild(el);
       });
       block.appendChild(legend);
-  
+
       // ✅ Build series map including spot and futures bars
-      const seriesMap = { 
-        maxCE: maxCELine, 
-        maxPE: maxPELine, 
-        ce: ceSeries, 
-        pe: peSeries 
+      const seriesMap = {
+        maxCE: maxCELine,
+        maxPE: maxPELine,
+        ce: ceSeries,
+        pe: peSeries
       };
-      
+
       if (underlyingBarSeries) {
         seriesMap['spot'] = underlyingBarSeries;
       }
-      
+
       futuresBarSeries.forEach((bar, idx) => {
         if (bar) {
           seriesMap[`f${idx + 1}`] = bar;
         }
       });
-  
+
       // Legend toggle
       legend.querySelectorAll(".legend-item").forEach((item) => {
         item.addEventListener("click", () => {
@@ -262,39 +262,39 @@
           }
         });
       });
-  
+
       // Tooltip
       const tooltip = document.createElement("div");
       tooltip.className = "oi-tooltip";
       tooltip.style.display = "none";
       block.appendChild(tooltip);
-  
+
       chart.subscribeCrosshairMove((param) => {
         if (!param?.time || !param?.point) {
           tooltip.style.display = "none";
           return;
         }
-  
+
         const idx = param.time;
         const strike = strikes[idx];
         if (strike === undefined) return;
-  
+
         // ✅ Get raw values directly from the chart data
         const ceValue = isChangeChart ? chartData.ce_oi_chg[idx] : chartData.ce_oi[idx];
         const peValue = isChangeChart ? chartData.pe_oi_chg[idx] : chartData.pe_oi[idx];
-  
+
         // Build tooltip content
         let tooltipContent = `
           <b>Strike:</b> ${strike}<br>
           <span style="color:${legendItems[2].color}">${legendItems[2].label}:</span> ${formatValue(ceValue || 0)}<br>
           <span style="color:${legendItems[3].color}">${legendItems[3].label}:</span> ${formatValue(peValue || 0)}
         `;
-  
+
         // ✅ Check if hovering over Spot bar
         if (underlyingBarIndex !== null && idx === underlyingBarIndex) {
           tooltipContent += `<br><span style="color:${spotColor}"><b>Spot Price:</b> ${underlyingPrice.toFixed(2)}</span>`;
         }
-  
+
         // ✅ Check if hovering over any Future bar
         futuresBarIndices.forEach((futureIdx, futureArrayIdx) => {
           if (futureIdx !== null && idx === futureIdx && futuresPrices[futureArrayIdx]) {
@@ -303,25 +303,25 @@
             tooltipContent += `<br><span style="color:${futuresColors[futureArrayIdx]}"><b>F${futureArrayIdx + 1}:</b> ${future.price.toFixed(2)} (Exp: ${expiryDate})</span>`;
           }
         });
-  
+
         tooltip.innerHTML = tooltipContent;
         tooltip.style.left = param.point.x + 15 + "px";
         tooltip.style.top = param.point.y + 15 + "px";
         tooltip.style.display = "block";
-  
+
         // Hover strike label
         if (window.syncLabelEl) {
           window.syncLabelEl.textContent = `Strike: ${strike}`;
         }
       });
-  
+
       window.addEventListener("resize", () =>
         chart.applyOptions({ width: block.clientWidth })
       );
-  
+
       return chart;
     }
-  
+
     // ==============================
     // 📊 Prepare Data
     // ==============================
@@ -330,17 +330,17 @@
     // ✅ Keep negative values for OI Change (don't use absolute)
     const ceChg = strikes.map((s, i) => ({ time: i, value: chartData.ce_oi_chg[i] || 0 }));
     const peChg = strikes.map((s, i) => ({ time: i, value: chartData.pe_oi_chg[i] || 0 }));
-  
+
     const maxCEVal = Math.max(...chartData.ce_oi);
     const maxPEVal = Math.max(...chartData.pe_oi);
     const maxCE = { time: chartData.ce_oi.indexOf(maxCEVal), value: maxCEVal };
     const maxPE = { time: chartData.pe_oi.indexOf(maxPEVal), value: maxPEVal };
-  
+
     const maxCEChgVal = Math.max(...chartData.ce_oi_chg);
     const maxPEChgVal = Math.max(...chartData.pe_oi_chg);
     const maxCEChg = { time: chartData.ce_oi_chg.indexOf(maxCEChgVal), value: maxCEChgVal };
     const maxPEChg = { time: chartData.pe_oi_chg.indexOf(maxPEChgVal), value: maxPEChgVal };
-  
+
     // Floating label
     const label = document.createElement("div");
     label.id = "strike-hover-label";
@@ -351,7 +351,7 @@
     label.textContent = "Strike: —";
     container.prepend(label);
     window.syncLabelEl = label;
-  
+
     // ==============================
     // 🟢 Create Charts
     // ==============================
@@ -369,7 +369,7 @@
       maxPE,
       false
     );
-  
+
     const oiChangeChart = createChartBlock(
       `${ticker}-${expiry} OI Change`,
       [
@@ -384,13 +384,13 @@
       maxPEChg,
       true
     );
-  
+
     // 🔗 Sync crosshair
     oiChart.subscribeCrosshairMove((param) => {
       if (!param?.time) return;
       oiChangeChart.moveCrosshair({ x: param.point?.x || 0, y: 0 });
     });
-  
+
     oiChangeChart.subscribeCrosshairMove((param) => {
       if (!param?.time) return;
       oiChart.moveCrosshair({ x: param.point?.x || 0, y: 0 });

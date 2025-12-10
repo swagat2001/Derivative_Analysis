@@ -6,38 +6,38 @@
 
 <header class="universal-header">
   <div class="header-container">
-    
+
     <!-- LEFT: Logo -->
     <div class="header-logo">
       <a href="{{ url_for('dashboard.dashboard') }}" class="logo-link" title="Goldmine Derivatives">
-        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" 
+        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}"
              alt="Goldmine" class="logo-img">
       </a>
     </div>
 
     <!-- CENTER: Navigation -->
     <nav class="header-nav">
-      <a href="{{ url_for('dashboard.dashboard') }}" 
+      <a href="{{ url_for('dashboard.dashboard') }}"
          class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
         Dashboard
       </a>
-      
+
       <!-- Stock Detail - Always visible, links to stock selection page -->
       <div class="nav-stock-detail">
         {% if request.endpoint == 'stock.stock_detail' and ticker %}
-          <a href="{{ url_for('stock.stock_detail', ticker=ticker) }}" 
+          <a href="{{ url_for('stock.stock_detail', ticker=ticker) }}"
              class="nav-link active">
             {{ ticker }} Detail
           </a>
         {% else %}
-          <a href="{{ url_for('stock.stock_search') }}" 
+          <a href="{{ url_for('stock.stock_search') }}"
              class="nav-link {% if request.endpoint == 'stock.stock_search' %}active{% endif %}">
             Stock Detail
           </a>
         {% endif %}
       </div>
-      
-      <a href="{{ url_for('screener.screener_landing') }}" 
+
+      <a href="{{ url_for('screener.screener_landing') }}"
          class="nav-link {% if request.endpoint == 'screener.screener_landing' %}active{% endif %}">
         Screener
       </a>
@@ -53,14 +53,14 @@
             <path d="m21 21-4.35-4.35"></path>
           </svg>
         </button>
-        
+
         <!-- Search Dropdown (hidden by default) -->
         <div class="search-dropdown" id="searchDropdown" style="display: none;">
           <form class="search-form" onsubmit="handleStockSearch(event)">
-            <input type="text" 
-                   name="symbol" 
+            <input type="text"
+                   name="symbol"
                    id="stockSearchInput"
-                   class="search-input" 
+                   class="search-input"
                    placeholder="Search stocks..."
                    autocomplete="off"
                    list="stockList">
@@ -86,7 +86,7 @@
             </svg>
             <span class="user-name">{{ user_display_name or current_user }}</span>
           </button>
-          
+
           <!-- User Dropdown -->
           <div class="user-dropdown" id="userDropdown" style="display: none;">
             <a href="{{ url_for('auth.logout') }}" class="logout-link">

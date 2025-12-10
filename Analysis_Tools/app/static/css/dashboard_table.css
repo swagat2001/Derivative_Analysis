@@ -34,7 +34,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(139, 36, 50, 0.15),
     0 0 0 1px rgba(139, 36, 50, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);

@@ -62,7 +62,7 @@
           {# PUT Fair Price = Max(0, Strike - Futures) #}
           {% set ce_fair_price_raw = (futures_val - strike_val) if futures_val and strike_val else None %}
           {% set pe_fair_price_raw = (strike_val - futures_val) if futures_val and strike_val else None %}
-          
+
           {# Apply Max(0, value) to ensure non-negative #}
           {% set ce_fair_price = [0, ce_fair_price_raw]|max if ce_fair_price_raw is not none else None %}
           {% set pe_fair_price = [0, pe_fair_price_raw]|max if pe_fair_price_raw is not none else None %}

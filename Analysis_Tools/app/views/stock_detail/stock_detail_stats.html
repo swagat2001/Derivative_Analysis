@@ -15,7 +15,7 @@
       <div class="stat-label">Total CE OI Chg</div>
       <div class="stat-value">{{ stats.total_ce_oi_chg }}</div>
     </div>
-    
+
     <!-- Row 2 -->
     <div class="stat-card">
       <div class="stat-label">Total PE OI</div>
@@ -25,7 +25,7 @@
       <div class="stat-label">Total PE OI Chg</div>
       <div class="stat-value">{{ stats.total_pe_oi_chg }}</div>
     </div>
-    
+
     <!-- Row 3 -->
     <div class="stat-card">
       <div class="stat-label">Diff PE-CE OI</div>
@@ -35,7 +35,7 @@
       <div class="stat-label">Diff PE-CE OI Chg</div>
       <div class="stat-value {% if stats.diff_pe_ce_oi_chg and stats.diff_pe_ce_oi_chg|replace(' Cr', '')|replace(' L', '')|float < 0 %}negative{% endif %}">{{ stats.diff_pe_ce_oi_chg }}</div>
     </div>
-    
+
     <!-- Row 4 -->
     <div class="stat-card">
       <div class="stat-label">Trend OI</div>
@@ -45,7 +45,7 @@
       <div class="stat-label">Trend OI Chg</div>
       <div class="stat-value trend-{{ stats.trend_oi_chg|lower if stats.trend_oi_chg else 'neutral' }}">{{ stats.trend_oi_chg }}</div>
     </div>
-    
+
     <!-- Row 5 -->
     <div class="stat-card">
       <div class="stat-label">Max CE OI Strike</div>
@@ -55,7 +55,7 @@
       <div class="stat-label">Max PE OI Strike</div>
       <div class="stat-value">{{ stats.max_pe_oi_strike }}</div>
     </div>
-    
+
     <!-- Row 6 -->
     <div class="stat-card">
       <div class="stat-label">Max CE OI Chg Strike</div>

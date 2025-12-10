@@ -23,14 +23,14 @@
     </div>
 
     {% if futures_data and (futures_data.CME or futures_data.NME or futures_data.FME) %}
-    
+
     <!-- CME Section -->
     <div class="expiry-section">
         <div class="expiry-title">
             Current Month Expiry (CME)
             <span class="expiry-badge">{{ futures_data.CME|length }} Stocks</span>
         </div>
-        
+
         {% if futures_data.CME %}
         <div class="expiry-table-card">
             <table class="expiry-table">
@@ -85,7 +85,7 @@
             Next Month Expiry (NME)
             <span class="expiry-badge">{{ futures_data.NME|length }} Stocks</span>
         </div>
-        
+
         {% if futures_data.NME %}
         <div class="expiry-table-card">
             <table class="expiry-table">
@@ -140,7 +140,7 @@
             Far Month Expiry (FME)
             <span class="expiry-badge">{{ futures_data.FME|length }} Stocks</span>
         </div>
-        
+
         {% if futures_data.FME %}
         <div class="expiry-table-card">
             <table class="expiry-table">
