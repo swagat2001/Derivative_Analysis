@@ -5,21 +5,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-/* =============================================================
-   ROOT VARIABLES - GOLDMINE BRAND COLORS
-   ============================================================= */
-:root {
-  --goldmine-maroon: #8B2432;
-  --goldmine-maroon-dark: #6B1826;
-  --goldmine-maroon-light: #A03040;
-  --goldmine-gold: #D4AF37;
-  --bg-light: #f5f5f5;
-  --bg-gradient-start: #fdf8f8;
-  --bg-gradient-end: #fef1f1;
-  --text-dark: #2c2c2c;
-  --text-gray: #5a5a5a;
-  --border-light: #e5e7eb;
-}
 
 * {
   margin: 0;
@@ -33,26 +18,15 @@
    ============================================================= */
 .login-page {
   min-height: 100vh;
+  padding:50px 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, #f9fafb 50%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--goldmine-maroon) 0%, var(--goldmine-maroon-dark) 50%, #5a1420 100%);
   position: relative;
   overflow: hidden;
 }
 
-/* Decorative background elements */
-.login-page::before {
-  content: '';
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(139, 36, 50, 0.08) 0%, transparent 70%);
-  border-radius: 50%;
-  top: -100px;
-  right: 10%;
-  animation: float1 20s ease-in-out infinite;
-}
 
 .login-page::after {
   content: '';
@@ -79,13 +53,10 @@
 /* =============================================================
    LEFT VISUAL PANEL - GOLDMINE MAROON
    ============================================================= */
+.login-box {background-color: var(--bg-light); padding:25px; max-width: 1200px; width:100%; display: flex; flex-wrap: wrap; justify-content: space-between;}
+
 .login-visual {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 45%;
-  height: 100vh;
-  background: linear-gradient(135deg, var(--goldmine-maroon) 0%, var(--goldmine-maroon-dark) 50%, #5a1420 100%);
+  width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,24 +64,11 @@
   z-index: 1;
 }
 
-/* Decorative pattern overlay */
-.login-visual::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image:
-    radial-gradient(circle at 30% 40%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-  opacity: 0.6;
-}
 
 .visual-content {
   position: relative;
   z-index: 2;
-  color: white;
+  color: var(--text-gray);
   text-align: left;
   max-width: 450px;
 }
@@ -121,6 +79,7 @@
   line-height: 1.2;
   margin-bottom: 20px;
   letter-spacing: -1px;
+  color: var(--goldmine-maroon);
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -154,11 +113,11 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: rgba(212, 175, 55, 0.25);
+  background: rgba(212, 175, 55, 0.50);
   border-radius: 50%;
   font-weight: 700;
   font-size: 14px;
-  color: var(--goldmine-gold);
+  color: var(--goldmine-maroon);
 }
 
 /* Floating illustration placeholder */
@@ -181,23 +140,19 @@
    RIGHT FORM PANEL - WHITE CARD
    ============================================================= */
 .login-card-wrapper {
-  margin-left: 45%;
-  width: 55%;
-  min-height: 100vh;
+  width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 30px;
   position: relative;
   z-index: 10;
-  background: #ffffff;
 }
 
 .login-card {
   width: 100%;
   max-width: 440px;
-  background: #ffffff;
-  border-radius: 20px;
+  background:var(--goldmine-maroon);
   box-shadow:
     0 20px 60px -15px rgba(139, 36, 50, 0.15),
     0 0 0 1px rgba(0, 0, 0, 0.03);
@@ -216,21 +171,6 @@
   }
 }
 
-/* Goldmine brand accent - maroon to gold gradient */
-.login-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg,
-    var(--goldmine-maroon) 0%,
-    var(--goldmine-maroon-light) 50%,
-    var(--goldmine-gold) 100%);
-  border-radius: 20px 20px 0 0;
-  z-index: 1;
-}
 
 /* =============================================================
    HEADER
@@ -252,10 +192,10 @@
 }
 
 .login-title {
-  margin: 0 0 10px 0;
+  margin: 0;
   font-size: 30px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--bg-light);
   letter-spacing: -0.8px;
   animation: titleFade 0.8s ease-out 0.3s both;
 }
@@ -266,8 +206,8 @@
 }
 
 .login-subtitle {
-  margin: 0;
-  color: var(--text-gray);
+  margin: 0 0 20px;
+  color: var(--bg-light);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.6;
@@ -341,7 +281,7 @@
 .login-form label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--bg-light);
   letter-spacing: -0.2px;
 }
 
@@ -383,8 +323,8 @@
   height: 52px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--goldmine-maroon) 0%, var(--goldmine-maroon-dark) 100%);
-  color: white;
+  background: var(--goldmine-gold);
+  color: var(--text-dark);
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
@@ -397,7 +337,8 @@
 .login-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px 0 rgba(139, 36, 50, 0.4);
-  background: linear-gradient(135deg, var(--goldmine-maroon-light) 0%, var(--goldmine-maroon) 100%);
+  background:var(--goldmine-gold-dark) ;
+  color: var(--bg-light);
 }
 
 .login-button:active {
@@ -416,7 +357,7 @@
 .login-footnote {
   margin-top: 32px;
   text-align: center;
-  color: var(--text-gray);
+  color: var(--bg-light);
   font-size: 14px;
   font-weight: 400;
   padding-top: 24px;
@@ -435,7 +376,7 @@
 }
 
 .login-footnote a {
-  color: var(--goldmine-maroon);
+  color: var(--goldmine-gold);
   text-decoration: none;
   font-weight: 600;
   transition: all 0.2s ease;
@@ -448,20 +389,33 @@
 /* =============================================================
    RESPONSIVE - MOBILE
    ============================================================= */
-@media (max-width: 1024px) {
-  .login-visual {
-    display: none;
-  }
 
-  .login-card-wrapper {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .login-card {
-    max-width: 450px;
-  }
+@media (max-width: 1200px) {
+  .login-box {max-width: 970px;}
+  .login-subtitle {font-size: 13px;}
+  .visual-content h1 {font-size: 36px;}
+  .visual-content p {font-size: 16px;}
+  .feature-item {font-size: 14px;}
 }
+
+@media (max-width: 1024px) {
+  .login-card-wrapper {margin-left: 0;}
+  .login-card {max-width: 450px;}
+}
+
+@media (max-width: 991px) {
+  .login-box {max-width:90%;}
+  .login-visual {display: none;}
+  .login-card-wrapper {width:100%;}
+}
+
+@media (max-width: 767px) {
+  .login-page {background: transparent; padding: 0;}
+  .login-box {max-width:100%; min-height: 100vh;  padding: 0;}
+  .login-card-wrapper {padding: 0;}
+}
+
+
 
 @media (max-width: 480px) {
   .login-card-wrapper {
@@ -470,7 +424,6 @@
 
   .login-card {
     padding: 40px 32px;
-    border-radius: 16px;
   }
 
   .login-title {

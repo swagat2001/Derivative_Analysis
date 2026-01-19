@@ -2,9 +2,10 @@
 {% block title %}Signal Analysis{% endblock %}
 
 {% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <style>
-    .signal-container { max-width: 1400px; margin: 2px auto; padding: 2px; }
+    /* Signal Analysis Specific Styles */
     .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .signal-header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; }
     .filter-buttons { display: flex; gap: 10px; }
@@ -31,21 +32,23 @@
     .details-content { padding: 15px; font-size: 12px; }
     .category-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
     .category-item { padding: 4px 8px; background: white; border-radius: 4px; font-size: 11px; }
-    .stats-summary { display: flex; gap: 20px; margin-bottom: 2px; padding: 5px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .stats-summary { display: flex; gap: 20px; margin-bottom: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .stat-card { flex: 1; text-align: center; }
     .stat-card .value { font-size: 32px; font-weight: 700; }
     .stat-card .label { font-size: 13px; color: #666; }
     .stat-card.bullish .value { color: #28a745; }
     .stat-card.bearish .value { color: #dc3545; }
     .stat-card.neutral .value { color: #f39c12; }
-    .date-control { margin-bottom: 5px; padding: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .date-control { margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .date-control select { padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="signal-container">
+<div class="screener-container">
+  {% include 'components/screener_sidebar.html' %}
 
+  <main class="screener-main">
     <div class="date-control">
         <label>Select Date:</label>
         <select onchange="window.location.href='/screener/signal-analysis?date='+this.value+'&filter={{ signal_filter }}&sort={{ sort_by }}&order={{ sort_order }}';">
@@ -58,7 +61,6 @@
     {% set bullish_count = signals|selectattr('signal','equalto','BULLISH')|list|length %}
     {% set bearish_count = signals|selectattr('signal','equalto','BEARISH')|list|length %}
     {% set neutral_count = signals|selectattr('signal','equalto','NEUTRAL')|list|length %}
-
 
     <div class="stats-summary">
         <div class="stat-card"><div class="value">{{ signals|length }}</div><div class="label">Total Stocks</div></div>
@@ -140,6 +142,7 @@
             </tbody>
         </table>
     </div>
+  </main>
 </div>
 
 <script>

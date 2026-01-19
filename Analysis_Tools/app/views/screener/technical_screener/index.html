@@ -2,38 +2,41 @@
 {% block title %}Technical Screener{% endblock %}
 
 {% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/technical_screener.css') }}">
 {% endblock %}
 
 {% block content %}
+<div class="screener-container">
+
+  {% include 'components/screener_sidebar.html' %}
+
+  <main class="screener-main">
 <div class="technical-container">
-
-    <div class="technical-header">
-        <h1>📈 Technical Screener</h1>
-        <p>RSI, MACD, SMA and ADX based stock screening with visual heatmaps</p>
-    </div>
-
-    <div class="technical-controls">
-        <label>Select Date:</label>
-        <select onchange="window.location.href='/screener/technical?date='+this.value;">
-            {% for d in dates %}
-            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-        </select>
-    </div>
 
     {% if tech_data %}
 
     <!-- RSI Based Section -->
-    <div class="tech-section">
-        <div class="section-title">📊 RSI-Based Analysis</div>
-        <div class="tech-cards-grid">
+    <section class="screener-section">
+        <div class="section-title" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <span>📊 RSI-Based Analysis</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT DATE:</label>
+                <select onchange="window.location.href='/screener/technical?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                    {% for d in dates %}
+                    <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="cards-grid">
             <!-- RSI Overbought -->
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">RSI Overbought (RSI > 80)</div>
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">▶ RSI OVERBOUGHT (RSI > 80)</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -47,24 +50,24 @@
                         {% for item in tech_data.rsi_overbought %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td><span class="rsi-value overbought">{{ "%.1f"|format(item.rsi_14) }}</span></td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td class="positive">{{ "%.1f"|format(item.rsi_14) }}</td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="no-data-message">No overbought stocks found</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No overbought stocks found</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
 
             <!-- RSI Oversold -->
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">RSI Oversold (RSI < 20)</div>
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">▶ RSI OVERSOLD (RSI < 20)</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -78,30 +81,30 @@
                         {% for item in tech_data.rsi_oversold %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td><span class="rsi-value oversold">{{ "%.1f"|format(item.rsi_14) }}</span></td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td class="negative">{{ "%.1f"|format(item.rsi_14) }}</td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="no-data-message">No oversold stocks found</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No oversold stocks found</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- MACD Based Section -->
-    <div class="tech-section">
+    <section class="screener-section">
         <div class="section-title">📉 MACD-Based Analysis</div>
-        <div class="tech-cards-grid">
+        <div class="cards-grid">
             <!-- MACD Bullish Crossover -->
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">MACD Bullish Crossover</div>
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">MACD Bullish Crossover</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -115,24 +118,24 @@
                         {% for item in tech_data.macd_bullish %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                             <td class="positive">{{ "%.2f"|format(item.macd) }}</td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="no-data-message">No bullish crossovers found</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No bullish crossovers found</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
 
             <!-- MACD Bearish Crossover -->
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">MACD Bearish Crossover</div>
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">MACD Bearish Crossover</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -146,30 +149,30 @@
                         {% for item in tech_data.macd_bearish %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                             <td class="negative">{{ "%.2f"|format(item.macd) }}</td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="no-data-message">No bearish crossovers found</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No bearish crossovers found</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- SMA Based Section -->
-    <div class="tech-section">
+    <section class="screener-section">
         <div class="section-title">📈 SMA-Based Analysis</div>
-        <div class="tech-cards-grid">
+        <div class="cards-grid">
             <!-- Above Both SMA -->
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">Above 50 & 200 SMA (Bullish)</div>
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">Above 50 & 200 SMA (Bullish)</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -184,25 +187,25 @@
                         {% for item in tech_data.above_sma %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                             <td class="positive">{{ "%+.2f"|format(item.dist_from_200sma_pct) }}%</td>
                             <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="6" class="no-data-message">No stocks above both SMAs</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No stocks above both SMAs</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
 
             <!-- Below Both SMA -->
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">Below 50 & 200 SMA (Bearish)</div>
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">Below 50 & 200 SMA (Bearish)</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -217,30 +220,30 @@
                         {% for item in tech_data.below_sma %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                             <td class="negative">{{ "%+.2f"|format(item.dist_from_200sma_pct) }}%</td>
                             <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="6" class="no-data-message">No stocks below both SMAs</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No stocks below both SMAs</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- ADX Based Section -->
-    <div class="tech-section">
+    <section class="screener-section">
         <div class="section-title">💪 Strong Trending Stocks (ADX > 25)</div>
-        <div class="tech-cards-grid">
-            <div class="tech-card tech-card-full">
-                <div class="tech-card-header">
-                    <div class="tech-card-title">Strong Trending Stocks</div>
+        <div class="cards-grid">
+            <div class="screener-card">
+                <div class="card-header">
+                    <div class="card-title">Strong Trending Stocks</div>
                 </div>
-                <table class="tech-table">
+                <table class="card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -255,20 +258,20 @@
                         {% for item in tech_data.strong_trend %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                            <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                             <td><strong>{{ "%.1f"|format(item.adx_14) }}</strong></td>
                             <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
-                            <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="6" class="no-data-message">No strong trending stocks found</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No strong trending stocks found</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- ============================================================= -->
     <!-- HEATMAP SECTIONS WITH COUNTS AND TOGGLE -->
@@ -452,7 +455,15 @@
     </div>
 
     {% else %}
-    <div class="no-data-message">
+    <div style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT DATE:</label>
+            <select onchange="window.location.href='/screener/technical?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                {% for d in dates %}
+                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </div>
         No Technical Screener data available for the selected date.<br>
         Please run the database update to generate cache data.
     </div>
@@ -517,4 +528,7 @@ function toggleHeatmapFilter(containerId, category, legendItem) {
 }
 </script>
 
+</div>
+  </main>
+</div>
 {% endblock %}

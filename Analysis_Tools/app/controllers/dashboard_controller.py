@@ -1,44 +1,45 @@
-import csv
 import json
-import os
-import time
 from datetime import datetime
 from io import BytesIO
 
 import pandas as pd
-from flask import Blueprint, Response, jsonify, render_template, request, send_file, stream_with_context
+from flask import Blueprint, jsonify, render_template, request, send_file
 
 from ..models.dashboard_model import get_available_dates, get_dashboard_data
 from ..models.stock_model import get_available_dates
 
-dashboard_bp = Blueprint("dashboard", __name__)
-
-# Path to your live CSV data
-SPOT_DATA_PATH = r"C:\Users\Admin\Desktop\Derivative_Analysis\spot_data\Data\SpotData.csv"
+dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
-# --------------------------------------------------------------------
-# 🧠 Helper: Read live spot prices
-# --------------------------------------------------------------------
+# ============================================================================
+# 🧠 LIVE INDICES - DISABLED (SpotData.csv streaming eliminated)
+# ============================================================================
+# NOTE: Live data streaming has been removed from this project.
+# The SpotData.csv file and real-time index streaming are no longer used.
+# This stub function returns zeros to maintain backward compatibility with
+# templates that expect the 'indices' variable.
+#
+# ORIGINAL IMPLEMENTATION (for reference):
+# -----------------------------------------
+# SPOT_DATA_PATH = r"C:\Users\Admin\Desktop\Derivative_Analysis\spot_data\Data\SpotData.csv"
+#
+# def get_live_indices():
+#     df = pd.read_csv(SPOT_DATA_PATH)
+#     return {
+#         "NIFTY": float(df.iloc[0]["NIFTY"]),
+#         "BANKNIFTY": float(df.iloc[0]["BANK NIFTY"]),
+#         "GOLD": float(df.iloc[0]["GOLD"]),
+#         "SILVER": float(df.iloc[0]["SILVER"]),
+#     }
+# ============================================================================
+
+
 def get_live_indices():
-    try:
-        if not os.path.exists(SPOT_DATA_PATH):
-            print(f"[WARN] SpotData.csv not found at {SPOT_DATA_PATH}")
-            return {"NIFTY": 0.0, "BANKNIFTY": 0.0, "GOLD": 0.0, "SILVER": 0.0}
-
-        df = pd.read_csv(SPOT_DATA_PATH)
-        df.columns = [c.strip().upper() for c in df.columns]
-
-        return {
-            "NIFTY": float(df.iloc[0]["NIFTY"]),
-            "BANKNIFTY": float(df.iloc[0]["BANK NIFTY"]),
-            "GOLD": float(df.iloc[0]["GOLD"]),
-            "SILVER": float(df.iloc[0]["SILVER"]),
-        }
-
-    except Exception as e:
-        print(f"[ERROR] get_live_indices(): {e}")
-        return {"NIFTY": 0.0, "BANKNIFTY": 0.0, "GOLD": 0.0, "SILVER": 0.0}
+    """
+    STUB: Returns empty/zero indices data.
+    Live data streaming has been eliminated from this project.
+    """
+    return {"NIFTY": 0.0, "BANKNIFTY": 0.0, "GOLD": 0.0, "SILVER": 0.0}
 
 
 # --------------------------------------------------------------------
@@ -246,10 +247,14 @@ def api_dashboard_data():
 
 
 # --------------------------------------------------------------------
-# 🔁 API endpoint (optional)
+# 🔁 API endpoint - Returns zeros (live streaming disabled)
 # --------------------------------------------------------------------
 @dashboard_bp.route("/api/live_indices")
 def api_live_indices():
+    """
+    Returns empty/zero indices data.
+    Live data streaming has been eliminated from this project.
+    """
     return jsonify(get_live_indices())
 
 
@@ -317,37 +322,40 @@ def export_dashboard():
 
 
 # --------------------------------------------------------------------
-# 🧩 Server-Sent Events (live streaming)
+# 🧩 Server-Sent Events (live streaming) - DISABLED
 # --------------------------------------------------------------------
-@dashboard_bp.route("/stream/live_indices")
-def stream_live_indices():
-    """Continuously stream CSV changes as Server-Sent Events (SSE)."""
-
-    def event_stream():
-        last_values = None
-        while True:
-            try:
-                if os.path.exists(SPOT_DATA_PATH):
-                    with open(SPOT_DATA_PATH, "r") as f:
-                        reader = csv.DictReader(f)
-                        row = next(reader)
-                        current = {
-                            "NIFTY": float(row["Nifty"]),
-                            "BANKNIFTY": float(row["Bank Nifty"]),
-                            "GOLD": float(row["Gold"]),
-                            "SILVER": float(row["Silver"]),
-                        }
-
-                    # Only push when data changes
-                    if current != last_values:
-                        yield f"data: {json.dumps(current)}\n\n"
-                        last_values = current
-            except Exception as e:
-                yield f"event: error\ndata: {str(e)}\n\n"
-
-            time.sleep(0.1)  # checks every 100ms (~10 updates/sec)
-
-    return Response(stream_with_context(event_stream()), mimetype="text/event-stream")
+# NOTE: Live data streaming has been eliminated from this project.
+# The SSE endpoint below is commented out as SpotData.csv is no longer used.
+#
+# @dashboard_bp.route("/stream/live_indices")
+# def stream_live_indices():
+#     """Continuously stream CSV changes as Server-Sent Events (SSE)."""
+#
+#     def event_stream():
+#         last_values = None
+#         while True:
+#             try:
+#                 if os.path.exists(SPOT_DATA_PATH):
+#                     with open(SPOT_DATA_PATH, "r") as f:
+#                         reader = csv.DictReader(f)
+#                         row = next(reader)
+#                         current = {
+#                             "NIFTY": float(row["Nifty"]),
+#                             "BANKNIFTY": float(row["Bank Nifty"]),
+#                             "GOLD": float(row["Gold"]),
+#                             "SILVER": float(row["Silver"]),
+#                         }
+#
+#                     # Only push when data changes
+#                     if current != last_values:
+#                         yield f"data: {json.dumps(current)}\n\n"
+#                         last_values = current
+#             except Exception as e:
+#                 yield f"event: error\ndata: {str(e)}\n\n"
+#
+#             time.sleep(0.1)  # checks every 100ms (~10 updates/sec)
+#
+#     return Response(stream_with_context(event_stream()), mimetype="text/event-stream")
 
 
 @dashboard_bp.route("/api/historical-chart-data")

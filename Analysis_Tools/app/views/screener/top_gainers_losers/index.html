@@ -4,6 +4,7 @@
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener_export.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -12,6 +13,21 @@
 {% include 'screener/top_gainers_losers/screener_controls.html' %}
 
 <div class="screener-container">
+
+  {% include 'components/screener_sidebar.html' %}
+
+    <!-- MAIN CONTENT -->
+  <main class="screener-main">
+
+
+
+  <div class="top-filters" id="topMenuFilter">
+    <div class="filter-box"><a href="#openIntrest">Open Intrest</a></div>
+    <div class="filter-box active"> <a href="#Moneyness">Moneyness</a></div>
+    <div class="filter-box"><a href="#ImpliedVolatility">Implied Volatility</a></div>
+    <div class="filter-box"><a href="#FuturesAnalysis">Futures Analysis</a></div>
+    <div class="filter-box"><a href="#BullishBearish">BULLISH / BEARISH</a></div>
+  </div>
 
   {% include 'screener/top_gainers_losers/screener_header.html' %}
 
@@ -33,6 +49,7 @@
     </div>
   {% endif %}
 
+</div>
 </div>
 
 {% endblock %}

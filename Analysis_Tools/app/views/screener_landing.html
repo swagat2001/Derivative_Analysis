@@ -1,57 +1,853 @@
 {% extends "base.html" %}
-{% block title %}Screener{% endblock %}
+{% block title %}Goldmine – Screeners{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="screener-landing">
-    <div class="landing-header">
-        <h1>Screener Analysis</h1>
-        <p>Choose your analysis type</p>
+<div class="screener-container">
+
+  {% include 'components/screener_sidebar.html' %}
+
+  <!-- MAIN CONTENT -->
+  <main class="screener-main">
+
+    <!-- SCREENER LIST VIEW -->
+    <div id="screenerListView" class="screener-list">
+      <button class="create-btn">+ Create Screener</button>
+
+      <!-- TOP MENU (CATEGORY PILLS) -->
+      <div class="top-filters" id="topMenu"></div>
+
+      <div class="section-title" id="sectionTitle">All Screeners</div>
+
+      <!-- SCREENER LIST -->
+      <div id="screenerList"></div>
     </div>
 
-    <div class="options-grid">
-        <!-- Top Gainers & Losers -->
-        <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="option-card">
-            <div class="option-icon">📊</div>
-            <h2>Top Gainers & Losers</h2>
-            <p>
-                Comprehensive view of top 10 gainers and losers across 40 different categories including
-                OI changes, IV changes, Moneyness changes for Calls, Puts and Futures with PDF export functionality.
-            </p>
-        </a>
+    <!-- DETAIL VIEW (Hidden by default) -->
+    <div id="detailView" class="detail-view">
+      <button class="back-btn" onclick="showScreenerList()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Screeners
+      </button>
 
-        <!-- Signal Analysis -->
-        <a href="{{ url_for('signal_analysis.signal_analysis') }}" class="option-card">
-            <div class="option-icon">🎯</div>
-            <h2>Signal Analysis</h2>
-            <p>
-                Advanced bullish and bearish signal classification based on multi-factor analysis.
-                Filter and analyze stocks showing strong directional signals with detailed breakdowns.
-            </p>
-        </a>
+      <div class="detail-header">
+        <div class="detail-header-left">
+          <div class="detail-title">
+            <span id="detailTitle">Nifty 50</span>
+            <span class="author">by @goldmine</span>
+          </div>
+          <div class="detail-desc" id="detailDesc">
+            The Nifty 50 is a benchmark index in the Indian stock market.
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn" onclick="exportToCSV()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export
+          </button>
+          <button class="btn primary" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print
+          </button>
+        </div>
+      </div>
 
-        <!-- Futures OI Analysis -->
-        <a href="{{ url_for('futures_oi.futures_oi_screener') }}" class="option-card">
-            <div class="option-icon">📦</div>
-            <h2>Futures OI Analysis</h2>
-            <p>
-                Expiry-wise Open Interest analysis across Current Month, Next Month, and Far Month expiries.
-                Track OI, cumulative OI, percentiles and signals for each stock.
-            </p>
-        </a>
+      <!-- Filter Tags -->
+      <div class="detail-filters">
+        <div class="detail-tag active" id="detailTag">Nifty 50</div>
+        <div class="detail-tag" onclick="filterStocks('all')">All Stocks</div>
+        <div class="detail-tag" onclick="filterStocks('bullish')">Bullish</div>
+        <div class="detail-tag" onclick="filterStocks('bearish')">Bearish</div>
+      </div>
 
-        <!-- Technical Screener -->
-        <a href="{{ url_for('technical_screener.technical_screener') }}" class="option-card">
-            <div class="option-icon">📈</div>
-            <h2>Technical Screener</h2>
-            <p>
-                RSI-based, MACD-based, SMA-based and ADX-based stock screening with interactive heatmaps.
-                Identify overbought, oversold, trending and crossover opportunities.
-            </p>
-        </a>
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-label">Total Stocks</span>
+        </div>
+        <div class="stat-item bullish">
+          <span class="stat-value" id="statBullish">0</span>
+          <span class="stat-label">Bullish</span>
+        </div>
+        <div class="stat-item bearish">
+          <span class="stat-value" id="statBearish">0</span>
+          <span class="stat-label">Bearish</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="statNeutral">0</span>
+          <span class="stat-label">Neutral</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="detail-table" id="stocksTable">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"/></th>
+              <th onclick="sortTable('name')">Name</th>
+              <th onclick="sortTable('price')">Price</th>
+              <th onclick="sortTable('change')">Day Change</th>
+              <th onclick="sortTable('change_pct')">Change %</th>
+              <th onclick="sortTable('volume')">Volume</th>
+              <th onclick="sortTable('oi')">Open Interest</th>
+              <th onclick="sortTable('iv')">IV %</th>
+              <th>Signal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="stocksTableBody">
+            <!-- Rows will be inserted here -->
+          </tbody>
+        </table>
+
+        <div class="table-footer">
+          <div class="footer-left">
+            Showing <strong id="showingCount">0</strong> of <strong id="totalCount">0</strong> results
+          </div>
+          <div class="footer-right">
+            <button class="btn-small" onclick="exportToCSV()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download CSV
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+
+  </main>
 </div>
+
+{% endblock %}
+
+{% block page_js %}
+<script>
+/* ===== DUMMY STOCK DATA ===== */
+const STOCK_DATA = {
+  "nifty50": {
+    title: "Nifty 50",
+    tag: "Nifty 50",
+    description: "The Nifty 50 is a benchmark index in the Indian stock market. It includes the top 50 large-cap companies listed on the National Stock Exchange (NSE) based on market capitalization and liquidity.",
+    stocks: [
+      {ticker: "RELIANCE", price: 1473.20, change: -31.00, change_pct: -2.06, volume: 7154042, oi: 12500000, iv: 24.5, signal: "BEARISH"},
+      {ticker: "HDFCBANK", price: 1746.40, change: -2.65, change_pct: -0.28, volume: 12666323, oi: 8900000, iv: 18.2, signal: "NEUTRAL"},
+      {ticker: "ICICIBANK", price: 1434.50, change: 6.80, change_pct: 0.48, volume: 9566450, oi: 7600000, iv: 21.3, signal: "BULLISH"},
+      {ticker: "INFY", price: 1617.30, change: -21.70, change_pct: -1.32, volume: 1989675, oi: 5400000, iv: 22.8, signal: "BEARISH"},
+      {ticker: "TCS", price: 3845.60, change: 45.30, change_pct: 1.19, volume: 1245890, oi: 3200000, iv: 19.4, signal: "BULLISH"},
+      {ticker: "BHARTIARTL", price: 1678.90, change: 12.40, change_pct: 0.74, volume: 3456789, oi: 4500000, iv: 23.1, signal: "BULLISH"},
+      {ticker: "SBIN", price: 845.30, change: -8.90, change_pct: -1.04, volume: 8765432, oi: 9800000, iv: 26.7, signal: "BEARISH"},
+      {ticker: "HDFC", price: 2890.50, change: 34.20, change_pct: 1.20, volume: 2345678, oi: 4100000, iv: 20.5, signal: "BULLISH"},
+      {ticker: "KOTAKBANK", price: 1823.40, change: -15.60, change_pct: -0.85, volume: 1567890, oi: 3400000, iv: 19.8, signal: "NEUTRAL"},
+      {ticker: "LT", price: 3567.80, change: 28.90, change_pct: 0.82, volume: 987654, oi: 2800000, iv: 21.2, signal: "BULLISH"},
+      {ticker: "WIPRO", price: 456.70, change: -5.40, change_pct: -1.17, volume: 4567890, oi: 6700000, iv: 25.3, signal: "BEARISH"},
+      {ticker: "AXISBANK", price: 1234.50, change: 8.90, change_pct: 0.73, volume: 5678901, oi: 5200000, iv: 22.4, signal: "BULLISH"},
+      {ticker: "MARUTI", price: 12456.30, change: -156.70, change_pct: -1.24, volume: 345678, oi: 890000, iv: 24.6, signal: "BEARISH"},
+      {ticker: "SUNPHARMA", price: 1567.80, change: 23.40, change_pct: 1.51, volume: 2345678, oi: 3100000, iv: 27.8, signal: "BULLISH"},
+      {ticker: "TATAMOTORS", price: 987.60, change: -12.30, change_pct: -1.23, volume: 6789012, oi: 8200000, iv: 32.1, signal: "BEARISH"},
+      {ticker: "ASIANPAINT", price: 2890.40, change: 18.60, change_pct: 0.65, volume: 567890, oi: 1200000, iv: 18.9, signal: "NEUTRAL"},
+      {ticker: "BAJFINANCE", price: 7234.50, change: 89.30, change_pct: 1.25, volume: 1234567, oi: 2400000, iv: 28.4, signal: "BULLISH"},
+      {ticker: "HCLTECH", price: 1678.90, change: -18.40, change_pct: -1.08, volume: 1890123, oi: 3800000, iv: 23.6, signal: "BEARISH"},
+      {ticker: "TITAN", price: 3456.70, change: 42.10, change_pct: 1.23, volume: 890123, oi: 1600000, iv: 25.2, signal: "BULLISH"},
+      {ticker: "ULTRACEMCO", price: 11234.50, change: -78.90, change_pct: -0.70, volume: 234567, oi: 450000, iv: 20.1, signal: "NEUTRAL"},
+      {ticker: "TECHM", price: 1567.80, change: 12.30, change_pct: 0.79, volume: 2345678, oi: 4100000, iv: 24.8, signal: "BULLISH"},
+      {ticker: "POWERGRID", price: 312.40, change: 4.50, change_pct: 1.46, volume: 5678901, oi: 7800000, iv: 19.3, signal: "BULLISH"},
+      {ticker: "NTPC", price: 378.90, change: -2.30, change_pct: -0.60, volume: 4567890, oi: 6500000, iv: 18.7, signal: "NEUTRAL"},
+      {ticker: "M&M", price: 2678.40, change: 34.50, change_pct: 1.31, volume: 1890123, oi: 2900000, iv: 26.4, signal: "BULLISH"},
+      {ticker: "HINDALCO", price: 678.90, change: -8.70, change_pct: -1.27, volume: 3456789, oi: 5100000, iv: 29.8, signal: "BEARISH"}
+    ]
+  },
+  "banknifty": {
+    title: "Bank Nifty",
+    tag: "Bank Nifty",
+    description: "Bank Nifty is a sectoral index comprising the most liquid and large capitalized banking stocks. It provides investors and market intermediaries a benchmark that captures the capital market performance of Indian banking sector.",
+    stocks: [
+      {ticker: "HDFCBANK", price: 1746.40, change: -2.65, change_pct: -0.28, volume: 12666323, oi: 8900000, iv: 18.2, signal: "NEUTRAL"},
+      {ticker: "ICICIBANK", price: 1434.50, change: 6.80, change_pct: 0.48, volume: 9566450, oi: 7600000, iv: 21.3, signal: "BULLISH"},
+      {ticker: "SBIN", price: 845.30, change: -8.90, change_pct: -1.04, volume: 8765432, oi: 9800000, iv: 26.7, signal: "BEARISH"},
+      {ticker: "KOTAKBANK", price: 1823.40, change: -15.60, change_pct: -0.85, volume: 1567890, oi: 3400000, iv: 19.8, signal: "NEUTRAL"},
+      {ticker: "AXISBANK", price: 1234.50, change: 8.90, change_pct: 0.73, volume: 5678901, oi: 5200000, iv: 22.4, signal: "BULLISH"},
+      {ticker: "INDUSINDBK", price: 1456.70, change: 18.90, change_pct: 1.31, volume: 2345678, oi: 3100000, iv: 28.5, signal: "BULLISH"},
+      {ticker: "BANDHANBNK", price: 234.50, change: -3.40, change_pct: -1.43, volume: 4567890, oi: 4200000, iv: 35.2, signal: "BEARISH"},
+      {ticker: "FEDERALBNK", price: 178.90, change: 2.10, change_pct: 1.19, volume: 3456789, oi: 5600000, iv: 24.8, signal: "BULLISH"},
+      {ticker: "IDFCFIRSTB", price: 87.60, change: -1.20, change_pct: -1.35, volume: 6789012, oi: 8100000, iv: 31.4, signal: "BEARISH"},
+      {ticker: "PNB", price: 112.30, change: 1.80, change_pct: 1.63, volume: 7890123, oi: 9200000, iv: 29.6, signal: "BULLISH"},
+      {ticker: "AUBANK", price: 678.40, change: -5.60, change_pct: -0.82, volume: 1234567, oi: 2100000, iv: 26.3, signal: "NEUTRAL"},
+      {ticker: "BANKBARODA", price: 267.80, change: 3.40, change_pct: 1.29, volume: 5678901, oi: 6800000, iv: 27.1, signal: "BULLISH"}
+    ]
+  },
+  "high-oi": {
+    title: "High OI Buildup",
+    tag: "High OI",
+    description: "Stocks showing significant Open Interest accumulation. High OI buildup often indicates strong market interest and potential directional moves.",
+    stocks: [] // Will be populated from nifty50
+  },
+  "iv-spike": {
+    title: "IV Spike Alert",
+    tag: "IV Spike",
+    description: "Stocks with unusual Implied Volatility movement. IV spikes often precede significant price movements and can indicate upcoming events or market uncertainty.",
+    stocks: [] // Will be populated from nifty50
+  }
+};
+
+// Populate high-oi and iv-spike from nifty50 data
+STOCK_DATA["high-oi"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.oi - a.oi).slice(0, 15);
+STOCK_DATA["iv-spike"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.iv - a.iv).slice(0, 15);
+
+/* ===== SCREENER DATA WITH ROUTES ===== */
+const SCREENER_DATA = {
+  "Derivative Screeners": [
+    {
+      title: "Top Gainers & Losers",
+      description: "Top 10 gainers/losers across 40 categories - OI, IV, Moneyness for Calls, Puts & Futures",
+      icon: "📊",
+      url: "{{ url_for('gainers_losers.top_gainers_losers') }}",
+      badge: "Popular",
+      inline: false
+    },
+    {
+      title: "Signal Analysis",
+      description: "Advanced bullish/bearish signal classification with multi-factor analysis",
+      icon: "🎯",
+      url: "{{ url_for('signal_analysis.signal_analysis') }}",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "Futures OI Analysis",
+      description: "Expiry-wise Open Interest analysis - Current, Next & Far Month",
+      icon: "📦",
+      url: "{{ url_for('futures_oi.futures_oi_screener') }}",
+      badge: null,
+      inline: false
+    }
+  ],
+  "Technical Screeners": [
+    {
+      title: "Technical Screener",
+      description: "RSI, MACD, SMA, ADX based screening with interactive heatmaps",
+      icon: "📈",
+      url: "{{ url_for('technical_screener.technical_screener') }}",
+      badge: "Premium",
+      inline: false
+    },
+    {
+      title: "Golden Crossover",
+      description: "Stocks where 50-day SMA crosses above 200-day SMA",
+      icon: "✨",
+      url: "{{ url_for('technical_screener.golden_crossover') }}",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Death Crossover",
+      description: "Stocks where 50-day SMA crosses below 200-day SMA",
+      icon: "💀",
+      url: "{{ url_for('technical_screener.death_crossover') }}",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "RSI Overbought",
+      description: "Stocks with RSI > 70 indicating potential reversal",
+      icon: "🔥",
+      url: "{{ url_for('technical_screener.technical_screener') }}?filter=rsi_overbought",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "RSI Oversold",
+      description: "Stocks with RSI < 30 indicating potential bounce",
+      icon: "❄️",
+      url: "{{ url_for('technical_screener.technical_screener') }}?filter=rsi_oversold",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Strong Trending (ADX)",
+      description: "Stocks with ADX > 25 showing strong trend momentum",
+      icon: "💪",
+      url: "{{ url_for('technical_screener.technical_screener') }}?filter=adx_strong",
+      badge: null,
+      inline: false
+    }
+  ],
+  "Fundamental Screeners": [
+    {
+      title: "Nifty 50 Analysis",
+      description: "Comprehensive derivative analysis for Nifty 50 stocks",
+      icon: "🏆",
+      dataKey: "nifty50",
+      apiUrl: "{{ url_for('index_screener.api_nifty50') }}",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "Bank Nifty Analysis",
+      description: "Derivative analysis for Bank Nifty constituents",
+      icon: "🏦",
+      dataKey: "banknifty",
+      apiUrl: "{{ url_for('index_screener.api_banknifty') }}",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "High OI Buildup",
+      description: "Stocks showing significant Open Interest accumulation",
+      icon: "📥",
+      dataKey: "high-oi",
+      apiUrl: "{{ url_for('index_screener.api_high_oi') }}",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "IV Spike Alert",
+      description: "Stocks with unusual Implied Volatility movement",
+      icon: "⚡",
+      dataKey: "iv-spike",
+      apiUrl: "{{ url_for('index_screener.api_iv_spike') }}",
+      badge: null,
+      inline: true
+    }
+  ],
+  "Intraday Screeners": [
+    {
+      title: "Price Gainers Today",
+      description: "Top price gainers in today's trading session",
+      icon: "🟢",
+      url: "{{ url_for('dashboard.dashboard') }}?sort=change_desc",
+      badge: "Live",
+      inline: false
+    },
+    {
+      title: "Price Losers Today",
+      description: "Top price losers in today's trading session",
+      icon: "🔴",
+      url: "{{ url_for('dashboard.dashboard') }}?sort=change_asc",
+      badge: "Live",
+      inline: false
+    },
+    {
+      title: "High Volume Alert",
+      description: "Stocks trading above average volume",
+      icon: "📢",
+      url: "{{ url_for('dashboard.dashboard') }}?filter=high_volume",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Breakout Scanner",
+      description: "Stocks breaking key resistance levels",
+      icon: "🚀",
+      url: "{{ url_for('technical_screener.technical_screener') }}?filter=breakout",
+      badge: "Beta",
+      inline: false
+    }
+  ]
+};
+
+let currentStocks = [];
+let currentDataKey = '';
+
+const topMenu = document.getElementById("topMenu");
+const screenerList = document.getElementById("screenerList");
+const sectionTitle = document.getElementById("sectionTitle");
+const screenerListView = document.getElementById("screenerListView");
+const detailView = document.getElementById("detailView");
+
+/* ===== BUILD MENU ===== */
+function buildMenu() {
+  addPill("All Screeners", true);
+  Object.keys(SCREENER_DATA).forEach(cat => addPill(cat));
+}
+
+function addPill(label, active=false) {
+  const pill = document.createElement("div");
+  pill.className = "filter-box" + (active ? " active" : "");
+  pill.textContent = label;
+  pill.onclick = () => {
+    document.querySelectorAll(".filter-box").forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    label === "All Screeners" ? renderAll() : renderCategory(label);
+  };
+  topMenu.appendChild(pill);
+}
+
+/* ===== RENDER SCREENER LIST ===== */
+function renderAll() {
+  sectionTitle.textContent = "All Screeners";
+  screenerList.innerHTML = "";
+  Object.entries(SCREENER_DATA).forEach(([category, items]) => {
+    const categoryHeader = document.createElement("div");
+    categoryHeader.className = "category-header";
+    categoryHeader.textContent = category;
+    screenerList.appendChild(categoryHeader);
+    items.forEach(item => renderCard(item));
+  });
+}
+
+function renderCategory(cat) {
+  sectionTitle.textContent = cat;
+  screenerList.innerHTML = "";
+  SCREENER_DATA[cat].forEach(item => renderCard(item));
+}
+
+function renderCard(item) {
+  const card = document.createElement("div");
+  card.className = "screener-card";
+  card.style.cursor = "pointer";
+
+  let badgeHTML = '';
+  if (item.badge) {
+    const badgeClass = item.badge.toLowerCase().replace(' ', '-');
+    badgeHTML = `<span class="screener-badge badge-${badgeClass}">${item.badge}</span>`;
+  }
+
+  card.innerHTML = `
+    <div class="screener-left">
+      <div class="icon">${item.icon}</div>
+      <div class="screener-info">
+        <div class="screener-title">${item.title} ${badgeHTML}</div>
+        <div class="screener-desc">${item.description}</div>
+      </div>
+    </div>
+    <div class="screener-right">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </div>
+  `;
+
+  // Handle click
+  card.onclick = () => {
+    if (item.inline && item.dataKey) {
+      // Fetch from API and show detail view
+      if (item.apiUrl) {
+        fetchAndShowDetailView(item.dataKey, item.apiUrl);
+      } else {
+        showDetailView(item.dataKey);
+      }
+    } else if (item.url) {
+      window.location.href = item.url;
+    }
+  };
+
+  screenerList.appendChild(card);
+}
+
+/* ===== DETAIL VIEW FUNCTIONS ===== */
+function loadScreenerPageInline(title, url) {
+  // Show loading state
+  detailView.innerHTML = `
+    <button class="back-btn" onclick="showScreenerList()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Screeners
+    </button>
+    <div style="padding: 40px; text-align: center;">
+      <div class="loading-spinner"></div>
+      <p>Loading ${title}...</p>
+    </div>
+  `;
+  screenerListView.classList.add('hidden');
+  detailView.classList.add('active');
+
+  // Fetch the full page
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(html => {
+      // Extract the main content from the fetched page
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Get the main content (everything inside .container or main)
+      const mainContent = doc.querySelector('main') || doc.querySelector('.container') || doc.body;
+
+      // Update detail view with back button + content
+      detailView.innerHTML = `
+        <button class="back-btn" onclick="showScreenerList()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Screeners
+        </button>
+        <div class="inline-screener-content">
+          ${mainContent.innerHTML}
+        </div>
+      `;
+
+      // Re-execute any scripts in the loaded content
+      const scripts = detailView.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        Array.from(oldScript.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        newScript.textContent = oldScript.textContent;
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading screener page:', error);
+      detailView.innerHTML = `
+        <button class="back-btn" onclick="showScreenerList()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Screeners
+        </button>
+        <div style="padding: 40px; text-align: center;">
+          <p style="color: #e74c3c; margin-bottom: 10px;">Failed to load ${title}</p>
+          <p style="color: #666; font-size: 14px;">${error.message}</p>
+          <button class="btn primary" onclick="showScreenerList()" style="margin-top: 20px;">Back to Screeners</button>
+        </div>
+      `;
+    });
+}
+
+function fetchAndShowDetailView(dataKey, apiUrl) {
+  // Show loading state
+  detailView.innerHTML = '<div style="padding: 40px; text-align: center;"><div class="loading-spinner"></div><p>Loading data...</p></div>';
+  screenerListView.classList.add('hidden');
+  detailView.classList.add('active');
+
+  // Fetch data from Flask API
+  fetch(apiUrl)
+    .then(response => {
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Data received:', data);
+
+      // Validate data structure
+      if (!data || !data.stocks || !Array.isArray(data.stocks)) {
+        throw new Error('Invalid data structure received');
+      }
+
+      // Store in STOCK_DATA for offline use
+      STOCK_DATA[dataKey] = {
+        title: data.title,
+        tag: data.tag,
+        description: data.description,
+        stocks: data.stocks
+      };
+
+      console.log(`Stored ${data.stocks.length} stocks in STOCK_DATA['${dataKey}']`);
+
+      // Show detail view with fetched data
+      showDetailView(dataKey);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      detailView.innerHTML = `
+        <div style="padding: 40px; text-align: center;">
+          <p style="color: #e74c3c; margin-bottom: 10px;">Failed to load data</p>
+          <p style="color: #666; font-size: 14px;">${error.message}</p>
+          <button class="btn primary" onclick="location.reload()" style="margin-top: 20px;">Refresh Page</button>
+        </div>
+      `;
+    });
+}
+
+function showDetailView(dataKey) {
+  const data = STOCK_DATA[dataKey];
+  if (!data) return;
+
+  currentDataKey = dataKey;
+  currentStocks = [...data.stocks];
+
+  // Restore full detail view HTML
+  detailView.innerHTML = `
+    <button class="back-btn" onclick="showScreenerList()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Screeners
+    </button>
+
+    <div class="detail-header">
+      <div class="detail-header-left">
+        <div class="detail-title">
+          <span id="detailTitle">${data.title}</span>
+          <span class="author">by @goldmine</span>
+        </div>
+        <div class="detail-desc" id="detailDesc">${data.description}</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn" onclick="exportToCSV()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        </button>
+        <button class="btn primary" onclick="window.print()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          Print
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-filters">
+      <div class="detail-tag" onclick="filterStocks('all')" style="cursor: pointer;">All</div>
+      <div class="detail-tag" onclick="filterStocks('bullish')" style="cursor: pointer;">Bullish</div>
+      <div class="detail-tag" onclick="filterStocks('bearish')" style="cursor: pointer;">Bearish</div>
+      <div class="detail-tag" onclick="filterStocks('neutral')" style="cursor: pointer;">Neutral</div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-value" id="statTotal">0</span>
+        <span class="stat-label">Total Stocks</span>
+      </div>
+      <div class="stat-item bullish">
+        <span class="stat-value" id="statBullish">0</span>
+        <span class="stat-label">Bullish</span>
+      </div>
+      <div class="stat-item bearish">
+        <span class="stat-value" id="statBearish">0</span>
+        <span class="stat-label">Bearish</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="statNeutral">0</span>
+        <span class="stat-label">Neutral</span>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="detail-table" id="stocksTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"/></th>
+            <th onclick="sortTable('name')">Name</th>
+            <th onclick="sortTable('price')">Price</th>
+            <th onclick="sortTable('change')">Day Change</th>
+            <th onclick="sortTable('change_pct')">Change %</th>
+            <th onclick="sortTable('volume')">Volume</th>
+            <th onclick="sortTable('oi')">Open Interest</th>
+            <th onclick="sortTable('iv')">IV %</th>
+            <th>Signal</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="stocksTableBody"></tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="footer-left">
+          Showing <strong id="showingCount">0</strong> of <strong id="totalCount">0</strong> results
+        </div>
+        <div class="footer-right">
+          <button class="btn-small" onclick="exportToCSV()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Calculate stats
+  const bullish = currentStocks.filter(s => s.signal === 'BULLISH').length;
+  const bearish = currentStocks.filter(s => s.signal === 'BEARISH').length;
+  const neutral = currentStocks.filter(s => s.signal === 'NEUTRAL').length;
+
+  // Update filter tabs with counts
+  const filterTags = detailView.querySelectorAll('.detail-tag');
+  filterTags[0].innerHTML = `All (${currentStocks.length})`;
+  filterTags[1].innerHTML = `Bullish (${bullish})`;
+  filterTags[2].innerHTML = `Bearish (${bearish})`;
+  filterTags[3].innerHTML = `Neutral (${neutral})`;
+
+  document.getElementById('statTotal').textContent = currentStocks.length;
+  document.getElementById('statBullish').textContent = bullish;
+  document.getElementById('statBearish').textContent = bearish;
+  document.getElementById('statNeutral').textContent = neutral;
+
+  // Render table
+  renderStocksTable(currentStocks);
+
+  // Set first filter tab (All) as active
+  document.querySelectorAll('.detail-tag')[0].classList.add('active');
+
+  // Show detail view, hide list
+  screenerListView.classList.add('hidden');
+  detailView.classList.add('active');
+}
+
+function showScreenerList() {
+  detailView.classList.remove('active');
+  screenerListView.classList.remove('hidden');
+}
+
+function renderStocksTable(stocks) {
+  const tbody = document.getElementById('stocksTableBody');
+  tbody.innerHTML = '';
+
+  stocks.forEach(stock => {
+    const row = document.createElement('tr');
+    row.dataset.ticker = stock.ticker;
+
+    const changeClass = stock.change > 0 ? 'positive' : (stock.change < 0 ? 'negative' : '');
+    const changeSign = stock.change > 0 ? '+' : '';
+    const signalClass = stock.signal.toLowerCase();
+
+    row.innerHTML = `
+      <td><input type="checkbox" class="stock-checkbox" value="${stock.ticker}"/></td>
+      <td class="stock-name">
+        <span>${stock.ticker}</span>
+        <span class="exchange">NSE</span>
+      </td>
+      <td>₹${parseFloat(stock.price || 0).toFixed(2)}</td>
+      <td class="${changeClass}">${changeSign}${parseFloat(stock.change || 0).toFixed(2)}</td>
+      <td class="${changeClass}">${changeSign}${parseFloat(stock.change_pct || 0).toFixed(2)}%</td>
+      <td>${parseInt(stock.volume || 0).toLocaleString()}</td>
+      <td>${parseInt(stock.oi || 0).toLocaleString()}</td>
+      <td>${parseFloat(stock.iv || 0).toFixed(1)}%</td>
+      <td><span class="signal-badge ${signalClass}">${stock.signal}</span></td>
+      <td>
+        <a href="/stock/${stock.ticker}" class="action-btn" title="View Details">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </a>
+      </td>
+    `;
+
+    // Double click to navigate
+    row.ondblclick = () => {
+      window.location.href = `/stock/${stock.ticker}`;
+    };
+
+    tbody.appendChild(row);
+  });
+
+  // Update counts
+  document.getElementById('showingCount').textContent = stocks.length;
+  document.getElementById('totalCount').textContent = STOCK_DATA[currentDataKey] ? STOCK_DATA[currentDataKey].stocks.length : stocks.length;
+}
+
+/* ===== FILTER & SORT ===== */
+function filterStocks(filter) {
+  // Update active tag - find all tags and remove active, then add to clicked one
+  document.querySelectorAll('.detail-tag').forEach(tag => tag.classList.remove('active'));
+  event.target.classList.add('active');
+
+  let filtered = [...STOCK_DATA[currentDataKey].stocks];
+
+  if (filter === 'bullish') {
+    filtered = filtered.filter(s => s.signal === 'BULLISH');
+  } else if (filter === 'bearish') {
+    filtered = filtered.filter(s => s.signal === 'BEARISH');
+  } else if (filter === 'neutral') {
+    filtered = filtered.filter(s => s.signal === 'NEUTRAL');
+  }
+  // 'all' shows everything - no filtering needed
+
+  currentStocks = filtered;
+  renderStocksTable(filtered);
+}
+
+let sortDirection = {};
+function sortTable(column) {
+  sortDirection[column] = !sortDirection[column];
+  const dir = sortDirection[column] ? 1 : -1;
+
+  currentStocks.sort((a, b) => {
+    if (column === 'name') {
+      return dir * a.ticker.localeCompare(b.ticker);
+    }
+    return dir * (a[column] - b[column]);
+  });
+
+  renderStocksTable(currentStocks);
+}
+
+/* ===== UTILITY FUNCTIONS ===== */
+function toggleSelectAll() {
+  const selectAll = document.getElementById('selectAll');
+  document.querySelectorAll('.stock-checkbox').forEach(cb => cb.checked = selectAll.checked);
+}
+
+function exportToCSV() {
+  const data = STOCK_DATA[currentDataKey];
+  let csv = 'Ticker,Price,Change,Change%,Volume,OI,IV,Signal\n';
+
+  currentStocks.forEach(stock => {
+    csv += `${stock.ticker},${stock.price},${stock.change},${stock.change_pct}%,${stock.volume},${stock.oi},${stock.iv}%,${stock.signal}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${data.tag.replace(' ', '_')}_stocks.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+/* ===== SIDEBAR MENU CLICK ===== */
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', function() {
+    // First, go back to list view if in detail view
+    showScreenerList();
+
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    this.classList.add('active');
+
+    const filter = this.dataset.filter;
+    if (filter === 'explore') {
+      renderAll();
+    } else {
+      sectionTitle.textContent = this.textContent.trim();
+      screenerList.innerHTML = `
+        <div class="coming-soon">
+          <div class="coming-soon-icon">🚧</div>
+          <h3>Coming Soon</h3>
+          <p>This feature is under development. Stay tuned!</p>
+        </div>
+      `;
+    }
+  });
+});
+
+/* INIT */
+buildMenu();
+renderAll();
+</script>
 {% endblock %}

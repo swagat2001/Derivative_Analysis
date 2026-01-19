@@ -28,14 +28,13 @@
 .stat-card {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
   padding: 8px 10px;
   text-align: center;
   transition: all 0.2s ease-in-out;
 }
 
 .stat-card:hover {
-  background: #f3f4f6;
+  background: #f5e0e0;
   transform: translateY(-2px);
 }
 

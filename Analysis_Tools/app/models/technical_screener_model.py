@@ -243,3 +243,71 @@ def get_heatmap_data(date):
     except Exception as e:
         print(f"Error getting heatmap data: {e}")
         return []
+
+
+def get_golden_crossover_stocks(date, limit=50):
+    """
+    Get stocks with Golden Crossover (50-day SMA crosses above 200-day SMA)
+    Returns stocks where 50 SMA > 200 SMA (bullish signal)
+    """
+    try:
+        q = text(
+            """
+            SELECT
+                ticker,
+                underlying_price,
+                sma_50,
+                sma_200,
+                rsi_14,
+                adx_14,
+                dist_from_50sma_pct,
+                dist_from_200sma_pct,
+                ROUND(((sma_50 - sma_200) / sma_200 * 100)::numeric, 2) as sma_diff_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date
+                AND above_50_sma = TRUE
+                AND above_200_sma = TRUE
+                AND sma_50 > sma_200
+            ORDER BY sma_diff_pct DESC
+            LIMIT :limit
+        """
+        )
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting golden crossover: {e}")
+        return []
+
+
+def get_death_crossover_stocks(date, limit=50):
+    """
+    Get stocks with Death Crossover (50-day SMA crosses below 200-day SMA)
+    Returns stocks where 50 SMA < 200 SMA (bearish signal)
+    """
+    try:
+        q = text(
+            """
+            SELECT
+                ticker,
+                underlying_price,
+                sma_50,
+                sma_200,
+                rsi_14,
+                adx_14,
+                dist_from_50sma_pct,
+                dist_from_200sma_pct,
+                ROUND(((sma_50 - sma_200) / sma_200 * 100)::numeric, 2) as sma_diff_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date
+                AND below_50_sma = TRUE
+                AND below_200_sma = TRUE
+                AND sma_50 < sma_200
+            ORDER BY sma_diff_pct ASC
+            LIMIT :limit
+        """
+        )
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting death crossover: {e}")
+        return []

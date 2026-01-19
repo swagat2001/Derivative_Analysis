@@ -6,15 +6,6 @@
 /* =============================================================
    ANIMATED BACKGROUND WITH BULL/BEAR THEME
    ============================================================= */
-@keyframes floatBull {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.15; }
-  50% { transform: translate(30px, -20px) rotate(5deg); opacity: 0.25; }
-}
-
-@keyframes floatBear {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.15; }
-  50% { transform: translate(-30px, 20px) rotate(-5deg); opacity: 0.25; }
-}
 
 @keyframes chartLine {
   0% { stroke-dashoffset: 1000; }
@@ -33,7 +24,6 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 252, 245, 0.95) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
   box-shadow:
     0 10px 40px rgba(139, 36, 50, 0.15),
     0 0 0 1px rgba(139, 36, 50, 0.08),
@@ -43,31 +33,6 @@
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-/* Animated decorative elements */
-.table-wrapper::before {
-  content: '🐂';
-  position: absolute;
-  top: 20px;
-  right: 40px;
-  font-size: 80px;
-  opacity: 0.08;
-  animation: floatBull 8s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.table-wrapper::after {
-  content: '🐻';
-  position: absolute;
-  bottom: 20px;
-  left: 40px;
-  font-size: 80px;
-  opacity: 0.08;
-  animation: floatBear 10s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
 }
 
 .table-container {
@@ -127,9 +92,16 @@
   border-spacing: 0;
   font-size: 12px;
   background: white;
-  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+table.dataTable tbody tr.odd {
+  background-color: #fff;
+}
+
+table.dataTable tbody tr.even {
+  background-color: #e3e3e3;
 }
 
 /* =============================================================
@@ -200,10 +172,6 @@
   background: white;
 }
 
-.derivatives-table tbody tr:nth-child(even) {
-  background: linear-gradient(to right, #FFFCF5 0%, #ffffff 50%, #FFFCF5 100%);
-}
-
 .derivatives-table tbody tr:hover {
   background: linear-gradient(
     to right,
@@ -248,21 +216,13 @@
   font-weight: 700;
   text-align: left;
   padding-left: 16px !important;
-  min-width: 140px !important;
-  width: 140px !important;
-  background: linear-gradient(to right, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+  min-width: 110px !important;
+  width: 110px !important;
   position: relative;
 }
 
-.cell-stock::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: linear-gradient(to bottom, #8B2432 0%, #D4AF37 100%);
-}
+/* .dt-body-center.sorting, .col-center.highlight-col.sorting { width: 61.3906px!important;} */
+
 
 .stock-link {
   color: #8B2432;
@@ -332,6 +292,7 @@ tbody td.money-clickable:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(139, 36, 50, 0.3);
   z-index: 10;
+  border: 0;
 }
 
 tbody td.money-clickable:active {
@@ -452,19 +413,29 @@ tbody td.money-clickable:active {
   background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%) !important;
   color: white !important;
   border-color: #8B2432 !important;
-  box-shadow: 0 4px 12px rgba(139, 36, 50, 0.4);
 }
 
 .dataTables_wrapper .paginate_button.current:hover {
-  background: linear-gradient(135deg, #D4AF37 0%, #E5C158 100%) !important;
-  color: #2c2c2c !important;
-  border-color: #D4AF37 !important;
+  background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%) !important;
+  color: white !important;
+  border-color: #8B2432 !important;
 }
 
 .dataTables_wrapper .paginate_button.disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {color: #ffffff!important;}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover, .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: linear-gradient(135deg, #8B2432 0%, #6B1826 100%) !important;
+  color: white !important;
+  border-color: #8B2432 !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {pointer-events: none;}
+table.dataTable thead>tr>th.sorting:before, table.dataTable thead>tr>th.sorting:after, table.dataTable thead>tr>th.sorting_asc:before, table.dataTable thead>tr>th.sorting_asc:after, table.dataTable thead>tr>th.sorting_desc:before, table.dataTable thead>tr>th.sorting_desc:after, table.dataTable thead>tr>th.sorting_asc_disabled:before, table.dataTable thead>tr>th.sorting_asc_disabled:after, table.dataTable thead>tr>th.sorting_desc_disabled:before, table.dataTable thead>tr>th.sorting_desc_disabled:after, table.dataTable thead>tr>td.sorting:before, table.dataTable thead>tr>td.sorting:after, table.dataTable thead>tr>td.sorting_asc:before, table.dataTable thead>tr>td.sorting_asc:after, table.dataTable thead>tr>td.sorting_desc:before, table.dataTable thead>tr>td.sorting_desc:after, table.dataTable thead>tr>td.sorting_asc_disabled:before, table.dataTable thead>tr>td.sorting_asc_disabled:after, table.dataTable thead>tr>td.sorting_desc_disabled:before, table.dataTable thead>tr>td.sorting_desc_disabled:after {opacity: 0.5;}
+
+
 
 /* =============================================================
    RESPONSIVE ADJUSTMENTS

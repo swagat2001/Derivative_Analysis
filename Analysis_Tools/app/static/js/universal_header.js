@@ -1,46 +1,42 @@
 // ======================================================================
-// UNIVERSAL HEADER INTERACTIVITY (User Menu + Search)
+// UNIVERSAL HEADER INTERACTIVITY
+// ScanX Style - Simple, clean
 // ======================================================================
 
 document.addEventListener("DOMContentLoaded", function () {
-  // -------------------------------
-  // USER MENU TOGGLE
-  // -------------------------------
-  const userBtn = document.querySelector(".user-btn");
-  const userDropdown = document.getElementById("userDropdown");
 
-  if (userBtn && userDropdown) {
-    userBtn.addEventListener("click", function (event) {
-      event.stopPropagation(); // Prevent click bubbling
-      const isVisible = userDropdown.style.display === "block";
-      userDropdown.style.display = isVisible ? "none" : "block";
+  // -------------------------------
+  // SEARCH INPUT - Navigate on Enter
+  // -------------------------------
+  const searchInput = document.getElementById("stockSearchInput");
+
+  if (searchInput) {
+    searchInput.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        const ticker = this.value.trim().toUpperCase();
+        if (ticker) {
+          window.location.href = "/stock/" + ticker;
+        }
+      }
     });
 
-    // Close dropdown when clicking outside
-    document.addEventListener("click", function (event) {
-      if (!userDropdown.contains(event.target) && !userBtn.contains(event.target)) {
-        userDropdown.style.display = "none";
-      }
+    // Auto-select on focus
+    searchInput.addEventListener("focus", function () {
+      this.select();
     });
   }
 
   // -------------------------------
-  // SEARCH TOGGLE (if used)
+  // ACTIVE NAV LINK HIGHLIGHTING
   // -------------------------------
-  const searchBtn = document.querySelector(".search-btn");
-  const searchDropdown = document.getElementById("searchDropdown");
+  const currentPath = window.location.pathname;
+  const navLinks = document.querySelectorAll(".nav-link");
 
-  if (searchBtn && searchDropdown) {
-    searchBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      const isVisible = searchDropdown.style.display === "block";
-      searchDropdown.style.display = isVisible ? "none" : "block";
-    });
+  navLinks.forEach(link => {
+    const href = link.getAttribute("href");
+    if (href && currentPath.startsWith(href) && href !== "/") {
+      link.classList.add("active");
+    }
+  });
 
-    document.addEventListener("click", function (event) {
-      if (!searchDropdown.contains(event.target) && !searchBtn.contains(event.target)) {
-        searchDropdown.style.display = "none";
-      }
-    });
-  }
 });

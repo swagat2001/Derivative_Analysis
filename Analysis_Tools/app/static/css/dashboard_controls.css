@@ -3,15 +3,24 @@
   background: white;
   padding: 15px 20px;
   margin-bottom: 20px;
-  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+.control-group-right {
+    max-width: 405px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
 
+.control-group-right .control-group:last-child {
+  margin-left: 10px;
+}
 .control-row {
   display: flex;
   gap: 20px;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .control-group {

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}{{ screener_title }} – Screener{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index_screener.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="screener-detail-wrapper">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="page-title">
+        {{ screener_title }}
+        <span class="page-sub">by @goldmine</span>
+      </div>
+      <div class="page-desc">
+        {{ screener_description }}
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn" onclick="window.history.back()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back
+      </button>
+      <button class="btn" onclick="exportToCSV()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export
+      </button>
+      <button class="btn primary" onclick="window.location.href='{{ url_for('screener.screener_landing') }}'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        All Screeners
+      </button>
+    </div>
+  </div>
+
+  <!-- Tag / Filter Pills -->
+  <div class="filter-section">
+    <div class="tag active">{{ screener_tag }}</div>
+    <div class="tag">All Stocks</div>
+    <div class="tag">Bullish</div>
+    <div class="tag">Bearish</div>
+  </div>
+
+  <!-- Stats Summary -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ stocks|length }}</span>
+      <span class="stat-label">Total Stocks</span>
+    </div>
+    <div class="stat-item bullish">
+      <span class="stat-value">{{ bullish_count }}</span>
+      <span class="stat-label">Bullish</span>
+    </div>
+    <div class="stat-item bearish">
+      <span class="stat-value">{{ bearish_count }}</span>
+      <span class="stat-label">Bearish</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ neutral_count }}</span>
+      <span class="stat-label">Neutral</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="stocksTable">
+      <thead>
+        <tr>
+          <th class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"/></th>
+          <th class="col-name sortable" data-sort="name">
+            Name
+            <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 15l5 5 5-5M7 9l5-5 5 5"/>
+            </svg>
+          </th>
+          <th class="col-price sortable" data-sort="price">Price</th>
+          <th class="col-change sortable" data-sort="change">Day Change</th>
+          <th class="col-pct sortable" data-sort="change_pct">Change %</th>
+          <th class="col-volume sortable" data-sort="volume">Volume</th>
+          <th class="col-oi sortable" data-sort="oi">Open Interest</th>
+          <th class="col-iv sortable" data-sort="iv">IV %</th>
+          <th class="col-signal">Signal</th>
+          <th class="col-action">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for stock in stocks %}
+        <tr class="stock-row" data-ticker="{{ stock.ticker }}">
+          <td><input type="checkbox" class="stock-checkbox" value="{{ stock.ticker }}"/></td>
+          <td class="stock-name">
+            <span class="ticker-symbol">{{ stock.ticker }}</span>
+            <span class="exchange">NSE</span>
+          </td>
+          <td class="price">₹{{ "%.2f"|format(stock.price) }}</td>
+          <td class="{{ 'positive' if stock.change > 0 else 'negative' if stock.change < 0 else '' }}">
+            {{ "+" if stock.change > 0 else "" }}{{ "%.2f"|format(stock.change) }}
+          </td>
+          <td class="{{ 'positive' if stock.change_pct > 0 else 'negative' if stock.change_pct < 0 else '' }}">
+            {{ "+" if stock.change_pct > 0 else "" }}{{ "%.2f"|format(stock.change_pct) }}%
+          </td>
+          <td class="volume">{{ "{:,}".format(stock.volume) }}</td>
+          <td class="oi">{{ "{:,}".format(stock.oi) }}</td>
+          <td class="iv">{{ "%.1f"|format(stock.iv) }}%</td>
+          <td>
+            <span class="signal-badge {{ stock.signal|lower }}">{{ stock.signal }}</span>
+          </td>
+          <td>
+            <a href="{{ url_for('stock.stock_detail', ticker=stock.ticker) }}" class="action-btn" title="View Details">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="table-footer">
+      <div class="footer-left">
+        Showing <strong>{{ stocks|length }}</strong> of <strong>{{ total_count }}</strong> results
+      </div>
+      <div class="footer-right">
+        <button class="btn-small" onclick="exportToCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+// Select All checkbox
+function toggleSelectAll() {
+  const selectAll = document.getElementById('selectAll');
+  const checkboxes = document.querySelectorAll('.stock-checkbox');
+  checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+// Export to CSV
+function exportToCSV() {
+  const table = document.getElementById('stocksTable');
+  const rows = table.querySelectorAll('tbody tr');
+
+  let csv = 'Ticker,Price,Change,Change%,Volume,OI,IV,Signal\n';
+
+  rows.forEach(row => {
+    const ticker = row.dataset.ticker;
+    const cells = row.querySelectorAll('td');
+    const price = cells[2].textContent.replace('₹', '').trim();
+    const change = cells[3].textContent.trim();
+    const changePct = cells[4].textContent.trim();
+    const volume = cells[5].textContent.replace(/,/g, '').trim();
+    const oi = cells[6].textContent.replace(/,/g, '').trim();
+    const iv = cells[7].textContent.trim();
+    const signal = cells[8].textContent.trim();
+
+    csv += `${ticker},${price},${change},${changePct},${volume},${oi},${iv},${signal}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '{{ screener_tag }}_stocks.csv';
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// Sortable columns
+document.querySelectorAll('.sortable').forEach(th => {
+  th.addEventListener('click', function() {
+    const sortKey = this.dataset.sort;
+    const table = document.getElementById('stocksTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // Toggle sort direction
+    const isAsc = this.classList.contains('sort-asc');
+    document.querySelectorAll('.sortable').forEach(h => {
+      h.classList.remove('sort-asc', 'sort-desc');
+    });
+    this.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+
+    rows.sort((a, b) => {
+      let aVal, bVal;
+      const aCell = a.querySelector(`td:nth-child(${this.cellIndex + 1})`);
+      const bCell = b.querySelector(`td:nth-child(${this.cellIndex + 1})`);
+
+      if (sortKey === 'name') {
+        aVal = aCell.textContent.trim().toLowerCase();
+        bVal = bCell.textContent.trim().toLowerCase();
+        return isAsc ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+      } else {
+        aVal = parseFloat(aCell.textContent.replace(/[₹,%,+]/g, '').replace(/,/g, '')) || 0;
+        bVal = parseFloat(bCell.textContent.replace(/[₹,%,+]/g, '').replace(/,/g, '')) || 0;
+        return isAsc ? aVal - bVal : bVal - aVal;
+      }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+  });
+});
+
+// Row click to navigate
+document.querySelectorAll('.stock-row').forEach(row => {
+  row.addEventListener('dblclick', function() {
+    const ticker = this.dataset.ticker;
+    window.location.href = `/stock/${ticker}`;
+  });
+});
+
+// Filter tags
+document.querySelectorAll('.filter-section .tag').forEach(tag => {
+  tag.addEventListener('click', function() {
+    document.querySelectorAll('.filter-section .tag').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+
+    const filter = this.textContent.trim().toLowerCase();
+    const rows = document.querySelectorAll('.stock-row');
+
+    rows.forEach(row => {
+      const signal = row.querySelector('.signal-badge').textContent.trim().toLowerCase();
+      if (filter === 'all stocks' || filter === '{{ screener_tag|lower }}') {
+        row.style.display = '';
+      } else if (filter === signal) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

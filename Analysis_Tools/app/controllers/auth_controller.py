@@ -13,7 +13,7 @@ def login():
 
         if validate_user(username, password):
             session["user"] = username
-            return redirect(url_for("dashboard.dashboard"))
+            return redirect(url_for("home.home"))
 
         flash("Invalid username or password", "error")
 

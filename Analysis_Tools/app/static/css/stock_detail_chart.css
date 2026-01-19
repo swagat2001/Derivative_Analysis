@@ -5,31 +5,31 @@
 .chart-section {
     background: white;
     padding: 1px;
-    border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin: 20px 0;
     width: 100%;
 }
 
+.chart-section .section-title {padding-left: 20px;}
+
 .section-title {
     font-size: 18px;
     font-weight: 700;
     color: #2c3e50;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
+    margin-bottom: 0;
+    padding-bottom: 15px;
     border-bottom: 2px solid #e5e7eb;
 }
 
 .price-chart-container {
     height: 400px;
-    width: 1567px;
+    width: 100%;
     background: #f9fafb;
-    border-radius: 6px;
-    padding: 10px;
+    padding: 0;
     position: relative;
-    padding-left: 10px;
-    margin-left: 10px;
 }
+
+
 
 .chart-loading {
     display: flex;

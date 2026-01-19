@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Death Crossover - Technical Screener{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="screener-container">
+
+  {% include 'components/screener_sidebar.html' %}
+
+  <main class="screener-main">
+    {% if stocks %}
+    <section class="screener-section">
+        <div class="screener-card">
+            <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="card-title">🔴 Death Crossover Stocks</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT DATE:</label>
+                        <select onchange="window.location.href='/screener/technical-indicators/death-crossover?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                            {% for d in dates %}
+                            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 30px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #dc2626;">{{ stocks|length }}</div>
+                        <div style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Total Stocks</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #dc2626;">{{ "%.1f"|format((stocks|map(attribute='sma_diff_pct')|sum / stocks|length)) if stocks else 0 }}%</div>
+                        <div style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Avg SMA Spread</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #dc2626;">{{ "%.1f"|format(stocks|map(attribute='rsi_14')|select|sum / (stocks|map(attribute='rsi_14')|select|list|length)) if stocks|map(attribute='rsi_14')|select|list else 0 }}</div>
+                        <div style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Avg RSI</div>
+                    </div>
+                </div>
+            </div>
+            <table class="card-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Symbol</th>
+                        <th>Underlying Price</th>
+                        <th>50-Day SMA</th>
+                        <th>200-Day SMA</th>
+                        <th>SMA Spread %</th>
+                        <th>RSI</th>
+                        <th>ADX</th>
+                        <th>Signal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/stock/{{ stock.ticker }}" class="symbol-link">{{ stock.ticker }}</a></td>
+                        <td>{{ "%.2f"|format(stock.underlying_price) }}</td>
+                        <td>{{ "%.2f"|format(stock.sma_50) }}</td>
+                        <td>{{ "%.2f"|format(stock.sma_200) }}</td>
+                        <td class="negative">{{ "%.2f"|format(stock.sma_diff_pct) }}%</td>
+                        <td>{{ "%.1f"|format(stock.rsi_14) if stock.rsi_14 else 'N/A' }}</td>
+                        <td>{{ "%.1f"|format(stock.adx_14) if stock.adx_14 else 'N/A' }}</td>
+                        <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">BEARISH</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% else %}
+    <div style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT DATE:</label>
+            <select onchange="window.location.href='/screener/technical-indicators/death-crossover?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                {% for d in dates %}
+                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        No Death Crossover stocks found for the selected date.<br>
+        Try selecting a different date from the dropdown above.
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}

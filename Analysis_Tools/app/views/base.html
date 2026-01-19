@@ -5,11 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Goldmine Derivatives{% endblock %}</title>
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/favicon.png') }}">
+
   <!-- Global Poppins Font -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
 
   <!-- Universal Header CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/universal_header.css') }}">
+
+  <!-- Voice Assistant CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/voice_assistant.css') }}">
 
   <!-- Page-specific CSS -->
   {% block page_css %}{% endblock %}
@@ -30,6 +36,9 @@
   {% block page_js %}{% endblock %}
   <!-- Universal Header JS -->
   <script src="{{ url_for('static', filename='js/universal_header.js') }}"></script>
+
+  <!-- Voice Assistant JS -->
+  <script src="{{ url_for('static', filename='js/voice_assistant.js') }}"></script>
 
 </body>
 </html>

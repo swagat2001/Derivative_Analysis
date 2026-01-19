@@ -5,9 +5,11 @@ from flask import Flask, redirect, request, session, url_for
 
 from .controllers.auth_controller import auth_bp
 from .controllers.dashboard_controller import dashboard_bp
+from .controllers.home_controller import home_bp
 from .controllers.screener import screener_bp
 from .controllers.screener.futures_oi.controller import cache as futures_cache
 from .controllers.screener.futures_oi.controller import futures_oi_bp
+from .controllers.screener.index_screener.controller import index_screener_bp
 from .controllers.screener.signal_analysis.controller import cache as signal_cache
 from .controllers.screener.signal_analysis.controller import signal_analysis_bp
 from .controllers.screener.technical_screener.controller import cache as tech_cache
@@ -39,13 +41,15 @@ def create_app():
     # Register blueprints
     app.register_blueprint(health_bp)  # Health check at /health
     app.register_blueprint(auth_bp)
-    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(home_bp)  # Home page at /
+    app.register_blueprint(dashboard_bp)  # Dashboard at /dashboard
     app.register_blueprint(stock_bp)
     app.register_blueprint(screener_bp)  # Landing page at /screener
     app.register_blueprint(gainers_losers_bp)  # Tables at /screener/top-gainers-losers
     app.register_blueprint(signal_analysis_bp)  # Signals at /screener/signal-analysis
     app.register_blueprint(futures_oi_bp)  # Futures OI at /screener/futures-oi
     app.register_blueprint(technical_screener_bp)  # Technical at /screener/technical
+    app.register_blueprint(index_screener_bp)  # Index screeners at /screener/index/
 
     # Add custom Jinja2 filter for expiry date formatting
     def format_expiry_date(date_str):

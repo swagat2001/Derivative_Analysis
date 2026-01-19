@@ -1,7 +1,6 @@
 <!-- ======================================================================
      UNIVERSAL HEADER - GOLDMINE DERIVATIVES PLATFORM
-     Fixed across all pages: Dashboard, Stock Detail, Screener
-     Clean, minimal, professional design inspired by screener.in
+     ScanX Style - Clean, minimal, professional design
      ====================================================================== -->
 
 <header class="universal-header">
@@ -9,7 +8,7 @@
 
     <!-- LEFT: Logo -->
     <div class="header-logo">
-      <a href="{{ url_for('dashboard.dashboard') }}" class="logo-link" title="Goldmine Derivatives">
+      <a href="{{ url_for('home.home') }}" class="logo-link" title="Goldmine Derivatives">
         <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}"
              alt="Goldmine" class="logo-img">
       </a>
@@ -17,92 +16,74 @@
 
     <!-- CENTER: Navigation -->
     <nav class="header-nav">
-      <a href="{{ url_for('dashboard.dashboard') }}"
-         class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
-        Dashboard
+      <a href="{{ url_for('home.home') }}"
+         class="nav-link {% if request.endpoint == 'home.home' %}active{% endif %}">
+        Home
       </a>
-
-      <!-- Stock Detail - Always visible, links to stock selection page -->
-      <div class="nav-stock-detail">
-        {% if request.endpoint == 'stock.stock_detail' and ticker %}
-          <a href="{{ url_for('stock.stock_detail', ticker=ticker) }}"
-             class="nav-link active">
-            {{ ticker }} Detail
-          </a>
-        {% else %}
-          <a href="{{ url_for('stock.stock_search') }}"
-             class="nav-link {% if request.endpoint == 'stock.stock_search' %}active{% endif %}">
-            Stock Detail
-          </a>
-        {% endif %}
-      </div>
-
+      <a href="#" class="nav-link">
+        News
+      </a>
+      <a href="#" class="nav-link">
+        Create
+      </a>
       <a href="{{ url_for('screener.screener_landing') }}"
-         class="nav-link {% if request.endpoint == 'screener.screener_landing' %}active{% endif %}">
-        Screener
+         class="nav-link {% if 'screener' in request.endpoint %}active{% endif %}">
+        Screeners
+      </a>
+      <a href="{{ url_for('dashboard.dashboard') }}"
+         class="nav-link {% if 'dashboard' in request.endpoint %}active{% endif %}">
+        Dashboard
       </a>
     </nav>
 
-    <!-- RIGHT: Search + User -->
-    <div class="header-right">
-      <!-- Search Icon (expandable) -->
-      <div class="header-search">
-        <button class="search-btn" type="button" title="Search stocks" onclick="toggleSearch()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-        </button>
-
-        <!-- Search Dropdown (hidden by default) -->
-        <div class="search-dropdown" id="searchDropdown" style="display: none;">
-          <form class="search-form" onsubmit="handleStockSearch(event)">
-            <input type="text"
-                   name="symbol"
-                   id="stockSearchInput"
-                   class="search-input"
-                   placeholder="Search stocks..."
-                   autocomplete="off"
-                   list="stockList">
-            <datalist id="stockList">
-              {% if stock_list %}
-                {% for symbol in stock_list %}
-                  <option value="{{ symbol }}">
-                {% endfor %}
-              {% endif %}
-            </datalist>
-          </form>
-        </div>
+    <!-- CENTER-RIGHT: Search Box -->
+    <div class="header-search">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text"
+               id="stockSearchInput"
+               class="search-input"
+               placeholder="Search for stocks"
+               autocomplete="off"
+               list="stockList"
+               onkeypress="handleSearchKeypress(event)">
+        <datalist id="stockList">
+          {% if stock_list %}
+            {% for symbol in stock_list %}
+              <option value="{{ symbol }}">
+            {% endfor %}
+          {% endif %}
+        </datalist>
       </div>
+    </div>
 
-      <!-- User Menu -->
-      <div class="header-user">
-        {% if current_user %}
-        <div class="user-menu">
-          <button class="user-btn" type="button" onclick="toggleUserMenu()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span class="user-name">{{ user_display_name or current_user }}</span>
-          </button>
-
-          <!-- User Dropdown -->
-          <div class="user-dropdown" id="userDropdown" style="display: none;">
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              Logout
-            </a>
-          </div>
+    <!-- RIGHT: Auth Buttons -->
+    <div class="header-actions">
+      {% if current_user %}
+        <div class="user-info">
+          <span class="user-greeting">Welcome,</span>
+          <span class="user-name">{{ user_display_name or current_user }}</span>
         </div>
-        {% endif %}
-      </div>
-
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+        <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Open Account</a>
+      {% endif %}
     </div>
 
   </div>
 </header>
+
+<script>
+function handleSearchKeypress(event) {
+  if (event.key === 'Enter') {
+    const ticker = document.getElementById('stockSearchInput').value.trim().toUpperCase();
+    if (ticker) {
+      window.location.href = '/stock/' + ticker;
+    }
+  }
+}
+</script>

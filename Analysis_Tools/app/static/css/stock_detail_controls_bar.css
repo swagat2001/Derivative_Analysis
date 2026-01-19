@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     gap: 30px;
-    padding: 8px 30px;
+    padding: 20px 30px;
     margin-top: 6px;
     background: linear-gradient(135deg, #7c1e1d 100%, #7c1e1d 100%);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

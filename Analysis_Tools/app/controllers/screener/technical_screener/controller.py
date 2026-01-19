@@ -13,6 +13,11 @@ from ....models.screener_model import (
     get_technical_indicators_screeners,
 )
 from ....models.stock_model import get_filtered_tickers
+from ....models.technical_screener_model import (
+    get_death_crossover_stocks,
+    get_golden_crossover_stocks,
+    get_technical_available_dates,
+)
 
 technical_screener_bp = Blueprint("technical_screener", __name__, url_prefix="/screener/technical-indicators")
 
@@ -144,3 +149,91 @@ def api_technical_data():
     except Exception as e:
         print(f"[ERROR] api_technical_data: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@technical_screener_bp.route("/golden-crossover")
+def golden_crossover():
+    """
+    Golden Crossover Screener - 50-day SMA crosses above 200-day SMA
+    """
+    try:
+        dates = get_technical_available_dates()
+        if not dates:
+            return render_template(
+                "screener/technical_screener/golden_crossover.html",
+                dates=[],
+                selected_date=None,
+                stocks=[],
+                indices=get_live_indices(),
+                stock_list=get_filtered_tickers(),
+                error="No dates available",
+            )
+
+        selected_date = request.args.get("date", dates[-1])  # Most recent date
+        stocks = get_golden_crossover_stocks(selected_date, limit=100)
+
+        # Add signal field
+        for stock in stocks:
+            stock["signal"] = "BULLISH"
+
+        print(f"[DEBUG] Golden Crossover: {len(stocks)} stocks found for {selected_date}")
+
+        return render_template(
+            "screener/technical_screener/golden_crossover.html",
+            dates=dates,
+            selected_date=selected_date,
+            stocks=stocks,
+            indices=get_live_indices(),
+            stock_list=get_filtered_tickers(),
+        )
+
+    except Exception as e:
+        print(f"[ERROR] golden_crossover route: {e}")
+        import traceback
+
+        traceback.print_exc()
+        return jsonify({"error": f"Golden Crossover failed: {str(e)}"}), 500
+
+
+@technical_screener_bp.route("/death-crossover")
+def death_crossover():
+    """
+    Death Crossover Screener - 50-day SMA crosses below 200-day SMA
+    """
+    try:
+        dates = get_technical_available_dates()
+        if not dates:
+            return render_template(
+                "screener/technical_screener/death_crossover.html",
+                dates=[],
+                selected_date=None,
+                stocks=[],
+                indices=get_live_indices(),
+                stock_list=get_filtered_tickers(),
+                error="No dates available",
+            )
+
+        selected_date = request.args.get("date", dates[-1])  # Most recent date
+        stocks = get_death_crossover_stocks(selected_date, limit=100)
+
+        # Add signal field
+        for stock in stocks:
+            stock["signal"] = "BEARISH"
+
+        print(f"[DEBUG] Death Crossover: {len(stocks)} stocks found for {selected_date}")
+
+        return render_template(
+            "screener/technical_screener/death_crossover.html",
+            dates=dates,
+            selected_date=selected_date,
+            stocks=stocks,
+            indices=get_live_indices(),
+            stock_list=get_filtered_tickers(),
+        )
+
+    except Exception as e:
+        print(f"[ERROR] death_crossover route: {e}")
+        import traceback
+
+        traceback.print_exc()
+        return jsonify({"error": f"Death Crossover failed: {str(e)}"}), 500

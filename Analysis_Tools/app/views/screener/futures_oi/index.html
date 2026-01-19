@@ -2,38 +2,41 @@
 {% block title %}Futures OI Analysis{% endblock %}
 
 {% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/futures_oi.css') }}">
 {% endblock %}
 
 {% block content %}
+<div class="screener-container">
+
+  {% include 'components/screener_sidebar.html' %}
+
+  <main class="screener-main">
 <div class="futures-oi-container">
-
-    <div class="futures-oi-header">
-        <h1>📦 Futures OI Analysis</h1>
-        <p>Open Interest analysis across Current Month, Next Month, and Far Month expiries</p>
-    </div>
-
-    <div class="futures-oi-controls">
-        <label>Select Date:</label>
-        <select onchange="window.location.href='/screener/futures-oi?date='+this.value;">
-            {% for d in dates %}
-            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-        </select>
-    </div>
 
     {% if futures_data and (futures_data.CME or futures_data.NME or futures_data.FME) %}
 
     <!-- CME Section -->
-    <div class="expiry-section">
-        <div class="expiry-title">
-            Current Month Expiry (CME)
-            <span class="expiry-badge">{{ futures_data.CME|length }} Stocks</span>
+    <section class="screener-section">
+        <div class="section-title" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span>Current Month Expiry (CME)</span>
+                <span style="background: #8b2432; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{{ futures_data.CME|length }} Stocks</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT DATE:</label>
+                <select onchange="window.location.href='/screener/futures-oi?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                    {% for d in dates %}
+                    <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
 
         {% if futures_data.CME %}
-        <div class="expiry-table-card">
-            <table class="expiry-table">
+        <div class="screener-card">
+            <table class="card-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -51,10 +54,10 @@
                     {% for item in futures_data.CME %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                        <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                         <td>{{ item.expiry_date }}</td>
-                        <td>₹{{ "%.2f"|format(item.expiry_price) }}</td>
+                        <td>{{ "%.2f"|format(item.expiry_price) }}</td>
                         <td>{{ item.expiry_oi|int|format_number }}</td>
                         <td>
                             <span class="percentile-bar">
@@ -68,27 +71,27 @@
                             </span>
                             <span class="percentile-value">{{ "%.1f"|format(item.price_percentile) }}%</span>
                         </td>
-                        <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                        <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; {% if item.signal|lower == 'bullish' %}background: #d1fae5; color: #065f46;{% else %}background: #fee2e2; color: #991b1b;{% endif %}">{{ item.signal }}</span></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="no-data-message">No CME data available for this date</div>
+        <div style="text-align: center; padding: 20px; color: #6b7280;">No CME data available for this date</div>
         {% endif %}
-    </div>
+    </section>
 
     <!-- NME Section -->
-    <div class="expiry-section">
-        <div class="expiry-title">
-            Next Month Expiry (NME)
-            <span class="expiry-badge">{{ futures_data.NME|length }} Stocks</span>
+    <section class="screener-section">
+        <div class="section-title" style="display: flex; align-items: center; gap: 15px;">
+            <span>Next Month Expiry (NME)</span>
+            <span style="background: #8b2432; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{{ futures_data.NME|length }} Stocks</span>
         </div>
 
         {% if futures_data.NME %}
-        <div class="expiry-table-card">
-            <table class="expiry-table">
+        <div class="screener-card">
+            <table class="card-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -106,10 +109,10 @@
                     {% for item in futures_data.NME %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                        <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                         <td>{{ item.expiry_date }}</td>
-                        <td>₹{{ "%.2f"|format(item.expiry_price) }}</td>
+                        <td>{{ "%.2f"|format(item.expiry_price) }}</td>
                         <td>{{ item.expiry_oi|int|format_number }}</td>
                         <td>
                             <span class="percentile-bar">
@@ -123,27 +126,27 @@
                             </span>
                             <span class="percentile-value">{{ "%.1f"|format(item.price_percentile) }}%</span>
                         </td>
-                        <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                        <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; {% if item.signal|lower == 'bullish' %}background: #d1fae5; color: #065f46;{% else %}background: #fee2e2; color: #991b1b;{% endif %}">{{ item.signal }}</span></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="no-data-message">No NME data available for this date</div>
+        <div style="text-align: center; padding: 20px; color: #6b7280;">No NME data available for this date</div>
         {% endif %}
-    </div>
+    </section>
 
     <!-- FME Section -->
-    <div class="expiry-section">
-        <div class="expiry-title">
-            Far Month Expiry (FME)
-            <span class="expiry-badge">{{ futures_data.FME|length }} Stocks</span>
+    <section class="screener-section">
+        <div class="section-title" style="display: flex; align-items: center; gap: 15px;">
+            <span>Far Month Expiry (FME)</span>
+            <span style="background: #8b2432; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{{ futures_data.FME|length }} Stocks</span>
         </div>
 
         {% if futures_data.FME %}
-        <div class="expiry-table-card">
-            <table class="expiry-table">
+        <div class="screener-card">
+            <table class="card-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -161,10 +164,10 @@
                     {% for item in futures_data.FME %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><a href="/stock/{{ item.ticker }}" class="ticker-link">{{ item.ticker }}</a></td>
-                        <td>₹{{ "%.2f"|format(item.underlying_price) }}</td>
+                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
                         <td>{{ item.expiry_date }}</td>
-                        <td>₹{{ "%.2f"|format(item.expiry_price) }}</td>
+                        <td>{{ "%.2f"|format(item.expiry_price) }}</td>
                         <td>{{ item.expiry_oi|int|format_number }}</td>
                         <td>
                             <span class="percentile-bar">
@@ -178,23 +181,33 @@
                             </span>
                             <span class="percentile-value">{{ "%.1f"|format(item.price_percentile) }}%</span>
                         </td>
-                        <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                        <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; {% if item.signal|lower == 'bullish' %}background: #d1fae5; color: #065f46;{% else %}background: #fee2e2; color: #991b1b;{% endif %}">{{ item.signal }}</span></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="no-data-message">No FME data available for this date</div>
+        <div style="text-align: center; padding: 20px; color: #6b7280;">No FME data available for this date</div>
         {% endif %}
-    </div>
+    </section>
 
     {% else %}
-    <div class="no-data-message">
+    <div style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT DATE:</label>
+            <select onchange="window.location.href='/screener/futures-oi?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                {% for d in dates %}
+                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </div>
         No Futures OI data available for the selected date.<br>
         Please run the database update to generate cache data.
     </div>
     {% endif %}
 
+</div>
+  </main>
 </div>
 {% endblock %}

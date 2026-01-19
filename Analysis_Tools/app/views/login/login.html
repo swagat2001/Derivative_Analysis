@@ -10,128 +10,124 @@
 <body>
   <div class="login-page">
     <!-- LEFT VISUAL PANEL -->
-    <div class="login-visual">
-      <div class="visual-content">
-        <h1>Trade Smarter with AI-Powered Insights</h1>
-        <p>Advanced derivatives analysis platform built for professional traders</p>
-
-        <div class="visual-features">
-          <div class="feature-item">Real-time Options Chain Analysis</div>
-          <div class="feature-item">AI-Driven Market Predictions</div>
-          <div class="feature-item">Advanced Greeks Calculations</div>
-          <div class="feature-item">Institutional-Grade Analytics</div>
-        </div>
-      </div>
-
-      <!-- Placeholder for 3D illustration -->
-      <div class="visual-illustration">
-        <!-- Bull & Bear Market Symbols -->
-        <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Bull (Uptrend) -->
-          <g opacity="0.3">
-            <path d="M100 250 Q120 200 140 250" stroke="#D4AF37" stroke-width="4" stroke-linecap="round"/>
-            <circle cx="95" cy="240" r="8" fill="#D4AF37"/>
-            <circle cx="105" cy="240" r="8" fill="#D4AF37"/>
-            <path d="M85 235 L95 225 L105 235" stroke="#D4AF37" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </g>
-
-          <!-- Bear (Downtrend) -->
-          <g opacity="0.25">
-            <path d="M300 150 Q280 200 260 150" stroke="rgba(255,255,255,0.4)" stroke-width="4" stroke-linecap="round"/>
-            <circle cx="295" cy="160" r="6" fill="rgba(255,255,255,0.4)"/>
-            <circle cx="305" cy="160" r="6" fill="rgba(255,255,255,0.4)"/>
-          </g>
-
-          <!-- Candlestick Chart Pattern -->
-          <g opacity="0.2" transform="translate(150, 200)">
-            <rect x="0" y="10" width="8" height="30" fill="#00ff00" opacity="0.5"/>
-            <line x1="4" y1="0" x2="4" y2="50" stroke="#00ff00" stroke-width="2" opacity="0.5"/>
-
-            <rect x="15" y="5" width="8" height="40" fill="#ff0000" opacity="0.5"/>
-            <line x1="19" y1="0" x2="19" y2="55" stroke="#ff0000" stroke-width="2" opacity="0.5"/>
-
-            <rect x="30" y="15" width="8" height="25" fill="#00ff00" opacity="0.5"/>
-            <line x1="34" y1="5" x2="34" y2="45" stroke="#00ff00" stroke-width="2" opacity="0.5"/>
-          </g>
-
-          <!-- Upward Arrow Trend -->
-          <g opacity="0.2">
-            <path d="M50 350 L100 300 L150 320 L200 250 L250 270 L300 200"
-                  stroke="rgba(212, 175, 55, 0.6)" stroke-width="4"
-                  stroke-linecap="round" fill="none"
-                  stroke-dasharray="10,5"/>
-            <polygon points="300,200 290,210 310,210" fill="rgba(212, 175, 55, 0.6)"/>
-          </g>
-
-          <!-- Abstract Circles (Market Bubbles) -->
-          <circle cx="80" cy="100" r="25" fill="rgba(255,255,255,0.1)"/>
-          <circle cx="320" cy="320" r="35" fill="rgba(212, 175, 55, 0.08)"/>
-          <circle cx="200" cy="150" r="20" fill="rgba(255,255,255,0.12)"/>
-
-          <!-- Rupee Symbol -->
-          <g opacity="0.15" transform="translate(250, 280)">
-            <text x="0" y="0" font-size="40" font-weight="bold" fill="white">₹</text>
-          </g>
-        </svg>
-      </div>
-    </div>
-
-    <!-- RIGHT FORM PANEL -->
-    <div class="login-card-wrapper">
-      <div class="login-card">
-        <div class="login-header">
+    <div class="login-box">
+      <div class="login-visual">
+        <div class="visual-content">
           <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine Logo" class="login-logo"/>
-          <h1 class="login-title">Welcome Back</h1>
-          <p class="login-subtitle">Sign in to your derivatives analysis platform</p>
+          <h1>Trade Smarter with AI-Powered Insights</h1>
+          <p>Advanced derivatives analysis platform built for professional traders</p>
+
+          <div class="visual-features">
+            <div class="feature-item">Real-time Options Chain Analysis</div>
+            <div class="feature-item">AI-Driven Market Predictions</div>
+            <div class="feature-item">Advanced Greeks Calculations</div>
+            <div class="feature-item">Institutional-Grade Analytics</div>
+          </div>
         </div>
 
-        {% with messages = get_flashed_messages(category_filter=['error']) %}
-          {% if messages %}
-            <div class="login-error">
-              <strong>⚠</strong> {{ messages[0] }}
+        <!-- Placeholder for 3D illustration -->
+        <div class="visual-illustration">
+          <!-- Bull & Bear Market Symbols -->
+          <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Bull (Uptrend) -->
+            <g opacity="0.3">
+              <path d="M100 250 Q120 200 140 250" stroke="#D4AF37" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="95" cy="240" r="8" fill="#D4AF37"/>
+              <circle cx="105" cy="240" r="8" fill="#D4AF37"/>
+              <path d="M85 235 L95 225 L105 235" stroke="#D4AF37" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </g>
+
+            <!-- Bear (Downtrend) -->
+            <g opacity="0.25">
+              <path d="M300 150 Q280 200 260 150" stroke="rgba(255,255,255,0.4)" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="295" cy="160" r="6" fill="rgba(255,255,255,0.4)"/>
+              <circle cx="305" cy="160" r="6" fill="rgba(255,255,255,0.4)"/>
+            </g>
+
+            <!-- Candlestick Chart Pattern -->
+            <g opacity="0.2" transform="translate(150, 200)">
+              <rect x="0" y="10" width="8" height="30" fill="#00ff00" opacity="0.5"/>
+              <line x1="4" y1="0" x2="4" y2="50" stroke="#00ff00" stroke-width="2" opacity="0.5"/>
+
+              <rect x="15" y="5" width="8" height="40" fill="#ff0000" opacity="0.5"/>
+              <line x1="19" y1="0" x2="19" y2="55" stroke="#ff0000" stroke-width="2" opacity="0.5"/>
+
+              <rect x="30" y="15" width="8" height="25" fill="#00ff00" opacity="0.5"/>
+              <line x1="34" y1="5" x2="34" y2="45" stroke="#00ff00" stroke-width="2" opacity="0.5"/>
+            </g>
+
+            <!-- Upward Arrow Trend -->
+            <g opacity="0.2">
+              <path d="M50 350 L100 300 L150 320 L200 250 L250 270 L300 200"
+                    stroke="rgba(212, 175, 55, 0.6)" stroke-width="4"
+                    stroke-linecap="round" fill="none"
+                    stroke-dasharray="10,5"/>
+              <polygon points="300,200 290,210 310,210" fill="rgba(212, 175, 55, 0.6)"/>
+            </g>
+
+            <!-- Abstract Circles (Market Bubbles) -->
+            <circle cx="80" cy="100" r="25" fill="rgba(255,255,255,0.1)"/>
+            <circle cx="320" cy="320" r="35" fill="rgba(212, 175, 55, 0.08)"/>
+            <circle cx="200" cy="150" r="20" fill="rgba(255,255,255,0.12)"/>
+
+            <!-- Rupee Symbol -->
+            <g opacity="0.15" transform="translate(250, 280)">
+              <text x="0" y="0" font-size="40" font-weight="bold" fill="white">₹</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+
+      <!-- RIGHT FORM PANEL -->
+      <div class="login-card-wrapper">
+        <div class="login-card">
+          <h2 class="login-title">Welcome Back</h2>
+          <p class="login-subtitle">Sign in to your derivatives analysis platform</p>
+          {% with messages = get_flashed_messages(category_filter=['error']) %}
+            {% if messages %}
+              <div class="login-error">
+                <strong>⚠</strong> {{ messages[0] }}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <form method="post" class="login-form" action="{{ url_for('auth.login') }}">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                autofocus
+                placeholder="Enter your username"
+                autocomplete="username"
+              />
             </div>
-          {% endif %}
-        {% endwith %}
 
-        <form method="post" class="login-form" action="{{ url_for('auth.login') }}">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              required
-              autofocus
-              placeholder="Enter your username"
-              autocomplete="username"
-            />
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="Enter your password"
+                autocomplete="current-password"
+              />
+            </div>
+
+            <button type="submit" class="login-button">
+              Sign In
+            </button>
+          </form>
+
+          <div class="login-footnote">
+            <p>🔒 Secure access to your platform</p>
+            <p>Test: <strong>admin</strong> / <strong>admin123</strong></p>
+            <p style="margin-top: 18px; font-size: 15px;">Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up</a></p>
           </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="Enter your password"
-              autocomplete="current-password"
-            />
-          </div>
-
-          <button type="submit" class="login-button">
-            Sign In
-          </button>
-        </form>
-
-        <div class="login-footnote">
-          <p style="color: #7c7e8c; font-size: 13px; margin-bottom: 10px;">🔒 Secure access to your platform</p>
-          <p style="font-size: 13px; color: #a0a3b1;">
-            Test: <strong style="color: #5a5a5a;">admin</strong> / <strong style="color: #5a5a5a;">admin123</strong>
-          </p>
-          <p style="margin-top: 18px; font-size: 15px;">
-            Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up</a>
-          </p>
         </div>
       </div>
     </div>
