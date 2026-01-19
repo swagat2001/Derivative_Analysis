@@ -1,0 +1,120 @@
+<!-- Universal Screener Sidebar with Built-in Styles -->
+<style>
+/* ===== SIDEBAR STYLES ===== */
+.screener-sidebar {
+    width: 260px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 16px;
+    border: 1px solid #e5e7eb;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+    flex-shrink: 0;
+}
+
+.screener-sidebar h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 16px 0;
+    padding-left: 12px;
+}
+
+.screener-sidebar hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 12px 0;
+}
+
+.screener-sidebar .menu-item {
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    color: #444;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.screener-sidebar .menu-item:hover {
+    background: #f3f4f6;
+    color: #1a1a1a;
+}
+
+.screener-sidebar .menu-item.active {
+    background: linear-gradient(135deg, #ffeeee 0%, #fee8e8 100%);
+    color: var(--goldmine-maroon);
+    font-weight: 600;
+}
+
+.screener-sidebar .menu-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+/* ===== RESPONSIVE SIDEBAR ===== */
+@media (max-width: 1024px) {
+    .screener-sidebar {
+        width: 100%;
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 16px;
+    }
+
+    .screener-sidebar h3 {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .screener-sidebar hr {
+        display: none;
+    }
+
+    .screener-sidebar .menu-item {
+        padding: 8px 14px;
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .screener-sidebar .menu-item {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}
+</style>
+
+<aside class="screener-sidebar">
+  <h3>Screeners</h3>
+  <a href="{{ url_for('screener.screener_landing') }}" class="menu-item {% if request.endpoint == 'screener.screener_landing' %}active{% endif %}">
+    <span class="menu-icon">🔍</span> Explore
+  </a>
+  <div class="menu-item">
+    <span class="menu-icon">📡</span> Live Market Scanner
+  </div>
+  <div class="menu-item">
+    <span class="menu-icon">⚡</span> By Goldmine
+  </div>
+  <div class="menu-item">
+    <span class="menu-icon">⭐</span> Following
+  </div>
+  <div class="menu-item">
+    <span class="menu-icon">🚀</span> Boosted
+  </div>
+  <div class="menu-item">
+    <span class="menu-icon">🔗</span> Shared With Me
+  </div>
+  <hr>
+  <div class="menu-item">
+    <span class="menu-icon">💾</span> My Saved Screeners
+  </div>
+</aside>

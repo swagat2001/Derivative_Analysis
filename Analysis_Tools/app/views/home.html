@@ -1,0 +1,627 @@
+{% extends "base.html" %}
+{% block title %}Goldmine – Stock Screener & Derivatives Analysis Platform{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+<!-- Slick Slider CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+{% endblock %}
+
+
+{% block content %}
+<div class="home-wrapper">
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Single platform for <span class="highlight">stock market analysis</span>,
+          execution & management of trades.
+        </h1>
+        <p class="hero-subtitle">
+          We're providing Technical screeners to help you express your trading & investing ideas,
+          to help you analyse the markets better. Stock Markets are the true indicator
+          of the growth of any country's economy.
+        </p>
+        <div class="hero-actions">
+          <a href="{{ url_for('screener.screener_landing') }}" class="btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            Explore Screeners
+          </a>
+          <a href="{{ url_for('dashboard.dashboard') }}" class="btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            Go to Dashboard
+          </a>
+        </div>
+
+        <!-- Market Statistics Section -->
+        <div class="market-statistics">
+          <div class="stats-header">
+            <h3>Market Statistics</h3>
+            <span class="stats-timestamp">As on 09-Jan-2026 15:36 IST</span>
+          </div>
+
+          <div class="stats-grid-top">
+            <div class="stat-card purple">
+              <div class="stat-label">Stock Traded</div>
+              <div class="stat-value">3,240</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-label">Advances</div>
+              <div class="stat-value">747</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">Declines</div>
+              <div class="stat-value">2,395</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-label">Unchanged</div>
+              <div class="stat-value">98</div>
+            </div>
+          </div>
+
+          <div class="stats-grid-bottom">
+            <div class="stat-item">
+              <div class="stat-item-label">No. of Stocks at</div>
+              <div class="stat-item-title">52 Week High</div>
+              <div class="stat-item-value up">▲ 27</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-label">No. of Stocks at</div>
+              <div class="stat-item-title">52 Week Low</div>
+              <div class="stat-item-value down">307 ▼</div>
+            </div>
+            <div class="stat-center-icon">
+              <img src="../static/image/favicon.png" alt="" />
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-label">No. of Stocks in</div>
+              <div class="stat-item-title">Upper Circuit</div>
+              <div class="stat-item-value up">40</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-label">No. of Stocks in</div>
+              <div class="stat-item-title">Lower Circuit</div>
+              <div class="stat-item-value down">84</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-cards-grid">
+          <div class="hero-card">
+            <div class="card-header">
+              <span class="card-title">NIFTY 50</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value up" id="nifty50Value">24,677.80</div>
+                <div class="card-change up" id="nifty50Change">▲ +0.42%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card red">
+            <div class="card-header">
+              <span class="card-title">BANK NIFTY</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value down" id="bankniftyValue">51,234.50</div>
+                <div class="card-change down" id="bankniftyChange">▼ -0.18%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <div class="card-header">
+              <span class="card-title">SENSEX</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value up" id="sensexValue">83,758.43</div>
+                <div class="card-change up" id="sensexChange">▲ +1.23%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <div class="card-header">
+              <span class="card-title">NIFTY FIN</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value up" id="niftyfinValue">23,890.40</div>
+                <div class="card-change up" id="niftyfinChange">▲ +0.67%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card red">
+            <div class="card-header">
+              <span class="card-title">NIFTY NEXT 50</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value down" id="niftynext50Value">68,499.30</div>
+                <div class="card-change down" id="niftynext50Change">▼ -1.01%</div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-card red">
+            <div class="card-header">
+              <span class="card-title">NIFTY 100</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value down" id="nifty100Value">26,260.30</div>
+                <div class="card-change down" id="nifty100Change">▼ -0.76%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Index Info Section -->
+        <div class="index-detail-section">
+          <div class="index-detail-header">
+            <div class="index-detail-left">
+              <h2 class="index-name" id="selectedIndexName">NIFTY 50 <span class="arrow">›</span></h2>
+              <div class="index-main-value" id="selectedIndexValue">24,677.80</div>
+              <div class="index-main-change down" id="selectedIndexChange">-185.70 (-0.72%)</div>
+            </div>
+            <div class="index-detail-right">
+              <div class="index-stats">
+                <div class="stat-item">
+                  <span class="stat-dot open"></span>
+                  <span class="stat-label">Open</span>
+                  <span class="stat-value" id="indexOpen">25,840.40</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-dot high"></span>
+                  <span class="stat-label">High</span>
+                  <span class="stat-value" id="indexHigh">25,940.60</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-dot low"></span>
+                  <span class="stat-label">Low</span>
+                  <span class="stat-value" id="indexLow">25,623.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Large Chart Below Cards -->
+        <div class="hero-chart-large">
+          <canvas id="marketIndexChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES SECTION ===== -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>Everything you need for smarter trading</h2>
+      <p>Powerful tools built for Indian markets</p>
+    </div>
+
+    <div class="features-grid">
+      <a href="{{ url_for('screener.screener_landing') }}" class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>50+ Readymade Screeners</h3>
+        <p>Fundamental, Technical, Intraday & Derivative screeners built by experts. Filter stocks with razor-sharp efficiency.</p>
+        <span class="feature-link">Explore Screeners →</span>
+      </a>
+
+      <a href="{{ url_for('dashboard.dashboard') }}" class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Derivatives Dashboard</h3>
+        <p>Complete options analysis with Delta, Vega, OI tracking. Monitor Call & Put activity across all strikes.</p>
+        <span class="feature-link">Open Dashboard →</span>
+      </a>
+
+      <a href="{{ url_for('screener.screener_landing') }}" class="feature-card">
+        <div class="feature-icon">🗺️</div>
+        <h3>Stock Heatmaps</h3>
+        <p>Zoom out and get the complete picture of the market. Discover performance of every stock in an index.</p>
+        <span class="feature-link">View Heatmaps →</span>
+      </a>
+
+      <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Top Gainers & Losers</h3>
+        <p>40 categories of market movers - OI, IV, Moneyness analysis for Calls, Puts & Futures in real-time.</p>
+        <span class="feature-link">See Rankings →</span>
+      </a>
+
+      <a href="{{ url_for('signal_analysis.signal_analysis') }}" class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Signal Analysis</h3>
+        <p>Advanced bullish/bearish classification with multi-factor scoring. AI-powered trade signals.</p>
+        <span class="feature-link">Check Signals →</span>
+      </a>
+
+      <a href="{{ url_for('technical_screener.technical_screener') }}" class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Technical Indicators</h3>
+        <p>RSI, MACD, SMA crossovers, ADX trends. Interactive heatmaps for quick technical analysis.</p>
+        <span class="feature-link">Analyze Now →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== SCREENER TYPES SECTION ===== -->
+  <section class="screener-types-section">
+    <div class="section-header">
+      <h2>Screeners for every trading style</h2>
+      <p>Whether you're a day trader or long-term investor</p>
+    </div>
+
+    <div class="screener-tabs">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="fundamental">Fundamental</button>
+        <button class="tab-btn" data-tab="technical">Technical</button>
+        <button class="tab-btn" data-tab="intraday">Intraday</button>
+        <button class="tab-btn" data-tab="derivative">Derivative</button>
+      </div>
+
+      <div class="tab-content active" id="fundamental">
+        <div class="tab-description">
+          <h3>Fundamental Screeners</h3>
+          <p>For traders and investors who want to look at cold hard facts about a company's financial health. Screen stocks based on EPS, P/E, Working Capital, and more for better stock picking.</p>
+          <ul class="screener-list">
+            <li>📌 Nifty 50 Analysis</li>
+            <li>📌 Bank Nifty Constituents</li>
+            <li>📌 High OI Buildup Stocks</li>
+            <li>📌 IV Spike Alerts</li>
+          </ul>
+          <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View All Screeners</a>
+        </div>
+        <div class="tab-visual">
+          <div class="mini-table">
+            <div class="mini-row header">
+              <span>Stock</span>
+              <span>Price</span>
+              <span>Change</span>
+            </div>
+            <div class="mini-row">
+              <span>RELIANCE</span>
+              <span>₹1,473.20</span>
+              <span class="down">-2.06%</span>
+            </div>
+            <div class="mini-row">
+              <span>HDFCBANK</span>
+              <span>₹1,746.40</span>
+              <span class="down">-0.28%</span>
+            </div>
+            <div class="mini-row">
+              <span>ICICIBANK</span>
+              <span>₹1,434.50</span>
+              <span class="up">+0.48%</span>
+            </div>
+            <div class="mini-row">
+              <span>TCS</span>
+              <span>₹3,845.60</span>
+              <span class="up">+1.19%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="technical">
+        <div class="tab-description">
+          <h3>Technical Screeners</h3>
+          <p>Built to help you capture stocks when they trend towards specific price points and zones. Ideal for traders who want to identify Crossovers, Breakouts, and momentum shifts.</p>
+          <ul class="screener-list">
+            <li>📌 Golden Crossover (50/200 SMA)</li>
+            <li>📌 RSI Overbought/Oversold</li>
+            <li>📌 MACD Signal Crossover</li>
+            <li>📌 Strong ADX Trending</li>
+          </ul>
+          <a href="{{ url_for('technical_screener.technical_screener') }}" class="btn-outline">View Technical Screeners</a>
+        </div>
+        <div class="tab-visual">
+          <div class="indicator-cards">
+            <div class="ind-card">
+              <span class="ind-label">RSI</span>
+              <span class="ind-value">67.4</span>
+              <span class="ind-status neutral">Neutral</span>
+            </div>
+            <div class="ind-card">
+              <span class="ind-label">MACD</span>
+              <span class="ind-value">+12.5</span>
+              <span class="ind-status bullish">Bullish</span>
+            </div>
+            <div class="ind-card">
+              <span class="ind-label">ADX</span>
+              <span class="ind-value">32.1</span>
+              <span class="ind-status bullish">Strong</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="intraday">
+        <div class="tab-description">
+          <h3>Intraday Screeners</h3>
+          <p>Move quickly between 9:15 to 3:30 with day trading screeners. Choose from High Volume Stocks, Intraday Recovery, Gap Up/Down, and more.</p>
+          <ul class="screener-list">
+            <li>📌 Price Gainers Today</li>
+            <li>📌 Price Losers Today</li>
+            <li>📌 High Volume Alerts</li>
+            <li>📌 Breakout Scanner</li>
+          </ul>
+          <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View Intraday Screeners</a>
+        </div>
+        <div class="tab-visual">
+          <div class="live-ticker">
+            <div class="ticker-item up">
+              <span class="ticker-symbol">TATAMOTORS</span>
+              <span class="ticker-change">+4.2%</span>
+            </div>
+            <div class="ticker-item up">
+              <span class="ticker-symbol">ADANIENT</span>
+              <span class="ticker-change">+3.8%</span>
+            </div>
+            <div class="ticker-item down">
+              <span class="ticker-symbol">WIPRO</span>
+              <span class="ticker-change">-2.1%</span>
+            </div>
+            <div class="ticker-item up">
+              <span class="ticker-symbol">BHARTIARTL</span>
+              <span class="ticker-change">+2.9%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="derivative">
+        <div class="tab-description">
+          <h3>Derivative Screeners</h3>
+          <p>Advanced F&O analysis with OI buildup, IV tracking, and options flow. Perfect for options traders looking for edge in the market.</p>
+          <ul class="screener-list">
+            <li>📌 Top Gainers & Losers (40 Tables)</li>
+            <li>📌 Signal Analysis</li>
+            <li>📌 Futures OI Analysis</li>
+            <li>📌 Options Chain Insights</li>
+          </ul>
+          <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="btn-outline">View Derivative Screeners</a>
+        </div>
+        <div class="tab-visual">
+          <div class="oi-bars">
+            <div class="oi-bar">
+              <span class="oi-label">Call OI</span>
+              <div class="bar-wrapper">
+                <div class="bar call" style="width: 65%"></div>
+              </div>
+              <span class="oi-value">12.5L</span>
+            </div>
+            <div class="oi-bar">
+              <span class="oi-label">Put OI</span>
+              <div class="bar-wrapper">
+                <div class="bar put" style="width: 45%"></div>
+              </div>
+              <span class="oi-value">8.9L</span>
+            </div>
+            <div class="oi-bar">
+              <span class="oi-label">PCR</span>
+              <div class="bar-wrapper">
+                <div class="bar pcr" style="width: 71%"></div>
+              </div>
+              <span class="oi-value">0.71</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MARKET INSIGHTS SECTION ===== -->
+  <section class="insights-section">
+    <div class="insights-grid">
+      <div class="insight-card fii-dii">
+        <div class="insight-header">
+          <h3>FII/DII Activity</h3>
+          <span class="insight-badge">Live</span>
+        </div>
+        <div class="insight-content">
+          <div class="activity-row">
+            <span class="activity-label">FII (Net)</span>
+            <span class="activity-value down">-₹2,345 Cr</span>
+          </div>
+          <div class="activity-row">
+            <span class="activity-label">DII (Net)</span>
+            <span class="activity-value up">+₹1,890 Cr</span>
+          </div>
+          <p class="insight-note">Check the money flow by FIIs and DIIs. This reveals the true strength of markets.</p>
+        </div>
+      </div>
+
+      <div class="insight-card market-mood">
+        <div class="insight-header">
+          <h3>Market Breadth</h3>
+          <span class="insight-badge">Today</span>
+        </div>
+        <div class="insight-content">
+          <div class="breadth-visual">
+            <div class="breadth-bar">
+              <div class="advance" style="width: 55%">
+                <span>1,245</span>
+              </div>
+              <div class="decline" style="width: 45%">
+                <span>1,023</span>
+              </div>
+            </div>
+            <div class="breadth-labels">
+              <span class="up">Advances</span>
+              <span class="down">Declines</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-card pe-ratio">
+        <div class="insight-header">
+          <h3>Nifty PE Ratio</h3>
+          <span class="insight-badge">Valuation</span>
+        </div>
+        <div class="insight-content">
+          <div class="pe-value">22.4</div>
+          <div class="pe-status">
+            <span class="status-dot yellow"></span>
+            <span>Fairly Valued</span>
+          </div>
+          <div class="pe-range">
+            <span>15</span>
+            <div class="range-bar">
+              <div class="range-marker" style="left: 50%"></div>
+            </div>
+            <span>30</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Start analyzing the market today</h2>
+      <p>Join thousands of traders using Goldmine for smarter investment decisions</p>
+      <div class="cta-actions">
+        <a href="{{ url_for('auth.signup') }}" class="btn-primary large">
+          Create Free Account
+        </a>
+        <a href="{{ url_for('screener.screener_landing') }}" class="btn-secondary large">
+          Explore Screeners
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="home-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine" class="footer-logo">
+        <p>Stock Screener & Derivatives Analysis Platform Built for India</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Products</h4>
+          <a href="{{ url_for('screener.screener_landing') }}">Screeners</a>
+          <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+          <a href="#">Heatmaps</a>
+          <a href="#">Insights</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="#">Documentation</a>
+          <a href="#">API</a>
+          <a href="#">Blog</a>
+          <a href="#">Support</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About Us</a>
+          <a href="#">Contact</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Goldmine Stocks Pvt Ltd. All rights reserved.</p>
+    </div>
+  </footer>
+
+</div>
+{% endblock %}
+
+{% block page_js %}
+<!-- jQuery (required for Slick Slider) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Slick Slider JS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<!-- Chart.js for market index charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+
+<!-- Market data from Flask backend -->
+<script>
+const marketData = {
+  nifty50: { value: 24677.80, change: 0.42, open: 25840.40, high: 25940.60, low: 25623.00 },
+  banknifty: { value: 51234.50, change: -0.18, open: 51450.00, high: 51550.30, low: 51100.20 },
+  sensex: { value: 83758.43, change: 1.23, open: 83200.00, high: 83900.50, low: 83150.00 },
+  niftyfin: { value: 23890.40, change: 0.67, open: 23750.00, high: 23950.00, low: 23700.00 },
+  niftynext50: { value: 68499.30, change: -1.01, open: 69200.00, high: 69350.00, low: 68400.00 },
+  niftyfinservice: { value: 27388.75, change: -1.03, open: 27680.00, high: 27750.00, low: 27350.00 },
+  nifty100: { value: 26260.30, change: -0.76, open: 26450.00, high: 26500.00, low: 26200.00 }
+};
+</script>
+
+<!-- Market charts initialization -->
+<script src="{{ url_for('static', filename='js/home_market_charts.js') }}"></script>
+<!-- Live indices updates -->
+<script src="{{ url_for('static', filename='js/home_live_updates.js') }}"></script>
+<!-- Slick Slider initialization -->
+<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+<script>
+// Timeframe button switching
+document.querySelectorAll('.timeframe-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    // Update buttons
+    document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+
+    // Here you can add logic to update chart data based on timeframe
+    const timeframe = this.dataset.timeframe;
+    console.log('Selected timeframe:', timeframe);
+    // TODO: Update chart with new timeframe data
+  });
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const tabId = this.dataset.tab;
+
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+  });
+});
+
+// Animate on scroll (simple version)
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('animate-in');
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.feature-card, .insight-card').forEach(el => {
+  observer.observe(el);
+});
+</script>
+{% endblock %}
