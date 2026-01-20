@@ -259,7 +259,7 @@ def api_live_indices():
 
 
 # -----------------------------------------------------------
-# ðŸ“¤ Export to Excel
+# 📤 Export to Excel
 # -----------------------------------------------------------
 @dashboard_bp.route("/export", methods=["GET"])
 def export_dashboard():
@@ -361,8 +361,8 @@ def export_dashboard():
 @dashboard_bp.route("/api/historical-chart-data")
 def get_historical_chart_data():
     """
-    OPTIMIZED: Returns 40-day historical data using SINGLE batch query instead of 40+ queries
-    This reduces query time from 8-10 seconds to under 1 second.
+    OPTIMIZED: Returns 40-day historical data using SINGLE batch query
+    FIXED: Proper data type conversion to avoid string/int comparison errors
     """
     ticker = request.args.get("ticker")
     option_type = request.args.get("option_type")  # 'call' or 'put'
@@ -384,9 +384,7 @@ def get_historical_chart_data():
         base_table = f"TBL_{ticker}"
         opt_type_param = "CE" if option_type == "call" else "PE"
 
-        # -------------------------------------------------------------
-        # 🚀 OPTIMIZED: Single batch query for ALL 40 days of data
-        # -------------------------------------------------------------
+        # Single batch query for ALL 40 days of data
         batch_query = text(
             f"""
             WITH date_range AS (
@@ -400,18 +398,18 @@ def get_historical_chart_data():
                 SELECT
                     d."BizDt"::DATE AS "BizDt",
                     d."OptnTp",
-                    d."StrkPric",
-                    d."TtlTradgVol",
-                    d."OpnIntrst",
-                    d."TtlTrfVal",
-                    d."vega"
+                    CAST(d."StrkPric" AS FLOAT) AS "StrkPric",
+                    CAST(d."TtlTradgVol" AS FLOAT) AS "TtlTradgVol",
+                    CAST(d."OpnIntrst" AS FLOAT) AS "OpnIntrst",
+                    CAST(d."TtlTrfVal" AS FLOAT) AS "TtlTrfVal",
+                    CAST(d."vega" AS FLOAT) AS "vega"
                 FROM "{table_name}" d
                 INNER JOIN date_range dr ON d."BizDt"::DATE = dr."BizDt"
             ),
             base_data AS (
                 SELECT DISTINCT
                     b."BizDt"::DATE AS "BizDt",
-                    b."UndrlygPric"
+                    CAST(b."UndrlygPric" AS FLOAT) AS "UndrlygPric"
                 FROM "{base_table}" b
                 INNER JOIN date_range dr ON b."BizDt"::DATE = dr."BizDt"
             ),
@@ -440,35 +438,41 @@ def get_historical_chart_data():
         """
         )
 
-        # Execute single optimized query (replaces 40+ queries!)
+        # Execute query
         df_all = pd.read_sql(batch_query, engine, params={"curr_date": curr_date})
 
         if df_all.empty:
             return jsonify({"error": "No data", "success": False}), 404
 
-        # Process data in memory (much faster than multiple DB queries)
+        # Ensure all numeric columns are proper floats (double safety)
+        numeric_columns = ["StrkPric", "UndrlygPric", "TtlTradgVol", "OpnIntrst", "TtlTrfVal", "vega"]
+        for col in numeric_columns:
+            if col in df_all.columns:
+                df_all[col] = pd.to_numeric(df_all[col], errors="coerce")
+
+        # Process data
         historical_data = []
         dates = sorted(df_all["BizDt"].unique())
 
         for date in dates:
             try:
                 date_str = str(date)
-                date_data = df_all[df_all["BizDt"] == date]
+                date_data = df_all[df_all["BizDt"] == date].copy()
 
                 if date_data.empty:
                     continue
 
-                # Get underlying price
+                # Get underlying price (now guaranteed to be numeric)
                 underlying_price = date_data["UndrlygPric"].dropna()
                 if underlying_price.empty:
                     continue
                 underlying_price = float(underlying_price.iloc[0])
 
                 # Calculate PCR
-                put_volume = date_data[date_data["OptnTp"] == "PE"]["TtlTradgVol"].sum()
-                call_volume = date_data[date_data["OptnTp"] == "CE"]["TtlTradgVol"].sum()
-                put_oi = date_data[date_data["OptnTp"] == "PE"]["OpnIntrst"].sum()
-                call_oi = date_data[date_data["OptnTp"] == "CE"]["OpnIntrst"].sum()
+                put_volume = float(date_data[date_data["OptnTp"] == "PE"]["TtlTradgVol"].sum())
+                call_volume = float(date_data[date_data["OptnTp"] == "CE"]["TtlTradgVol"].sum())
+                put_oi = float(date_data[date_data["OptnTp"] == "PE"]["OpnIntrst"].sum())
+                call_oi = float(date_data[date_data["OptnTp"] == "CE"]["OpnIntrst"].sum())
 
                 pcr_volume = round(put_volume / call_volume, 4) if call_volume > 0 else 0
                 pcr_oi = round(put_oi / call_oi, 4) if call_oi > 0 else 0
@@ -495,20 +499,27 @@ def get_historical_chart_data():
                 }
 
                 if metric == "money":
+                    # Now both StrkPric and underlying_price are guaranteed numeric
                     if option_type == "call":
                         mask = (date_data["OptnTp"] == "CE") & (date_data["StrkPric"] < underlying_price)
                     else:
                         mask = (date_data["OptnTp"] == "PE") & (date_data["StrkPric"] > underlying_price)
 
                     itm_contracts = date_data[mask]
-                    total_money = (itm_contracts["TtlTrfVal"] * abs(itm_contracts["StrkPric"] - underlying_price)).sum()
-                    data_point["value"] = float(total_money)
+                    if not itm_contracts.empty:
+                        total_money = (
+                            itm_contracts["TtlTrfVal"] * abs(itm_contracts["StrkPric"] - underlying_price)
+                        ).sum()
+                        data_point["value"] = float(total_money)
+                    else:
+                        data_point["value"] = 0.0
                     data_point["metric_label"] = "Money"
 
                 elif metric == "vega":
                     if strike and strike != "N/A":
+                        strike_float = float(strike)
                         strike_data = date_data[
-                            (date_data["OptnTp"] == opt_type_param) & (date_data["StrkPric"] == float(strike))
+                            (date_data["OptnTp"] == opt_type_param) & (date_data["StrkPric"] == strike_float)
                         ]
                         value = float(strike_data["vega"].iloc[0]) if not strike_data.empty else 0
                         data_point["value"] = value
@@ -522,6 +533,9 @@ def get_historical_chart_data():
 
             except Exception as e:
                 print(f"[ERROR] {ticker} | {date} | {e}")
+                import traceback
+
+                traceback.print_exc()
                 continue
 
         return jsonify({"success": True, "ticker": ticker, "data": historical_data})

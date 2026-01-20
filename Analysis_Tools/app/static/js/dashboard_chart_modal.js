@@ -41,7 +41,7 @@ function openChartModal(el) {
     const params = new URLSearchParams({ticker: stock, option_type: optionType, metric: metric, date: date});
     if (strike && strike !== 'N/A') params.append('strike', strike);
 
-    fetch(`/api/historical-chart-data?${params}`)
+    fetch(`/dashboard/api/historical-chart-data?${params}`)
         .then(r => r.json())
         .then(result => {
             loading.style.display = 'none';
@@ -52,8 +52,9 @@ function openChartModal(el) {
                 canvas.style.display = 'block';
             }
         })
-        .catch(() => {
+        .catch(error => {
             loading.style.display = 'none';
+            console.error('Chart error:', error);
             canvas.innerHTML = '<div class="chart-loading">Error loading chart</div>';
             canvas.style.display = 'block';
         });
