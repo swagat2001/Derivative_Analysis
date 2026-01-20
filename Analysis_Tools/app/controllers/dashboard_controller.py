@@ -66,6 +66,10 @@ def dashboard():
 
         # Handle empty dates gracefully
         if not dates:
+            # Support AJAX requests
+            if request.args.get("ajax") == "true":
+                return jsonify({"data": [], "dates": [], "selected_date": None, "mtype": "TOTAL"})
+
             return render_template(
                 "dashboard.html",
                 data=[],
@@ -98,6 +102,10 @@ def dashboard():
         # Fetch all data (DON'T paginate for client-side DataTables)
         all_data = get_dashboard_data(selected_date, mtype)
         data_list = [dict(row) for row in all_data]
+
+        # If AJAX request, return JSON instead of HTML
+        if request.args.get("ajax") == "true":
+            return jsonify({"data": data_list, "dates": dates, "selected_date": selected_date, "mtype": mtype})
 
         return render_template(
             "dashboard.html",
