@@ -16,6 +16,65 @@
 }
 
 /* ============================= */
+/* BACK BUTTON STYLES */
+/* ============================= */
+
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.back-btn:hover {
+  background: #f9fafb;
+  border-color: #8B2432;
+  color: #8B2432;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.back-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Mobile responsive styles for back button */
+@media (max-width: 768px) {
+  .back-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .back-button-container {
+    margin-bottom: 16px;
+  }
+}
+
+/* ============================= */
 /* GRID LAYOUT */
 /* ============================= */
 

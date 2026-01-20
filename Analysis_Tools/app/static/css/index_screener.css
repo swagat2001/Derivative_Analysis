@@ -103,10 +103,26 @@
 
 /* ===== Filter Section ===== */
 .filter-section {
+  position: sticky;
+  top: 66px; /* Account for header height */
+  z-index: 999;
   display: flex;
   gap: 10px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  padding: 16px 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Mobile responsive adjustments for sticky filters */
+@media (max-width: 768px) {
+  .filter-section {
+    top: 60px; /* Smaller header on mobile */
+    padding: 12px 0;
+    gap: 8px;
+  }
 }
 
 .tag {

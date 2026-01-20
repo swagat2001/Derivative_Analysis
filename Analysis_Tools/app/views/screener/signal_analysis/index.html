@@ -6,9 +6,27 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <style>
     /* Signal Analysis Specific Styles */
-    .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .signal-header { position: sticky; top: 66px; z-index: 999; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px 0; background: #ffffff; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .signal-header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; }
     .filter-buttons { display: flex; gap: 10px; }
+    
+    /* Mobile responsive adjustments for sticky signal header */
+    @media (max-width: 768px) {
+        .signal-header {
+            top: 60px; /* Smaller header on mobile */
+            padding: 12px 0;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .signal-header h1 {
+            font-size: 20px;
+        }
+        .filter-buttons {
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+    }
     .filter-btn { padding: 8px 20px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-decoration: none; color: #333; }
     .filter-btn:hover { border-color: #8B2432; color: #8B2432; }
     .filter-btn.active { background: #8B2432; color: white; border-color: #8B2432; }
@@ -49,6 +67,17 @@
   {% include 'components/screener_sidebar.html' %}
 
   <main class="screener-main">
+
+    <!-- Back Button -->
+    <div class="back-button-container" style="margin-bottom: 20px;">
+      <button class="back-btn" onclick="window.location.href='{{ url_for('screener.screener_landing') }}'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Screeners
+      </button>
+    </div>
+
     <div class="date-control">
         <label>Select Date:</label>
         <select onchange="window.location.href='/screener/signal-analysis?date='+this.value+'&filter={{ signal_filter }}&sort={{ sort_by }}&order={{ sort_order }}';">
