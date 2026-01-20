@@ -3,10 +3,13 @@ Screener controller for Important Screener page.
 OPTIMIZED: Uses single-pass data fetching with Flask-Caching.
 Includes PDF export functionality with Goldmine letterhead design.
 
+NOTE: Signal computation is centralized in app.services.signal_service
+      This controller imports from there to ensure consistency across the app.
+
 IMPROVEMENTS:
 1. Futures tables now exclude Strike column in PDF (all values are 0)
 2. Proper path handling for templates and images
-3. FINAL SIGNALS (BULLISH / BEARISH) loaded from screener cache (preferred)
+3. FINAL SIGNALS (BULLISH / BEARISH) computed using centralized signal service
    - Displayed in the screener UI (final_signals)
    - Printed as a separate table in the PDF after all 40 tables and before disclaimer
 """
@@ -25,6 +28,9 @@ from ....models.dashboard_model import get_available_dates
 from ....models.screener_model import get_all_screener_data
 from ....models.stock_model import get_filtered_tickers
 from ....models.technical_screener_model import get_heatmap_data
+
+# Import from centralized signal service (SINGLE SOURCE OF TRUTH)
+from ....services.signal_service import compute_signals_from_screener_data
 
 gainers_losers_bp = Blueprint("gainers_losers", __name__, url_prefix="/screener/top-gainers-losers")
 
@@ -50,92 +56,13 @@ def clear_cache():
 # ========================================================================
 
 
-def _compute_final_signals_from_db_rows(screener_data):
-    """Pure membership-based bullish/bearish scoring"""
-
-    bullish_sections = [
-        "iv_call_gainers",
-        "iv_call_itm_gainers",
-        "iv_call_otm_gainers",
-        "iv_put_losers",
-        "iv_put_itm_losers",
-        "iv_put_otm_losers",
-        "oi_call_gainers",
-        "oi_call_itm_gainers",
-        "oi_call_otm_gainers",
-        "oi_put_losers",
-        "oi_put_itm_losers",
-        "oi_put_otm_losers",
-        "moneyness_call_gainers",
-        "moneyness_call_itm_gainers",
-        "moneyness_call_otm_gainers",
-        "moneyness_put_losers",
-        "moneyness_put_itm_losers",
-        "moneyness_put_otm_losers",
-        "future_oi_gainers",
-    ]
-
-    bearish_sections = [
-        "iv_call_losers",
-        "iv_call_itm_losers",
-        "iv_call_otm_losers",
-        "iv_put_gainers",
-        "iv_put_itm_gainers",
-        "iv_put_otm_gainers",
-        "oi_call_losers",
-        "oi_call_itm_losers",
-        "oi_call_otm_losers",
-        "oi_put_gainers",
-        "oi_put_itm_gainers",
-        "oi_put_otm_gainers",
-        "moneyness_call_losers",
-        "moneyness_call_itm_losers",
-        "moneyness_call_otm_losers",
-        "moneyness_put_gainers",
-        "moneyness_put_itm_gainers",
-        "moneyness_put_otm_gainers",
-        "future_oi_losers",
-    ]
-
-    bullish_cnt = {}
-    bearish_cnt = {}
-
-    # count bullish membership
-    for sec in bullish_sections:
-        for r in screener_data.get(sec, []):
-            t = r.get("ticker")
-            if t:
-                bullish_cnt[t] = bullish_cnt.get(t, 0) + 1
-
-    # count bearish membership
-    for sec in bearish_sections:
-        for r in screener_data.get(sec, []):
-            t = r.get("ticker")
-            if t:
-                bearish_cnt[t] = bearish_cnt.get(t, 0) + 1
-
-    # final classification - handle ties as NEUTRAL
-    finals = {}
-    all_tickers = set(list(bullish_cnt.keys()) + list(bearish_cnt.keys()))
-
-    for t in all_tickers:
-        b = bullish_cnt.get(t, 0)
-        s = bearish_cnt.get(t, 0)
-        if b > s:
-            finals[t] = "BULLISH"
-        elif s > b:
-            finals[t] = "BEARISH"
-        else:
-            finals[t] = "NEUTRAL"  # Equal counts = neutral
-
-    return finals
-
-
 @cache.memoize(timeout=3600)
 def get_screener_data_formatted(selected_date):
     """
     Single data fetch - cached for 1 hour.
     Returns None if no data available.
+
+    NOTE: Signal computation uses centralized service from app.services.signal_service
     """
     try:
         all_data = get_all_screener_data(selected_date)
@@ -199,8 +126,8 @@ def get_screener_data_formatted(selected_date):
         screener_data["future_moneyness_gainers"] = all_data["moneyness"]["FUT"]["ALL"][:10]
         screener_data["future_moneyness_losers"] = all_data["moneyness"]["FUT"]["ALL_LOSERS"][:10]
 
-        # Build final signals (preferred: read from DB rows if present)
-        screener_data["final_signals"] = _compute_final_signals_from_db_rows(screener_data)
+        # Build final signals using CENTRALIZED signal service (SINGLE SOURCE OF TRUTH)
+        screener_data["final_signals"] = compute_signals_from_screener_data(screener_data)
 
         return screener_data
 
@@ -477,7 +404,6 @@ def top_gainers_losers():
 
         # pass final_signals to template for UI display
         final_signals = screener_data.get("final_signals", {})
-        print("FINAL SIGNALS UI →", final_signals)
 
         return render_template(
             "screener/top_gainers_losers/index.html",
@@ -524,7 +450,7 @@ def create_screener_pdf(screener_data, selected_date):
         from playwright.sync_api import sync_playwright
         from PyPDF2 import PdfMerger
 
-        print("[INFO] 📄 Starting PDF generation with Playwright...")
+        print("[INFO] Starting PDF generation with Playwright...")
 
         # ============================================================
         # CALCULATE DATE FROM SELECTED_DATE PARAMETER
@@ -545,20 +471,16 @@ def create_screener_pdf(screener_data, selected_date):
         # ============================================================
         # PATHS (Using correct paths from your project structure)
         # ============================================================
-        print("[INFO] 🗂️  Setting up paths...")
+        print("[INFO] Setting up paths...")
         base_views = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\views\screener\top_gainers_losers"
         cover_path = os.path.join(base_views, "screener_cover_a4.html")
         table_path = os.path.join(base_views, "screener_table_pages.html")
         asset = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\static\image"
 
-        print(f"[DEBUG] Cover path: {cover_path}")
-        print(f"[DEBUG] Table path: {table_path}")
-        print(f"[DEBUG] Asset path: {asset}")
-
         # ============================================================
         # CONVERT IMAGES TO BASE64
         # ============================================================
-        print("[INFO] 🖼️  Encoding images to base64...")
+        print("[INFO] Encoding images to base64...")
 
         def img_to_base64(img_path):
             """Convert image file to base64 data URL"""
@@ -575,8 +497,6 @@ def create_screener_pdf(screener_data, selected_date):
         ig_b64 = img_to_base64(os.path.join(asset, "instagram_icon.png"))
         li_b64 = img_to_base64(os.path.join(asset, "linkedin_icon.png"))
         yt_b64 = img_to_base64(os.path.join(asset, "youtube_icon.png"))
-
-        print("[INFO] ✓ Images encoded")
 
         # ============================================================
         # HELPER FUNCTIONS
@@ -604,7 +524,7 @@ def create_screener_pdf(screener_data, selected_date):
         # ============================================================
         # STEP 1: PREPARE COVER HTML
         # ============================================================
-        print("[INFO] 📖 Step 1: Reading cover HTML...")
+        print("[INFO] Step 1: Reading cover HTML...")
         with open(cover_path, "r", encoding="utf-8") as f:
             cover_html = f.read()
 
@@ -636,12 +556,10 @@ def create_screener_pdf(screener_data, selected_date):
         cover_html = cover_html.replace('src="/static/image/linkedin_icon.png"', f'src="{li_b64}"')
         cover_html = cover_html.replace('src="/static/image/youtube_icon.png"', f'src="{yt_b64}"')
 
-        print("[INFO] ✓ Cover HTML prepared")
-
         # ============================================================
         # STEP 2: PREPARE TABLES HTML (Generate all 40 mini-tables)
         # ============================================================
-        print("[INFO] 📊 Step 2: Generating 40 tables with mini-table HTML...")
+        print("[INFO] Step 2: Generating 40 tables with mini-table HTML...")
 
         with open(table_path, "r", encoding="utf-8") as f:
             tables_html = f.read()
@@ -714,7 +632,7 @@ def create_screener_pdf(screener_data, selected_date):
         # final signals table generator (placed AFTER all 40 tables and BEFORE disclaimer)
         def make_final_signal_table(final_signals, max_rows=50):
             """
-            final_signals: dict {ticker: 'BULLISH'|'BEARISH'}
+            final_signals: dict {ticker: 'BULLISH'|'BEARISH'|'NEUTRAL'}
             Sorted: All BULLISH first (alphabetical), then BEARISH (alphabetical).
             """
             if not isinstance(final_signals, dict):
@@ -754,20 +672,6 @@ def create_screener_pdf(screener_data, selected_date):
         def make_signal_analysis_table(signals_data, rows_per_page=28):
             """
             Generate Signal Analysis HTML table for PDF with automatic pagination
-            Splits into multiple pages if data exceeds rows_per_page
-
-            signals_data: dict from get_signal_data_formatted() with structure:
-            {
-                'ticker': {
-                    'signal': 'BULLISH' or 'BEARISH' or 'NEUTRAL',
-                    'bullish_count': int,
-                    'bearish_count': int,
-                    'bullish_categories': [list],
-                    'bearish_categories': [list]
-                }
-            }
-
-            Returns: Complete HTML with <div class="content"> wrappers and page breaks
             """
             if not isinstance(signals_data, dict):
                 signals_data = {}
@@ -786,44 +690,24 @@ def create_screener_pdf(screener_data, selected_date):
                     bullish_list.append((ticker, data, score))
                 elif signal == "BEARISH":
                     bearish_list.append((ticker, data, score))
-                # NEUTRAL signals are excluded
 
-            # Sort BULLISH by score descending (highest positive scores first)
             bullish_list.sort(key=lambda x: x[2], reverse=True)
-
-            # Sort BEARISH by score ascending (most negative scores first, i.e., strongest bearish)
             bearish_list.sort(key=lambda x: x[2])
-
-            # Combine: All BULLISH first, then all BEARISH
             combined = bullish_list + bearish_list
-
-            # Remove score from tuple (keep only ticker and data)
             sorted_signals = [(ticker, data) for ticker, data, score in combined]
 
             if not sorted_signals:
                 return """<div class="content">
             <h2>Signal Analysis Summary</h2>
             <table class="signal-analysis-table">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">#</th>
-                        <th style="width: 15%;">Symbol</th>
-                        <th style="width: 12%;">Signal</th>
-                        <th style="width: 15%;">Strength</th>
-                    </tr>
-                </thead>
                 <tbody>
                     <tr><td colspan='4' style='text-align:center; padding:8px; color:#999;'>No signal data available</td></tr>
                 </tbody>
             </table>
         </div>"""
 
-            # Calculate number of pages needed
             total_rows = len(sorted_signals)
             total_pages = (total_rows + rows_per_page - 1) // rows_per_page
-
-            print(f"[INFO] Signal Analysis: {total_rows} rows → {total_pages} page(s)")
-
             html_output = ""
 
             for page_num in range(total_pages):
@@ -831,14 +715,10 @@ def create_screener_pdf(screener_data, selected_date):
                 end_idx = min(start_idx + rows_per_page, total_rows)
                 page_data = sorted_signals[start_idx:end_idx]
 
-                # Start page
                 html_output += '<div class="content">\n'
-
-                # Page title
                 if page_num == 0:
                     html_output += "    <h2>Signal Analysis Summary</h2>\n"
 
-                # Table header
                 html_output += """    <table class="signal-analysis-table">
                         <thead>
                             <tr style="background: #333; color: white;">
@@ -851,25 +731,21 @@ def create_screener_pdf(screener_data, selected_date):
                         <tbody>
         """
 
-                # Table rows
                 for idx, (ticker, data) in enumerate(page_data):
                     global_row_num = start_idx + idx + 1
                     signal = data.get("signal", "NEUTRAL")
                     bullish_count = data.get("bullish_count", 0)
                     bearish_count = data.get("bearish_count", 0)
-
-                    # Badge class
                     badge_class = (
                         "bullish" if signal == "BULLISH" else ("bearish" if signal == "BEARISH" else "neutral")
                     )
 
-                    # Row background based on signal type
                     if signal == "BULLISH":
-                        bg = "#d4edda"  # Light green for bullish
+                        bg = "#d4edda"
                     elif signal == "BEARISH":
-                        bg = "#f8d7da"  # Light red for bearish
+                        bg = "#f8d7da"
                     else:
-                        bg = "#fff3cd"  # Light yellow for neutral (shouldn't appear now)
+                        bg = "#fff3cd"
 
                     html_output += f"            <tr style='background:{bg};'>\n"
                     html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0; text-align:center;'>{global_row_num}</td>\n"
@@ -878,46 +754,39 @@ def create_screener_pdf(screener_data, selected_date):
                     html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><div class='signal-strength'><span class='bull'>🟢 {bullish_count}</span><span class='bear'>🔴 {bearish_count}</span></div></td>\n"
                     html_output += "            </tr>\n"
 
-                # Close table and content div
                 html_output += "        </tbody>\n    </table>\n</div>\n"
 
-                # Add page break if not last page
                 if page_num < total_pages - 1:
                     html_output += '\n<div style="page-break-before: always;"></div>\n\n'
 
             return html_output
 
-        # Generate all 40 tables (26 for Options + 4 for Futures)
+        # Generate all 40 tables
         replacements = {
-            # OI - Calls (6)
             "{{oi_call_gainers_table}}": make_mini_table(safe("oi_call_gainers"), "Top 10 Call OI Gainers (ALL)"),
             "{{oi_call_itm_gainers_table}}": make_mini_table(safe("oi_call_itm_gainers"), "Top 10 ITM Call OI Gainers"),
             "{{oi_call_otm_gainers_table}}": make_mini_table(safe("oi_call_otm_gainers"), "Top 10 OTM Call OI Gainers"),
             "{{oi_call_losers_table}}": make_mini_table(safe("oi_call_losers"), "Top 10 Call OI Losers (ALL)"),
             "{{oi_call_itm_losers_table}}": make_mini_table(safe("oi_call_itm_losers"), "Top 10 ITM Call OI Losers"),
             "{{oi_call_otm_losers_table}}": make_mini_table(safe("oi_call_otm_losers"), "Top 10 OTM Call OI Losers"),
-            # OI - Puts (6)
             "{{oi_put_gainers_table}}": make_mini_table(safe("oi_put_gainers"), "Top 10 Put OI Gainers (ALL)"),
             "{{oi_put_itm_gainers_table}}": make_mini_table(safe("oi_put_itm_gainers"), "Top 10 ITM Put OI Gainers"),
             "{{oi_put_otm_gainers_table}}": make_mini_table(safe("oi_put_otm_gainers"), "Top 10 OTM Put OI Gainers"),
             "{{oi_put_losers_table}}": make_mini_table(safe("oi_put_losers"), "Top 10 Put OI Losers (ALL)"),
             "{{oi_put_itm_losers_table}}": make_mini_table(safe("oi_put_itm_losers"), "Top 10 ITM Put OI Losers"),
             "{{oi_put_otm_losers_table}}": make_mini_table(safe("oi_put_otm_losers"), "Top 10 OTM Put OI Losers"),
-            # IV - Calls (6)
             "{{iv_call_gainers_table}}": make_mini_table(safe("iv_call_gainers"), "Top 10 IV Call Gainers (ALL)"),
             "{{iv_call_itm_gainers_table}}": make_mini_table(safe("iv_call_itm_gainers"), "Top 10 ITM Call IV Gainers"),
             "{{iv_call_otm_gainers_table}}": make_mini_table(safe("iv_call_otm_gainers"), "Top 10 OTM Call IV Gainers"),
             "{{iv_call_losers_table}}": make_mini_table(safe("iv_call_losers"), "Top 10 IV Call Losers (ALL)"),
             "{{iv_call_itm_losers_table}}": make_mini_table(safe("iv_call_itm_losers"), "Top 10 ITM Call IV Losers"),
             "{{iv_call_otm_losers_table}}": make_mini_table(safe("iv_call_otm_losers"), "Top 10 OTM Call IV Losers"),
-            # IV - Puts (6)
             "{{iv_put_gainers_table}}": make_mini_table(safe("iv_put_gainers"), "Top 10 IV Put Gainers (ALL)"),
             "{{iv_put_itm_gainers_table}}": make_mini_table(safe("iv_put_itm_gainers"), "Top 10 ITM IV Put Gainers"),
             "{{iv_put_otm_gainers_table}}": make_mini_table(safe("iv_put_otm_gainers"), "Top 10 OTM IV Put Gainers"),
             "{{iv_put_losers_table}}": make_mini_table(safe("iv_put_losers"), "Top 10 IV Put Losers (ALL)"),
             "{{iv_put_itm_losers_table}}": make_mini_table(safe("iv_put_itm_losers"), "Top 10 ITM IV Put Losers"),
             "{{iv_put_otm_losers_table}}": make_mini_table(safe("iv_put_otm_losers"), "Top 10 OTM IV Put Losers"),
-            # Moneyness - Calls (6)
             "{{moneyness_call_gainers_table}}": make_mini_table(
                 safe("moneyness_call_gainers"), "Top 10 Moneyness Call Gainers (ALL)"
             ),
@@ -936,7 +805,6 @@ def create_screener_pdf(screener_data, selected_date):
             "{{moneyness_call_otm_losers_table}}": make_mini_table(
                 safe("moneyness_call_otm_losers"), "Top 10 OTM Moneyness Call Losers"
             ),
-            # Moneyness - Puts (6)
             "{{moneyness_put_gainers_table}}": make_mini_table(
                 safe("moneyness_put_gainers"), "Top 10 Moneyness Put Gainers (ALL)"
             ),
@@ -955,7 +823,6 @@ def create_screener_pdf(screener_data, selected_date):
             "{{moneyness_put_otm_losers_table}}": make_mini_table(
                 safe("moneyness_put_otm_losers"), "Top 10 OTM Moneyness Put Losers"
             ),
-            # Futures (4) - NOW PASSING is_future=True TO REMOVE STRIKE COLUMN ✅
             "{{future_oi_gainers_table}}": make_mini_table(
                 safe("future_oi_gainers"), "Top 10 Future OI Gainers", is_future=True
             ),
@@ -970,30 +837,23 @@ def create_screener_pdf(screener_data, selected_date):
             ),
         }
 
-        # Insert all 40 tables
         for placeholder, value in replacements.items():
             tables_html = tables_html.replace(placeholder, value)
 
-        # Insert final signals table AFTER all 40 tables and BEFORE disclaimer
         final_signals_html = make_final_signal_table(screener_data.get("final_signals", {}), max_rows=200)
         tables_html = tables_html.replace("{{final_signal_table}}", final_signals_html)
 
-        print("[INFO] ✓ Tables HTML prepared (40 tables + final signals table)")
-
         # ============================================================
-        # INSERT SIGNAL ANALYSIS TABLE
+        # INSERT SIGNAL ANALYSIS TABLE (uses centralized signal service via signal_analysis controller)
         # ============================================================
-        print("[INFO] 📊 Generating Signal Analysis table...")
+        print("[INFO] Generating Signal Analysis table...")
 
-        # Import signal analysis data function
         from ..signal_analysis.controller import get_signal_data_formatted as get_signals
 
-        # Fetch signal analysis data for the same date
         signal_analysis_data = get_signals(selected_date)
 
         if signal_analysis_data:
             signal_analysis_html = make_signal_analysis_table(signal_analysis_data, rows_per_page=27)
-            print(f"[INFO]   ✓ Signal Analysis table generated")
         else:
             signal_analysis_html = """<div class="content">
             <h2>Signal Analysis Summary</h2>
@@ -1003,33 +863,26 @@ def create_screener_pdf(screener_data, selected_date):
                 </tbody>
             </table>
         </div>"""
-            print("[WARN]   No signal analysis data found")
 
-        # Replace placeholder in HTML
         tables_html = tables_html.replace("{{signal_analysis_placeholder}}", signal_analysis_html)
-
-        print("[INFO] ✓ Signal Analysis table inserted")
 
         # ============================================================
         # INSERT TECHNICAL HEATMAP SECTION
         # ============================================================
-        print("[INFO] 📊 Generating Technical Heatmap...")
+        print("[INFO] Generating Technical Heatmap...")
 
         technical_heatmap_html = generate_technical_heatmap_html(selected_date)
         tables_html = tables_html.replace("{{technical_heatmap_section}}", technical_heatmap_html)
 
-        print("[INFO] ✓ Technical Heatmap inserted")
-
         # ============================================================
         # STEP 3: RENDER TO PDF WITH PLAYWRIGHT
         # ============================================================
-        print("[INFO] 🖨️  Step 3: Rendering to PDF with Playwright...")
+        print("[INFO] Step 3: Rendering to PDF with Playwright...")
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
 
-            # Create temporary HTML files
             with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False, encoding="utf-8") as cover_file:
                 cover_file.write(cover_html)
                 cover_temp_path = cover_file.name
@@ -1038,12 +891,9 @@ def create_screener_pdf(screener_data, selected_date):
                 tables_file.write(tables_html)
                 tables_temp_path = tables_file.name
 
-            # Convert Windows path to file:// URL
             cover_url = f'file:///{cover_temp_path.replace(chr(92), "/")}'
             tables_url = f'file:///{tables_temp_path.replace(chr(92), "/")}'
 
-            # Render cover page
-            print("[INFO]   → Rendering cover page...")
             page.goto(cover_url)
             page.wait_for_load_state("networkidle")
             cover_pdf_bytes = page.pdf(
@@ -1051,10 +901,7 @@ def create_screener_pdf(screener_data, selected_date):
                 print_background=True,
                 margin={"top": "0px", "right": "0px", "bottom": "0px", "left": "0px"},
             )
-            print("[INFO]   ✓ Cover page rendered")
 
-            # Render tables
-            print("[INFO]   → Rendering tables...")
             page.goto(tables_url)
             page.wait_for_load_state("networkidle")
             tables_pdf_bytes = page.pdf(
@@ -1062,11 +909,9 @@ def create_screener_pdf(screener_data, selected_date):
                 print_background=True,
                 margin={"top": "0mm", "right": "0mm", "bottom": "0mm", "left": "0mm"},
             )
-            print("[INFO]   ✓ Tables rendered")
 
             browser.close()
 
-            # Cleanup temp files
             try:
                 os.unlink(cover_temp_path)
                 os.unlink(tables_temp_path)
@@ -1076,26 +921,21 @@ def create_screener_pdf(screener_data, selected_date):
         # ============================================================
         # STEP 4: MERGE PDFs
         # ============================================================
-        print("[INFO] 🔗 Step 4: Merging PDFs...")
+        print("[INFO] Step 4: Merging PDFs...")
         merger = PdfMerger()
 
-        # Add cover
         cover_buffer = BytesIO(cover_pdf_bytes)
         merger.append(cover_buffer)
-        print("[INFO]   ✓ Cover added")
 
-        # Add tables
         tables_buffer = BytesIO(tables_pdf_bytes)
         merger.append(tables_buffer)
-        print("[INFO]   ✓ Tables added")
 
-        # Write final PDF
         final_buffer = BytesIO()
         merger.write(final_buffer)
         merger.close()
 
         final_buffer.seek(0)
-        print("[INFO] ✅ PDF generation complete!")
+        print("[INFO] PDF generation complete!")
         return final_buffer
 
     except Exception as e:
@@ -1121,7 +961,6 @@ def export_screener_pdf():
         if not selected_date:
             return jsonify({"error": "Date parameter required"}), 400
 
-        # Reuse cached data - no duplicate query!
         screener_data = get_screener_data_formatted(selected_date)
 
         if not screener_data:

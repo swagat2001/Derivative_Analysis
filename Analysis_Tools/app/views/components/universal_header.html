@@ -20,18 +20,19 @@
          class="nav-link {% if request.endpoint == 'home.home' %}active{% endif %}">
         Home
       </a>
-      <a href="#" class="nav-link">
+      <a href="{{ url_for('news.news_page') }}"
+         class="nav-link {% if request.endpoint and 'news' in request.endpoint %}active{% endif %}">
         News
       </a>
       <a href="#" class="nav-link">
         Create
       </a>
       <a href="{{ url_for('screener.screener_landing') }}"
-         class="nav-link {% if 'screener' in request.endpoint %}active{% endif %}">
+         class="nav-link {% if request.endpoint and 'screener' in request.endpoint %}active{% endif %}">
         Screeners
       </a>
       <a href="{{ url_for('dashboard.dashboard') }}"
-         class="nav-link {% if 'dashboard' in request.endpoint %}active{% endif %}">
+         class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">
         Dashboard
       </a>
     </nav>

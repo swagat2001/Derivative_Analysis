@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category_name }} - Stock Market News | Goldmine{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/news.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="news-container">
+
+    <!-- Page Header -->
+    <div class="news-header">
+        <div class="news-header-content">
+            <h1 class="news-title">
+                <svg class="news-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+                    <path d="M18 14h-8"/>
+                    <path d="M15 18h-5"/>
+                    <path d="M10 6h8v4h-8V6Z"/>
+                </svg>
+                Stock Market News
+            </h1>
+            <p class="news-subtitle">Comprehensive coverage of Indian stock markets from trusted sources</p>
+        </div>
+
+        <!-- Search Box -->
+        <div class="news-search-wrapper">
+            <form action="{{ url_for('news.news_search') }}" method="GET" class="news-search-form">
+                <input type="text"
+                       name="q"
+                       class="news-search-input"
+                       placeholder="Search news (e.g., Reliance, TCS, Budget, RBI...)"
+                       value="{{ search_query or '' }}">
+                <button type="submit" class="news-search-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- All Category Tabs in Single Row -->
+    <div class="news-categories">
+        <div class="categories-scroll">
+            <!-- Main Categories -->
+            <a href="{{ url_for('news.news_page', category='top') }}"
+               class="category-tab {% if selected_category == 'top' %}active{% endif %}">
+                <span class="cat-icon">🔥</span> Top Stories
+            </a>
+            <a href="{{ url_for('news.news_page', category='market') }}"
+               class="category-tab {% if selected_category == 'market' %}active{% endif %}">
+                <span class="cat-icon">📈</span> Markets
+            </a>
+            <a href="{{ url_for('news.news_page', category='corporate') }}"
+               class="category-tab {% if selected_category == 'corporate' %}active{% endif %}">
+                <span class="cat-icon">🏢</span> Corporate
+            </a>
+            <a href="{{ url_for('news.news_page', category='earnings') }}"
+               class="category-tab {% if selected_category == 'earnings' %}active{% endif %}">
+                <span class="cat-icon">📊</span> Earnings
+            </a>
+            <a href="{{ url_for('news.news_page', category='ipo') }}"
+               class="category-tab {% if selected_category == 'ipo' %}active{% endif %}">
+                <span class="cat-icon">🎯</span> IPO
+            </a>
+            <a href="{{ url_for('news.news_page', category='fii') }}"
+               class="category-tab {% if selected_category == 'fii' %}active{% endif %}">
+                <span class="cat-icon">💹</span> FII/DII
+            </a>
+            <a href="{{ url_for('news.news_page', category='policy') }}"
+               class="category-tab {% if selected_category == 'policy' %}active{% endif %}">
+                <span class="cat-icon">🏛️</span> Policy
+            </a>
+            <a href="{{ url_for('news.news_page', category='economy') }}"
+               class="category-tab {% if selected_category == 'economy' %}active{% endif %}">
+                <span class="cat-icon">💰</span> Economy
+            </a>
+
+            <span class="category-divider"></span>
+
+            <!-- Sector Categories -->
+            <a href="{{ url_for('news.news_page', category='banking') }}"
+               class="category-tab {% if selected_category == 'banking' %}active{% endif %}">
+                <span class="cat-icon">🏦</span> Banking
+            </a>
+            <a href="{{ url_for('news.news_page', category='it') }}"
+               class="category-tab {% if selected_category == 'it' %}active{% endif %}">
+                <span class="cat-icon">💻</span> IT
+            </a>
+            <a href="{{ url_for('news.news_page', category='pharma') }}"
+               class="category-tab {% if selected_category == 'pharma' %}active{% endif %}">
+                <span class="cat-icon">💊</span> Pharma
+            </a>
+            <a href="{{ url_for('news.news_page', category='auto') }}"
+               class="category-tab {% if selected_category == 'auto' %}active{% endif %}">
+                <span class="cat-icon">🚗</span> Auto
+            </a>
+            <a href="{{ url_for('news.news_page', category='energy') }}"
+               class="category-tab {% if selected_category == 'energy' %}active{% endif %}">
+                <span class="cat-icon">⛽</span> Energy
+            </a>
+            <a href="{{ url_for('news.news_page', category='metals') }}"
+               class="category-tab {% if selected_category == 'metals' %}active{% endif %}">
+                <span class="cat-icon">🔩</span> Metals
+            </a>
+            <a href="{{ url_for('news.news_page', category='realty') }}"
+               class="category-tab {% if selected_category == 'realty' %}active{% endif %}">
+                <span class="cat-icon">🏠</span> Realty
+            </a>
+            <a href="{{ url_for('news.news_page', category='fmcg') }}"
+               class="category-tab {% if selected_category == 'fmcg' %}active{% endif %}">
+                <span class="cat-icon">🛒</span> FMCG
+            </a>
+
+            <span class="category-divider"></span>
+
+            <!-- Other Categories -->
+            <a href="{{ url_for('news.news_page', category='global') }}"
+               class="category-tab {% if selected_category == 'global' %}active{% endif %}">
+                <span class="cat-icon">🌍</span> Global
+            </a>
+            <a href="{{ url_for('news.news_page', category='commodities') }}"
+               class="category-tab {% if selected_category == 'commodities' %}active{% endif %}">
+                <span class="cat-icon">🥇</span> Commodities
+            </a>
+            <a href="{{ url_for('news.news_page', category='forex') }}"
+               class="category-tab {% if selected_category == 'forex' %}active{% endif %}">
+                <span class="cat-icon">💱</span> Forex
+            </a>
+            <a href="{{ url_for('news.news_page', category='crypto') }}"
+               class="category-tab {% if selected_category == 'crypto' %}active{% endif %}">
+                <span class="cat-icon">₿</span> Crypto
+            </a>
+            <a href="{{ url_for('news.news_page', category='mf') }}"
+               class="category-tab {% if selected_category == 'mf' %}active{% endif %}">
+                <span class="cat-icon">📁</span> Mutual Funds
+            </a>
+        </div>
+    </div>
+
+    <!-- Current Category Title -->
+    <div class="news-section-header">
+        <div class="section-title-wrap">
+            <h2 class="section-title">{{ category_name }}</h2>
+            {% if category_description %}
+            <span class="section-desc">- {{ category_description }}</span>
+            {% endif %}
+        </div>
+        <div class="section-meta">
+            <span class="news-count">{{ news_items|length }} articles</span>
+            <button class="refresh-btn" onclick="location.reload();" title="Refresh news">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                    <path d="M16 16h5v5"/>
+                </svg>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- News Grid -->
+    {% if news_items %}
+    <div class="news-grid">
+        {% for news in news_items %}
+        <article class="news-card {% if loop.index <= 2 %}featured{% endif %}">
+            <a href="{{ news.link }}" target="_blank" rel="noopener noreferrer" class="news-card-link">
+                <div class="news-card-content">
+                    <div class="news-card-header">
+                        <span class="news-source-badge">{{ news.source }}</span>
+                        <span class="news-time-badge">{{ news.relative_time }}</span>
+                    </div>
+
+                    <h3 class="news-card-title">{{ news.title }}</h3>
+
+                    {% if news.description %}
+                    <p class="news-card-description">{{ news.description }}</p>
+                    {% endif %}
+
+                    <div class="news-card-footer">
+                        <div class="read-more">
+                            Read full article
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="news-empty">
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+            <path d="M18 14h-8"/>
+            <path d="M15 18h-5"/>
+            <path d="M10 6h8v4h-8V6Z"/>
+        </svg>
+        <h3>No news found</h3>
+        <p>Try searching for a different topic or check back later.</p>
+    </div>
+    {% endif %}
+
+    <!-- Attribution Footer -->
+    <div class="news-attribution">
+        <div class="attribution-content">
+            <svg class="attribution-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <p>
+                <strong>Source Attribution:</strong> All news articles are sourced from
+                <a href="https://news.google.com" target="_blank" rel="noopener">Google News RSS</a>
+                and are the property of their respective publishers (Economic Times, Moneycontrol, LiveMint, Business Standard, CNBC TV18, etc.).
+                Goldmine does not claim ownership of any third-party content.
+                Click on any article to read the full story on the original publisher's website.
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+// Auto-refresh news every 5 minutes
+setTimeout(function() {
+    location.reload();
+}, 300000);
+
+// Scroll active tab into view
+document.addEventListener('DOMContentLoaded', function() {
+    const activeTab = document.querySelector('.category-tab.active');
+    if (activeTab) {
+        activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+});
+</script>
+{% endblock %}

@@ -6,6 +6,7 @@ from flask import Flask, redirect, request, session, url_for
 from .controllers.auth_controller import auth_bp
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.home_controller import home_bp
+from .controllers.news_controller import news_bp
 from .controllers.screener import screener_bp
 from .controllers.screener.futures_oi.controller import cache as futures_cache
 from .controllers.screener.futures_oi.controller import futures_oi_bp
@@ -42,6 +43,7 @@ def create_app():
     app.register_blueprint(health_bp)  # Health check at /health
     app.register_blueprint(auth_bp)
     app.register_blueprint(home_bp)  # Home page at /
+    app.register_blueprint(news_bp)  # News at /news
     app.register_blueprint(dashboard_bp)  # Dashboard at /dashboard
     app.register_blueprint(stock_bp)
     app.register_blueprint(screener_bp)  # Landing page at /screener
