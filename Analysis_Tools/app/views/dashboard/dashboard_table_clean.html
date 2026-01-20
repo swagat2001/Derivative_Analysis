@@ -9,7 +9,7 @@
     <!-- Date Selector -->
     <div class="control-group">
       <label for="dateSelect">Date:</label>
-      <select id="dateSelect" name="date" onchange="window.location.href='/?date='+this.value+'&mtype={{ mtype }}'">
+      <select id="dateSelect" name="date" onchange="window.location.href='/dashboard/?date='+this.value+'&mtype={{ mtype }}'">
         {% for d in dates %}
         <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
         {% endfor %}
@@ -20,15 +20,18 @@
       <div class="control-group">
         <div class="btn-group">
           <button class="filter-btn {% if mtype == 'TOTAL' %}active{% endif %}"
-                  onclick="window.location.href='/?date={{ selected_date }}&mtype=TOTAL'">
+                  data-mtype="TOTAL"
+                  onclick="filterDashboard('TOTAL')">
             TOTAL
           </button>
           <button class="filter-btn {% if mtype == 'ITM' %}active{% endif %}"
-                  onclick="window.location.href='/?date={{ selected_date }}&mtype=ITM'">
+                  data-mtype="ITM"
+                  onclick="filterDashboard('ITM')">
             ITM
           </button>
           <button class="filter-btn {% if mtype == 'OTM' %}active{% endif %}"
-                  onclick="window.location.href='/?date={{ selected_date }}&mtype=OTM'">
+                  data-mtype="OTM"
+                  onclick="filterDashboard('OTM')">
             OTM
           </button>
         </div>
