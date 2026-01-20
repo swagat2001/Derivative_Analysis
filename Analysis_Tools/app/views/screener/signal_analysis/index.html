@@ -5,60 +5,196 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <style>
-    /* Signal Analysis Specific Styles */
-    .signal-header { position: sticky; top: 66px; z-index: 999; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px 0; background: #ffffff; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .signal-header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; }
-    .filter-buttons { display: flex; gap: 10px; }
-    
-    /* Mobile responsive adjustments for sticky signal header */
-    @media (max-width: 768px) {
-        .signal-header {
-            top: 60px; /* Smaller header on mobile */
-            padding: 12px 0;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        .signal-header h1 {
-            font-size: 20px;
-        }
-        .filter-buttons {
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+/* Stats as clickable filters on right */
+.stats-filters {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.stat-filter {
+    text-align: center;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    border: 2px solid transparent;
+}
+
+.stat-filter:hover {
+    background: #f9fafb;
+}
+
+.stat-filter.active {
+    background: #fef2f2;
+    border-color: #8B2432;
+}
+
+.stat-filter .value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.stat-filter .label {
+    font-size: 10px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-filter.total .value { color: #374151; }
+.stat-filter.bullish .value { color: #16a34a; }
+.stat-filter.bearish .value { color: #dc2626; }
+.stat-filter.neutral .value { color: #d97706; }
+
+.stat-filter.total.active .value { color: #8B2432; }
+
+/* Signal Badge */
+.signal-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.signal-badge.bullish { background: #dcfce7; color: #166534; }
+.signal-badge.bearish { background: #fee2e2; color: #991b1b; }
+.signal-badge.neutral { background: #fef3c7; color: #92400e; }
+
+/* Signal Score */
+.signal-score {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.signal-score .bull { color: #16a34a; }
+.signal-score .bear { color: #dc2626; }
+
+/* Expand Button */
+.expand-btn {
+    background: none;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.expand-btn:hover {
+    border-color: #8B2432;
+    color: #8B2432;
+    background: #fef2f2;
+}
+
+/* Details Row */
+.details-row {
+    display: none;
+    background: #f9fafb;
+}
+
+.details-row.show {
+    display: table-row;
+}
+
+.details-content {
+    padding: 14px 16px;
+}
+
+.category-section {
+    margin-bottom: 10px;
+}
+
+.category-section:last-child {
+    margin-bottom: 0;
+}
+
+.category-section strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+}
+
+.category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.category-item {
+    padding: 3px 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #4b5563;
+}
+
+/* Sort indicator */
+.sortable { cursor: pointer; user-select: none; }
+.sortable:hover { background: #f3f4f6; }
+.sort-icon { font-size: 10px; margin-left: 3px; opacity: 0.6; }
+
+/* Loading overlay */
+.loading-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.loading-overlay.show {
+    display: flex;
+}
+
+.loading-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #f3f4f6;
+    border-top-color: #8B2432;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.table-container {
+    position: relative;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 14px !important;
     }
-    .filter-btn { padding: 8px 20px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-decoration: none; color: #333; }
-    .filter-btn:hover { border-color: #8B2432; color: #8B2432; }
-    .filter-btn.active { background: #8B2432; color: white; border-color: #8B2432; }
-    .signals-table { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .signals-table table { width: 100%; border-collapse: collapse; }
-    .signals-table th { background: #2a2e39; color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 13px; user-select: none; }
-    .signals-table th.sortable { cursor: pointer; }
-    .signals-table th.sortable:hover { background: #353a47; }
-    .signals-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-    .signals-table tr:hover { background: #f8f9fa; }
-    .sort-indicator { font-size: 12px; margin-left: 5px; opacity: 0.7; }
-    .signal-badge { padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 12px; }
-    .signal-badge.bullish { background: #d4edda; color: #155724; }
-    .signal-badge.bearish { background: #f8d7da; color: #721c24; }
-    .signal-badge.neutral { background: #fff3cd; color: #856404; }
-    .signal-score { display: flex; gap: 15px; font-size: 12px; }
-    .signal-score .bull { color: #28a745; font-weight: 600; }
-    .signal-score .bear { color: #dc3545; font-weight: 600; }
-    .expand-btn { background: none; border: none; color: #8B2432; cursor: pointer; font-size: 12px; text-decoration: underline; }
-    .details-row { display: none; background: #f8f9fa; }
-    .details-content { padding: 15px; font-size: 12px; }
-    .category-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
-    .category-item { padding: 4px 8px; background: white; border-radius: 4px; font-size: 11px; }
-    .stats-summary { display: flex; gap: 20px; margin-bottom: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .stat-card { flex: 1; text-align: center; }
-    .stat-card .value { font-size: 32px; font-weight: 700; }
-    .stat-card .label { font-size: 13px; color: #666; }
-    .stat-card.bullish .value { color: #28a745; }
-    .stat-card.bearish .value { color: #dc3545; }
-    .stat-card.neutral .value { color: #f39c12; }
-    .date-control { margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .date-control select { padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; }
+
+    .stats-filters {
+        gap: 12px;
+    }
+
+    .stat-filter {
+        padding: 4px 8px;
+    }
+
+    .stat-filter .value {
+        font-size: 18px;
+    }
+}
 </style>
 {% endblock %}
 
@@ -78,110 +214,264 @@
       </button>
     </div>
 
-    <div class="date-control">
-        <label>Select Date:</label>
-        <select onchange="window.location.href='/screener/signal-analysis?date='+this.value+'&filter={{ signal_filter }}&sort={{ sort_by }}&order={{ sort_order }}';">
-            {% for d in dates %}
-            <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-        </select>
-    </div>
+    <section class="screener-section">
+      <div class="screener-card">
+        <!-- Single Row Header: Title + Date on left, Stats/Filters on right -->
+        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
 
-    {% set bullish_count = signals|selectattr('signal','equalto','BULLISH')|list|length %}
-    {% set bearish_count = signals|selectattr('signal','equalto','BEARISH')|list|length %}
-    {% set neutral_count = signals|selectattr('signal','equalto','NEUTRAL')|list|length %}
+          <!-- Left: Title + Date -->
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="card-title">📊 Signal Analysis</div>
 
-    <div class="stats-summary">
-        <div class="stat-card"><div class="value">{{ signals|length }}</div><div class="label">Total Stocks</div></div>
-        <div class="stat-card bullish"><div class="value">{{ bullish_count }}</div><div class="label">Bullish Signals</div></div>
-        <div class="stat-card bearish"><div class="value">{{ bearish_count }}</div><div class="label">Bearish Signals</div></div>
-        <div class="stat-card neutral"><div class="value">{{ neutral_count }}</div><div class="label">Neutral Signals</div></div>
-    </div>
-
-    <div class="signal-header">
-        <h1>Signal Analysis</h1>
-        <div class="filter-buttons">
-            <a href="?date={{ selected_date }}&filter=all&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='all' %}active{% endif %}">All</a>
-            <a href="?date={{ selected_date }}&filter=bullish&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='bullish' %}active{% endif %}">Bullish</a>
-            <a href="?date={{ selected_date }}&filter=bearish&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='bearish' %}active{% endif %}">Bearish</a>
-            <a href="?date={{ selected_date }}&filter=neutral&sort={{ sort_by }}&order={{ sort_order }}" class="filter-btn {% if signal_filter=='neutral' %}active{% endif %}">Neutral</a>
-        </div>
-    </div>
-
-    <div class="signals-table">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th class="sortable">
-                        <a href="?date={{ selected_date }}&filter={{ signal_filter }}&sort=symbol&order={% if sort_by == 'symbol' and sort_order == 'asc' %}desc{% else %}asc{% endif %}" style="color: white; text-decoration: none; display: block;">
-                            Symbol
-                            {% if sort_by == 'symbol' %}
-                                <span class="sort-indicator">{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}</span>
-                            {% endif %}
-                        </a>
-                    </th>
-                    <th>Signal</th>
-                    <th class="sortable">
-                        <a href="?date={{ selected_date }}&filter={{ signal_filter }}&sort=strength&order={% if sort_by == 'strength' and sort_order == 'desc' %}asc{% else %}desc{% endif %}" style="color: white; text-decoration: none; display: block;">
-                            Signal Strength
-                            {% if sort_by == 'strength' %}
-                                <span class="sort-indicator">{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}</span>
-                            {% endif %}
-                        </a>
-                    </th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in signals %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td><strong>{{ item.ticker }}</strong></td>
-                    <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
-                    <td>
-                        <div class="signal-score">
-                            <span class="bull">🟢 {{ item.bullish_count }}</span>
-                            <span class="bear">🔴 {{ item.bearish_count }}</span>
-                        </div>
-                    </td>
-                    <td><button class="expand-btn" onclick="toggleDetails('details-{{ loop.index }}')">View Breakdown</button></td>
-                </tr>
-                <tr class="details-row" id="details-{{ loop.index }}">
-                    <td colspan="5">
-                        <div class="details-content">
-                            <strong style="color:#28a745;">Bullish Categories ({{ item.bullish_count }})</strong>
-                            <div class="category-list">
-                                {% for c in item.bullish_categories %}
-                                    <div class="category-item">{{ c }}</div>
-                                {% endfor %}
-                            </div>
-                            <div style="margin-top:15px;">
-                                <strong style="color:#dc3545;">Bearish Categories ({{ item.bearish_count }})</strong>
-                                <div class="category-list">
-                                    {% for c in item.bearish_categories %}
-                                        <div class="category-item">{{ c }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="font-size: 11px; font-weight: 600; color: #8B2432; text-transform: uppercase;">Date:</label>
+              <select id="dateSelect" onchange="handleDateChange(this.value)" style="font-size: 12px; padding: 5px 10px; border: 1px solid #e5e7eb; border-radius: 4px; background: white; cursor: pointer;">
+                {% for d in dates %}
+                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
                 {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Right: Stats that also work as Filters -->
+          <div class="stats-filters">
+            <div class="stat-filter total {% if signal_filter=='all' %}active{% endif %}" data-filter="all">
+              <div class="value" id="statTotal">{{ total_count }}</div>
+              <div class="label">Total</div>
+            </div>
+            <div class="stat-filter bullish {% if signal_filter=='bullish' %}active{% endif %}" data-filter="bullish">
+              <div class="value" id="statBullish">{{ bullish_count }}</div>
+              <div class="label">Bullish</div>
+            </div>
+            <div class="stat-filter bearish {% if signal_filter=='bearish' %}active{% endif %}" data-filter="bearish">
+              <div class="value" id="statBearish">{{ bearish_count }}</div>
+              <div class="label">Bearish</div>
+            </div>
+            <div class="stat-filter neutral {% if signal_filter=='neutral' %}active{% endif %}" data-filter="neutral">
+              <div class="value" id="statNeutral">{{ neutral_count }}</div>
+              <div class="label">Neutral</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+          <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+          </div>
+
+          <table class="card-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">#</th>
+                <th class="sortable" data-sort="symbol">
+                  Symbol <span class="sort-icon" id="sortSymbol">{% if sort_by == 'symbol' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</span>
+                </th>
+                <th style="width: 90px;">Signal</th>
+                <th class="sortable" data-sort="strength" style="width: 120px;">
+                  Strength <span class="sort-icon" id="sortStrength">{% if sort_by == 'strength' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</span>
+                </th>
+                <th style="width: 80px;">Details</th>
+              </tr>
+            </thead>
+            <tbody id="signalsTableBody">
+              {% for item in signals %}
+              <tr class="signal-row">
+                <td>{{ loop.index }}</td>
+                <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
+                <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
+                <td>
+                  <div class="signal-score">
+                    <span class="bull">🟢 {{ item.bullish_count }}</span>
+                    <span class="bear">🔴 {{ item.bearish_count }}</span>
+                  </div>
+                </td>
+                <td><button class="expand-btn" onclick="toggleDetails('details-{{ loop.index }}')">View</button></td>
+              </tr>
+              <tr class="details-row" id="details-{{ loop.index }}">
+                <td colspan="5">
+                  <div class="details-content">
+                    <div class="category-section">
+                      <strong style="color:#16a34a;">Bullish Categories ({{ item.bullish_count }})</strong>
+                      <div class="category-list">
+                        {% for c in item.bullish_categories %}
+                        <div class="category-item">{{ c }}</div>
+                        {% endfor %}
+                        {% if not item.bullish_categories %}
+                        <div class="category-item" style="color:#999;">None</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="category-section">
+                      <strong style="color:#dc2626;">Bearish Categories ({{ item.bearish_count }})</strong>
+                      <div class="category-list">
+                        {% for c in item.bearish_categories %}
+                        <div class="category-item">{{ c }}</div>
+                        {% endfor %}
+                        {% if not item.bearish_categories %}
+                        <div class="category-item" style="color:#999;">None</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
             </tbody>
-        </table>
-    </div>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
 <script>
+// State management
+let currentFilter = '{{ signal_filter }}';
+let currentSortBy = '{{ sort_by }}';
+let currentSortOrder = '{{ sort_order }}';
+let currentDate = '{{ selected_date }}';
+
+// Toggle details row
 function toggleDetails(id) {
-    var row = document.getElementById(id);
-    if (row.style.display === 'table-row') {
-        row.style.display = 'none';
-    } else {
-        row.style.display = 'table-row';
+    const row = document.getElementById(id);
+    if (row) {
+        row.classList.toggle('show');
     }
+}
+
+// Show/hide loading
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+// Update stats display
+function updateStats(stats) {
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statBullish').textContent = stats.bullish;
+    document.getElementById('statBearish').textContent = stats.bearish;
+    document.getElementById('statNeutral').textContent = stats.neutral;
+}
+
+// Render table rows
+function renderTable(signals) {
+    const tbody = document.getElementById('signalsTableBody');
+
+    if (!signals || signals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">No signals found</td></tr>';
+        return;
+    }
+
+    let html = '';
+    signals.forEach((item, index) => {
+        const signalClass = item.signal.toLowerCase();
+        const rowId = 'details-' + (index + 1);
+
+        html += `
+            <tr class="signal-row">
+                <td>${index + 1}</td>
+                <td><a href="/stock/${item.ticker}" class="symbol-link">${item.ticker}</a></td>
+                <td><span class="signal-badge ${signalClass}">${item.signal}</span></td>
+                <td>
+                    <div class="signal-score">
+                        <span class="bull">🟢 ${item.bullish_count}</span>
+                        <span class="bear">🔴 ${item.bearish_count}</span>
+                    </div>
+                </td>
+                <td><button class="expand-btn" onclick="toggleDetails('${rowId}')">View</button></td>
+            </tr>
+            <tr class="details-row" id="${rowId}">
+                <td colspan="5">
+                    <div class="details-content">
+                        <div class="category-section">
+                            <strong style="color:#16a34a;">Bullish Categories (${item.bullish_count})</strong>
+                            <div class="category-list">
+                                ${item.bullish_categories && item.bullish_categories.length > 0
+                                    ? item.bullish_categories.map(c => `<div class="category-item">${c}</div>`).join('')
+                                    : '<div class="category-item" style="color:#999;">None</div>'}
+                            </div>
+                        </div>
+                        <div class="category-section">
+                            <strong style="color:#dc2626;">Bearish Categories (${item.bearish_count})</strong>
+                            <div class="category-list">
+                                ${item.bearish_categories && item.bearish_categories.length > 0
+                                    ? item.bearish_categories.map(c => `<div class="category-item">${c}</div>`).join('')
+                                    : '<div class="category-item" style="color:#999;">None</div>'}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// Fetch signals via AJAX
+async function fetchSignals() {
+    showLoading();
+
+    try {
+        const url = `/screener/signal-analysis/api/signals?date=${currentDate}&filter=${currentFilter}&sort=${currentSortBy}&order=${currentSortOrder}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) {
+            renderTable(data.signals);
+            updateStats(data.stats);
+            updateSortIndicators();
+        } else {
+            console.error('Error fetching signals:', data.error);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+    } finally {
+        hideLoading();
+    }
+}
+
+// Update sort indicators
+function updateSortIndicators() {
+    document.getElementById('sortSymbol').textContent = currentSortBy === 'symbol' ? (currentSortOrder === 'asc' ? '▲' : '▼') : '';
+    document.getElementById('sortStrength').textContent = currentSortBy === 'strength' ? (currentSortOrder === 'asc' ? '▲' : '▼') : '';
+}
+
+// Handle stat-filter click (stats on right side work as filters)
+document.querySelectorAll('.stat-filter').forEach(stat => {
+    stat.addEventListener('click', function() {
+        document.querySelectorAll('.stat-filter').forEach(s => s.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        fetchSignals();
+    });
+});
+
+// Handle sort header click
+document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', function() {
+        const sortField = this.dataset.sort;
+
+        if (currentSortBy === sortField) {
+            currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSortBy = sortField;
+            currentSortOrder = sortField === 'symbol' ? 'asc' : 'desc';
+        }
+
+        fetchSignals();
+    });
+});
+
+// Handle date change
+function handleDateChange(newDate) {
+    currentDate = newDate;
+    fetchSignals();
 }
 </script>
 {% endblock %}

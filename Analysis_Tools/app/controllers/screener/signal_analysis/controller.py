@@ -36,33 +36,43 @@ def get_signal_data_formatted(selected_date):
 def _apply_sorting(signals_list, sort_by, sort_order, signal_filter):
     """
     Apply sorting to signals list based on column and order
-
-    Args:
-        signals_list: list of signal dictionaries
-        sort_by: 'symbol' or 'strength'
-        sort_order: 'asc' or 'desc'
-        signal_filter: 'all', 'bullish', 'bearish', 'neutral'
-
-    Returns:
-        Sorted list
     """
     if sort_by == "symbol":
-        # Sort by ticker name (alphabetically)
         signals_list.sort(key=lambda x: x["ticker"].lower(), reverse=(sort_order == "desc"))
     elif sort_by == "strength":
-        # Sort based on active filter
         if signal_filter == "bullish":
-            # Sort by bullish count only
             signals_list.sort(key=lambda x: x["bullish_count"], reverse=(sort_order == "desc"))
         elif signal_filter == "bearish":
-            # Sort by bearish count only
             signals_list.sort(key=lambda x: x["bearish_count"], reverse=(sort_order == "desc"))
         else:
-            # For 'all' and 'neutral' - sort by net score
             signals_list.sort(key=lambda x: x["score"], reverse=(sort_order == "desc"))
     else:
-        # Default: sort by net strength (score), descending
         signals_list.sort(key=lambda x: x["score"], reverse=True)
+
+    return signals_list
+
+
+def _get_signals_list(selected_date):
+    """Get signals as list with all computed fields"""
+    signals_dict = get_signal_data_formatted(selected_date)
+
+    if not signals_dict:
+        return []
+
+    signals_list = []
+    for ticker, data in signals_dict.items():
+        score = data["bullish_count"] - data["bearish_count"]
+        signals_list.append(
+            {
+                "ticker": ticker,
+                "signal": data["signal"],
+                "bullish_count": data["bullish_count"],
+                "bearish_count": data["bearish_count"],
+                "score": score,
+                "bullish_categories": data["bullish_categories"],
+                "bearish_categories": data["bearish_categories"],
+            }
+        )
 
     return signals_list
 
@@ -80,36 +90,24 @@ def signal_analysis():
         if not selected_date:
             return jsonify({"error": "No dates available"}), 404
 
-        # Get signals from centralized service
-        signals_dict = get_signal_data_formatted(selected_date)
+        # Get all signals
+        all_signals = _get_signals_list(selected_date)
 
-        if not signals_dict:
-            signals_dict = {}
-
-        # Convert dict to list with score calculation
-        signals_list = []
-        for ticker, data in signals_dict.items():
-            score = data["bullish_count"] - data["bearish_count"]
-
-            signals_list.append(
-                {
-                    "ticker": ticker,
-                    "signal": data["signal"],
-                    "bullish_count": data["bullish_count"],
-                    "bearish_count": data["bearish_count"],
-                    "score": score,
-                    "bullish_categories": data["bullish_categories"],
-                    "bearish_categories": data["bearish_categories"],
-                }
-            )
+        # Calculate counts for stats display
+        total_count = len(all_signals)
+        bullish_count = len([s for s in all_signals if s["signal"] == "BULLISH"])
+        bearish_count = len([s for s in all_signals if s["signal"] == "BEARISH"])
+        neutral_count = len([s for s in all_signals if s["signal"] == "NEUTRAL"])
 
         # Apply filter
         if signal_filter == "bullish":
-            signals_list = [s for s in signals_list if s["signal"] == "BULLISH"]
+            signals_list = [s for s in all_signals if s["signal"] == "BULLISH"]
         elif signal_filter == "bearish":
-            signals_list = [s for s in signals_list if s["signal"] == "BEARISH"]
+            signals_list = [s for s in all_signals if s["signal"] == "BEARISH"]
         elif signal_filter == "neutral":
-            signals_list = [s for s in signals_list if s["signal"] == "NEUTRAL"]
+            signals_list = [s for s in all_signals if s["signal"] == "NEUTRAL"]
+        else:
+            signals_list = all_signals
 
         # Apply sorting
         signals_list = _apply_sorting(signals_list, sort_by, sort_order, signal_filter)
@@ -123,6 +121,10 @@ def signal_analysis():
             signal_filter=signal_filter,
             sort_by=sort_by,
             sort_order=sort_order,
+            total_count=total_count,
+            bullish_count=bullish_count,
+            bearish_count=bearish_count,
+            neutral_count=neutral_count,
             stock_list=get_filtered_tickers(),
             stock_symbol=None,
         )
@@ -133,3 +135,59 @@ def signal_analysis():
 
         traceback.print_exc()
         return jsonify({"error": f"Signal analysis failed: {str(e)}"}), 500
+
+
+@signal_analysis_bp.route("/api/signals")
+def api_signals():
+    """API endpoint for AJAX filtering - returns JSON"""
+    try:
+        dates = get_available_dates()
+        selected_date = request.args.get("date", dates[0] if dates else None)
+        signal_filter = request.args.get("filter", "all")
+        sort_by = request.args.get("sort", "strength")
+        sort_order = request.args.get("order", "desc")
+
+        if not selected_date:
+            return jsonify({"error": "No dates available"}), 404
+
+        # Get all signals
+        all_signals = _get_signals_list(selected_date)
+
+        # Calculate counts
+        total_count = len(all_signals)
+        bullish_count = len([s for s in all_signals if s["signal"] == "BULLISH"])
+        bearish_count = len([s for s in all_signals if s["signal"] == "BEARISH"])
+        neutral_count = len([s for s in all_signals if s["signal"] == "NEUTRAL"])
+
+        # Apply filter
+        if signal_filter == "bullish":
+            signals_list = [s for s in all_signals if s["signal"] == "BULLISH"]
+        elif signal_filter == "bearish":
+            signals_list = [s for s in all_signals if s["signal"] == "BEARISH"]
+        elif signal_filter == "neutral":
+            signals_list = [s for s in all_signals if s["signal"] == "NEUTRAL"]
+        else:
+            signals_list = all_signals
+
+        # Apply sorting
+        signals_list = _apply_sorting(signals_list, sort_by, sort_order, signal_filter)
+
+        return jsonify(
+            {
+                "success": True,
+                "signals": signals_list,
+                "stats": {
+                    "total": total_count,
+                    "bullish": bullish_count,
+                    "bearish": bearish_count,
+                    "neutral": neutral_count,
+                },
+                "filter": signal_filter,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+            }
+        )
+
+    except Exception as e:
+        print(f"[ERROR] api_signals(): {e}")
+        return jsonify({"error": str(e)}), 500
