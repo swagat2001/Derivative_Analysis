@@ -6,6 +6,8 @@ from flask import Flask, redirect, request, session, url_for
 from .controllers.auth_controller import auth_bp
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.home_controller import home_bp
+from .controllers.insights.controller import cache as insights_cache
+from .controllers.insights.controller import insights_bp
 from .controllers.news_controller import news_bp
 from .controllers.screener import screener_bp
 from .controllers.screener.futures_oi.controller import cache as futures_cache
@@ -13,6 +15,8 @@ from .controllers.screener.futures_oi.controller import futures_oi_bp
 from .controllers.screener.index_screener.controller import index_screener_bp
 from .controllers.screener.signal_analysis.controller import cache as signal_cache
 from .controllers.screener.signal_analysis.controller import signal_analysis_bp
+from .controllers.screener.signal_scanner.controller import cache as scanner_cache
+from .controllers.screener.signal_scanner.controller import signal_scanner_bp
 from .controllers.screener.technical_screener.controller import cache as tech_cache
 from .controllers.screener.technical_screener.controller import technical_screener_bp
 from .controllers.screener.top_gainers_losers.controller import cache as gainers_cache
@@ -33,6 +37,8 @@ def create_app():
     signal_cache.init_app(app)
     futures_cache.init_app(app)
     tech_cache.init_app(app)
+    insights_cache.init_app(app)
+    scanner_cache.init_app(app)
 
     # Initialize authentication system (creates users table and default admin)
     from .models.auth_model import ensure_initialized
@@ -44,11 +50,13 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(home_bp)  # Home page at /
     app.register_blueprint(news_bp)  # News at /news
+    app.register_blueprint(insights_bp)  # Insights at /insights
     app.register_blueprint(dashboard_bp)  # Dashboard at /dashboard
     app.register_blueprint(stock_bp)
     app.register_blueprint(screener_bp)  # Landing page at /screener
     app.register_blueprint(gainers_losers_bp)  # Tables at /screener/top-gainers-losers
     app.register_blueprint(signal_analysis_bp)  # Signals at /screener/signal-analysis
+    app.register_blueprint(signal_scanner_bp)  # Signal Scanner at /screener/signal-scanner
     app.register_blueprint(futures_oi_bp)  # Futures OI at /screener/futures-oi
     app.register_blueprint(technical_screener_bp)  # Technical at /screener/technical
     app.register_blueprint(index_screener_bp)  # Index screeners at /screener/index/

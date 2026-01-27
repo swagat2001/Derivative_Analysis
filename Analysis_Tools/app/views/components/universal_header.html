@@ -24,12 +24,13 @@
          class="nav-link {% if request.endpoint and 'news' in request.endpoint %}active{% endif %}">
         News
       </a>
-      <a href="#" class="nav-link">
-        Create
-      </a>
       <a href="{{ url_for('screener.screener_landing') }}"
          class="nav-link {% if request.endpoint and 'screener' in request.endpoint %}active{% endif %}">
         Screeners
+      </a>
+      <a href="{{ url_for('insights.insights_page') }}"
+         class="nav-link {% if request.endpoint and 'insights' in request.endpoint %}active{% endif %}">
+        Insights
       </a>
       <a href="{{ url_for('dashboard.dashboard') }}"
          class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">

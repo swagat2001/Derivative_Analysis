@@ -1,0 +1,1737 @@
+{% extends "base.html" %}
+
+{% block title %}Market Insights - Derivative Analysis{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
+<style>
+    /* ============================================
+   INSIGHTS PAGE - SCANX TREEMAP STYLE
+   ============================================ */
+    .insights-page-wrapper {
+        display: flex;
+        gap: 0;
+        padding: 0;
+        max-width: 100%;
+        margin: 0;
+        min-height: calc(100vh - 60px);
+    }
+
+    .insights-main-content {
+        flex: 1;
+        min-width: 0;
+        padding: 20px 30px;
+        background: #f8fafc;
+    }
+
+    /* Header - ScanX Style */
+    .insights-header.scanx-style {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .insights-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .info-icon {
+        font-size: 14px;
+        color: #9ca3af;
+        cursor: help;
+    }
+
+    /* Header Right - Index Price Display */
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .header-right .index-label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .header-right .index-price {
+        color: #1f2937;
+        font-weight: 700;
+    }
+
+    .header-right .index-change {
+        font-weight: 600;
+    }
+
+    .header-right .index-change.positive {
+        color: #16a34a;
+    }
+
+    .header-right .index-change.negative {
+        color: #dc2626;
+    }
+
+    .header-right .index-arrow {
+        font-size: 16px;
+    }
+
+    .header-right .index-arrow.up {
+        color: #16a34a;
+    }
+
+    .header-right .index-arrow.down {
+        color: #dc2626;
+    }
+
+    /* ============================================
+   CONTROLS BAR - SCANX STYLE
+   ============================================ */
+    .controls-bar.scanx-controls {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 10px 0;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .controls-spacer {
+        flex: 1;
+    }
+
+    /* Control Groups - ScanX Style */
+    .scanx-controls .control-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .scanx-controls .control-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+        text-transform: none;
+    }
+
+    .scanx-controls .control-group select {
+        padding: 6px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        background: white;
+        cursor: pointer;
+        min-width: auto;
+        color: #1f2937;
+    }
+
+    .scanx-controls .control-group select:focus {
+        outline: none;
+        border-color: #6b7280;
+    }
+
+    /* Control Groups */
+    .control-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .control-group label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+
+    .control-group select {
+        padding: 8px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        background: white;
+        cursor: pointer;
+        min-width: 130px;
+    }
+
+    .control-group select:focus {
+        outline: none;
+        border-color: #8B2432;
+    }
+
+    /* Heat Scale */
+    .heat-scale {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin-left: auto;
+    }
+
+    .heat-scale-item {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .heat-scale-item.neg-3 {
+        background: #991b1b;
+        color: white;
+    }
+
+    .heat-scale-item.neg-2 {
+        background: #dc2626;
+        color: white;
+    }
+
+    .heat-scale-item.neg-1 {
+        background: #fca5a5;
+        color: #7f1d1d;
+    }
+
+    .heat-scale-item.zero {
+        background: #d1d5db;
+        color: #374151;
+    }
+
+    .heat-scale-item.pos-1 {
+        background: #86efac;
+        color: #14532d;
+    }
+
+    .heat-scale-item.pos-2 {
+        background: #22c55e;
+        color: white;
+    }
+
+    .heat-scale-item.pos-3 {
+        background: #15803d;
+        color: white;
+    }
+
+    /* ============================================
+   MARKET SUMMARY BAR
+   ============================================ */
+    .market-summary-bar {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .summary-stat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 12px;
+        border-right: 1px solid #f1f5f9;
+        text-align: center;
+    }
+
+    .summary-stat:last-child {
+        border-right: none;
+    }
+
+    .summary-stat .stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .summary-stat .stat-label {
+        font-size: 9px;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-top: 4px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .summary-stat.advances .stat-value {
+        color: #16a34a;
+    }
+
+    .summary-stat.declines .stat-value {
+        color: #dc2626;
+    }
+
+    .summary-stat.unchanged .stat-value {
+        color: #64748b;
+    }
+
+    .summary-stat.bullish .stat-value {
+        color: #16a34a;
+    }
+
+    .summary-stat.bearish .stat-value {
+        color: #dc2626;
+    }
+
+    .summary-stat.neutral .stat-value {
+        color: #f59e0b;
+    }
+
+    /* ============================================
+   TABS
+   ============================================ */
+    .insights-tabs {
+        display: flex;
+        gap: 4px;
+        background: white;
+        padding: 6px;
+        border-radius: 10px;
+        margin-bottom: 16px;
+        overflow-x: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .tab-btn {
+        padding: 10px 18px;
+        border: none;
+        background: transparent;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tab-btn:hover {
+        color: #1f2937;
+        background: #f8fafc;
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, #8B2432 0%, #c14858 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(139, 36, 50, 0.3);
+    }
+
+    .tab-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* ============================================
+   TREEMAP HEATMAP - SCANX STYLE (Squarified)
+   ============================================ */
+    .treemap-container {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 4px;
+        min-height: 600px;
+    }
+
+    .treemap-container-abs {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .treemap-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 3px;
+    }
+
+    /* Stock Cell - Absolute Positioned for Squarified Treemap */
+    .treemap-cell-abs {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        overflow: visible;
+        border-radius: 3px;
+        box-sizing: border-box;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .treemap-cell-abs:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        overflow: visible;
+    }
+
+    .treemap-cell-abs .stock-logo {
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2px;
+        font-weight: 800;
+        color: #1f2937;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .treemap-cell-abs .symbol {
+        font-weight: 800;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .treemap-cell-abs .price {
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        margin-top: 1px;
+    }
+
+    .treemap-cell-abs .change {
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Stock Cell - EXACT ScanX Style (fallback) */
+    .treemap-cell {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 4px;
+        padding: 8px 4px;
+    }
+
+    .treemap-cell:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        z-index: 100;
+    }
+
+    /* Stock Logo Circle */
+    .treemap-cell .stock-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+        font-size: 10px;
+        font-weight: 800;
+        color: #1f2937;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .treemap-cell .symbol {
+        font-size: 11px;
+        font-weight: 800;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .treemap-cell .price {
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        margin-top: 2px;
+    }
+
+    .treemap-cell .change {
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Size Classes - Market Cap Based */
+    .treemap-cell.size-xxl {
+        width: 140px;
+        height: 140px;
+        flex: 0 0 140px;
+    }
+
+    .treemap-cell.size-xl {
+        width: 120px;
+        height: 120px;
+        flex: 0 0 120px;
+    }
+
+    .treemap-cell.size-lg {
+        width: 100px;
+        height: 100px;
+        flex: 0 0 100px;
+    }
+
+    .treemap-cell.size-md {
+        width: 85px;
+        height: 85px;
+        flex: 0 0 85px;
+    }
+
+    .treemap-cell.size-sm {
+        width: 70px;
+        height: 70px;
+        flex: 0 0 70px;
+    }
+
+    .treemap-cell.size-xs {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+    }
+
+    .treemap-cell.size-xxl .stock-logo {
+        width: 42px;
+        height: 42px;
+        font-size: 13px;
+    }
+
+    .treemap-cell.size-xxl .symbol {
+        font-size: 14px;
+    }
+
+    .treemap-cell.size-xxl .price {
+        font-size: 12px;
+    }
+
+    .treemap-cell.size-xxl .change {
+        font-size: 12px;
+    }
+
+    .treemap-cell.size-xl .stock-logo {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+
+    .treemap-cell.size-xl .symbol {
+        font-size: 13px;
+    }
+
+    .treemap-cell.size-xl .price {
+        font-size: 11px;
+    }
+
+    .treemap-cell.size-xl .change {
+        font-size: 11px;
+    }
+
+    .treemap-cell.size-lg .stock-logo {
+        width: 30px;
+        height: 30px;
+    }
+
+    .treemap-cell.size-lg .symbol {
+        font-size: 11px;
+    }
+
+    .treemap-cell.size-sm .stock-logo {
+        width: 24px;
+        height: 24px;
+        font-size: 8px;
+    }
+
+    .treemap-cell.size-sm .symbol {
+        font-size: 9px;
+    }
+
+    .treemap-cell.size-sm .price {
+        display: none;
+    }
+
+    .treemap-cell.size-sm .change {
+        font-size: 8px;
+    }
+
+    .treemap-cell.size-xs .stock-logo {
+        width: 20px;
+        height: 20px;
+        font-size: 7px;
+    }
+
+    .treemap-cell.size-xs .symbol {
+        font-size: 8px;
+    }
+
+    .treemap-cell.size-xs .price {
+        display: none;
+    }
+
+    .treemap-cell.size-xs .change {
+        font-size: 7px;
+    }
+
+    /* Tooltip */
+    .treemap-tooltip {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(15, 23, 42, 0.98);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        min-width: 180px;
+    }
+
+    .treemap-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 8px solid transparent;
+        border-top-color: rgba(15, 23, 42, 0.98);
+    }
+
+    .treemap-cell:hover .treemap-tooltip,
+    .treemap-cell-abs:hover .treemap-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .treemap-tooltip .tt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .treemap-tooltip .tt-symbol {
+        font-weight: 800;
+        font-size: 15px;
+        color: #60a5fa;
+    }
+
+    .treemap-tooltip .tt-change {
+        font-weight: 700;
+        font-size: 13px;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    .treemap-tooltip .tt-change.positive {
+        background: rgba(34, 197, 94, 0.2);
+        color: #4ade80;
+    }
+
+    .treemap-tooltip .tt-change.negative {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+    }
+
+    .treemap-tooltip .tt-price {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .treemap-tooltip .tt-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 3px 0;
+        font-size: 11px;
+    }
+
+    .treemap-tooltip .tt-row .label {
+        color: #94a3b8;
+    }
+
+    .treemap-tooltip .tt-row .value {
+        font-weight: 600;
+    }
+
+    /* ============================================
+   HEAT COLORS - ScanX Style
+   ============================================ */
+    .heat-5 {
+        background: linear-gradient(145deg, #15803d 0%, #22c55e 100%);
+    }
+
+    .heat-4 {
+        background: linear-gradient(145deg, #22c55e 0%, #4ade80 100%);
+    }
+
+    .heat-3 {
+        background: linear-gradient(145deg, #4ade80 0%, #86efac 100%);
+    }
+
+    .heat-2 {
+        background: linear-gradient(145deg, #86efac 0%, #bbf7d0 100%);
+    }
+
+    .heat-1 {
+        background: linear-gradient(145deg, #bbf7d0 0%, #dcfce7 100%);
+    }
+
+    .heat-0 {
+        background: linear-gradient(145deg, #e2e8f0 0%, #f1f5f9 100%);
+    }
+
+    .heat--1 {
+        background: linear-gradient(145deg, #fecaca 0%, #fca5a5 100%);
+    }
+
+    .heat--2 {
+        background: linear-gradient(145deg, #fca5a5 0%, #f87171 100%);
+    }
+
+    .heat--3 {
+        background: linear-gradient(145deg, #f87171 0%, #ef4444 100%);
+    }
+
+    .heat--4 {
+        background: linear-gradient(145deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .heat--5 {
+        background: linear-gradient(145deg, #dc2626 0%, #b91c1c 100%);
+    }
+
+    /* Dark text for light backgrounds - both cell types */
+    .heat-1 .symbol,
+    .heat-1 .change,
+    .heat-1 .price,
+    .heat-2 .symbol,
+    .heat-2 .change,
+    .heat-2 .price,
+    .heat-3 .symbol,
+    .heat-3 .change,
+    .heat-3 .price,
+    .heat-0 .symbol,
+    .heat-0 .change,
+    .heat-0 .price,
+    .heat--1 .symbol,
+    .heat--1 .change,
+    .heat--1 .price {
+        color: #1f2937 !important;
+        text-shadow: none !important;
+    }
+
+    /* ============================================
+   SECTOR VIEW
+   ============================================ */
+    .sector-heatmap {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 16px;
+    }
+
+    .sector-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .sector-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sector-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .sector-change {
+        font-size: 15px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 6px;
+    }
+
+    .sector-change.positive {
+        color: #16a34a;
+        background: rgba(22, 163, 74, 0.1);
+    }
+
+    .sector-change.negative {
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+    }
+
+    .sector-stocks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 14px;
+    }
+
+    .stock-tile {
+        padding: 10px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+        min-width: 75px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .stock-tile:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        z-index: 100;
+    }
+
+    .stock-tile .symbol {
+        display: block;
+        font-weight: 800;
+        font-size: 12px;
+    }
+
+    .stock-tile .change {
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    /* Other tabs styles */
+    .delivery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 14px;
+    }
+
+    .delivery-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .delivery-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .delivery-symbol {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+    .delivery-symbol:hover {
+        text-decoration: underline;
+    }
+
+    .delivery-sector {
+        font-size: 10px;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .delivery-price {
+        font-size: 13px;
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .delivery-pct .pct-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #16a34a;
+    }
+
+    .delivery-pct .pct-label {
+        font-size: 9px;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .week52-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .week52-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .week52-header {
+        padding: 14px 18px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .week52-title {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .week52-count {
+        font-size: 13px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .week52-count.high {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .week52-count.low {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .volume-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+    }
+
+    .volume-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .volume-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .volume-symbol {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+    .volume-ratio {
+        font-size: 14px;
+        font-weight: 800;
+        color: #8B2432;
+        background: #fef2f2;
+        padding: 5px 10px;
+        border-radius: 6px;
+    }
+
+    .volume-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .volume-stat {
+        text-align: center;
+        padding: 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .volume-stat .value {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .volume-stat .label {
+        font-size: 9px;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #8B2432;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #64748b;
+    }
+
+    .positive {
+        color: #16a34a;
+    }
+
+    .negative {
+        color: #dc2626;
+    }
+
+    .symbol-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .symbol-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 1200px) {
+        .week52-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .controls-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .heat-scale {
+            justify-content: center;
+            margin-left: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .insights-main-content {
+            padding: 14px;
+        }
+
+        .sector-heatmap {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="insights-page-wrapper">
+    {% include 'components/insights_sidebar.html' %}
+
+    <div class="insights-main-content">
+        <!-- Header Row (ScanX Style) -->
+        <div class="insights-header scanx-style">
+            <div class="header-left">
+                <h1 class="insights-title" id="heatmapTitle">
+                    <span id="heatmapTitleText">Nifty 50 Heatmap</span>
+                    <span class="info-icon" title="Stock market heatmap showing price changes">ⓘ</span>
+                </h1>
+            </div>
+            <div class="header-right" id="indexPriceBox">
+                <span class="index-label" id="indexLabel">Nifty 50</span>
+                <span class="index-price" id="indexPrice">--</span>
+                <span class="index-change positive" id="indexChange">-- (--)</span>
+                <span class="index-arrow" id="indexArrow">↗</span>
+            </div>
+        </div>
+
+        <!-- Controls Bar (ScanX Style) -->
+        <div class="controls-bar scanx-controls" id="heatmapControls">
+            <div class="control-group">
+                <label>Index :</label>
+                <select id="indexSelect" onchange="changeIndex(this.value)">
+                    {% for idx in index_list %}
+                    <option value="{{ idx.key }}" {% if idx.key==selected_index %}selected{% endif %}>{{ idx.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Sort By :</label>
+                <select id="heatmapSort" onchange="loadHeatmap()">
+                    <option value="turnover" selected>Turnover</option>
+                    <option value="volume">Volume</option>
+                    <option value="change">Change %</option>
+                    <option value="marketcap">Market Cap</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Performance By :</label>
+                <select id="performanceSelect" onchange="changePerformance(this.value)">
+                    <option value="D" selected>D%</option>
+                    <option value="W">W%</option>
+                    <option value="M">M%</option>
+                    <option value="3M">3M%</option>
+                    <option value="6M">6M%</option>
+                    <option value="1Y">1Y%</option>
+                </select>
+            </div>
+
+            <!-- Hidden date selector for actual data -->
+            <input type="hidden" id="dateSelect" value="{{ selected_date }}">
+
+            <div class="control-group view-toggle" style="display:none;">
+                <select id="heatmapView" onchange="loadHeatmap()">
+                    <option value="grid">Treemap</option>
+                    <option value="sector">By Sector</option>
+                </select>
+            </div>
+
+            <div class="controls-spacer"></div>
+
+            <div class="heat-scale">
+                <span class="heat-scale-item neg-3">-3%</span>
+                <span class="heat-scale-item neg-2">-2%</span>
+                <span class="heat-scale-item neg-1">-1%</span>
+                <span class="heat-scale-item zero">0%</span>
+                <span class="heat-scale-item pos-1">1%</span>
+                <span class="heat-scale-item pos-2">2%</span>
+                <span class="heat-scale-item pos-3">3%</span>
+            </div>
+        </div>
+
+        <!-- Tabs (Hidden on Heatmap view for clean layout) -->
+        <div class="insights-tabs" id="insightsTabs" style="{% if active_tab == 'heatmap' %}display:none;{% endif %}">
+            <button class="tab-btn {% if active_tab == 'heatmap' %}active{% endif %}" onclick="switchTab('heatmap')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Heatmap
+            </button>
+            <button class="tab-btn {% if active_tab == 'fii-dii' %}active{% endif %}" onclick="switchTab('fii-dii')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M12 20V10" />
+                    <path d="M18 20V4" />
+                    <path d="M6 20v-4" />
+                </svg>
+                FII/DII Activity
+            </button>
+            <button class="tab-btn {% if active_tab == 'delivery' %}active{% endif %}" onclick="switchTab('delivery')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                </svg>
+                Delivery Data
+            </button>
+            <button class="tab-btn {% if active_tab == '52week' %}active{% endif %}" onclick="switchTab('52week')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                </svg>
+                52-Week High/Low
+            </button>
+            <button class="tab-btn {% if active_tab == 'volume' %}active{% endif %}" onclick="switchTab('volume')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                </svg>
+                Volume Breakouts
+            </button>
+            <button class="tab-btn {% if active_tab == 'sectors' %}active{% endif %}" onclick="switchTab('sectors')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                    <path d="M22 12A10 10 0 0 0 12 2v10z" />
+                </svg>
+                Sector Performance
+            </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="heatmap-tab" class="tab-content {% if active_tab == 'heatmap' %}active{% endif %}">
+            <div id="heatmap-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="fii-dii-tab" class="tab-content {% if active_tab == 'fii-dii' %}active{% endif %}">
+            <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
+                <div class="control-group"><label>Period:</label><select id="fiiDiiPeriod" onchange="loadFiiDii()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="15">Last 15 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="60">Last 60 Days</option>
+                    </select></div>
+            </div>
+            <div id="fii-dii-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="delivery-tab" class="tab-content {% if active_tab == 'delivery' %}active{% endif %}">
+            <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
+                <div class="control-group"><label>Min Delivery %:</label><select id="minDelivery"
+                        onchange="loadDelivery()">
+                        <option value="0">All</option>
+                        <option value="30">≥ 30%</option>
+                        <option value="50" selected>≥ 50%</option>
+                        <option value="70">≥ 70%</option>
+                        <option value="80">≥ 80%</option>
+                    </select></div>
+                <div class="control-group"><label>Sort:</label><select id="deliverySort" onchange="loadDelivery()">
+                        <option value="delivery_pct">By Delivery %</option>
+                        <option value="volume">By Volume</option>
+                    </select></div>
+            </div>
+            <div id="delivery-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="52week-tab" class="tab-content {% if active_tab == '52week' %}active{% endif %}">
+            <div id="week52-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="volume-tab" class="tab-content {% if active_tab == 'volume' %}active{% endif %}">
+            <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
+                <div class="control-group"><label>Volume Multiplier:</label><select id="volumeMultiplier"
+                        onchange="loadVolume()">
+                        <option value="1.5">≥ 1.5x Avg</option>
+                        <option value="2" selected>≥ 2x Avg</option>
+                        <option value="3">≥ 3x Avg</option>
+                    </select></div>
+            </div>
+            <div id="volume-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectors-tab" class="tab-content {% if active_tab == 'sectors' %}active{% endif %}">
+            <div id="sectors-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+    let currentDate = '{{ selected_date }}';
+    let currentTab = '{{ active_tab }}';
+    let currentIndex = '{{ selected_index }}';
+
+    const indexIcons = { 'all': '📊', 'nifty50': '🏆', 'niftynext50': '📈', 'niftybank': '🏦', 'niftyit': '💻', 'niftypharma': '💊', 'niftyauto': '🚗', 'niftymetal': '⚙️', 'niftyfmcg': '🛒', 'niftyenergy': '⚡', 'niftypsubank': '🏛️', 'niftyfinancial': '💰', 'sensex': '🎯' };
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tab + '-tab').classList.add('active');
+        event.target.closest('.tab-btn').classList.add('active');
+        currentTab = tab;
+        const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDii, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors };
+        if (loaders[tab]) loaders[tab]();
+    }
+
+    let currentPerformance = 'D';
+
+    function changeIndex(index) {
+        currentIndex = index;
+        loadHeatmap();
+    }
+
+    function changeDate(date) {
+        currentDate = date;
+        loadHeatmap();
+    }
+
+    function changePerformance(period) {
+        currentPerformance = period;
+        // For now, just reload with the latest data
+        // In future, this could fetch historical data based on period
+        loadHeatmap();
+    }
+
+    function getHeatClass(change) {
+        if (change >= 5) return 'heat-5';
+        if (change >= 3) return 'heat-4';
+        if (change >= 2) return 'heat-3';
+        if (change >= 1) return 'heat-2';
+        if (change >= 0.3) return 'heat-1';
+        if (change > -0.3) return 'heat-0';
+        if (change > -1) return 'heat--1';
+        if (change > -2) return 'heat--2';
+        if (change > -3) return 'heat--3';
+        if (change > -5) return 'heat--4';
+        return 'heat--5';
+    }
+
+    function formatNumber(num) {
+        if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+        if (num >= 1e7) return (num / 1e7).toFixed(1) + 'Cr';
+        if (num >= 1e5) return (num / 1e5).toFixed(1) + 'L';
+        if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K';
+        return num.toLocaleString();
+    }
+
+    function formatPrice(price) { return '₹' + parseFloat(price).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+    // ============================================
+    // SQUARIFIED TREEMAP ALGORITHM
+    // Box sizes proportional to volume/turnover
+    // ============================================
+
+    // Filter out index derivatives that skew the treemap
+    const INDEX_SYMBOLS = ['BANKNIFTY', 'NIFTY', 'MIDCPNIFTY', 'NIFTYIT', 'FINNIFTY', 'SENSEX', 'BANKEX'];
+
+    function squarify(values, x, y, width, height) {
+        const rects = [];
+        const total = values.reduce((s, v) => s + v.value, 0);
+
+        if (values.length === 0 || total === 0) return rects;
+        if (values.length === 1) {
+            return [{ ...values[0], x, y, width, height }];
+        }
+
+        // Calculate normalized areas
+        const area = width * height;
+        const normalized = values.map(v => ({
+            ...v,
+            area: (v.value / total) * area
+        })).sort((a, b) => b.area - a.area);
+
+        // Use slice-and-dice for simplicity and reliability
+        let remaining = [...normalized];
+        let currentX = x, currentY = y;
+        let currentW = width, currentH = height;
+
+        while (remaining.length > 0) {
+            // Determine layout direction based on aspect ratio
+            const isHorizontal = currentW >= currentH;
+
+            // Find how many items to place in this row
+            let row = [];
+            let rowSum = 0;
+            const side = isHorizontal ? currentH : currentW;
+
+            for (let i = 0; i < remaining.length; i++) {
+                const item = remaining[i];
+                const newRow = [...row, item];
+                const newSum = rowSum + item.area;
+
+                if (row.length === 0) {
+                    row = newRow;
+                    rowSum = newSum;
+                    continue;
+                }
+
+                // Calculate aspect ratios
+                const oldWorst = calculateWorst(row, side, rowSum);
+                const newWorst = calculateWorst(newRow, side, newSum);
+
+                if (newWorst <= oldWorst) {
+                    row = newRow;
+                    rowSum = newSum;
+                } else {
+                    break;
+                }
+            }
+
+            // Layout the row
+            const rowThickness = side > 0 ? rowSum / side : 0;
+            let offset = 0;
+
+            row.forEach(item => {
+                const itemSize = rowThickness > 0 ? item.area / rowThickness : 0;
+
+                if (isHorizontal) {
+                    rects.push({
+                        ...item,
+                        x: currentX,
+                        y: currentY + offset,
+                        width: rowThickness,
+                        height: itemSize
+                    });
+                    offset += itemSize;
+                } else {
+                    rects.push({
+                        ...item,
+                        x: currentX + offset,
+                        y: currentY,
+                        width: itemSize,
+                        height: rowThickness
+                    });
+                    offset += itemSize;
+                }
+            });
+
+            // Update remaining space
+            if (isHorizontal) {
+                currentX += rowThickness;
+                currentW -= rowThickness;
+            } else {
+                currentY += rowThickness;
+                currentH -= rowThickness;
+            }
+
+            // Remove placed items
+            remaining = remaining.slice(row.length);
+
+            // Safety check
+            if (currentW <= 0 || currentH <= 0) break;
+        }
+
+        return rects;
+    }
+
+    function calculateWorst(row, side, sum) {
+        if (row.length === 0 || side === 0 || sum === 0) return Infinity;
+        const thickness = sum / side;
+        let worst = 0;
+        row.forEach(item => {
+            const length = item.area / thickness;
+            const aspect = Math.max(thickness / length, length / thickness);
+            worst = Math.max(worst, aspect);
+        });
+        return worst;
+    }
+
+    async function loadHeatmap() {
+        const container = document.getElementById('heatmap-container');
+        const view = document.getElementById('heatmapView').value;
+        const sort = document.getElementById('heatmapSort').value;
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+        try {
+            const response = await fetch(`/insights/api/heatmap?date=${currentDate}&sort=${sort}&index=${currentIndex}`);
+            const data = await response.json();
+
+            if (!data.success || !data.stocks.length) {
+                container.innerHTML = '<div class="empty-state"><p>No data available</p></div>';
+                return;
+            }
+
+            if (data.indices) updateIndexDropdown(data.indices);
+            updateMarketSummary(data.stats);
+
+            if (view === 'sector') renderSectorHeatmap(data.stocks);
+            else renderTreemapHeatmap(data.stocks, sort);
+        } catch (error) {
+            console.error('Error:', error);
+            container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>';
+        }
+    }
+
+    function updateIndexDropdown(indices) {
+        const select = document.getElementById('indexSelect');
+        const currentVal = select.value;
+        select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === currentVal ? 'selected' : ''}>${idx.name}</option>`).join('');
+    }
+
+    function updateMarketSummary(stats) {
+        if (!stats) return;
+
+        // Get selected index name
+        const selectedIndex = document.getElementById('indexSelect');
+        const indexName = selectedIndex ? selectedIndex.options[selectedIndex.selectedIndex].text.split(' (')[0] : 'All F&O';
+
+        // Update title to reflect selected index
+        const titleText = document.getElementById('heatmapTitleText');
+        if (titleText) {
+            titleText.textContent = indexName + ' Heatmap';
+        }
+
+        // Update right side index info (using stats for now since we don't have live price)
+        const indexLabel = document.getElementById('indexLabel');
+        const indexChange = document.getElementById('indexChange');
+        const indexArrow = document.getElementById('indexArrow');
+
+        if (indexLabel) indexLabel.textContent = indexName;
+
+        if (indexChange) {
+            const changeText = `${stats.advances} ↑ ${stats.declines} ↓`;
+            indexChange.textContent = changeText;
+            indexChange.className = 'index-change ' + (stats.advances > stats.declines ? 'positive' : 'negative');
+        }
+
+        if (indexArrow) {
+            indexArrow.textContent = stats.advances > stats.declines ? '↗' : '↘';
+            indexArrow.className = 'index-arrow ' + (stats.advances > stats.declines ? 'up' : 'down');
+        }
+    }
+
+    function createTreemapCellAbsolute(stock, x, y, width, height) {
+        const changeClass = stock.change_pct >= 0 ? 'positive' : 'negative';
+        const changeSign = stock.change_pct >= 0 ? '+' : '';
+        const heatClass = getHeatClass(stock.change_pct);
+        const initials = stock.symbol.substring(0, 2);
+
+        // Determine content visibility based on cell size
+        const area = width * height;
+        const showLogo = area > 3000;
+        const showPrice = area > 5000;
+        const showSymbol = area > 1500;
+        const showChange = area > 2500;
+
+        // Dynamic font sizes based on cell size
+        const symbolSize = Math.min(14, Math.max(8, Math.sqrt(area) / 8));
+        const priceSize = Math.min(12, Math.max(7, Math.sqrt(area) / 10));
+        const changeSize = Math.min(11, Math.max(7, Math.sqrt(area) / 11));
+        const logoSize = Math.min(40, Math.max(18, Math.sqrt(area) / 4));
+
+        const logoHtml = showLogo ? `<div class="stock-logo" style="width:${logoSize}px;height:${logoSize}px;font-size:${logoSize / 3}px;">${initials}</div>` : '';
+        const symbolHtml = showSymbol ? `<span class="symbol" style="font-size:${symbolSize}px;">${stock.symbol}</span>` : '';
+        const priceHtml = showPrice ? `<span class="price" style="font-size:${priceSize}px;">${formatPrice(stock.close)}</span>` : '';
+        const changeHtml = showChange ? `<span class="change" style="font-size:${changeSize}px;">${changeSign}${stock.change_pct.toFixed(2)}%</span>` : '';
+
+        return `
+        <a href="/stock/${stock.symbol}" target="_blank" class="treemap-cell-abs ${heatClass}"
+           style="left:${x}px;top:${y}px;width:${width}px;height:${height}px;">
+            ${logoHtml}
+            ${symbolHtml}
+            ${priceHtml}
+            ${changeHtml}
+            <div class="treemap-tooltip">
+                <div class="tt-header">
+                    <span class="tt-symbol">${stock.symbol}</span>
+                    <span class="tt-change ${changeClass}">${changeSign}${stock.change_pct.toFixed(2)}%</span>
+                </div>
+                <div class="tt-price">${formatPrice(stock.close)}</div>
+                <div class="tt-row"><span class="label">High</span><span class="value">${formatPrice(stock.high)}</span></div>
+                <div class="tt-row"><span class="label">Low</span><span class="value">${formatPrice(stock.low)}</span></div>
+                <div class="tt-row"><span class="label">Volume</span><span class="value">${formatNumber(stock.volume)}</span></div>
+                <div class="tt-row"><span class="label">Turnover</span><span class="value">${formatNumber(stock.turnover)}</span></div>
+                <div class="tt-row"><span class="label">Sector</span><span class="value">${stock.sector}</span></div>
+            </div>
+        </a>
+    `;
+    }
+
+    function renderTreemapHeatmap(stocks, sortBy) {
+        const container = document.getElementById('heatmap-container');
+
+        // Get container dimensions
+        const containerWidth = container.offsetWidth || 1200;
+        const containerHeight = Math.max(600, Math.min(800, containerWidth * 0.55));
+
+        // Filter out index derivatives that have disproportionate turnover
+        let filteredStocks = stocks.filter(s => !INDEX_SYMBOLS.includes(s.symbol.toUpperCase()));
+
+        // If filtering removed too many stocks, use original
+        if (filteredStocks.length < 10) filteredStocks = stocks;
+
+        // Determine value key based on sort
+        let valueKey = 'turnover';
+        if (sortBy === 'volume') valueKey = 'volume';
+
+        // Prepare data for treemap
+        const treemapData = filteredStocks.map(s => ({
+            ...s,
+            value: Math.max(s[valueKey] || 1, 1)
+        }));
+
+        // Generate treemap layout using the squarify function
+        const rects = squarify(treemapData, 4, 4, containerWidth - 8, containerHeight - 8);
+
+        // Build HTML
+        let html = `<div class="treemap-container-abs" style="width:${containerWidth}px;height:${containerHeight}px;position:relative;">`;
+
+        rects.forEach(rect => {
+            if (rect.width > 2 && rect.height > 2) {
+                html += createTreemapCellAbsolute(rect, rect.x, rect.y, rect.width - 2, rect.height - 2);
+            }
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function renderSectorHeatmap(stocks) {
+        const container = document.getElementById('heatmap-container');
+        const sectorGroups = {};
+
+        stocks.forEach(stock => {
+            if (!sectorGroups[stock.sector]) sectorGroups[stock.sector] = [];
+            sectorGroups[stock.sector].push(stock);
+        });
+
+        const sortedSectors = Object.entries(sectorGroups)
+            .map(([sector, sectorStocks]) => ({
+                sector,
+                stocks: sectorStocks.sort((a, b) => b.change_pct - a.change_pct),
+                avgChange: sectorStocks.reduce((sum, s) => sum + s.change_pct, 0) / sectorStocks.length
+            }))
+            .sort((a, b) => b.avgChange - a.avgChange);
+
+        let html = '<div class="sector-heatmap">';
+        sortedSectors.forEach(({ sector, stocks: sectorStocks, avgChange }) => {
+            const changeClass = avgChange >= 0 ? 'positive' : 'negative';
+            const changeSign = avgChange >= 0 ? '+' : '';
+
+            html += `<div class="sector-card"><div class="sector-header"><span class="sector-name">${sector}</span><span class="sector-change ${changeClass}">${changeSign}${avgChange.toFixed(2)}%</span></div><div class="sector-stocks">`;
+            sectorStocks.forEach(stock => {
+                const heatClass = getHeatClass(stock.change_pct);
+                const sSign = stock.change_pct >= 0 ? '+' : '';
+                html += `<a href="/stock/${stock.symbol}" target="_blank" class="stock-tile ${heatClass}"><span class="symbol">${stock.symbol}</span><span class="change">${sSign}${stock.change_pct.toFixed(2)}%</span></a>`;
+            });
+            html += '</div></div>';
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    async function loadFiiDii() {
+        const container = document.getElementById('fii-dii-container');
+        const days = document.getElementById('fiiDiiPeriod').value;
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/insights/api/fii-dii?end_date=${currentDate}&days=${days}`);
+            const data = await response.json();
+            if (!data.success || !data.data.length) { container.innerHTML = '<div class="empty-state"><p>No FII/DII data</p></div>'; return; }
+            const sentimentClass = data.summary.overall_sentiment === 'Bullish' ? 'positive' : 'negative';
+            container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Index Options OI Activity</span></div><div style="padding:16px"><div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat declines"><span class="stat-value">${formatNumber(Math.abs(data.summary.total_ce_oi_change))}</span><span class="stat-label">CE OI Change</span></div><div class="summary-stat advances"><span class="stat-value">${formatNumber(Math.abs(data.summary.total_pe_oi_change))}</span><span class="stat-label">PE OI Change</span></div><div class="summary-stat ${sentimentClass}"><span class="stat-value">${data.summary.overall_sentiment}</span><span class="stat-label">Sentiment</span></div></div></div></div><div class="screener-card"><div class="card-header"><span class="card-title">Daily Activity</span></div><table class="card-table"><thead><tr><th>Date</th><th>CE OI Δ</th><th>PE OI Δ</th><th>Net OI</th><th>Sentiment</th></tr></thead><tbody>${data.data.map(row => `<tr><td>${row.date}</td><td class="negative">${formatNumber(row.ce_oi_change)}</td><td class="positive">${formatNumber(row.pe_oi_change)}</td><td class="${row.net_index_oi >= 0 ? 'positive' : 'negative'}">${formatNumber(row.net_index_oi)}</td><td><span class="${row.sentiment === 'Bullish' ? 'positive' : 'negative'}">${row.sentiment}</span></td></tr>`).join('')}</tbody></table></div>`;
+        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+    }
+
+    async function loadDelivery() {
+        const container = document.getElementById('delivery-container');
+        const minPct = document.getElementById('minDelivery').value;
+        const sort = document.getElementById('deliverySort').value;
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/insights/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${currentIndex}`);
+            const data = await response.json();
+            if (!data.success || !data.data.length) { container.innerHTML = '<div class="empty-state"><p>No delivery data</p></div>'; return; }
+            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat"><span class="stat-value">${data.summary.total_stocks}</span><span class="stat-label">Total</span></div><div class="summary-stat"><span class="stat-value">${data.summary.avg_delivery_pct}%</span><span class="stat-label">Avg Delivery</span></div><div class="summary-stat advances"><span class="stat-value">${data.summary.high_delivery_count}</span><span class="stat-label">High Delivery</span></div></div><div class="delivery-grid">${data.data.map(s => `<div class="delivery-card"><div class="delivery-info"><a href="/stock/${s.symbol}" target="_blank" class="delivery-symbol">${s.symbol}</a><span class="delivery-sector">${s.sector}</span><span class="delivery-price">₹${s.close.toLocaleString()}</span></div><div class="delivery-pct"><span class="pct-value">${s.delivery_pct.toFixed(1)}%</span><span class="pct-label">Delivery</span></div></div>`).join('')}</div>`;
+        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+    }
+
+    async function load52Week() {
+        const container = document.getElementById('week52-container');
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/insights/api/52-week?date=${currentDate}&index=${currentIndex}`);
+            const data = await response.json();
+            if (!data.success) { container.innerHTML = '<div class="empty-state"><p>No 52-week data</p></div>'; return; }
+            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">🔥 At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s.year_high).toLocaleString()}</td><td class="positive">${parseFloat(s.pct_from_high).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">📈 Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s.year_high).toLocaleString()}</td><td class="positive">${parseFloat(s.pct_from_high).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">⚠️ At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s.year_low).toLocaleString()}</td><td class="negative">${parseFloat(s.pct_from_low).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">📉 Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s.year_low).toLocaleString()}</td><td class="negative">${parseFloat(s.pct_from_low).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
+        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+    }
+
+    async function loadVolume() {
+        const container = document.getElementById('volume-container');
+        const multiplier = document.getElementById('volumeMultiplier').value;
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/insights/api/volume-breakouts?date=${currentDate}&multiplier=${multiplier}&index=${currentIndex}`);
+            const data = await response.json();
+            if (!data.success || !data.data.length) { container.innerHTML = '<div class="empty-state"><p>No volume breakouts</p></div>'; return; }
+            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat"><span class="stat-value">${data.count}</span><span class="stat-label">Breakout Stocks</span></div></div><div class="volume-grid">${data.data.map(s => `<div class="volume-card"><div class="volume-header"><a href="/stock/${s.symbol}" target="_blank" class="volume-symbol">${s.symbol}</a><span class="volume-ratio">${s.volume_ratio}x</span></div><div class="volume-stats"><div class="volume-stat"><span class="value">${formatNumber(s.volume)}</span><span class="label">Volume</span></div><div class="volume-stat"><span class="value">${formatNumber(s.avg_volume)}</span><span class="label">Avg Vol</span></div><div class="volume-stat"><span class="value">₹${s.close.toLocaleString()}</span><span class="label">Price</span></div><div class="volume-stat"><span class="value">${s.sector}</span><span class="label">Sector</span></div></div></div>`).join('')}</div>`;
+        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+    }
+
+    async function loadSectors() {
+        const container = document.getElementById('sectors-container');
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/insights/api/sector-performance?date=${currentDate}`);
+            const data = await response.json();
+            if (!data.success || !data.sectors.length) { container.innerHTML = '<div class="empty-state"><p>No sector data</p></div>'; return; }
+            container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Sector Performance</span></div><table class="card-table"><thead><tr><th>#</th><th>Sector</th><th>Avg Change</th><th>Turnover</th><th>Stocks</th><th>Top Movers</th></tr></thead><tbody>${data.sectors.map((s, i) => `<tr><td>${i + 1}</td><td><strong>${s.sector}</strong></td><td class="${s.avg_change >= 0 ? 'positive' : 'negative'}">${s.avg_change >= 0 ? '+' : ''}${s.avg_change}%</td><td>${formatNumber(s.total_turnover)}</td><td>${s.stock_count}</td><td>${s.stocks.slice(0, 3).map(sym => `<a href="/stock/${sym}" class="symbol-link">${sym}</a>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
+        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load the current tab's data on page load
+        const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDii, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors };
+        if (loaders[currentTab]) {
+            loaders[currentTab]();
+        } else {
+            loadHeatmap();
+        }
+    });
+</script>
+{% endblock %}

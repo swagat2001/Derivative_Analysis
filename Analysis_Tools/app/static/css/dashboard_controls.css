@@ -1,12 +1,12 @@
 /* Dashboard Controls Styling */
 .dashboard-controls {
   position: sticky;
-  top: 66px; /* Account for header height */
+  top: 0!important; /* Account for header height */
   z-index: 999;
-  background: white;
+  background: white!important;
   padding: 15px 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: none!important;
   border-bottom: 1px solid #e5e7eb;
 }
 

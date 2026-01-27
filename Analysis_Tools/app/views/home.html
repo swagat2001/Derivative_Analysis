@@ -230,11 +230,11 @@
         <span class="feature-link">Open Dashboard →</span>
       </a>
 
-      <a href="{{ url_for('screener.screener_landing') }}" class="feature-card">
+      <a href="{{ url_for('insights.insights_page') }}" class="feature-card">
         <div class="feature-icon">🗺️</div>
-        <h3>Stock Heatmaps</h3>
-        <p>Zoom out and get the complete picture of the market. Discover performance of every stock in an index.</p>
-        <span class="feature-link">View Heatmaps →</span>
+        <h3>Market Insights</h3>
+        <p>Heatmaps, FII/DII activity, delivery data, 52-week analysis & volume breakouts in one place.</p>
+        <span class="feature-link">View Insights →</span>
       </a>
 
       <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="feature-card">
@@ -521,8 +521,8 @@
           <h4>Products</h4>
           <a href="{{ url_for('screener.screener_landing') }}">Screeners</a>
           <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
-          <a href="#">Heatmaps</a>
-          <a href="#">Insights</a>
+          <a href="{{ url_for('insights.insights_page') }}">Heatmaps</a>
+          <a href="{{ url_for('insights.insights_page') }}">Insights</a>
         </div>
         <div class="footer-col">
           <h4>Resources</h4>

@@ -20,10 +20,11 @@ db_password = "Gallop@3104"
 db_host = "localhost"
 db_port = "5432"
 db_name = "BhavCopy_Database"
+db_name_cash = "CashStocks_Database"  # Cash/Equity database
 
 db_password_enc = quote_plus(db_password)
 
-# Create engine with proper connection pooling configuration
+# Create engine for F&O database (BhavCopy_Database)
 engine = create_engine(
     f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}",
     pool_size=10,
@@ -32,6 +33,17 @@ engine = create_engine(
     pool_recycle=3600,
     echo=False,
     connect_args={"connect_timeout": 10, "application_name": "Derivatives_Analysis"},
+)
+
+# Create engine for Cash/Equity database (CashStocks_Database)
+engine_cash = create_engine(
+    f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name_cash}",
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True,
+    pool_recycle=3600,
+    echo=False,
+    connect_args={"connect_timeout": 10, "application_name": "Cash_Analysis"},
 )
 
 # =============================================================

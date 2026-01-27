@@ -1,120 +1,222 @@
 <!-- Universal Screener Sidebar with Built-in Styles -->
 <style>
-/* ===== SIDEBAR STYLES ===== */
-.screener-sidebar {
-    width: 260px;
+  /* ===== SIDEBAR STYLES ===== */
+  .screener-sidebar {
+    width: 240px;
     background: #fff;
     border-radius: 12px;
-    padding: 20px 16px;
+    padding: 16px 12px;
     border: 1px solid #e5e7eb;
     height: fit-content;
     position: sticky;
     top: 80px;
     flex-shrink: 0;
-}
+  }
 
-.screener-sidebar h3 {
-    font-size: 16px;
-    font-weight: 700;
+  .screener-sidebar h3 {
+    font-size: 15px;
+    font-weight: 600;
     color: #1a1a1a;
-    margin: 0 0 16px 0;
+    margin: 0 0 14px 0;
     padding-left: 12px;
-}
+  }
 
-.screener-sidebar hr {
+  .screener-sidebar hr {
     border: none;
     border-top: 1px solid #e5e7eb;
     margin: 12px 0;
-}
+  }
 
-.screener-sidebar .menu-item {
-    padding: 12px 14px;
+  .screener-sidebar .menu-item {
+    padding: 10px 12px;
     border-radius: 8px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     cursor: pointer;
     color: #444;
     font-size: 14px;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 10px;
-    transition: all 0.2s ease;
+    gap: 12px;
+    transition: all 0.15s ease;
     text-decoration: none;
-}
+  }
 
-.screener-sidebar .menu-item:hover {
-    background: #f3f4f6;
+  .screener-sidebar .menu-item:hover {
+    background: #f8f9fa;
     color: #1a1a1a;
-}
+  }
 
-.screener-sidebar .menu-item.active {
-    background: linear-gradient(135deg, #ffeeee 0%, #fee8e8 100%);
-    color: var(--goldmine-maroon);
+  .screener-sidebar .menu-item.active {
+    background: #f0f7ff;
+    color: #2563eb;
+  }
+
+  .screener-sidebar .menu-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .screener-sidebar .menu-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Icon color backgrounds */
+  .icon-explore {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  .icon-scanner {
+    background: #fff3e0;
+    color: #f57c00;
+  }
+
+  .icon-goldmine {
+    background: #fce4ec;
+    color: #c2185b;
+  }
+
+  .icon-following {
+    background: #fff8e1;
+    color: #ffa000;
+  }
+
+  .icon-boosted {
+    background: #e8f5e9;
+    color: #388e3c;
+  }
+
+  .icon-shared {
+    background: #e8eaf6;
+    color: #5c6bc0;
+  }
+
+  .icon-saved {
+    background: #f3e5f5;
+    color: #7b1fa2;
+  }
+
+  .screener-sidebar .menu-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .screener-sidebar .menu-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: #8B2432;
+    color: white;
+    margin-left: auto;
     font-weight: 600;
-}
+    text-transform: uppercase;
+  }
 
-.screener-sidebar .menu-icon {
-    font-size: 16px;
-    width: 20px;
-    text-align: center;
-}
-
-/* ===== RESPONSIVE SIDEBAR ===== */
-@media (max-width: 1024px) {
+  /* ===== RESPONSIVE SIDEBAR ===== */
+  @media (max-width: 1024px) {
     .screener-sidebar {
-        width: 100%;
-        position: static;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 16px;
+      width: 100%;
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 12px;
     }
 
     .screener-sidebar h3 {
-        width: 100%;
-        margin-bottom: 12px;
+      width: 100%;
+      margin-bottom: 8px;
     }
 
     .screener-sidebar hr {
-        display: none;
+      display: none;
     }
 
     .screener-sidebar .menu-item {
-        padding: 8px 14px;
-        margin-bottom: 0;
+      padding: 8px 12px;
+      margin-bottom: 0;
     }
-}
-
-@media (max-width: 640px) {
-    .screener-sidebar .menu-item {
-        font-size: 13px;
-        padding: 8px 12px;
-    }
-}
+  }
 </style>
 
 <aside class="screener-sidebar">
   <h3>Screeners</h3>
-  <a href="{{ url_for('screener.screener_landing') }}" class="menu-item {% if request.endpoint == 'screener.screener_landing' %}active{% endif %}">
-    <span class="menu-icon">🔍</span> Explore
+  <a href="{{ url_for('screener.screener_landing') }}"
+    class="menu-item {% if request.endpoint == 'screener.screener_landing' %}active{% endif %}">
+    <span class="menu-icon icon-explore">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    </span>
+    Explore
   </a>
-  <div class="menu-item">
-    <span class="menu-icon">📡</span> Live Market Scanner
+  <a href="{{ url_for('signal_scanner.scanner_page') }}"
+    class="menu-item {% if request.endpoint == 'signal_scanner.scanner_page' %}active{% endif %}">
+    <span class="menu-icon icon-scanner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+      </svg>
+    </span>
+    Signal Scanner
+    <span class="menu-badge">New</span>
+  </a>
+  <div class="menu-item disabled">
+    <span class="menu-icon icon-goldmine">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    </span>
+    By Goldmine
   </div>
-  <div class="menu-item">
-    <span class="menu-icon">⚡</span> By Goldmine
+  <div class="menu-item disabled">
+    <span class="menu-icon icon-following">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon
+          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    </span>
+    Following
   </div>
-  <div class="menu-item">
-    <span class="menu-icon">⭐</span> Following
+  <div class="menu-item disabled">
+    <span class="menu-icon icon-boosted">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      </svg>
+    </span>
+    Boosted
   </div>
-  <div class="menu-item">
-    <span class="menu-icon">🚀</span> Boosted
-  </div>
-  <div class="menu-item">
-    <span class="menu-icon">🔗</span> Shared With Me
+  <div class="menu-item disabled">
+    <span class="menu-icon icon-shared">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="6" cy="12" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+      </svg>
+    </span>
+    Shared With Me
   </div>
   <hr>
-  <div class="menu-item">
-    <span class="menu-icon">💾</span> My Saved Screeners
+  <div class="menu-item disabled">
+    <span class="menu-icon icon-saved">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+        <polyline points="17 21 17 13 7 13 7 21" />
+        <polyline points="7 3 7 8 15 8" />
+      </svg>
+    </span>
+    My Saved Screeners
   </div>
 </aside>

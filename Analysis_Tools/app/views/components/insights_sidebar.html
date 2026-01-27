@@ -1,0 +1,160 @@
+<!-- Insights Sidebar Component -->
+<style>
+  .insights-sidebar {
+    width: 240px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 12px;
+    border: 1px solid #e5e7eb;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+    flex-shrink: 0;
+  }
+
+  .insights-sidebar h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 14px 0;
+    padding-left: 12px;
+  }
+
+  .insights-sidebar hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 12px 0;
+  }
+
+  .insights-sidebar .menu-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    cursor: pointer;
+    color: #444;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
+
+  .insights-sidebar .menu-item:hover {
+    background: #f8f9fa;
+    color: #1a1a1a;
+  }
+
+  .insights-sidebar .menu-item.active {
+    background: #f0f7ff;
+    color: #2563eb;
+  }
+
+  .insights-sidebar .menu-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .insights-sidebar .menu-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .icon-heatmap { background: #fef3c7; color: #d97706; }
+  .icon-fii { background: #dbeafe; color: #2563eb; }
+  .icon-delivery { background: #d1fae5; color: #059669; }
+  .icon-52week { background: #fce7f3; color: #db2777; }
+  .icon-volume { background: #ede9fe; color: #7c3aed; }
+  .icon-sector { background: #ffedd5; color: #ea580c; }
+
+  @media (max-width: 1024px) {
+    .insights-sidebar {
+      width: 100%;
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 12px;
+    }
+    .insights-sidebar h3 { width: 100%; margin-bottom: 8px; }
+    .insights-sidebar hr { display: none; }
+    .insights-sidebar .menu-item { padding: 8px 12px; margin-bottom: 0; }
+  }
+</style>
+
+<aside class="insights-sidebar">
+  <h3>Market Insights</h3>
+  <a href="{{ url_for('insights.insights_page') }}?tab=heatmap"
+     class="menu-item {% if active_tab == 'heatmap' %}active{% endif %}">
+    <span class="menu-icon icon-heatmap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+    </span>
+    Heatmap
+  </a>
+  <a href="{{ url_for('insights.insights_page') }}?tab=fii-dii"
+     class="menu-item {% if active_tab == 'fii-dii' %}active{% endif %}">
+    <span class="menu-icon icon-fii">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+      </svg>
+    </span>
+    FII/DII Activity
+  </a>
+  <a href="{{ url_for('insights.insights_page') }}?tab=delivery"
+     class="menu-item {% if active_tab == 'delivery' %}active{% endif %}">
+    <span class="menu-icon icon-delivery">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      </svg>
+    </span>
+    Delivery Data
+  </a>
+  <a href="{{ url_for('insights.insights_page') }}?tab=52week"
+     class="menu-item {% if active_tab == '52week' %}active{% endif %}">
+    <span class="menu-icon icon-52week">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+        <polyline points="16 7 22 7 22 13"/>
+      </svg>
+    </span>
+    52-Week High/Low
+  </a>
+  <a href="{{ url_for('insights.insights_page') }}?tab=volume"
+     class="menu-item {% if active_tab == 'volume' %}active{% endif %}">
+    <span class="menu-icon icon-volume">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+        <polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+      </svg>
+    </span>
+    Volume Breakouts
+  </a>
+  <a href="{{ url_for('insights.insights_page') }}?tab=sectors"
+     class="menu-item {% if active_tab == 'sectors' %}active{% endif %}">
+    <span class="menu-icon icon-sector">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+        <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+      </svg>
+    </span>
+    Sector Performance
+  </a>
+  <hr>
+  <a href="{{ url_for('screener.screener_landing') }}" class="menu-item">
+    <span class="menu-icon" style="background:#f3f4f6;color:#6b7280;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+    </span>
+    Back to Screeners
+  </a>
+</aside>

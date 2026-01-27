@@ -1144,7 +1144,7 @@
 .footer-logo {
   height: 40px;
   margin-bottom: 16px;
-  filter: brightness(0) invert(1);
+  /* filter: brightness(0) invert(1); */
 }
 
 .footer-brand p {
