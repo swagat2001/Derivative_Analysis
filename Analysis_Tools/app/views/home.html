@@ -496,8 +496,10 @@
   <!-- ===== CTA SECTION ===== -->
   <section class="cta-section">
     <div class="cta-content">
-      <h2>Start analyzing the market today</h2>
-      <p>Join thousands of traders using Goldmine for smarter investment decisions</p>
+      <div class="cta-info">
+        <h2>Start analyzing the market today</h2>
+        <p>Join thousands of traders using Goldmine for smarter investment decisions</p>
+      </div>
       <div class="cta-actions">
         <a href="{{ url_for('auth.signup') }}" class="btn-primary large">
           Create Free Account
@@ -514,7 +516,13 @@
     <div class="footer-content">
       <div class="footer-brand">
         <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine" class="footer-logo">
-        <p>Stock Screener & Derivatives Analysis Platform Built for India</p>
+        <h4>📍 Registered Office:</h4>
+        <p>
+            Unit no. 111–111, 11th Floor,<br>
+            Block no. 53-E, Dalal Street Building (BSE Tower),<br>
+            Road 5E, Zone-5, Gift City,<br>
+            Gandhinagar – 382050, Gujarat
+        </p>
       </div>
       <div class="footer-links">
         <div class="footer-col">
@@ -541,7 +549,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2025 Goldmine Stocks Pvt Ltd. All rights reserved.</p>
+      <p>© 2026 Goldmine Stocks Pvt Ltd. All rights reserved.</p>
     </div>
   </footer>
 

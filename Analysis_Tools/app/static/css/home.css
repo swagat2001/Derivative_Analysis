@@ -1072,26 +1072,34 @@
 /* ===== CTA SECTION ===== */
 .cta-section {
   background: linear-gradient(135deg, var(--goldmine-maroon) 0%, var(--goldmine-maroon-dark) 100%);
-  padding: 80px 40px;
+  padding: 30px;
   text-align: center;
 }
 
 .cta-content {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cta-info {
+  max-width: calc(100% - 420px);
+  width: 100%;
+  text-align: left;
+  padding-right: 20px;
 }
 
 .cta-content h2 {
   font-size: 32px;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 12px;
 }
 
 .cta-content p {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 32px;
 }
 
 .cta-actions {
@@ -1140,13 +1148,16 @@
 .footer-brand {
   max-width: 300px;
 }
-
 .footer-logo {
   height: 40px;
   margin-bottom: 16px;
-  /* filter: brightness(0) invert(1); */
 }
-
+.footer-brand h4 {
+  color: #9ca3af;
+  margin-bottom: 15px;
+  border-top: 1px solid #3c3c3c;
+  padding-top: 15px;
+}
 .footer-brand p {
   font-size: 14px;
   color: #9ca3af;
