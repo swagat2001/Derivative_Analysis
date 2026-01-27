@@ -565,7 +565,24 @@ input, select, textarea {
 #BullishBearish .card-table table {width: 100%;}
 #BullishBearish .card-table table th:first-child, #BullishBearish .card-table table td:first-child {width:100px !important;}
 
-/* Responsive */
+
+#summaryGrid .summary-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 10px;
+}
+#summaryGrid .summary-card .value {
+    text-align: left;
+    line-height: 17px;
+    font-size: 50px;
+}
+
+#summaryGrid .summary-card .label {
+  text-align: left;
+}
+
+/* ===================================================== Responsive ===================================================== */
 @media (max-width: 1200px) {
   .table-wrap {
     overflow-x: auto;

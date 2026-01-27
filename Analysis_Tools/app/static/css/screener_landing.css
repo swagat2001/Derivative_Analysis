@@ -150,12 +150,12 @@
         font-size: 13px;
         gap: 6px;
     }
-    
+
     .back-btn svg {
         width: 14px;
         height: 14px;
     }
-    
+
     .back-button-container {
         margin-bottom: 16px;
     }
@@ -197,6 +197,11 @@
     border-color: var(--goldmine-maroon);
     box-shadow: 0 4px 16px rgba(11, 92, 255, 0.12);
     transform: translateX(4px);
+}
+
+#screenerList .screener-card {
+    display: flex;
+    align-items: center;
 }
 
 .screener-left {

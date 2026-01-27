@@ -1138,15 +1138,27 @@
 
 .footer-content {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 40px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #323232;
 }
 
+.footer-certified {
+  max-width: 100%;
+  width: 100%;
+  margin-top: 30px;
+  padding:30px 100px;
+  border-top: 1px solid #323232;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+}
+
+
 .footer-brand {
-  max-width: 300px;
+  max-width: 330px;
 }
 .footer-logo {
   height: 40px;
