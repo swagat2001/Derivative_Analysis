@@ -6,6 +6,9 @@
     margin-top: 6px;
     background: linear-gradient(135deg, #7c1e1d 100%, #7c1e1d 100%);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 64px;
+    z-index: 101;
 }
 .stock-controls-bar .control-group {
     display: flex;
@@ -35,4 +38,7 @@
 .stock-controls-bar .control-group input[type="date"]:hover {
     background: #ffffff;
     border-color: rgba(255, 255, 255, 0.6);
+}
+.fundamental-btn {
+    margin: 0 0 0 auto;
 }
