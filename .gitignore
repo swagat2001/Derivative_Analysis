@@ -147,7 +147,11 @@ cython_debug/
 Thumbs.db
 
 # Project specific
-spot_data/
+# spot_data - allow Python scripts but ignore binaries and data
+spot_data/Data/
+spot_data/*.exe
+spot_data/*.config
+spot_data/instruments.txt
 *.xlsx
 !*template*.xlsx
 Database/Backups/
