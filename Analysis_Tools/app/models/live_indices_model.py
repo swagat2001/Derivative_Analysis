@@ -1,124 +1,54 @@
 """
 Live Indices Data Model
-Reads real-time data from C++ WebSocket application output files
+Reads real-time data from spot files written by live_indices_streamer.py
 """
 
-import math
 import os
 from datetime import datetime
 from typing import Dict, List, Optional
 
 
 class LiveIndicesReader:
-    """Reads live market data from text files written by C++ application"""
+    """Reads live market data from text files written by Python WebSocket streamer"""
 
-    BASE_PATH = "C:\\Users\\Admin\\Desktop\\insu\\data\\"
+    # Path to spot data directory (relative to project root)
+    BASE_PATH = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+        "spot_data",
+        "Data",
+    )
 
-    # File paths for each index
+    # File mappings for each index
     FILES = {
-        "nifty50": {"spot": "NiftyIndexSpot.txt", "history": "NiftyIndex.txt"},
-        "banknifty": {"spot": "BankNiftySpot.txt", "history": "BankNifty.txt"},
-        "sensex": {"spot": "SensexSpot.txt", "history": "Sensex.txt"},
-        "niftyfin": {"spot": "NiftyFinSpot.txt", "history": "NiftyFin.txt"},
-        "niftynext50": {"spot": "NiftyNext50Spot.txt", "history": "NiftyNext50.txt"},
+        "nifty50": {"spot": "Nifty50Spot.txt", "history": "Nifty50History.txt"},
+        "banknifty": {"spot": "BankNiftySpot.txt", "history": "BankNiftyHistory.txt"},
+        "sensex": {"spot": "SensexSpot.txt", "history": "SensexHistory.txt"},
+        "niftyfin": {"spot": "NiftyFinSpot.txt", "history": "NiftyFinHistory.txt"},
+        "niftynext50": {"spot": "NiftyNext50Spot.txt", "history": "NiftyNext50History.txt"},
+        "nifty100": {"spot": "Nifty100Spot.txt", "history": "Nifty100History.txt"},
     }
 
     # Static fallback data when files don't exist (market closed)
-    FALLBACK_DATA = {}
-
-    @staticmethod
-    def _init_fallback_data():
-        """Initialize static fallback data with pre-generated history"""
-        LiveIndicesReader.FALLBACK_DATA = {
-            "nifty50": {
-                "value": 26147.10,
-                "open": 26143.05,
-                "high": 26147.30,
-                "low": 26142.65,
-                "previousClose": 26143.05,
-                "history": LiveIndicesReader._generate_smooth_pattern(26143.05, 26147.10, 26147.30, 26142.65, 0),
-            },
-            "banknifty": {
-                "value": 51234.50,
-                "open": 51450.00,
-                "high": 51550.30,
-                "low": 51100.20,
-                "previousClose": 51450.00,
-                "history": LiveIndicesReader._generate_smooth_pattern(51450.00, 51234.50, 51550.30, 51100.20, 1),
-            },
-            "sensex": {
-                "value": 83758.43,
-                "open": 83200.00,
-                "high": 83900.50,
-                "low": 83150.00,
-                "previousClose": 83200.00,
-                "history": LiveIndicesReader._generate_smooth_pattern(83200.00, 83758.43, 83900.50, 83150.00, 2),
-            },
-            "niftyfin": {
-                "value": 23890.40,
-                "open": 23750.00,
-                "high": 23950.00,
-                "low": 23700.00,
-                "previousClose": 23750.00,
-                "history": LiveIndicesReader._generate_smooth_pattern(23750.00, 23890.40, 23950.00, 23700.00, 3),
-            },
-            "niftynext50": {
-                "value": 68499.30,
-                "open": 69200.00,
-                "high": 69350.00,
-                "low": 68400.00,
-                "previousClose": 69200.00,
-                "history": LiveIndicesReader._generate_smooth_pattern(69200.00, 68499.30, 69350.00, 68400.00, 4),
-            },
-        }
-
-    @staticmethod
-    def _generate_smooth_pattern(
-        open_val: float, close_val: float, high_val: float, low_val: float, seed: int
-    ) -> List[Dict]:
-        """Generate deterministic smooth pattern using sine waves"""
-        history = []
-        points = 100
-
-        for i in range(points):
-            # Calculate time
-            minutes = int((i / points) * 390)  # 390 minutes in trading day
-            hour = 9 + (minutes // 60)
-            minute = minutes % 60
-            timestamp = f"2026-01-11 {hour:02d}:{minute:02d}:00"
-
-            # Progress through the day
-            progress = i / (points - 1)
-
-            # Create smooth sine wave pattern that respects open/close/high/low
-            # Use seed to make different patterns for different indices
-            phase = seed * 0.5
-            wave1 = math.sin(progress * math.pi * 3 + phase) * 0.3
-            wave2 = math.sin(progress * math.pi * 5 + phase) * 0.15
-            wave3 = math.sin(progress * math.pi * 7 + phase) * 0.08
-
-            # Combine waves (-1 to 1 range)
-            combined_wave = (wave1 + wave2 + wave3) / (0.3 + 0.15 + 0.08)
-
-            # Map to price range
-            mid_price = (high_val + low_val) / 2
-            range_size = (high_val - low_val) / 2
-
-            # Calculate value based on wave
-            base_value = mid_price + (combined_wave * range_size * 0.8)
-
-            # Add linear trend from open to close
-            trend = open_val + (close_val - open_val) * progress
-
-            # Blend wave and trend
-            value = base_value * 0.6 + trend * 0.4
-
-            # Ensure within bounds
-            value = max(low_val, min(high_val, value))
-
-            history.append({"timestamp": timestamp, "value": round(value, 2)})
-
-        return history
+    FALLBACK_DATA = {
+        "nifty50": {"value": 24677.80, "open": 24600.00, "high": 24700.00, "low": 24550.00, "previousClose": 24600.00},
+        "banknifty": {
+            "value": 51234.50,
+            "open": 51450.00,
+            "high": 51550.30,
+            "low": 51100.20,
+            "previousClose": 51450.00,
+        },
+        "sensex": {"value": 83758.43, "open": 83200.00, "high": 83900.50, "low": 83150.00, "previousClose": 83200.00},
+        "niftyfin": {"value": 23890.40, "open": 23750.00, "high": 23950.00, "low": 23700.00, "previousClose": 23750.00},
+        "niftynext50": {
+            "value": 68499.30,
+            "open": 69200.00,
+            "high": 69350.00,
+            "low": 68400.00,
+            "previousClose": 69200.00,
+        },
+        "nifty100": {"value": 26260.30, "open": 26450.00, "high": 26500.00, "low": 26200.00, "previousClose": 26450.00},
+    }
 
     @staticmethod
     def read_file(filepath: str) -> Optional[str]:
@@ -193,13 +123,6 @@ class LiveIndicesReader:
         }
 
     @staticmethod
-    def get_last_value_from_history(history: List[Dict]) -> Optional[float]:
-        """Get last value from history"""
-        if not history:
-            return None
-        return history[-1]["value"]
-
-    @staticmethod
     def get_index_data(index_key: str) -> Optional[Dict]:
         """Get complete data for a single index"""
         if index_key not in LiveIndicesReader.FILES:
@@ -223,18 +146,13 @@ class LiveIndicesReader:
 
         # If no spot value, try to get last value from history
         if current_value is None and history:
-            current_value = LiveIndicesReader.get_last_value_from_history(history)
+            current_value = history[-1]["value"]
 
         # If still no value, use static fallback
         if current_value is None:
             if index_key in LiveIndicesReader.FALLBACK_DATA:
                 fallback = LiveIndicesReader.FALLBACK_DATA[index_key]
                 current_value = fallback["value"]
-
-                # Use pre-generated static history
-                history = fallback["history"]
-
-                # Use fallback O/H/L
                 ohlc = {"open": fallback["open"], "high": fallback["high"], "low": fallback["low"]}
                 previous_close = fallback["previousClose"]
             else:
@@ -270,10 +188,6 @@ class LiveIndicesReader:
 
         # Always return success=True with at least fallback data
         return {"success": True, "timestamp": datetime.now().isoformat(), "indices": result}
-
-
-# Initialize fallback data once on module load
-LiveIndicesReader._init_fallback_data()
 
 
 def get_live_indices():

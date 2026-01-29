@@ -33,7 +33,8 @@ class LiveIndicesUpdater {
             'banknifty': { valueId: 'bankniftyValue', changeId: 'bankniftyChange' },
             'sensex': { valueId: 'sensexValue', changeId: 'sensexChange' },
             'niftyfin': { valueId: 'niftyfinValue', changeId: 'niftyfinChange' },
-            'niftynext50': { valueId: 'niftynext50Value', changeId: 'niftynext50Change' }
+            'niftynext50': { valueId: 'niftynext50Value', changeId: 'niftynext50Change' },
+            'nifty100': { valueId: 'nifty100Value', changeId: 'nifty100Change' }
         };
 
         const mapping = cardMap[indexKey];
@@ -90,7 +91,8 @@ class LiveIndicesUpdater {
             'banknifty': 'BANK NIFTY',
             'sensex': 'SENSEX',
             'niftyfin': 'NIFTY FIN',
-            'niftynext50': 'NIFTY NEXT 50'
+            'niftynext50': 'NIFTY NEXT 50',
+            'nifty100': 'NIFTY 100'
         };
 
         const indexNameEl = document.getElementById('selectedIndexName');
@@ -209,7 +211,8 @@ class LiveIndicesUpdater {
             'bankniftyValue': 'banknifty',
             'sensexValue': 'sensex',
             'niftyfinValue': 'niftyfin',
-            'niftynext50Value': 'niftynext50'
+            'niftynext50Value': 'niftynext50',
+            'nifty100Value': 'nifty100'
         };
 
         Object.keys(cardMap).forEach(valueId => {
