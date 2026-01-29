@@ -1,0 +1,98 @@
+{
+  "2011-12-01": [
+    {
+      "EquityCapital": 42.0
+    },
+    {
+      "Reserves": 2492.0
+    },
+    {
+      "Borrowings ": 0.0
+    },
+    {
+      "OtherLiabilities ": 3784.0
+    },
+    {
+      "TotalLiabilities": 6319.0
+    },
+    {
+      "FixedAssets ": 1195.0
+    },
+    {
+      "CWIP": 74.0
+    },
+    {
+      "Investments": 17.0
+    },
+    {
+      "OtherAssets ": 5033.0
+    },
+    {
+      "TotalAssets": 6319.0
+    }
+  ],
+  "2012-12-01": [
+    {
+      "EquityCapital": 42.0
+    },
+    {
+      "Reserves": 2559.0
+    },
+    {
+      "Borrowings ": 328.0
+    },
+    {
+      "OtherLiabilities ": 3575.0
+    },
+    {
+      "TotalLiabilities": 6504.0
+    },
+    {
+      "FixedAssets ": 1234.0
+    },
+    {
+      "CWIP": 117.0
+    },
+    {
+      "Investments": 17.0
+    },
+    {
+      "OtherAssets ": 5137.0
+    },
+    {
+      "TotalAssets": 6504.0
+    }
+  ],
+  "2022-06-01": [
+    {
+      "EquityCapital": 42.0
+    },
+    {
+      "Reserves": 4129.0
+    },
+    {
+      "Borrowings ": 30.0
+    },
+    {
+      "OtherLiabilities ": 4343.0
+    },
+    {
+      "TotalLiabilities": 8545.0
+    },
+    {
+      "FixedAssets ": 823.0
+    },
+    {
+      "CWIP": 100.0
+    },
+    {
+      "Investments": 975.0
+    },
+    {
+      "OtherAssets ": 6647.0
+    },
+    {
+      "TotalAssets": 8545.0
+    }
+  ]
+}

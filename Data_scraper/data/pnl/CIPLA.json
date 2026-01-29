@@ -1,0 +1,496 @@
+{
+  "2014-03-01": [
+    {
+      "Sales ": 10173.0
+    },
+    {
+      "Expenses ": 8026.0
+    },
+    {
+      "OperatingProfit": 2147.0
+    },
+    {
+      "OPM%": 0.21
+    },
+    {
+      "OtherIncome ": 251.0
+    },
+    {
+      "Interest": 146.0
+    },
+    {
+      "Depreciation": 373.0
+    },
+    {
+      "Profitbeforetax": 1880.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 1404.0
+    },
+    {
+      "EPSinRs": 17.29
+    },
+    {
+      "DividendPayout%": 0.12
+    }
+  ],
+  "2015-03-01": [
+    {
+      "Sales ": 11345.0
+    },
+    {
+      "Expenses ": 9183.0
+    },
+    {
+      "OperatingProfit": 2163.0
+    },
+    {
+      "OPM%": 0.19
+    },
+    {
+      "OtherIncome ": 164.0
+    },
+    {
+      "Interest": 168.0
+    },
+    {
+      "Depreciation": 505.0
+    },
+    {
+      "Profitbeforetax": 1654.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 1229.0
+    },
+    {
+      "EPSinRs": 14.71
+    },
+    {
+      "DividendPayout%": 0.14
+    }
+  ],
+  "2016-03-01": [
+    {
+      "Sales ": 13790.0
+    },
+    {
+      "Expenses ": 11310.0
+    },
+    {
+      "OperatingProfit": 2480.0
+    },
+    {
+      "OPM%": 0.18
+    },
+    {
+      "OtherIncome ": 208.0
+    },
+    {
+      "Interest": 207.0
+    },
+    {
+      "Depreciation": 754.0
+    },
+    {
+      "Profitbeforetax": 1727.0
+    },
+    {
+      "Tax%": 0.19
+    },
+    {
+      "NetProfit ": 1383.0
+    },
+    {
+      "EPSinRs": 16.93
+    },
+    {
+      "DividendPayout%": 0.12
+    }
+  ],
+  "2017-03-01": [
+    {
+      "Sales ": 14394.0
+    },
+    {
+      "Expenses ": 11898.0
+    },
+    {
+      "OperatingProfit": 2496.0
+    },
+    {
+      "OPM%": 0.17
+    },
+    {
+      "OtherIncome ": 208.0
+    },
+    {
+      "Interest": 159.0
+    },
+    {
+      "Depreciation": 1323.0
+    },
+    {
+      "Profitbeforetax": 1222.0
+    },
+    {
+      "Tax%": 0.15
+    },
+    {
+      "NetProfit ": 1035.0
+    },
+    {
+      "EPSinRs": 12.51
+    },
+    {
+      "DividendPayout%": 0.16
+    }
+  ],
+  "2018-03-01": [
+    {
+      "Sales ": 15156.0
+    },
+    {
+      "Expenses ": 12329.0
+    },
+    {
+      "OperatingProfit": 2826.0
+    },
+    {
+      "OPM%": 0.19
+    },
+    {
+      "OtherIncome ": 280.0
+    },
+    {
+      "Interest": 114.0
+    },
+    {
+      "Depreciation": 1323.0
+    },
+    {
+      "Profitbeforetax": 1669.0
+    },
+    {
+      "Tax%": 0.15
+    },
+    {
+      "NetProfit ": 1417.0
+    },
+    {
+      "EPSinRs": 17.52
+    },
+    {
+      "DividendPayout%": 0.17
+    }
+  ],
+  "2019-03-01": [
+    {
+      "Sales ": 16362.0
+    },
+    {
+      "Expenses ": 13265.0
+    },
+    {
+      "OperatingProfit": 3097.0
+    },
+    {
+      "OPM%": 0.19
+    },
+    {
+      "OtherIncome ": 477.0
+    },
+    {
+      "Interest": 168.0
+    },
+    {
+      "Depreciation": 1326.0
+    },
+    {
+      "Profitbeforetax": 2079.0
+    },
+    {
+      "Tax%": 0.27
+    },
+    {
+      "NetProfit ": 1492.0
+    },
+    {
+      "EPSinRs": 18.96
+    },
+    {
+      "DividendPayout%": 0.16
+    }
+  ],
+  "2020-03-01": [
+    {
+      "Sales ": 17132.0
+    },
+    {
+      "Expenses ": 13926.0
+    },
+    {
+      "OperatingProfit": 3206.0
+    },
+    {
+      "OPM%": 0.19
+    },
+    {
+      "OtherIncome ": 344.0
+    },
+    {
+      "Interest": 197.0
+    },
+    {
+      "Depreciation": 1175.0
+    },
+    {
+      "Profitbeforetax": 2178.0
+    },
+    {
+      "Tax%": 0.29
+    },
+    {
+      "NetProfit ": 1500.0
+    },
+    {
+      "EPSinRs": 19.18
+    },
+    {
+      "DividendPayout%": 0.21
+    }
+  ],
+  "2021-03-01": [
+    {
+      "Sales ": 19160.0
+    },
+    {
+      "Expenses ": 14907.0
+    },
+    {
+      "OperatingProfit": 4252.0
+    },
+    {
+      "OPM%": 0.22
+    },
+    {
+      "OtherIncome ": 266.0
+    },
+    {
+      "Interest": 161.0
+    },
+    {
+      "Depreciation": 1068.0
+    },
+    {
+      "Profitbeforetax": 3290.0
+    },
+    {
+      "Tax%": 0.27
+    },
+    {
+      "NetProfit ": 2389.0
+    },
+    {
+      "EPSinRs": 29.82
+    },
+    {
+      "DividendPayout%": 0.17
+    }
+  ],
+  "2022-03-01": [
+    {
+      "Sales ": 21763.0
+    },
+    {
+      "Expenses ": 17211.0
+    },
+    {
+      "OperatingProfit": 4553.0
+    },
+    {
+      "OPM%": 0.21
+    },
+    {
+      "OtherIncome ": 99.0
+    },
+    {
+      "Interest": 106.0
+    },
+    {
+      "Depreciation": 1052.0
+    },
+    {
+      "Profitbeforetax": 3493.0
+    },
+    {
+      "Tax%": 0.27
+    },
+    {
+      "NetProfit ": 2547.0
+    },
+    {
+      "EPSinRs": 31.19
+    },
+    {
+      "DividendPayout%": 0.16
+    }
+  ],
+  "2023-03-01": [
+    {
+      "Sales ": 22753.0
+    },
+    {
+      "Expenses ": 17726.0
+    },
+    {
+      "OperatingProfit": 5027.0
+    },
+    {
+      "OPM%": 0.22
+    },
+    {
+      "OtherIncome ": 293.0
+    },
+    {
+      "Interest": 110.0
+    },
+    {
+      "Depreciation": 1172.0
+    },
+    {
+      "Profitbeforetax": 4038.0
+    },
+    {
+      "Tax%": 0.3
+    },
+    {
+      "NetProfit ": 2833.0
+    },
+    {
+      "EPSinRs": 34.71
+    },
+    {
+      "DividendPayout%": 0.24
+    }
+  ],
+  "2024-03-01": [
+    {
+      "Sales ": 25774.0
+    },
+    {
+      "Expenses ": 19483.0
+    },
+    {
+      "OperatingProfit": 6291.0
+    },
+    {
+      "OPM%": 0.24
+    },
+    {
+      "OtherIncome ": 552.0
+    },
+    {
+      "Interest": 90.0
+    },
+    {
+      "Depreciation": 1051.0
+    },
+    {
+      "Profitbeforetax": 5702.0
+    },
+    {
+      "Tax%": 0.27
+    },
+    {
+      "NetProfit ": 4154.0
+    },
+    {
+      "EPSinRs": 51.05
+    },
+    {
+      "DividendPayout%": 0.25
+    }
+  ],
+  "2025-03-01": [
+    {
+      "Sales ": 27548.0
+    },
+    {
+      "Expenses ": 20420.0
+    },
+    {
+      "OperatingProfit": 7128.0
+    },
+    {
+      "OPM%": 0.26
+    },
+    {
+      "OtherIncome ": 862.0
+    },
+    {
+      "Interest": 62.0
+    },
+    {
+      "Depreciation": 1107.0
+    },
+    {
+      "Profitbeforetax": 6821.0
+    },
+    {
+      "Tax%": 0.22
+    },
+    {
+      "NetProfit ": 5269.0
+    },
+    {
+      "EPSinRs": 65.28
+    },
+    {
+      "DividendPayout%": 0.25
+    }
+  ],
+  "TTM": [
+    {
+      "Sales ": 28351.0
+    },
+    {
+      "Expenses ": 21886.0
+    },
+    {
+      "OperatingProfit": 6466.0
+    },
+    {
+      "OPM%": 0.23
+    },
+    {
+      "OtherIncome ": 747.0
+    },
+    {
+      "Interest": 55.0
+    },
+    {
+      "Depreciation": 1137.0
+    },
+    {
+      "Profitbeforetax": 6021.0
+    },
+    {
+      "Tax%": 0.0
+    },
+    {
+      "NetProfit ": 4533.0
+    },
+    {
+      "EPSinRs": 56.29
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ]
+}

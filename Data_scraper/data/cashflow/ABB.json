@@ -1,0 +1,44 @@
+{
+  "2011-12-01": [
+    {
+      "CashfromOperatingActivity ": 120.0
+    },
+    {
+      "CashfromInvestingActivity ": -361.0
+    },
+    {
+      "CashfromFinancingActivity ": -80.0
+    },
+    {
+      "NetCashFlow": -321.0
+    }
+  ],
+  "2012-12-01": [
+    {
+      "CashfromOperatingActivity ": -44.0
+    },
+    {
+      "CashfromInvestingActivity ": -340.0
+    },
+    {
+      "CashfromFinancingActivity ": 210.0
+    },
+    {
+      "NetCashFlow": -173.0
+    }
+  ],
+  "2024-12-01": [
+    {
+      "CashfromOperatingActivity ": 0.0
+    },
+    {
+      "CashfromInvestingActivity ": 0.0
+    },
+    {
+      "CashfromFinancingActivity ": 0.0
+    },
+    {
+      "NetCashFlow": 0.0
+    }
+  ]
+}

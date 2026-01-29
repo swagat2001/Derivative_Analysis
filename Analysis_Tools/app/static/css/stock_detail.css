@@ -53,3 +53,879 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================ */
+/* STOCK CONTROLS BAR STYLES */
+/* ============================ */
+
+.stock-controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 20px 30px;
+    margin-top: 6px;
+    background: linear-gradient(135deg, #7c1e1d 100%, #7c1e1d 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 64px;
+    z-index: 101;
+}
+
+.stock-controls-bar .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 150px;
+}
+
+.stock-controls-bar .control-group label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.stock-controls-bar .control-group select,
+.stock-controls-bar .control-group input[type="date"] {
+    padding: 6px 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.95);
+    color: #2c3e50;
+    cursor: pointer;
+}
+
+.stock-controls-bar .control-group select:hover,
+.stock-controls-bar .control-group input[type="date"]:hover {
+    background: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.fundamental-btn {
+    margin: 0 0 0 auto;
+}
+
+/* ============================ */
+/* STOCK DETAIL HEADER STYLES */
+/* ============================ */
+
+.stock-detail-header {
+    padding: 20px 10px;
+}
+
+.stock-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Date Selector */
+.date-selector {
+    margin: 15px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.date-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.date-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+}
+
+.date-select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+.date-select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.btn-load {
+    padding: 8px 20px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-load:hover {
+    background: #1d4ed8;
+}
+
+/* ============================ */
+/* STOCK DETAIL EXPIRY STYLES */
+/* ============================ */
+
+.expiry-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+.expiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.expiry-table th {
+    padding: 10px 8px;
+    background: #f3f4f6;
+    border-bottom: 2px solid #d1d5db;
+    font-weight: 600;
+    text-align: left;
+    color: #374151;
+    font-size: 12px;
+}
+
+.expiry-table td {
+    padding: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+    font-size: 12px;
+}
+
+.expiry-table tr:hover {
+    background-color: #f9fafb;
+}
+
+.call-value {
+    color: #059669;
+    font-weight: 600;
+}
+
+.put-value {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.pcr-value {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.positive {
+    color: #059669;
+    font-weight: 600;
+}
+
+.negative {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* ============================ */
+/* 📊 STOCK DETAIL STATISTICS STYLES */
+/* ============================ */
+
+/* Outer Card Container */
+.stats-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* ============================ */
+/* METRICS GRID */
+/* ============================ */
+.stats-grid-two-col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+.stat-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 8px 10px;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+    background: #f5e0e0;
+    transform: translateY(-2px);
+}
+
+.stat-label {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+}
+
+.stat-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.stat-call {
+    color: #2563eb;
+    /* blue for Call OI */
+}
+
+.stat-put {
+    color: #dc2626;
+    /* red for Put OI */
+}
+
+.trend-bullish {
+    color: #059669;
+    /* green for bullish */
+    font-weight: 700;
+}
+
+.trend-bearish {
+    color: #dc2626;
+    /* red for bearish */
+    font-weight: 700;
+}
+
+/* ============================ */
+/* PCR MINI CARDS */
+/* ============================ */
+.pcr-mini-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.pcr-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    text-align: center;
+    padding: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+}
+
+.pcr-card:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+}
+
+.pcr-label {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.pcr-value {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.pcr-oi .pcr-value {
+    color: #059669;
+    /* green */
+}
+
+.pcr-vol .pcr-value {
+    color: #9333ea;
+    /* purple */
+}
+
+/* ============================ */
+/* NO DATA MESSAGE */
+/* ============================ */
+.no-data-message {
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+    padding: 20px 0;
+}
+
+/* ============================ */
+/* RESPONSIVE DESIGN - STATS */
+/* ============================ */
+@media (max-width: 1100px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pcr-mini-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pcr-mini-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================ */
+/* STOCK DETAIL CHART STYLES */
+/* ============================ */
+
+.chart-section {
+    background: white;
+    padding: 1px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin: 20px 0;
+    width: 100%;
+}
+
+.chart-section .section-title {
+    padding-left: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.price-chart-container {
+    height: 400px;
+    width: 100%;
+    background: #f9fafb;
+    padding: 0;
+    position: relative;
+}
+
+
+
+.chart-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f4f6;
+    border-top: 4px solid #2563eb;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.no-data-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.error-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #ef4444;
+    font-size: 14px;
+}
+
+/* ==============================
+   OPTION CHAIN TABLE STYLES
+   ============================== */
+
+.option-chain-section {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin: 20px 0;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.table-container {
+    overflow-x: auto;
+    max-height: 650px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+}
+
+.option-chain-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.option-chain-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+}
+
+.option-chain-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #d1d5db;
+}
+
+.ce-th {
+    background: #ecfdf5;
+    color: #166534;
+    text-align: center !important;
+}
+
+.pe-th {
+    background: #fef2f2;
+    color: #991b1b;
+    text-align: center !important;
+}
+
+.strike-th {
+    background: #fef3c7;
+    color: #78350f;
+    border-left: 3px solid #facc15;
+    border-right: 3px solid #facc15;
+    text-align: center !important;
+}
+
+/* ==============================
+   TABLE BODY STYLING
+   ============================== */
+
+.option-chain-table tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.option-chain-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.option-chain-table tbody tr:hover {
+    background: #f3f4f6;
+}
+
+.ce-td,
+.pe-td,
+.strike-td {
+    padding: 10px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.strike-td {
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    background: #fefce8;
+    color: #854d0e;
+    border-left: 3px solid #facc15;
+    border-right: 3px solid #facc15;
+}
+
+/* ==============================
+   🎯 ATM ROW — GOLDMINE MAROON HIGHLIGHT
+   ============================== */
+
+.atm-row {
+    background: #fef2f2 !important;
+    font-weight: 600;
+    border-top: 2px solid #8B2432;
+    border-bottom: 2px solid #8B2432;
+    transition: background 0.3s ease;
+}
+
+.atm-strike {
+    background: #8B2432 !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    border-left: 3px solid #8B2432;
+    border-right: 3px solid #8B2432;
+}
+
+.atm-row:hover {
+    background: #fee2e2 !important;
+}
+
+/* Make ATM row text more visible */
+.atm-row td {
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+}
+
+/* ==============================
+   🎨 OTM / ITM ZONE LOGIC - LIGHT GOLDEN INSTEAD OF GREY
+   ============================== */
+
+/* ✅ Above ATM — Calls are OTM (light golden), Puts are ITM (white) */
+.otm-call td.ce-td {
+    background: #ffffff !important;
+    /* white */
+    color: #1f2937 !important;
+    font-weight: 500;
+}
+
+.otm-call td.pe-td {
+    background: #fef9e7 !important;
+    /* light golden - improved visibility */
+    color: #1f2937 !important;
+    font-weight: 500;
+}
+
+
+/* ✅ Below ATM — Calls are ITM (light golden), Puts are OTM (white) */
+.otm-put td.ce-td {
+    background: #fef9e7 !important;
+    /* light golden - improved visibility */
+    color: #1f2937 !important;
+    font-weight: 500;
+}
+
+.otm-put td.pe-td {
+    background: #ffffff !important;
+    /* white */
+    color: #1f2937 !important;
+    font-weight: 500;
+}
+
+/* Keep ATM row isolated with distinct styling */
+.atm-row td {
+    background: #fef2f2 !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+}
+
+.atm-row td.strike-td {
+    background: #8B2432 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+/* Smooth transitions */
+.otm-call td.ce-td,
+.otm-put td.pe-td,
+.otm-call td.pe-td,
+.otm-put td.ce-td {
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ==============================
+   POSITIVE / NEGATIVE TEXT COLORS
+   ============================== */
+
+.pos {
+    color: #16a34a !important;
+    font-weight: 700;
+}
+
+.neg {
+    color: #dc2626 !important;
+    font-weight: 700;
+}
+
+/* ==============================
+   NO DATA PLACEHOLDER
+   ============================== */
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* ==============================
+   SCROLLBAR STYLING
+   ============================== */
+
+.table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #d6d3d1;
+    border-radius: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a29e;
+}
+
+/* =============================== */
+/* 📊 STOCK DETAIL GAUGES LAYOUT   */
+/* Pure CSS - No JavaScript */
+/* =============================== */
+
+/* Gauges Section Container */
+.gauges-section {
+    background: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+}
+
+.gauges-section .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+    padding: 0;
+}
+
+/* Gauges Grid - Vertical Stack */
+.gauges-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Individual Gauge Card */
+.gauge-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    min-height: 200px;
+}
+
+.gauge-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+}
+
+/* Gauge Label */
+.gauge-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Gauge SVG Container */
+.gauge-container {
+    width: 550px;
+    height: 202px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px auto;
+    position: relative;
+}
+
+/* SVG Gauge Styling */
+.gauge-svg {
+    width: 550px;
+    height: 202px;
+    display: block;
+}
+
+.gauge-svg circle {
+    transition: stroke-dashoffset 0.6s ease-in-out;
+}
+
+/* Gauge Range Labels */
+.gauge-range {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 100px;
+    margin-top: 4px;
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* No Data Message */
+.no-data-message {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* ==========================================================
+   OI CHARTS — TRADINGVIEW STYLE
+   ========================================================== */
+
+.oi-charts-section {
+    background: white;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin: 20px 0;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.chart-container {
+    position: relative;
+    min-height: 400px;
+}
+
+.tv-chart-block {
+    position: relative;
+    height: 350px;
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.chart-inline-title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #374151;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.chart-inline-legend {
+    position: absolute;
+    top: 10px;
+    right: 35px;
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.legend-item.inactive {
+    opacity: 0.4;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.oi-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+#strike-hover-label {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 14px;
+}

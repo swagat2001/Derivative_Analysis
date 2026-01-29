@@ -3,208 +3,207 @@
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_controls.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_chart_modal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 <style>
-/* Dashboard-specific table styling */
-.dashboard-table-wrapper {
-  background: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-  overflow: hidden;
-  margin: 20px;
-}
+  /* Dashboard-specific table styling */
+  .dashboard-table-wrapper {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    margin: 20px;
+  }
 
-.dashboard-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #fafafa;
-}
+  .dashboard-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fafafa;
+  }
 
-.control-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex: 1;
-}
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+  }
 
-.control-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-.control-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #b91c1c;
-  text-transform: uppercase;
-}
+  .control-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #b91c1c;
+    text-transform: uppercase;
+  }
 
-.control-group select {
-  font-size: 13px;
-  padding: 6px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: white;
-  color: #1f2937;
-  cursor: pointer;
-}
+  .control-group select {
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+    color: #1f2937;
+    cursor: pointer;
+  }
 
-.btn-group {
-  display: flex;
-  gap: 8px;
-}
+  .btn-group {
+    display: flex;
+    gap: 8px;
+  }
 
-.filter-btn {
-  padding: 6px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: white;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+  .filter-btn {
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-.filter-btn:hover {
-  background: #f9fafb;
-  border-color: #b91c1c;
-  color: #b91c1c;
-}
+  .filter-btn:hover {
+    background: #f9fafb;
+    border-color: #b91c1c;
+    color: #b91c1c;
+  }
 
-.filter-btn.active {
-  background: #b91c1c;
-  color: white;
-  border-color: #b91c1c;
-}
+  .filter-btn.active {
+    background: #b91c1c;
+    color: white;
+    border-color: #b91c1c;
+  }
 
-.btn-export {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: #16a34a;
-  color: white;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  transition: background 0.2s;
-}
+  .btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #16a34a;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
 
-.btn-export:hover {
-  background: #15803d;
-}
+  .btn-export:hover {
+    background: #15803d;
+  }
 
-.dashboard-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
+  .dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
 
-.dashboard-table thead {
-  background: #f9fafb;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
+  .dashboard-table thead {
+    background: #f9fafb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
 
-.dashboard-table th {
-  text-align: center;
-  padding: 10px 8px;
-  font-weight: 600;
-  color: #6b7280;
-  /*border-bottom: 2px solid #e5e7eb;*/
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
+  .dashboard-table th {
+    text-align: center;
+    padding: 10px 8px;
+    font-weight: 600;
+    color: #6b7280;
+    /*border-bottom: 2px solid #e5e7eb;*/
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
 
-.dashboard-table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #f1f5f9;
-  color: #1f2937;
-  text-align: center;
-}
+  .dashboard-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1f2937;
+    text-align: center;
+  }
 
-.dashboard-table tbody tr:hover {
-  background: #f9fafb;
-}
+  .dashboard-table tbody tr:hover {
+    background: #f9fafb;
+  }
 
-.dashboard-table tbody tr:last-child td {
-  border-bottom: none;
-}
+  .dashboard-table tbody tr:last-child td {
+    border-bottom: none;
+  }
 
-.cell-stock {
-  text-align: left !important;
-  font-weight: 500;
-}
+  .cell-stock {
+    text-align: left !important;
+    font-weight: 500;
+  }
 
-.symbol-link {
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-}
+  .symbol-link {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+  }
 
-.symbol-link:hover {
-  text-decoration: underline;
-}
+  .symbol-link:hover {
+    text-decoration: underline;
+  }
 
-.money-clickable {
-  cursor: pointer;
-  color: #7c3aed;
-  font-weight: 600;
-  transition: all 0.2s;
-}
+  .money-clickable {
+    cursor: pointer;
+    color: #7c3aed;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
 
-.money-clickable:hover {
-  background: #ede9fe;
-  color: #6d28d9;
-}
+  .money-clickable:hover {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
 
-.highlight-col {
-  background: #fef3c7;
-  font-weight: 600;
-}
+  .highlight-col {
+    background: #fef3c7;
+    font-weight: 600;
+  }
 
-.positive {
-  color: #16a34a;
-  font-weight: 600;
-}
+  .positive {
+    color: #16a34a;
+    font-weight: 600;
+  }
 
-.negative {
-  color: #dc2626;
-  font-weight: 600;
-}
+  .negative {
+    color: #dc2626;
+    font-weight: 600;
+  }
 
-.table-container {
-  max-height: calc(100vh - 250px);
-  overflow-y: auto;
-}
+  .table-container {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+  }
 
-/* Scrollbar styling */
-.table-container::-webkit-scrollbar {
-  width: 8px;
-}
+  /* Scrollbar styling */
+  .table-container::-webkit-scrollbar {
+    width: 8px;
+  }
 
-.table-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
+  .table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
 
-.table-container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
+  .table-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
 
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+  .table-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
 </style>
 {% endblock %}
 
@@ -215,35 +214,32 @@
     <div class="control-row">
       <div class="control-group">
         <label for="dateSelect">Date:</label>
-        <select id="dateSelect" name="date" onchange="window.location.href='/dashboard/?date='+this.value+'&mtype={{ mtype }}'">
+        <select id="dateSelect" name="date"
+          onchange="window.location.href='/dashboard/?date='+this.value+'&mtype={{ mtype }}'">
           {% for d in dates %}
-          <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+          <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
           {% endfor %}
         </select>
       </div>
 
       <div class="btn-group">
-        <button class="filter-btn {% if mtype == 'TOTAL' %}active{% endif %}"
-                data-mtype="TOTAL"
-                onclick="filterDashboard('TOTAL')">
+        <button class="filter-btn {% if mtype == 'TOTAL' %}active{% endif %}" data-mtype="TOTAL"
+          onclick="filterDashboard('TOTAL')">
           TOTAL
         </button>
-        <button class="filter-btn {% if mtype == 'ITM' %}active{% endif %}"
-                data-mtype="ITM"
-                onclick="filterDashboard('ITM')">
+        <button class="filter-btn {% if mtype == 'ITM' %}active{% endif %}" data-mtype="ITM"
+          onclick="filterDashboard('ITM')">
           ITM
         </button>
-        <button class="filter-btn {% if mtype == 'OTM' %}active{% endif %}"
-                data-mtype="OTM"
-                onclick="filterDashboard('OTM')">
+        <button class="filter-btn {% if mtype == 'OTM' %}active{% endif %}" data-mtype="OTM"
+          onclick="filterDashboard('OTM')">
           OTM
         </button>
       </div>
     </div>
 
-    <a href="{{ url_for('dashboard.export_dashboard', date=selected_date, mtype=mtype) }}"
-       class="btn-export"
-       title="Export to Excel">
+    <a href="{{ url_for('dashboard.export_dashboard', date=selected_date, mtype=mtype) }}" class="btn-export"
+      title="Export to Excel">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
         <polyline points="7 10 12 15 17 10"></polyline>
@@ -275,91 +271,76 @@
           <th rowspan="2">Put AMoney</th>
         </tr>
         <tr>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
-          <th>Strike</th><th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
         </tr>
       </thead>
       <tbody id="tableBody">
         {% if data %}
-          {% for row in data %}
-          <tr>
-            <td class="cell-stock"><a href="{{ url_for('stock.stock_detail', ticker=row.stock) }}" class="symbol-link">{{ row.stock }}</a></td>
-            <td>{{ row.call_delta_pos_strike }}</td>
-            <td>{{ row.call_delta_pos_pct }}</td>
-            <td>{{ row.call_delta_neg_strike }}</td>
-            <td>{{ row.call_delta_neg_pct }}</td>
-            <td>{{ row.call_vega_pos_strike }}</td>
-            <td class="money-clickable"
-                data-stock="{{ row.stock }}"
-                data-option-type="call"
-                data-metric="vega"
-                data-strike="{{ row.call_vega_pos_strike }}"
-                data-date="{{ selected_date }}">
-              {{ row.call_vega_pos_pct }}
-            </td>
-            <td>{{ row.call_vega_neg_strike }}</td>
-            <td class="money-clickable"
-                data-stock="{{ row.stock }}"
-                data-option-type="call"
-                data-metric="vega"
-                data-strike="{{ row.call_vega_neg_strike }}"
-                data-date="{{ selected_date }}">
-              {{ row.call_vega_neg_pct }}
-            </td>
-            <td>{{ "{:.2f}".format(row.call_total_tradval or 0) }}</td>
-            <td class="money-clickable"
-                data-stock="{{ row.stock }}"
-                data-option-type="call"
-                data-metric="money"
-                data-strike="N/A"
-                data-date="{{ selected_date }}">
-              {{ "{:.2f}".format(row.call_total_money or 0) }}
-            </td>
-            <td class="highlight-col">{{ "{:.2f}".format(row.closing_price or 0) }}</td>
-            <td class="highlight-col">{{ "{:.2f}".format(row.rsi or 0) }}</td>
-            <td>{{ row.put_delta_pos_strike }}</td>
-            <td>{{ row.put_delta_pos_pct }}</td>
-            <td>{{ row.put_delta_neg_strike }}</td>
-            <td>{{ row.put_delta_neg_pct }}</td>
-            <td>{{ row.put_vega_pos_strike }}</td>
-            <td class="money-clickable"
-                data-stock="{{ row.stock }}"
-                data-option-type="put"
-                data-metric="vega"
-                data-strike="{{ row.put_vega_pos_strike }}"
-                data-date="{{ selected_date }}">
-              {{ row.put_vega_pos_pct }}
-            </td>
-            <td>{{ row.put_vega_neg_strike }}</td>
-            <td class="money-clickable"
-                data-stock="{{ row.stock }}"
-                data-option-type="put"
-                data-metric="vega"
-                data-strike="{{ row.put_vega_neg_strike }}"
-                data-date="{{ selected_date }}">
-              {{ row.put_vega_neg_pct }}
-            </td>
-            <td>{{ "{:.2f}".format(row.put_total_tradval or 0) }}</td>
-            <td class="money-clickable"
-                data-stock="{{ row.stock }}"
-                data-option-type="put"
-                data-metric="money"
-                data-strike="N/A"
-                data-date="{{ selected_date }}">
-              {{ "{:.2f}".format(row.put_total_money or 0) }}
-            </td>
-          </tr>
-          {% endfor %}
+        {% for row in data %}
+        <tr>
+          <td class="cell-stock"><a href="{{ url_for('stock.stock_detail', ticker=row.stock) }}" class="symbol-link">{{
+              row.stock }}</a></td>
+          <td>{{ row.call_delta_pos_strike }}</td>
+          <td>{{ row.call_delta_pos_pct }}</td>
+          <td>{{ row.call_delta_neg_strike }}</td>
+          <td>{{ row.call_delta_neg_pct }}</td>
+          <td>{{ row.call_vega_pos_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="call" data-metric="vega"
+            data-strike="{{ row.call_vega_pos_strike }}" data-date="{{ selected_date }}">
+            {{ row.call_vega_pos_pct }}
+          </td>
+          <td>{{ row.call_vega_neg_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="call" data-metric="vega"
+            data-strike="{{ row.call_vega_neg_strike }}" data-date="{{ selected_date }}">
+            {{ row.call_vega_neg_pct }}
+          </td>
+          <td>{{ "{:.2f}".format(row.call_total_tradval or 0) }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="call" data-metric="money"
+            data-strike="N/A" data-date="{{ selected_date }}">
+            {{ "{:.2f}".format(row.call_total_money or 0) }}
+          </td>
+          <td class="highlight-col">{{ "{:.2f}".format(row.closing_price or 0) }}</td>
+          <td class="highlight-col">{{ "{:.2f}".format(row.rsi or 0) }}</td>
+          <td>{{ row.put_delta_pos_strike }}</td>
+          <td>{{ row.put_delta_pos_pct }}</td>
+          <td>{{ row.put_delta_neg_strike }}</td>
+          <td>{{ row.put_delta_neg_pct }}</td>
+          <td>{{ row.put_vega_pos_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="put" data-metric="vega"
+            data-strike="{{ row.put_vega_pos_strike }}" data-date="{{ selected_date }}">
+            {{ row.put_vega_pos_pct }}
+          </td>
+          <td>{{ row.put_vega_neg_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="put" data-metric="vega"
+            data-strike="{{ row.put_vega_neg_strike }}" data-date="{{ selected_date }}">
+            {{ row.put_vega_neg_pct }}
+          </td>
+          <td>{{ "{:.2f}".format(row.put_total_tradval or 0) }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="put" data-metric="money"
+            data-strike="N/A" data-date="{{ selected_date }}">
+            {{ "{:.2f}".format(row.put_total_money or 0) }}
+          </td>
+        </tr>
+        {% endfor %}
         {% else %}
-          <tr>
-            <td colspan="23" style="text-align: center; padding: 40px; color: #6b7280;">No data available</td>
-          </tr>
+        <tr>
+          <td colspan="23" style="text-align: center; padding: 40px; color: #6b7280;">No data available</td>
+        </tr>
         {% endif %}
       </tbody>
     </table>

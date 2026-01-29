@@ -1,0 +1,496 @@
+{
+  "2022-09-01": [
+    {
+      "Sales ": 3519.0
+    },
+    {
+      "Expenses ": 2698.0
+    },
+    {
+      "OperatingProfit": 822.0
+    },
+    {
+      "OPM%": 0.23
+    },
+    {
+      "OtherIncome ": 193.0
+    },
+    {
+      "Interest": 7.0
+    },
+    {
+      "Depreciation": 127.0
+    },
+    {
+      "Profitbeforetax": 880.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 657.0
+    },
+    {
+      "EPSinRs": 24.02
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/9/2022/"
+    }
+  ],
+  "2022-12-01": [
+    {
+      "Sales ": 3721.0
+    },
+    {
+      "Expenses ": 2864.0
+    },
+    {
+      "OperatingProfit": 857.0
+    },
+    {
+      "OPM%": 0.23
+    },
+    {
+      "OtherIncome ": 256.0
+    },
+    {
+      "Interest": 8.0
+    },
+    {
+      "Depreciation": 135.0
+    },
+    {
+      "Profitbeforetax": 971.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 741.0
+    },
+    {
+      "EPSinRs": 27.09
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/12/2022/"
+    }
+  ],
+  "2023-03-01": [
+    {
+      "Sales ": 3804.0
+    },
+    {
+      "Expenses ": 2871.0
+    },
+    {
+      "OperatingProfit": 934.0
+    },
+    {
+      "OPM%": 0.25
+    },
+    {
+      "OtherIncome ": 379.0
+    },
+    {
+      "Interest": 8.0
+    },
+    {
+      "Depreciation": 148.0
+    },
+    {
+      "Profitbeforetax": 1156.0
+    },
+    {
+      "Tax%": 0.22
+    },
+    {
+      "NetProfit ": 906.0
+    },
+    {
+      "EPSinRs": 33.11
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/3/2023/"
+    }
+  ],
+  "2023-06-01": [
+    {
+      "Sales ": 3986.0
+    },
+    {
+      "Expenses ": 2966.0
+    },
+    {
+      "OperatingProfit": 1021.0
+    },
+    {
+      "OPM%": 0.26
+    },
+    {
+      "OtherIncome ": 344.0
+    },
+    {
+      "Interest": 10.0
+    },
+    {
+      "Depreciation": 142.0
+    },
+    {
+      "Profitbeforetax": 1212.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 918.0
+    },
+    {
+      "EPSinRs": 33.58
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/6/2023/"
+    }
+  ],
+  "2023-09-01": [
+    {
+      "Sales ": 4115.0
+    },
+    {
+      "Expenses ": 3027.0
+    },
+    {
+      "OperatingProfit": 1087.0
+    },
+    {
+      "OPM%": 0.26
+    },
+    {
+      "OtherIncome ": 375.0
+    },
+    {
+      "Interest": 13.0
+    },
+    {
+      "Depreciation": 143.0
+    },
+    {
+      "Profitbeforetax": 1307.0
+    },
+    {
+      "Tax%": 0.22
+    },
+    {
+      "NetProfit ": 1016.0
+    },
+    {
+      "EPSinRs": 37.12
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/9/2023/"
+    }
+  ],
+  "2023-12-01": [
+    {
+      "Sales ": 4179.0
+    },
+    {
+      "Expenses ": 3089.0
+    },
+    {
+      "OperatingProfit": 1090.0
+    },
+    {
+      "OPM%": 0.26
+    },
+    {
+      "OtherIncome ": 368.0
+    },
+    {
+      "Interest": 12.0
+    },
+    {
+      "Depreciation": 148.0
+    },
+    {
+      "Profitbeforetax": 1298.0
+    },
+    {
+      "Tax%": 0.23
+    },
+    {
+      "NetProfit ": 996.0
+    },
+    {
+      "EPSinRs": 36.38
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/12/2023/"
+    }
+  ],
+  "2024-03-01": [
+    {
+      "Sales ": 4256.0
+    },
+    {
+      "Expenses ": 3127.0
+    },
+    {
+      "OperatingProfit": 1129.0
+    },
+    {
+      "OPM%": 0.27
+    },
+    {
+      "OtherIncome ": 437.0
+    },
+    {
+      "Interest": 15.0
+    },
+    {
+      "Depreciation": 165.0
+    },
+    {
+      "Profitbeforetax": 1385.0
+    },
+    {
+      "Tax%": 0.23
+    },
+    {
+      "NetProfit ": 1070.0
+    },
+    {
+      "EPSinRs": 39.1
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/3/2024/"
+    }
+  ],
+  "2024-06-01": [
+    {
+      "Sales ": 4393.0
+    },
+    {
+      "Expenses ": 3228.0
+    },
+    {
+      "OperatingProfit": 1165.0
+    },
+    {
+      "OPM%": 0.27
+    },
+    {
+      "OtherIncome ": 457.0
+    },
+    {
+      "Interest": 12.0
+    },
+    {
+      "Depreciation": 169.0
+    },
+    {
+      "Profitbeforetax": 1441.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 1101.0
+    },
+    {
+      "EPSinRs": 40.2
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/6/2024/"
+    }
+  ],
+  "2024-09-01": [
+    {
+      "Sales ": 4263.0
+    },
+    {
+      "Expenses ": 3175.0
+    },
+    {
+      "OperatingProfit": 1088.0
+    },
+    {
+      "OPM%": 0.26
+    },
+    {
+      "OtherIncome ": 468.0
+    },
+    {
+      "Interest": 13.0
+    },
+    {
+      "Depreciation": 180.0
+    },
+    {
+      "Profitbeforetax": 1362.0
+    },
+    {
+      "Tax%": 0.19
+    },
+    {
+      "NetProfit ": 1100.0
+    },
+    {
+      "EPSinRs": 40.15
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/9/2024/"
+    }
+  ],
+  "2024-12-01": [
+    {
+      "Sales ": 4973.0
+    },
+    {
+      "Expenses ": 3772.0
+    },
+    {
+      "OperatingProfit": 1201.0
+    },
+    {
+      "OPM%": 0.24
+    },
+    {
+      "OtherIncome ": 452.0
+    },
+    {
+      "Interest": 13.0
+    },
+    {
+      "Depreciation": 179.0
+    },
+    {
+      "Profitbeforetax": 1461.0
+    },
+    {
+      "Tax%": 0.2
+    },
+    {
+      "NetProfit ": 1170.0
+    },
+    {
+      "EPSinRs": 42.7
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/12/2024/"
+    }
+  ],
+  "2025-03-01": [
+    {
+      "Sales ": 5241.0
+    },
+    {
+      "Expenses ": 3983.0
+    },
+    {
+      "OperatingProfit": 1258.0
+    },
+    {
+      "OPM%": 0.24
+    },
+    {
+      "OtherIncome ": 628.0
+    },
+    {
+      "Interest": 16.0
+    },
+    {
+      "Depreciation": 201.0
+    },
+    {
+      "Profitbeforetax": 1669.0
+    },
+    {
+      "Tax%": 0.18
+    },
+    {
+      "NetProfit ": 1362.0
+    },
+    {
+      "EPSinRs": 49.68
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/3/2025/"
+    }
+  ],
+  "2025-06-01": [
+    {
+      "Sales ": 5042.0
+    },
+    {
+      "Expenses ": 3839.0
+    },
+    {
+      "OperatingProfit": 1203.0
+    },
+    {
+      "OPM%": 0.24
+    },
+    {
+      "OtherIncome ": 603.0
+    },
+    {
+      "Interest": 15.0
+    },
+    {
+      "Depreciation": 198.0
+    },
+    {
+      "Profitbeforetax": 1593.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 1205.0
+    },
+    {
+      "EPSinRs": 43.95
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/6/2025/"
+    }
+  ],
+  "2025-09-01": [
+    {
+      "Sales ": 6172.0
+    },
+    {
+      "Expenses ": 4660.0
+    },
+    {
+      "OperatingProfit": 1512.0
+    },
+    {
+      "OPM%": 0.24
+    },
+    {
+      "OtherIncome ": 486.0
+    },
+    {
+      "Interest": 19.0
+    },
+    {
+      "Depreciation": 200.0
+    },
+    {
+      "Profitbeforetax": 1779.0
+    },
+    {
+      "Tax%": 0.23
+    },
+    {
+      "NetProfit ": 1369.0
+    },
+    {
+      "EPSinRs": 49.93
+    },
+    {
+      "RawPDF": "/company/source/quarter/888/9/2025/"
+    }
+  ]
+}

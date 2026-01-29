@@ -1,0 +1,418 @@
+{
+  "2014-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 3943.0
+    },
+    {
+      "Borrowings ": 249.0
+    },
+    {
+      "OtherLiabilities ": 3787.0
+    },
+    {
+      "TotalLiabilities": 8075.0
+    },
+    {
+      "FixedAssets ": 2562.0
+    },
+    {
+      "CWIP": 72.0
+    },
+    {
+      "Investments": 1424.0
+    },
+    {
+      "OtherAssets ": 4019.0
+    },
+    {
+      "TotalAssets": 8075.0
+    }
+  ],
+  "2015-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 4646.0
+    },
+    {
+      "Borrowings ": 418.0
+    },
+    {
+      "OtherLiabilities ": 3754.0
+    },
+    {
+      "TotalLiabilities": 8914.0
+    },
+    {
+      "FixedAssets ": 2660.0
+    },
+    {
+      "CWIP": 196.0
+    },
+    {
+      "Investments": 1588.0
+    },
+    {
+      "OtherAssets ": 4471.0
+    },
+    {
+      "TotalAssets": 8914.0
+    }
+  ],
+  "2016-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 6429.0
+    },
+    {
+      "Borrowings ": 323.0
+    },
+    {
+      "OtherLiabilities ": 3711.0
+    },
+    {
+      "TotalLiabilities": 10559.0
+    },
+    {
+      "FixedAssets ": 3416.0
+    },
+    {
+      "CWIP": 107.0
+    },
+    {
+      "Investments": 2712.0
+    },
+    {
+      "OtherAssets ": 4324.0
+    },
+    {
+      "TotalAssets": 10559.0
+    }
+  ],
+  "2017-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 7508.0
+    },
+    {
+      "Borrowings ": 560.0
+    },
+    {
+      "OtherLiabilities ": 4241.0
+    },
+    {
+      "TotalLiabilities": 12405.0
+    },
+    {
+      "FixedAssets ": 3304.0
+    },
+    {
+      "CWIP": 258.0
+    },
+    {
+      "Investments": 2652.0
+    },
+    {
+      "OtherAssets ": 6192.0
+    },
+    {
+      "TotalAssets": 12405.0
+    }
+  ],
+  "2018-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 8314.0
+    },
+    {
+      "Borrowings ": 533.0
+    },
+    {
+      "OtherLiabilities ": 4820.0
+    },
+    {
+      "TotalLiabilities": 13763.0
+    },
+    {
+      "FixedAssets ": 3732.0
+    },
+    {
+      "CWIP": 1405.0
+    },
+    {
+      "Investments": 2141.0
+    },
+    {
+      "OtherAssets ": 6485.0
+    },
+    {
+      "TotalAssets": 13763.0
+    }
+  ],
+  "2019-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 9375.0
+    },
+    {
+      "Borrowings ": 1320.0
+    },
+    {
+      "OtherLiabilities ": 5459.0
+    },
+    {
+      "TotalLiabilities": 16249.0
+    },
+    {
+      "FixedAssets ": 6497.0
+    },
+    {
+      "CWIP": 210.0
+    },
+    {
+      "Investments": 2569.0
+    },
+    {
+      "OtherAssets ": 6974.0
+    },
+    {
+      "TotalAssets": 16249.0
+    }
+  ],
+  "2020-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 10034.0
+    },
+    {
+      "Borrowings ": 1118.0
+    },
+    {
+      "OtherLiabilities ": 4889.0
+    },
+    {
+      "TotalLiabilities": 16138.0
+    },
+    {
+      "FixedAssets ": 6272.0
+    },
+    {
+      "CWIP": 140.0
+    },
+    {
+      "Investments": 2019.0
+    },
+    {
+      "OtherAssets ": 7707.0
+    },
+    {
+      "TotalAssets": 16138.0
+    }
+  ],
+  "2021-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 12710.0
+    },
+    {
+      "Borrowings ": 1093.0
+    },
+    {
+      "OtherLiabilities ": 6456.0
+    },
+    {
+      "TotalLiabilities": 20355.0
+    },
+    {
+      "FixedAssets ": 5859.0
+    },
+    {
+      "CWIP": 183.0
+    },
+    {
+      "Investments": 4737.0
+    },
+    {
+      "OtherAssets ": 9577.0
+    },
+    {
+      "TotalAssets": 20355.0
+    }
+  ],
+  "2022-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 13716.0
+    },
+    {
+      "Borrowings ": 1587.0
+    },
+    {
+      "OtherLiabilities ": 7560.0
+    },
+    {
+      "TotalLiabilities": 22958.0
+    },
+    {
+      "FixedAssets ": 5519.0
+    },
+    {
+      "CWIP": 426.0
+    },
+    {
+      "Investments": 3248.0
+    },
+    {
+      "OtherAssets ": 13765.0
+    },
+    {
+      "TotalAssets": 22958.0
+    }
+  ],
+  "2023-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 15896.0
+    },
+    {
+      "Borrowings ": 1933.0
+    },
+    {
+      "OtherLiabilities ": 7854.0
+    },
+    {
+      "TotalLiabilities": 25779.0
+    },
+    {
+      "FixedAssets ": 5770.0
+    },
+    {
+      "CWIP": 1020.0
+    },
+    {
+      "Investments": 4262.0
+    },
+    {
+      "OtherAssets ": 14728.0
+    },
+    {
+      "TotalAssets": 25779.0
+    }
+  ],
+  "2024-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 18632.0
+    },
+    {
+      "Borrowings ": 2474.0
+    },
+    {
+      "OtherLiabilities ": 8698.0
+    },
+    {
+      "TotalLiabilities": 29901.0
+    },
+    {
+      "FixedAssets ": 7147.0
+    },
+    {
+      "CWIP": 2698.0
+    },
+    {
+      "Investments": 4588.0
+    },
+    {
+      "OtherAssets ": 15468.0
+    },
+    {
+      "TotalAssets": 29901.0
+    }
+  ],
+  "2025-03-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 19304.0
+    },
+    {
+      "Borrowings ": 2290.0
+    },
+    {
+      "OtherLiabilities ": 8665.0
+    },
+    {
+      "TotalLiabilities": 30355.0
+    },
+    {
+      "FixedAssets ": 9220.0
+    },
+    {
+      "CWIP": 1254.0
+    },
+    {
+      "Investments": 4725.0
+    },
+    {
+      "OtherAssets ": 15156.0
+    },
+    {
+      "TotalAssets": 30355.0
+    }
+  ],
+  "2025-09-01": [
+    {
+      "EquityCapital": 96.0
+    },
+    {
+      "Reserves": 19483.0
+    },
+    {
+      "Borrowings ": 3557.0
+    },
+    {
+      "OtherLiabilities ": 8213.0
+    },
+    {
+      "TotalLiabilities": 31349.0
+    },
+    {
+      "FixedAssets ": 9219.0
+    },
+    {
+      "CWIP": 1766.0
+    },
+    {
+      "Investments": 5431.0
+    },
+    {
+      "OtherAssets ": 14932.0
+    },
+    {
+      "TotalAssets": 31349.0
+    }
+  ]
+}

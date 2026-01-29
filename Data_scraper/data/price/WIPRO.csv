@@ -1,0 +1,4353 @@
+﻿date,metric,label,value,delivery
+2005-04-01,Price,Price on NSE,37.95,
+2005-04-08,Price,Price on NSE,37.53,
+2005-04-15,Price,Price on NSE,34.16,
+2005-04-22,Price,Price on NSE,36.33,
+2005-04-29,Price,Price on NSE,35.59,
+2005-05-06,Price,Price on NSE,35.89,
+2005-05-13,Price,Price on NSE,35.89,
+2005-05-20,Price,Price on NSE,37.42,
+2005-05-27,Price,Price on NSE,40.85,
+2005-06-04,Price,Price on NSE,40.76,
+2005-06-10,Price,Price on NSE,40.83,
+2005-06-17,Price,Price on NSE,41.96,
+2005-06-24,Price,Price on NSE,42.30,
+2005-07-01,Price,Price on NSE,42.01,
+2005-07-08,Price,Price on NSE,40.78,
+2005-07-15,Price,Price on NSE,39.74,
+2005-07-22,Price,Price on NSE,40.35,
+2005-07-29,Price,Price on NSE,41.54,
+2005-08-05,Price,Price on NSE,40.72,
+2005-08-12,Price,Price on NSE,40.32,
+2005-08-19,Price,Price on NSE,40.62,
+2005-08-26,Price,Price on NSE,40.57,
+2005-09-02,Price,Price on NSE,42.23,
+2005-09-09,Price,Price on NSE,41.90,
+2005-09-16,Price,Price on NSE,43.16,
+2005-09-23,Price,Price on NSE,40.37,
+2005-09-30,Price,Price on NSE,41.90,
+2005-10-07,Price,Price on NSE,43.80,
+2005-10-14,Price,Price on NSE,43.54,
+2005-10-21,Price,Price on NSE,43.49,
+2005-10-28,Price,Price on NSE,40.27,
+2005-11-02,Price,Price on NSE,41.70,
+2005-11-11,Price,Price on NSE,45.59,
+2005-11-18,Price,Price on NSE,47.83,
+2005-11-26,Price,Price on NSE,49.37,
+2005-12-02,Price,Price on NSE,48.71,
+2005-12-09,Price,Price on NSE,49.81,
+2005-12-16,Price,Price on NSE,49.84,
+2005-12-23,Price,Price on NSE,52.51,
+2005-12-30,Price,Price on NSE,52.27,
+2006-01-06,Price,Price on NSE,53.33,
+2006-01-13,Price,Price on NSE,51.90,
+2006-01-20,Price,Price on NSE,56.27,
+2006-01-27,Price,Price on NSE,56.99,
+2006-02-03,Price,Price on NSE,58.21,
+2006-02-10,Price,Price on NSE,57.80,
+2006-02-17,Price,Price on NSE,56.30,
+2006-02-24,Price,Price on NSE,58.27,
+2006-03-03,Price,Price on NSE,59.76,
+2006-03-10,Price,Price on NSE,58.71,
+2006-03-17,Price,Price on NSE,58.71,
+2006-03-24,Price,Price on NSE,59.95,
+2006-03-31,Price,Price on NSE,63.14,
+2006-04-07,Price,Price on NSE,61.01,
+2006-04-13,Price,Price on NSE,58.14,
+2006-04-21,Price,Price on NSE,61.93,
+2006-04-29,Price,Price on NSE,60.76,
+2006-05-05,Price,Price on NSE,60.86,
+2006-05-12,Price,Price on NSE,61.44,
+2006-05-19,Price,Price on NSE,55.03,
+2006-05-26,Price,Price on NSE,53.59,
+2006-06-02,Price,Price on NSE,53.02,
+2006-06-09,Price,Price on NSE,49.07,
+2006-06-16,Price,Price on NSE,49.70,
+2006-06-25,Price,Price on NSE,53.63,
+2006-06-30,Price,Price on NSE,57.92,
+2006-07-07,Price,Price on NSE,52.90,
+2006-07-14,Price,Price on NSE,55.18,
+2006-07-21,Price,Price on NSE,50.66,
+2006-07-28,Price,Price on NSE,54.50,
+2006-08-04,Price,Price on NSE,57.30,
+2006-08-11,Price,Price on NSE,56.96,
+2006-08-18,Price,Price on NSE,57.79,
+2006-08-25,Price,Price on NSE,57.62,
+2006-09-01,Price,Price on NSE,58.47,
+2006-09-08,Price,Price on NSE,57.45,
+2006-09-15,Price,Price on NSE,57.41,
+2006-09-22,Price,Price on NSE,58.58,
+2006-09-29,Price,Price on NSE,59.22,
+2006-10-06,Price,Price on NSE,58.02,
+2006-10-13,Price,Price on NSE,62.90,
+2006-10-21,Price,Price on NSE,62.45,
+2006-10-27,Price,Price on NSE,63.54,
+2006-11-03,Price,Price on NSE,59.72,
+2006-11-10,Price,Price on NSE,60.55,
+2006-11-17,Price,Price on NSE,62.08,
+2006-11-24,Price,Price on NSE,66.58,
+2006-12-01,Price,Price on NSE,67.81,
+2006-12-08,Price,Price on NSE,65.09,
+2006-12-15,Price,Price on NSE,63.93,
+2006-12-22,Price,Price on NSE,64.81,
+2006-12-29,Price,Price on NSE,68.36,
+2007-01-05,Price,Price on NSE,67.47,
+2007-01-12,Price,Price on NSE,70.67,
+2007-01-19,Price,Price on NSE,70.03,
+2007-01-25,Price,Price on NSE,73.48,
+2007-02-02,Price,Price on NSE,72.55,
+2007-02-09,Price,Price on NSE,72.55,
+2007-02-15,Price,Price on NSE,76.38,
+2007-02-23,Price,Price on NSE,70.32,
+2007-03-02,Price,Price on NSE,64.78,
+2007-03-09,Price,Price on NSE,63.82,
+2007-03-16,Price,Price on NSE,63.77,
+2007-03-23,Price,Price on NSE,67.39,
+2007-03-30,Price,Price on NSE,63.11,
+2007-04-05,Price,Price on NSE,62.35,
+2007-04-13,Price,Price on NSE,64.04,
+2007-04-20,Price,Price on NSE,64.45,
+2007-04-27,Price,Price on NSE,63.83,
+2007-05-04,Price,Price on NSE,64.00,
+2007-05-11,Price,Price on NSE,61.58,
+2007-05-18,Price,Price on NSE,61.29,
+2007-05-25,Price,Price on NSE,61.30,
+2007-06-01,Price,Price on NSE,61.40,
+2007-06-08,Price,Price on NSE,61.78,
+2007-06-15,Price,Price on NSE,59.85,
+2007-06-22,Price,Price on NSE,58.36,
+2007-06-29,Price,Price on NSE,58.49,
+2007-07-06,Price,Price on NSE,58.62,
+2007-07-13,Price,Price on NSE,57.83,
+2007-07-20,Price,Price on NSE,56.99,
+2007-07-27,Price,Price on NSE,55.58,
+2007-08-03,Price,Price on NSE,53.05,
+2007-08-10,Price,Price on NSE,54.18,
+2007-08-17,Price,Price on NSE,53.52,
+2007-08-24,Price,Price on NSE,51.61,
+2007-08-31,Price,Price on NSE,54.42,
+2007-09-07,Price,Price on NSE,53.96,
+2007-09-14,Price,Price on NSE,50.80,
+2007-09-21,Price,Price on NSE,49.49,
+2007-09-28,Price,Price on NSE,51.92,
+2007-10-05,Price,Price on NSE,51.91,
+2007-10-12,Price,Price on NSE,54.92,
+2007-10-19,Price,Price on NSE,56.41,
+2007-10-26,Price,Price on NSE,56.39,
+2007-11-02,Price,Price on NSE,55.49,
+2007-11-09,Price,Price on NSE,51.84,
+2007-11-16,Price,Price on NSE,51.99,
+2007-11-23,Price,Price on NSE,49.81,
+2007-11-30,Price,Price on NSE,51.97,
+2007-12-07,Price,Price on NSE,56.77,
+2007-12-14,Price,Price on NSE,56.09,
+2007-12-20,Price,Price on NSE,55.66,
+2007-12-28,Price,Price on NSE,59.56,
+2008-01-04,Price,Price on NSE,56.03,
+2008-01-11,Price,Price on NSE,55.15,
+2008-01-18,Price,Price on NSE,51.26,
+2008-01-25,Price,Price on NSE,48.74,
+2008-02-01,Price,Price on NSE,49.64,
+2008-02-08,Price,Price on NSE,47.62,
+2008-02-15,Price,Price on NSE,47.45,
+2008-02-22,Price,Price on NSE,48.15,
+2008-02-29,Price,Price on NSE,49.31,
+2008-03-07,Price,Price on NSE,47.02,
+2008-03-14,Price,Price on NSE,41.66,
+2008-03-19,Price,Price on NSE,42.69,
+2008-03-28,Price,Price on NSE,51.16,
+2008-04-04,Price,Price on NSE,46.81,
+2008-04-11,Price,Price on NSE,45.74,
+2008-04-17,Price,Price on NSE,51.81,
+2008-04-25,Price,Price on NSE,52.61,
+2008-05-02,Price,Price on NSE,56.66,
+2008-05-09,Price,Price on NSE,56.51,
+2008-05-16,Price,Price on NSE,57.06,
+2008-05-23,Price,Price on NSE,54.28,
+2008-05-30,Price,Price on NSE,57.46,
+2008-06-06,Price,Price on NSE,57.04,
+2008-06-13,Price,Price on NSE,53.93,
+2008-06-20,Price,Price on NSE,53.45,
+2008-06-27,Price,Price on NSE,49.72,
+2008-07-04,Price,Price on NSE,48.25,
+2008-07-11,Price,Price on NSE,46.51,
+2008-07-18,Price,Price on NSE,41.32,
+2008-07-25,Price,Price on NSE,45.95,
+2008-08-01,Price,Price on NSE,48.95,
+2008-08-08,Price,Price on NSE,49.37,
+2008-08-14,Price,Price on NSE,48.45,
+2008-08-22,Price,Price on NSE,47.24,
+2008-08-29,Price,Price on NSE,48.79,
+2008-09-05,Price,Price on NSE,47.93,
+2008-09-12,Price,Price on NSE,47.35,
+2008-09-19,Price,Price on NSE,47.04,
+2008-09-26,Price,Price on NSE,38.84,
+2008-10-03,Price,Price on NSE,38.55,
+2008-10-10,Price,Price on NSE,29.69,
+2008-10-17,Price,Price on NSE,29.05,
+2008-10-24,Price,Price on NSE,26.52,
+2008-10-31,Price,Price on NSE,30.76,
+2008-11-07,Price,Price on NSE,29.32,
+2008-11-14,Price,Price on NSE,27.23,
+2008-11-21,Price,Price on NSE,25.92,
+2008-11-28,Price,Price on NSE,27.38,
+2008-12-05,Price,Price on NSE,25.64,
+2008-12-12,Price,Price on NSE,26.83,
+2008-12-19,Price,Price on NSE,28.10,
+2008-12-26,Price,Price on NSE,25.57,
+2009-01-02,Price,Price on NSE,27.50,
+2009-01-09,Price,Price on NSE,28.31,
+2009-01-16,Price,Price on NSE,26.90,
+2009-01-23,Price,Price on NSE,24.10,
+2009-01-30,Price,Price on NSE,26.12,
+2009-02-06,Price,Price on NSE,25.30,
+2009-02-13,Price,Price on NSE,25.25,
+2009-02-20,Price,Price on NSE,24.28,
+2009-02-27,Price,Price on NSE,23.41,
+2009-03-06,Price,Price on NSE,24.07,
+2009-03-13,Price,Price on NSE,25.37,
+2009-03-20,Price,Price on NSE,26.07,
+2009-03-27,Price,Price on NSE,28.55,
+2009-04-02,Price,Price on NSE,30.47,
+2009-04-09,Price,Price on NSE,30.96,
+2009-04-17,Price,Price on NSE,31.02,
+2009-04-24,Price,Price on NSE,35.23,
+2009-04-29,Price,Price on NSE,37.33,
+2009-05-08,Price,Price on NSE,40.06,
+2009-05-15,Price,Price on NSE,42.60,
+2009-05-22,Price,Price on NSE,41.67,
+2009-05-29,Price,Price on NSE,43.13,
+2009-06-05,Price,Price on NSE,44.39,
+2009-06-12,Price,Price on NSE,46.26,
+2009-06-19,Price,Price on NSE,42.91,
+2009-06-26,Price,Price on NSE,43.36,
+2009-07-03,Price,Price on NSE,43.48,
+2009-07-10,Price,Price on NSE,43.41,
+2009-07-17,Price,Price on NSE,48.46,
+2009-07-24,Price,Price on NSE,51.97,
+2009-07-31,Price,Price on NSE,55.30,
+2009-08-07,Price,Price on NSE,56.39,
+2009-08-14,Price,Price on NSE,57.70,
+2009-08-21,Price,Price on NSE,57.88,
+2009-08-28,Price,Price on NSE,63.73,
+2009-09-04,Price,Price on NSE,62.31,
+2009-09-11,Price,Price on NSE,62.16,
+2009-09-18,Price,Price on NSE,64.21,
+2009-09-25,Price,Price on NSE,63.90,
+2009-10-01,Price,Price on NSE,68.60,
+2009-10-09,Price,Price on NSE,62.23,
+2009-10-17,Price,Price on NSE,64.73,
+2009-10-23,Price,Price on NSE,66.43,
+2009-10-30,Price,Price on NSE,68.36,
+2009-11-06,Price,Price on NSE,67.51,
+2009-11-13,Price,Price on NSE,71.40,
+2009-11-20,Price,Price on NSE,73.22,
+2009-11-27,Price,Price on NSE,70.24,
+2009-12-04,Price,Price on NSE,71.96,
+2009-12-11,Price,Price on NSE,72.70,
+2009-12-18,Price,Price on NSE,76.12,
+2009-12-24,Price,Price on NSE,78.34,
+2009-12-31,Price,Price on NSE,76.72,
+2010-01-08,Price,Price on NSE,75.37,
+2010-01-15,Price,Price on NSE,83.02,
+2010-01-22,Price,Price on NSE,78.98,
+2010-01-29,Price,Price on NSE,73.10,
+2010-02-06,Price,Price on NSE,73.12,
+2010-02-11,Price,Price on NSE,73.97,
+2010-02-19,Price,Price on NSE,75.11,
+2010-02-26,Price,Price on NSE,76.43,
+2010-03-05,Price,Price on NSE,77.38,
+2010-03-12,Price,Price on NSE,80.11,
+2010-03-19,Price,Price on NSE,81.96,
+2010-03-26,Price,Price on NSE,80.95,
+2010-04-01,Price,Price on NSE,81.38,
+2010-04-09,Price,Price on NSE,80.16,
+2010-04-16,Price,Price on NSE,81.47,
+2010-04-23,Price,Price on NSE,78.05,
+2010-04-30,Price,Price on NSE,75.76,
+2010-05-07,Price,Price on NSE,71.94,
+2010-05-14,Price,Price on NSE,75.18,
+2010-05-21,Price,Price on NSE,72.40,
+2010-05-28,Price,Price on NSE,74.89,
+2010-06-04,Price,Price on NSE,73.94,
+2010-06-11,Price,Price on NSE,73.04,
+2010-06-18,Price,Price on NSE,77.01,
+2010-06-25,Price,Price on NSE,73.20,
+2010-07-02,Price,Price on NSE,72.50,
+2010-07-09,Price,Price on NSE,75.44,
+2010-07-16,Price,Price on NSE,75.64,
+2010-07-23,Price,Price on NSE,77.56,
+2010-07-30,Price,Price on NSE,77.53,
+2010-08-06,Price,Price on NSE,81.41,
+2010-08-13,Price,Price on NSE,78.04,
+2010-08-20,Price,Price on NSE,77.42,
+2010-08-27,Price,Price on NSE,74.64,
+2010-09-03,Price,Price on NSE,75.46,
+2010-09-09,Price,Price on NSE,76.71,
+2010-09-17,Price,Price on NSE,79.02,
+2010-09-24,Price,Price on NSE,84.06,
+2010-10-01,Price,Price on NSE,86.81,
+2010-10-08,Price,Price on NSE,86.96,
+2010-10-15,Price,Price on NSE,89.03,
+2010-10-22,Price,Price on NSE,84.41,
+2010-10-29,Price,Price on NSE,78.93,
+2010-11-05,Price,Price on NSE,82.37,
+2010-11-12,Price,Price on NSE,79.95,
+2010-11-19,Price,Price on NSE,75.37,
+2010-11-26,Price,Price on NSE,76.62,
+2010-12-03,Price,Price on NSE,80.40,
+2010-12-10,Price,Price on NSE,84.80,
+2010-12-16,Price,Price on NSE,88.39,
+2010-12-24,Price,Price on NSE,90.90,
+2010-12-31,Price,Price on NSE,92.37,
+2011-01-07,Price,Price on NSE,89.68,
+2011-01-14,Price,Price on NSE,87.07,
+2011-01-21,Price,Price on NSE,85.74,
+2011-01-28,Price,Price on NSE,82.28,
+2011-02-04,Price,Price on NSE,82.11,
+2011-02-11,Price,Price on NSE,79.02,
+2011-02-18,Price,Price on NSE,81.36,
+2011-02-25,Price,Price on NSE,81.43,
+2011-03-04,Price,Price on NSE,83.00,
+2011-03-11,Price,Price on NSE,84.49,
+2011-03-18,Price,Price on NSE,82.71,
+2011-03-25,Price,Price on NSE,85.72,
+2011-04-01,Price,Price on NSE,89.51,
+2011-04-08,Price,Price on NSE,87.54,
+2011-04-15,Price,Price on NSE,84.58,
+2011-04-21,Price,Price on NSE,87.09,
+2011-04-29,Price,Price on NSE,84.67,
+2011-05-06,Price,Price on NSE,83.19,
+2011-05-13,Price,Price on NSE,83.21,
+2011-05-20,Price,Price on NSE,84.11,
+2011-05-27,Price,Price on NSE,83.12,
+2011-06-03,Price,Price on NSE,83.31,
+2011-06-10,Price,Price on NSE,82.26,
+2011-06-17,Price,Price on NSE,76.87,
+2011-06-24,Price,Price on NSE,79.76,
+2011-07-01,Price,Price on NSE,79.57,
+2011-07-08,Price,Price on NSE,81.14,
+2011-07-15,Price,Price on NSE,78.00,
+2011-07-22,Price,Price on NSE,76.31,
+2011-07-29,Price,Price on NSE,73.20,
+2011-08-05,Price,Price on NSE,69.06,
+2011-08-12,Price,Price on NSE,64.49,
+2011-08-19,Price,Price on NSE,60.24,
+2011-08-26,Price,Price on NSE,60.13,
+2011-09-02,Price,Price on NSE,62.88,
+2011-09-09,Price,Price on NSE,63.63,
+2011-09-16,Price,Price on NSE,63.70,
+2011-09-23,Price,Price on NSE,63.84,
+2011-09-30,Price,Price on NSE,64.08,
+2011-10-07,Price,Price on NSE,62.77,
+2011-10-14,Price,Price on NSE,68.31,
+2011-10-21,Price,Price on NSE,66.58,
+2011-10-28,Price,Price on NSE,70.34,
+2011-11-04,Price,Price on NSE,69.93,
+2011-11-11,Price,Price on NSE,71.85,
+2011-11-18,Price,Price on NSE,70.33,
+2011-11-25,Price,Price on NSE,69.56,
+2011-12-02,Price,Price on NSE,73.68,
+2011-12-09,Price,Price on NSE,76.14,
+2011-12-16,Price,Price on NSE,75.90,
+2011-12-23,Price,Price on NSE,76.34,
+2011-12-30,Price,Price on NSE,74.97,
+2012-01-07,Price,Price on NSE,76.50,
+2012-01-13,Price,Price on NSE,75.40,
+2012-01-20,Price,Price on NSE,77.80,
+2012-01-27,Price,Price on NSE,78.60,
+2012-02-03,Price,Price on NSE,80.37,
+2012-02-10,Price,Price on NSE,84.50,
+2012-02-17,Price,Price on NSE,84.40,
+2012-02-24,Price,Price on NSE,82.34,
+2012-03-03,Price,Price on NSE,80.34,
+2012-03-09,Price,Price on NSE,81.27,
+2012-03-16,Price,Price on NSE,80.58,
+2012-03-23,Price,Price on NSE,79.96,
+2012-03-30,Price,Price on NSE,82.75,
+2012-04-04,Price,Price on NSE,83.45,
+2012-04-13,Price,Price on NSE,78.84,
+2012-04-20,Price,Price on NSE,79.87,
+2012-04-28,Price,Price on NSE,76.47,
+2012-05-04,Price,Price on NSE,78.02,
+2012-05-11,Price,Price on NSE,75.38,
+2012-05-18,Price,Price on NSE,73.57,
+2012-05-25,Price,Price on NSE,74.11,
+2012-06-01,Price,Price on NSE,75.49,
+2012-06-08,Price,Price on NSE,75.84,
+2012-06-15,Price,Price on NSE,74.83,
+2012-06-22,Price,Price on NSE,75.22,
+2012-06-29,Price,Price on NSE,75.19,
+2012-07-06,Price,Price on NSE,73.74,
+2012-07-13,Price,Price on NSE,67.48,
+2012-07-20,Price,Price on NSE,68.31,
+2012-07-27,Price,Price on NSE,62.88,
+2012-08-03,Price,Price on NSE,65.28,
+2012-08-10,Price,Price on NSE,65.75,
+2012-08-17,Price,Price on NSE,66.47,
+2012-08-24,Price,Price on NSE,68.65,
+2012-08-31,Price,Price on NSE,68.18,
+2012-09-08,Price,Price on NSE,71.60,
+2012-09-14,Price,Price on NSE,73.63,
+2012-09-21,Price,Price on NSE,71.08,
+2012-09-28,Price,Price on NSE,71.65,
+2012-10-05,Price,Price on NSE,70.19,
+2012-10-12,Price,Price on NSE,66.19,
+2012-10-19,Price,Price on NSE,64.79,
+2012-10-26,Price,Price on NSE,63.19,
+2012-11-02,Price,Price on NSE,68.56,
+2012-11-09,Price,Price on NSE,69.72,
+2012-11-16,Price,Price on NSE,67.52,
+2012-11-23,Price,Price on NSE,68.98,
+2012-11-30,Price,Price on NSE,73.95,
+2012-12-07,Price,Price on NSE,71.49,
+2012-12-14,Price,Price on NSE,70.70,
+2012-12-21,Price,Price on NSE,71.35,
+2012-12-28,Price,Price on NSE,73.72,
+2013-01-04,Price,Price on NSE,75.90,
+2013-01-11,Price,Price on NSE,78.97,
+2013-01-18,Price,Price on NSE,74.72,
+2013-01-25,Price,Price on NSE,76.65,
+2013-02-01,Price,Price on NSE,76.64,
+2013-02-08,Price,Price on NSE,77.55,
+2013-02-15,Price,Price on NSE,75.07,
+2013-02-22,Price,Price on NSE,78.22,
+2013-03-01,Price,Price on NSE,79.29,
+2013-03-08,Price,Price on NSE,83.74,
+2013-03-15,Price,Price on NSE,82.91,
+2013-03-22,Price,Price on NSE,81.93,
+2013-03-28,Price,Price on NSE,82.20,
+2013-04-05,Price,Price on NSE,85.48,
+2013-04-12,Price,Price on NSE,71.97,
+2013-04-18,Price,Price on NSE,69.20,
+2013-04-26,Price,Price on NSE,61.92,
+2013-05-03,Price,Price on NSE,66.61,
+2013-05-11,Price,Price on NSE,66.57,
+2013-05-17,Price,Price on NSE,64.50,
+2013-05-24,Price,Price on NSE,63.04,
+2013-05-31,Price,Price on NSE,61.44,
+2013-06-07,Price,Price on NSE,62.80,
+2013-06-14,Price,Price on NSE,63.30,
+2013-06-21,Price,Price on NSE,65.33,
+2013-06-28,Price,Price on NSE,65.44,
+2013-07-05,Price,Price on NSE,65.81,
+2013-07-12,Price,Price on NSE,70.43,
+2013-07-19,Price,Price on NSE,73.39,
+2013-07-26,Price,Price on NSE,71.62,
+2013-08-02,Price,Price on NSE,82.26,
+2013-08-08,Price,Price on NSE,83.85,
+2013-08-16,Price,Price on NSE,85.60,
+2013-08-23,Price,Price on NSE,84.04,
+2013-08-30,Price,Price on NSE,90.68,
+2013-09-06,Price,Price on NSE,87.85,
+2013-09-13,Price,Price on NSE,85.41,
+2013-09-20,Price,Price on NSE,89.05,
+2013-09-27,Price,Price on NSE,89.23,
+2013-10-04,Price,Price on NSE,90.56,
+2013-10-11,Price,Price on NSE,91.55,
+2013-10-18,Price,Price on NSE,94.95,
+2013-10-25,Price,Price on NSE,90.21,
+2013-11-03,Price,Price on NSE,90.95,
+2013-11-08,Price,Price on NSE,90.30,
+2013-11-14,Price,Price on NSE,91.18,
+2013-11-22,Price,Price on NSE,89.62,
+2013-11-29,Price,Price on NSE,88.28,
+2013-12-06,Price,Price on NSE,92.59,
+2013-12-13,Price,Price on NSE,97.27,
+2013-12-20,Price,Price on NSE,102.92,
+2013-12-27,Price,Price on NSE,104.08,
+2014-01-03,Price,Price on NSE,104.37,
+2014-01-10,Price,Price on NSE,103.76,
+2014-01-17,Price,Price on NSE,103.63,
+2014-01-24,Price,Price on NSE,107.41,
+2014-01-31,Price,Price on NSE,107.83,
+2014-02-07,Price,Price on NSE,105.31,
+2014-02-14,Price,Price on NSE,105.72,
+2014-02-21,Price,Price on NSE,107.17,
+2014-02-28,Price,Price on NSE,111.99,
+2014-03-07,Price,Price on NSE,106.01,
+2014-03-14,Price,Price on NSE,102.68,
+2014-03-22,Price,Price on NSE,106.81,
+2014-03-28,Price,Price on NSE,103.51,
+2014-04-04,Price,Price on NSE,103.77,
+2014-04-11,Price,Price on NSE,106.52,
+2014-04-17,Price,Price on NSE,109.85,
+2014-04-25,Price,Price on NSE,97.36,
+2014-05-02,Price,Price on NSE,99.10,
+2014-05-09,Price,Price on NSE,96.37,
+2014-05-16,Price,Price on NSE,94.28,
+2014-05-23,Price,Price on NSE,91.88,
+2014-05-30,Price,Price on NSE,94.92,
+2014-06-06,Price,Price on NSE,95.47,
+2014-06-13,Price,Price on NSE,99.45,
+2014-06-20,Price,Price on NSE,100.65,
+2014-06-27,Price,Price on NSE,102.37,
+2014-07-04,Price,Price on NSE,102.52,
+2014-07-11,Price,Price on NSE,103.66,
+2014-07-18,Price,Price on NSE,102.58,
+2014-07-25,Price,Price on NSE,103.33,
+2014-08-01,Price,Price on NSE,100.50,
+2014-08-08,Price,Price on NSE,102.76,
+2014-08-14,Price,Price on NSE,102.37,
+2014-08-22,Price,Price on NSE,104.43,
+2014-08-28,Price,Price on NSE,105.99,
+2014-09-05,Price,Price on NSE,109.11,
+2014-09-12,Price,Price on NSE,107.82,
+2014-09-19,Price,Price on NSE,110.33,
+2014-09-26,Price,Price on NSE,110.37,
+2014-10-01,Price,Price on NSE,115.46,
+2014-10-10,Price,Price on NSE,109.63,
+2014-10-17,Price,Price on NSE,106.11,
+2014-10-23,Price,Price on NSE,105.05,
+2014-10-31,Price,Price on NSE,105.70,
+2014-11-07,Price,Price on NSE,103.78,
+2014-11-14,Price,Price on NSE,105.73,
+2014-11-21,Price,Price on NSE,107.27,
+2014-11-28,Price,Price on NSE,109.84,
+2014-12-05,Price,Price on NSE,108.54,
+2014-12-12,Price,Price on NSE,101.85,
+2014-12-19,Price,Price on NSE,103.23,
+2014-12-26,Price,Price on NSE,102.64,
+2015-01-02,Price,Price on NSE,104.50,
+2015-01-09,Price,Price on NSE,103.78,
+2015-01-16,Price,Price on NSE,104.08,
+2015-01-23,Price,Price on NSE,112.84,
+2015-01-30,Price,Price on NSE,113.73,
+2015-02-06,Price,Price on NSE,120.61,
+2015-02-13,Price,Price on NSE,123.88,
+2015-02-20,Price,Price on NSE,121.88,
+2015-02-28,Price,Price on NSE,123.60,
+2015-03-05,Price,Price on NSE,125.22,
+2015-03-13,Price,Price on NSE,119.86,
+2015-03-20,Price,Price on NSE,122.38,
+2015-03-27,Price,Price on NSE,114.78,
+2015-04-01,Price,Price on NSE,118.73,
+2015-04-10,Price,Price on NSE,115.82,
+2015-04-17,Price,Price on NSE,110.04,
+2015-04-24,Price,Price on NSE,98.10,
+2015-04-30,Price,Price on NSE,100.99,
+2015-05-08,Price,Price on NSE,101.35,
+2015-05-15,Price,Price on NSE,100.96,
+2015-05-22,Price,Price on NSE,105.10,
+2015-05-29,Price,Price on NSE,105.32,
+2015-06-05,Price,Price on NSE,104.22,
+2015-06-12,Price,Price on NSE,100.76,
+2015-06-19,Price,Price on NSE,105.30,
+2015-06-26,Price,Price on NSE,104.75,
+2015-07-03,Price,Price on NSE,103.05,
+2015-07-10,Price,Price on NSE,102.88,
+2015-07-17,Price,Price on NSE,106.57,
+2015-07-24,Price,Price on NSE,106.27,
+2015-07-31,Price,Price on NSE,106.85,
+2015-08-07,Price,Price on NSE,106.71,
+2015-08-14,Price,Price on NSE,107.86,
+2015-08-21,Price,Price on NSE,108.00,
+2015-08-28,Price,Price on NSE,105.68,
+2015-09-04,Price,Price on NSE,103.88,
+2015-09-11,Price,Price on NSE,104.83,
+2015-09-18,Price,Price on NSE,111.00,
+2015-09-24,Price,Price on NSE,113.08,
+2015-10-01,Price,Price on NSE,112.46,
+2015-10-09,Price,Price on NSE,111.07,
+2015-10-16,Price,Price on NSE,108.26,
+2015-10-23,Price,Price on NSE,106.46,
+2015-10-30,Price,Price on NSE,107.41,
+2015-11-06,Price,Price on NSE,106.87,
+2015-11-13,Price,Price on NSE,103.41,
+2015-11-20,Price,Price on NSE,106.82,
+2015-11-27,Price,Price on NSE,106.87,
+2015-12-04,Price,Price on NSE,106.75,
+2015-12-11,Price,Price on NSE,106.11,
+2015-12-18,Price,Price on NSE,103.92,
+2015-12-24,Price,Price on NSE,104.48,
+2016-01-01,Price,Price on NSE,104.34,
+2016-01-08,Price,Price on NSE,104.22,
+2016-01-15,Price,Price on NSE,101.83,
+2016-01-22,Price,Price on NSE,103.15,
+2016-01-29,Price,Price on NSE,105.53,
+2016-02-05,Price,Price on NSE,104.61,
+2016-02-12,Price,Price on NSE,97.00,
+2016-02-19,Price,Price on NSE,102.63,
+2016-02-26,Price,Price on NSE,99.47,
+2016-03-04,Price,Price on NSE,100.68,
+2016-03-11,Price,Price on NSE,101.07,
+2016-03-18,Price,Price on NSE,103.36,
+2016-03-23,Price,Price on NSE,104.21,
+2016-04-01,Price,Price on NSE,105.41,
+2016-04-08,Price,Price on NSE,103.05,
+2016-04-13,Price,Price on NSE,109.67,
+2016-04-22,Price,Price on NSE,104.62,
+2016-04-29,Price,Price on NSE,103.95,
+2016-05-06,Price,Price on NSE,99.96,
+2016-05-13,Price,Price on NSE,101.19,
+2016-05-20,Price,Price on NSE,101.89,
+2016-05-27,Price,Price on NSE,102.27,
+2016-06-03,Price,Price on NSE,101.40,
+2016-06-10,Price,Price on NSE,102.26,
+2016-06-17,Price,Price on NSE,103.51,
+2016-06-24,Price,Price on NSE,104.10,
+2016-07-01,Price,Price on NSE,104.80,
+2016-07-08,Price,Price on NSE,105.31,
+2016-07-15,Price,Price on NSE,103.97,
+2016-07-22,Price,Price on NSE,100.83,
+2016-07-29,Price,Price on NSE,102.20,
+2016-08-05,Price,Price on NSE,102.60,
+2016-08-12,Price,Price on NSE,101.96,
+2016-08-19,Price,Price on NSE,97.52,
+2016-08-26,Price,Price on NSE,91.88,
+2016-09-02,Price,Price on NSE,90.68,
+2016-09-09,Price,Price on NSE,90.13,
+2016-09-16,Price,Price on NSE,89.89,
+2016-09-23,Price,Price on NSE,90.04,
+2016-09-30,Price,Price on NSE,89.81,
+2016-10-07,Price,Price on NSE,89.43,
+2016-10-14,Price,Price on NSE,89.07,
+2016-10-21,Price,Price on NSE,93.60,
+2016-10-30,Price,Price on NSE,87.08,
+2016-11-04,Price,Price on NSE,84.85,
+2016-11-11,Price,Price on NSE,82.95,
+2016-11-18,Price,Price on NSE,81.97,
+2016-11-25,Price,Price on NSE,87.15,
+2016-12-02,Price,Price on NSE,86.33,
+2016-12-09,Price,Price on NSE,85.90,
+2016-12-16,Price,Price on NSE,86.91,
+2016-12-23,Price,Price on NSE,86.02,
+2016-12-30,Price,Price on NSE,88.96,
+2017-01-06,Price,Price on NSE,88.12,
+2017-01-13,Price,Price on NSE,90.88,
+2017-01-20,Price,Price on NSE,89.61,
+2017-01-27,Price,Price on NSE,87.30,
+2017-02-03,Price,Price on NSE,85.83,
+2017-02-10,Price,Price on NSE,87.99,
+2017-02-17,Price,Price on NSE,89.13,
+2017-02-23,Price,Price on NSE,91.15,
+2017-03-03,Price,Price on NSE,92.60,
+2017-03-10,Price,Price on NSE,91.33,
+2017-03-17,Price,Price on NSE,94.55,
+2017-03-24,Price,Price on NSE,96.24,
+2017-03-31,Price,Price on NSE,96.70,
+2017-04-07,Price,Price on NSE,95.98,
+2017-04-13,Price,Price on NSE,92.89,
+2017-04-21,Price,Price on NSE,92.11,
+2017-04-28,Price,Price on NSE,92.68,
+2017-05-05,Price,Price on NSE,93.62,
+2017-05-12,Price,Price on NSE,95.08,
+2017-05-19,Price,Price on NSE,97.46,
+2017-05-26,Price,Price on NSE,101.07,
+2017-06-02,Price,Price on NSE,103.44,
+2017-06-09,Price,Price on NSE,100.68,
+2017-06-16,Price,Price on NSE,95.72,
+2017-06-23,Price,Price on NSE,96.32,
+2017-06-30,Price,Price on NSE,96.89,
+2017-07-07,Price,Price on NSE,96.64,
+2017-07-14,Price,Price on NSE,97.45,
+2017-07-21,Price,Price on NSE,107.27,
+2017-07-28,Price,Price on NSE,108.40,
+2017-08-04,Price,Price on NSE,108.53,
+2017-08-11,Price,Price on NSE,108.64,
+2017-08-18,Price,Price on NSE,108.04,
+2017-08-24,Price,Price on NSE,108.53,
+2017-09-01,Price,Price on NSE,111.17,
+2017-09-08,Price,Price on NSE,112.69,
+2017-09-15,Price,Price on NSE,107.16,
+2017-09-22,Price,Price on NSE,110.42,
+2017-09-29,Price,Price on NSE,105.10,
+2017-10-06,Price,Price on NSE,107.48,
+2017-10-13,Price,Price on NSE,109.46,
+2017-10-19,Price,Price on NSE,109.52,
+2017-10-27,Price,Price on NSE,111.36,
+2017-11-03,Price,Price on NSE,110.46,
+2017-11-10,Price,Price on NSE,113.50,
+2017-11-17,Price,Price on NSE,110.69,
+2017-11-24,Price,Price on NSE,109.76,
+2017-12-01,Price,Price on NSE,108.53,
+2017-12-08,Price,Price on NSE,106.09,
+2017-12-15,Price,Price on NSE,108.64,
+2017-12-22,Price,Price on NSE,113.10,
+2017-12-29,Price,Price on NSE,117.85,
+2018-01-05,Price,Price on NSE,116.09,
+2018-01-12,Price,Price on NSE,119.55,
+2018-01-19,Price,Price on NSE,123.36,
+2018-01-25,Price,Price on NSE,116.99,
+2018-02-02,Price,Price on NSE,112.73,
+2018-02-09,Price,Price on NSE,106.88,
+2018-02-16,Price,Price on NSE,109.13,
+2018-02-23,Price,Price on NSE,110.63,
+2018-03-01,Price,Price on NSE,109.69,
+2018-03-09,Price,Price on NSE,106.90,
+2018-03-16,Price,Price on NSE,110.91,
+2018-03-23,Price,Price on NSE,106.75,
+2018-03-28,Price,Price on NSE,105.44,
+2018-04-06,Price,Price on NSE,106.49,
+2018-04-13,Price,Price on NSE,110.31,
+2018-04-20,Price,Price on NSE,111.77,
+2018-04-27,Price,Price on NSE,103.56,
+2018-05-04,Price,Price on NSE,101.21,
+2018-05-11,Price,Price on NSE,102.25,
+2018-05-18,Price,Price on NSE,100.84,
+2018-05-25,Price,Price on NSE,99.23,
+2018-06-01,Price,Price on NSE,97.73,
+2018-06-08,Price,Price on NSE,99.00,
+2018-06-15,Price,Price on NSE,100.09,
+2018-06-22,Price,Price on NSE,96.85,
+2018-06-29,Price,Price on NSE,98.06,
+2018-07-06,Price,Price on NSE,98.55,
+2018-07-13,Price,Price on NSE,105.32,
+2018-07-20,Price,Price on NSE,106.13,
+2018-07-27,Price,Price on NSE,102.94,
+2018-08-03,Price,Price on NSE,104.25,
+2018-08-10,Price,Price on NSE,104.57,
+2018-08-17,Price,Price on NSE,105.02,
+2018-08-24,Price,Price on NSE,109.56,
+2018-08-31,Price,Price on NSE,112.97,
+2018-09-07,Price,Price on NSE,121.76,
+2018-09-14,Price,Price on NSE,123.83,
+2018-09-21,Price,Price on NSE,125.70,
+2018-09-28,Price,Price on NSE,121.50,
+2018-10-05,Price,Price on NSE,121.99,
+2018-10-12,Price,Price on NSE,118.61,
+2018-10-19,Price,Price on NSE,121.19,
+2018-10-26,Price,Price on NSE,120.23,
+2018-11-02,Price,Price on NSE,119.40,
+2018-11-09,Price,Price on NSE,121.82,
+2018-11-16,Price,Price on NSE,122.33,
+2018-11-22,Price,Price on NSE,115.16,
+2018-11-30,Price,Price on NSE,121.75,
+2018-12-07,Price,Price on NSE,124.99,
+2018-12-14,Price,Price on NSE,124.91,
+2018-12-21,Price,Price on NSE,120.79,
+2018-12-28,Price,Price on NSE,123.77,
+2019-01-04,Price,Price on NSE,121.67,
+2019-01-11,Price,Price on NSE,123.26,
+2019-01-18,Price,Price on NSE,129.81,
+2019-01-25,Price,Price on NSE,132.55,
+2019-02-01,Price,Price on NSE,139.34,
+2019-02-08,Price,Price on NSE,139.76,
+2019-02-15,Price,Price on NSE,141.04,
+2019-02-22,Price,Price on NSE,142.04,
+2019-03-01,Price,Price on NSE,140.89,
+2019-03-08,Price,Price on NSE,128.85,
+2019-03-15,Price,Price on NSE,131.73,
+2019-03-22,Price,Price on NSE,130.28,
+2019-03-29,Price,Price on NSE,127.40,
+2019-04-05,Price,Price on NSE,131.05,
+2019-04-12,Price,Price on NSE,141.70,
+2019-04-18,Price,Price on NSE,142.40,
+2019-04-26,Price,Price on NSE,147.40,
+2019-05-03,Price,Price on NSE,145.45,
+2019-05-10,Price,Price on NSE,145.18,
+2019-05-17,Price,Price on NSE,143.20,
+2019-05-24,Price,Price on NSE,141.45,
+2019-05-31,Price,Price on NSE,143.20,
+2019-06-07,Price,Price on NSE,147.53,
+2019-06-14,Price,Price on NSE,149.40,
+2019-06-21,Price,Price on NSE,142.93,
+2019-06-28,Price,Price on NSE,140.25,
+2019-07-05,Price,Price on NSE,135.93,
+2019-07-12,Price,Price on NSE,129.48,
+2019-07-19,Price,Price on NSE,132.35,
+2019-07-26,Price,Price on NSE,131.80,
+2019-08-02,Price,Price on NSE,131.83,
+2019-08-09,Price,Price on NSE,131.75,
+2019-08-16,Price,Price on NSE,124.60,
+2019-08-23,Price,Price on NSE,125.70,
+2019-08-30,Price,Price on NSE,127.20,
+2019-09-06,Price,Price on NSE,126.00,
+2019-09-13,Price,Price on NSE,122.68,
+2019-09-20,Price,Price on NSE,122.98,
+2019-09-27,Price,Price on NSE,118.30,
+2019-10-04,Price,Price on NSE,118.85,
+2019-10-11,Price,Price on NSE,119.73,
+2019-10-18,Price,Price on NSE,124.45,
+2019-10-27,Price,Price on NSE,126.83,
+2019-11-01,Price,Price on NSE,129.30,
+2019-11-08,Price,Price on NSE,128.20,
+2019-11-15,Price,Price on NSE,126.28,
+2019-11-22,Price,Price on NSE,121.55,
+2019-11-29,Price,Price on NSE,118.85,
+2019-12-06,Price,Price on NSE,120.50,
+2019-12-13,Price,Price on NSE,121.93,
+2019-12-20,Price,Price on NSE,125.90,
+2019-12-27,Price,Price on NSE,123.78,
+2020-01-03,Price,Price on NSE,125.55,
+2020-01-10,Price,Price on NSE,125.88,
+2020-01-17,Price,Price on NSE,125.55,
+2020-01-24,Price,Price on NSE,123.80,
+2020-02-01,Price,Price on NSE,118.40,
+2020-02-07,Price,Price on NSE,121.98,
+2020-02-14,Price,Price on NSE,121.45,
+2020-02-20,Price,Price on NSE,122.85,
+2020-02-28,Price,Price on NSE,110.73,
+2020-03-06,Price,Price on NSE,111.78,
+2020-03-13,Price,Price on NSE,98.70,
+2020-03-20,Price,Price on NSE,89.60,
+2020-03-27,Price,Price on NSE,91.75,
+2020-04-03,Price,Price on NSE,90.00,
+2020-04-09,Price,Price on NSE,98.35,
+2020-04-17,Price,Price on NSE,93.50,
+2020-04-24,Price,Price on NSE,88.88,
+2020-04-30,Price,Price on NSE,95.48,
+2020-05-08,Price,Price on NSE,92.00,
+2020-05-15,Price,Price on NSE,91.90,
+2020-05-22,Price,Price on NSE,94.50,
+2020-05-29,Price,Price on NSE,106.40,
+2020-06-05,Price,Price on NSE,109.38,
+2020-06-12,Price,Price on NSE,103.95,
+2020-06-19,Price,Price on NSE,111.03,
+2020-06-26,Price,Price on NSE,112.73,
+2020-07-03,Price,Price on NSE,112.40,
+2020-07-10,Price,Price on NSE,111.05,
+2020-07-17,Price,Price on NSE,130.68,
+2020-07-24,Price,Price on NSE,135.28,
+2020-07-31,Price,Price on NSE,140.48,
+2020-08-07,Price,Price on NSE,138.70,
+2020-08-14,Price,Price on NSE,138.25,
+2020-08-21,Price,Price on NSE,136.68,
+2020-08-28,Price,Price on NSE,136.03,
+2020-09-04,Price,Price on NSE,138.00,
+2020-09-11,Price,Price on NSE,146.65,
+2020-09-18,Price,Price on NSE,158.25,
+2020-09-25,Price,Price on NSE,156.95,
+2020-10-01,Price,Price on NSE,156.53,
+2020-10-09,Price,Price on NSE,187.00,
+2020-10-16,Price,Price on NSE,169.83,
+2020-10-23,Price,Price on NSE,171.20,
+2020-10-30,Price,Price on NSE,170.35,
+2020-11-06,Price,Price on NSE,172.88,
+2020-11-14,Price,Price on NSE,172.73,
+2020-11-20,Price,Price on NSE,173.15,
+2020-11-27,Price,Price on NSE,175.25,
+2020-12-04,Price,Price on NSE,180.40,
+2020-12-11,Price,Price on NSE,176.75,
+2020-12-18,Price,Price on NSE,181.78,
+2020-12-24,Price,Price on NSE,191.10,
+2021-01-01,Price,Price on NSE,194.05,
+2021-01-08,Price,Price on NSE,215.10,
+2021-01-15,Price,Price on NSE,219.28,
+2021-01-22,Price,Price on NSE,222.38,
+2021-01-29,Price,Price on NSE,208.95,
+2021-02-05,Price,Price on NSE,212.78,
+2021-02-12,Price,Price on NSE,221.00,
+2021-02-19,Price,Price on NSE,214.98,
+2021-02-26,Price,Price on NSE,205.15,
+2021-03-05,Price,Price on NSE,210.43,
+2021-03-12,Price,Price on NSE,212.60,
+2021-03-19,Price,Price on NSE,205.25,
+2021-03-26,Price,Price on NSE,201.95,
+2021-04-01,Price,Price on NSE,208.20,
+2021-04-09,Price,Price on NSE,225.05,
+2021-04-16,Price,Price on NSE,234.60,
+2021-04-23,Price,Price on NSE,237.85,
+2021-04-30,Price,Price on NSE,246.38,
+2021-05-07,Price,Price on NSE,257.63,
+2021-05-14,Price,Price on NSE,249.23,
+2021-05-21,Price,Price on NSE,256.35,
+2021-05-28,Price,Price on NSE,269.35,
+2021-06-04,Price,Price on NSE,270.60,
+2021-06-11,Price,Price on NSE,277.15,
+2021-06-18,Price,Price on NSE,274.90,
+2021-06-25,Price,Price on NSE,273.75,
+2021-07-02,Price,Price on NSE,269.30,
+2021-07-09,Price,Price on NSE,262.90,
+2021-07-16,Price,Price on NSE,288.88,
+2021-07-23,Price,Price on NSE,299.58,
+2021-07-30,Price,Price on NSE,293.58,
+2021-08-06,Price,Price on NSE,299.00,
+2021-08-13,Price,Price on NSE,307.75,
+2021-08-20,Price,Price on NSE,310.03,
+2021-08-27,Price,Price on NSE,317.48,
+2021-09-03,Price,Price on NSE,327.55,
+2021-09-09,Price,Price on NSE,331.18,
+2021-09-17,Price,Price on NSE,332.63,
+2021-09-24,Price,Price on NSE,338.25,
+2021-10-01,Price,Price on NSE,318.13,
+2021-10-08,Price,Price on NSE,330.58,
+2021-10-14,Price,Price on NSE,354.13,
+2021-10-22,Price,Price on NSE,341.20,
+2021-10-29,Price,Price on NSE,323.38,
+2021-11-04,Price,Price on NSE,326.85,
+2021-11-12,Price,Price on NSE,330.03,
+2021-11-18,Price,Price on NSE,325.73,
+2021-11-26,Price,Price on NSE,310.73,
+2021-12-03,Price,Price on NSE,320.38,
+2021-12-10,Price,Price on NSE,319.13,
+2021-12-17,Price,Price on NSE,335.40,
+2021-12-24,Price,Price on NSE,349.23,
+2021-12-31,Price,Price on NSE,357.68,
+2022-01-07,Price,Price on NSE,355.75,
+2022-01-14,Price,Price on NSE,319.90,
+2022-01-21,Price,Price on NSE,302.53,
+2022-01-28,Price,Price on NSE,276.08,
+2022-02-04,Price,Price on NSE,285.88,
+2022-02-11,Price,Price on NSE,280.73,
+2022-02-18,Price,Price on NSE,281.23,
+2022-02-25,Price,Price on NSE,277.63,
+2022-03-04,Price,Price on NSE,287.65,
+2022-03-11,Price,Price on NSE,293.10,
+2022-03-17,Price,Price on NSE,300.60,
+2022-03-25,Price,Price on NSE,301.68,
+2022-04-01,Price,Price on NSE,300.90,
+2022-04-08,Price,Price on NSE,291.83,
+2022-04-13,Price,Price on NSE,279.60,
+2022-04-22,Price,Price on NSE,268.85,
+2022-04-29,Price,Price on NSE,254.40,
+2022-05-06,Price,Price on NSE,242.55,
+2022-05-13,Price,Price on NSE,234.33,
+2022-05-20,Price,Price on NSE,229.80,
+2022-05-27,Price,Price on NSE,233.48,
+2022-06-03,Price,Price on NSE,237.75,
+2022-06-10,Price,Price on NSE,230.48,
+2022-06-17,Price,Price on NSE,202.60,
+2022-06-24,Price,Price on NSE,209.38,
+2022-07-01,Price,Price on NSE,211.00,
+2022-07-08,Price,Price on NSE,209.55,
+2022-07-15,Price,Price on NSE,196.93,
+2022-07-22,Price,Price on NSE,205.43,
+2022-07-29,Price,Price on NSE,211.85,
+2022-08-05,Price,Price on NSE,220.00,
+2022-08-12,Price,Price on NSE,218.05,
+2022-08-19,Price,Price on NSE,216.23,
+2022-08-26,Price,Price on NSE,208.63,
+2022-09-02,Price,Price on NSE,203.85,
+2022-09-09,Price,Price on NSE,208.58,
+2022-09-16,Price,Price on NSE,200.83,
+2022-09-23,Price,Price on NSE,197.18,
+2022-09-30,Price,Price on NSE,197.13,
+2022-10-07,Price,Price on NSE,204.05,
+2022-10-14,Price,Price on NSE,188.65,
+2022-10-21,Price,Price on NSE,191.28,
+2022-10-28,Price,Price on NSE,191.63,
+2022-11-04,Price,Price on NSE,195.28,
+2022-11-11,Price,Price on NSE,199.85,
+2022-11-18,Price,Price on NSE,196.93,
+2022-11-25,Price,Price on NSE,201.40,
+2022-12-02,Price,Price on NSE,206.20,
+2022-12-09,Price,Price on NSE,197.03,
+2022-12-16,Price,Price on NSE,194.88,
+2022-12-23,Price,Price on NSE,188.83,
+2022-12-30,Price,Price on NSE,196.38,
+2023-01-06,Price,Price on NSE,191.00,
+2023-01-13,Price,Price on NSE,196.95,
+2023-01-20,Price,Price on NSE,201.58,
+2023-01-27,Price,Price on NSE,199.03,
+2023-02-03,Price,Price on NSE,203.95,
+2023-02-10,Price,Price on NSE,202.90,
+2023-02-17,Price,Price on NSE,203.15,
+2023-02-24,Price,Price on NSE,196.65,
+2023-03-03,Price,Price on NSE,195.23,
+2023-03-10,Price,Price on NSE,194.55,
+2023-03-17,Price,Price on NSE,188.25,
+2023-03-24,Price,Price on NSE,180.88,
+2023-03-31,Price,Price on NSE,182.63,
+2023-04-06,Price,Price on NSE,183.33,
+2023-04-13,Price,Price on NSE,184.15,
+2023-04-21,Price,Price on NSE,184.03,
+2023-04-28,Price,Price on NSE,192.50,
+2023-05-05,Price,Price on NSE,189.70,
+2023-05-12,Price,Price on NSE,191.63,
+2023-05-19,Price,Price on NSE,193.10,
+2023-05-26,Price,Price on NSE,200.85,
+2023-06-02,Price,Price on NSE,202.48,
+2023-06-09,Price,Price on NSE,198.65,
+2023-06-16,Price,Price on NSE,190.65,
+2023-06-23,Price,Price on NSE,189.98,
+2023-06-30,Price,Price on NSE,194.58,
+2023-07-07,Price,Price on NSE,197.93,
+2023-07-14,Price,Price on NSE,202.53,
+2023-07-21,Price,Price on NSE,202.35,
+2023-07-28,Price,Price on NSE,199.38,
+2023-08-04,Price,Price on NSE,204.43,
+2023-08-11,Price,Price on NSE,206.53,
+2023-08-18,Price,Price on NSE,205.85,
+2023-08-25,Price,Price on NSE,204.85,
+2023-09-01,Price,Price on NSE,208.18,
+2023-09-08,Price,Price on NSE,215.00,
+2023-09-15,Price,Price on NSE,220.53,
+2023-09-22,Price,Price on NSE,209.25,
+2023-09-29,Price,Price on NSE,203.03,
+2023-10-06,Price,Price on NSE,203.93,
+2023-10-13,Price,Price on NSE,205.53,
+2023-10-20,Price,Price on NSE,195.93,
+2023-10-27,Price,Price on NSE,191.18,
+2023-11-03,Price,Price on NSE,191.78,
+2023-11-12,Price,Price on NSE,191.23,
+2023-11-17,Price,Price on NSE,197.70,
+2023-11-24,Price,Price on NSE,198.00,
+2023-12-01,Price,Price on NSE,203.83,
+2023-12-08,Price,Price on NSE,211.30,
+2023-12-15,Price,Price on NSE,223.28,
+2023-12-22,Price,Price on NSE,231.33,
+2023-12-29,Price,Price on NSE,235.65,
+2024-01-05,Price,Price on NSE,228.30,
+2024-01-12,Price,Price on NSE,232.73,
+2024-01-20,Price,Price on NSE,238.98,
+2024-01-25,Price,Price on NSE,235.00,
+2024-02-02,Price,Price on NSE,241.58,
+2024-02-09,Price,Price on NSE,245.23,
+2024-02-16,Price,Price on NSE,271.50,
+2024-02-23,Price,Price on NSE,268.08,
+2024-03-02,Price,Price on NSE,261.43,
+2024-03-07,Price,Price on NSE,257.75,
+2024-03-15,Price,Price on NSE,258.50,
+2024-03-22,Price,Price on NSE,243.55,
+2024-03-28,Price,Price on NSE,240.05,
+2024-04-05,Price,Price on NSE,242.53,
+2024-04-12,Price,Price on NSE,235.38,
+2024-04-19,Price,Price on NSE,226.38,
+2024-04-26,Price,Price on NSE,232.30,
+2024-05-03,Price,Price on NSE,228.68,
+2024-05-10,Price,Price on NSE,225.93,
+2024-05-18,Price,Price on NSE,231.28,
+2024-05-24,Price,Price on NSE,231.83,
+2024-05-31,Price,Price on NSE,219.10,
+2024-06-07,Price,Price on NSE,242.28,
+2024-06-14,Price,Price on NSE,238.75,
+2024-06-21,Price,Price on NSE,245.28,
+2024-06-28,Price,Price on NSE,257.43,
+2024-07-05,Price,Price on NSE,267.55,
+2024-07-12,Price,Price on NSE,280.08,
+2024-07-19,Price,Price on NSE,278.60,
+2024-07-26,Price,Price on NSE,262.40,
+2024-08-02,Price,Price on NSE,251.08,
+2024-08-09,Price,Price on NSE,245.65,
+2024-08-16,Price,Price on NSE,258.13,
+2024-08-23,Price,Price on NSE,256.20,
+2024-08-30,Price,Price on NSE,269.20,
+2024-09-06,Price,Price on NSE,260.30,
+2024-09-13,Price,Price on NSE,275.30,
+2024-09-20,Price,Price on NSE,269.55,
+2024-09-27,Price,Price on NSE,270.90,
+2024-10-04,Price,Price on NSE,266.78,
+2024-10-11,Price,Price on NSE,264.15,
+2024-10-18,Price,Price on NSE,274.33,
+2024-10-25,Price,Price on NSE,271.73,
+2024-11-01,Price,Price on NSE,275.68,
+2024-11-08,Price,Price on NSE,284.50,
+2024-11-14,Price,Price on NSE,283.35,
+2024-11-22,Price,Price on NSE,285.83,
+2024-11-29,Price,Price on NSE,288.93,
+2024-12-06,Price,Price on NSE,297.35,
+2024-12-13,Price,Price on NSE,309.95,
+2024-12-20,Price,Price on NSE,305.20,
+2024-12-27,Price,Price on NSE,309.10,
+2025-01-03,Price,Price on NSE,294.45,
+2025-01-10,Price,Price on NSE,300.55,
+2025-01-17,Price,Price on NSE,281.95,
+2025-01-24,Price,Price on NSE,320.10,
+2025-02-01,Price,Price on NSE,304.80,
+2025-02-07,Price,Price on NSE,318.00,
+2025-02-14,Price,Price on NSE,308.10,
+2025-02-21,Price,Price on NSE,306.35,
+2025-02-28,Price,Price on NSE,277.65,
+2025-03-07,Price,Price on NSE,284.80,
+2025-03-13,Price,Price on NSE,264.00,
+2025-03-21,Price,Price on NSE,264.30,
+2025-03-28,Price,Price on NSE,262.25,
+2025-04-04,Price,Price on NSE,246.30,
+2025-04-11,Price,Price on NSE,239.75,
+2025-04-17,Price,Price on NSE,236.90,
+2025-04-25,Price,Price on NSE,240.90,
+2025-05-02,Price,Price on NSE,242.87,
+2025-05-09,Price,Price on NSE,242.01,
+2025-05-16,Price,Price on NSE,254.31,
+2025-05-23,Price,Price on NSE,247.36,
+2025-05-30,Price,Price on NSE,249.67,
+2025-06-06,Price,Price on NSE,248.59,
+2025-06-13,Price,Price on NSE,260.21,
+2025-06-20,Price,Price on NSE,266.54,
+2025-06-27,Price,Price on NSE,265.05,
+2025-07-04,Price,Price on NSE,270.05,
+2025-07-11,Price,Price on NSE,258.30,
+2025-07-18,Price,Price on NSE,266.95,
+2025-07-25,Price,Price on NSE,259.20,
+2025-08-01,Price,Price on NSE,242.75,
+2025-08-08,Price,Price on NSE,239.05,
+2025-08-14,Price,Price on NSE,246.81,
+2025-08-22,Price,Price on NSE,248.64,
+2025-08-29,Price,Price on NSE,249.41,
+2025-09-05,Price,Price on NSE,243.67,
+2025-09-12,Price,Price on NSE,251.94,
+2025-09-19,Price,Price on NSE,255.88,
+2025-09-26,Price,Price on NSE,235.75,
+2025-10-03,Price,Price on NSE,240.98,
+2025-10-10,Price,Price on NSE,248.70,
+2025-10-17,Price,Price on NSE,240.90,
+2025-10-24,Price,Price on NSE,242.98,
+2025-10-31,Price,Price on NSE,240.67,
+2025-11-07,Price,Price on NSE,236.49,
+2025-11-14,Price,Price on NSE,244.37,
+2025-11-21,Price,Price on NSE,244.49,
+2025-11-28,Price,Price on NSE,249.53,
+2025-12-05,Price,Price on NSE,259.91,
+2025-12-12,Price,Price on NSE,260.60,
+2025-12-19,Price,Price on NSE,264.45,
+2025-12-26,Price,Price on NSE,266.30,
+2026-01-02,Price,Price on NSE,269.00,
+2026-01-09,Price,Price on NSE,261.95,
+2026-01-16,Price,Price on NSE,267.45,
+2026-01-23,Price,Price on NSE,238.40,
+2026-01-27,Price,Price on NSE,234.80,
+2005-04-01,DMA50,50 DMA,37.95,
+2005-04-08,DMA50,50 DMA,37.92,
+2005-04-15,DMA50,50 DMA,37.62,
+2005-04-22,DMA50,50 DMA,36.98,
+2005-04-29,DMA50,50 DMA,36.81,
+2005-05-06,DMA50,50 DMA,36.62,
+2005-05-13,DMA50,50 DMA,36.55,
+2005-05-20,DMA50,50 DMA,36.66,
+2005-05-27,DMA50,50 DMA,37.13,
+2005-06-04,DMA50,50 DMA,37.80,
+2005-06-10,DMA50,50 DMA,38.38,
+2005-06-17,DMA50,50 DMA,38.90,
+2005-06-24,DMA50,50 DMA,39.58,
+2005-07-01,DMA50,50 DMA,40.09,
+2005-07-08,DMA50,50 DMA,40.29,
+2005-07-15,DMA50,50 DMA,40.20,
+2005-07-22,DMA50,50 DMA,40.21,
+2005-07-29,DMA50,50 DMA,40.29,
+2005-08-05,DMA50,50 DMA,40.42,
+2005-08-12,DMA50,50 DMA,40.45,
+2005-08-19,DMA50,50 DMA,40.50,
+2005-08-26,DMA50,50 DMA,40.52,
+2005-09-02,DMA50,50 DMA,40.64,
+2005-09-09,DMA50,50 DMA,40.88,
+2005-09-16,DMA50,50 DMA,41.21,
+2005-09-23,DMA50,50 DMA,41.27,
+2005-09-30,DMA50,50 DMA,41.43,
+2005-10-07,DMA50,50 DMA,41.96,
+2005-10-14,DMA50,50 DMA,42.29,
+2005-10-21,DMA50,50 DMA,42.31,
+2005-10-28,DMA50,50 DMA,42.23,
+2005-11-02,DMA50,50 DMA,42.13,
+2005-11-11,DMA50,50 DMA,42.44,
+2005-11-18,DMA50,50 DMA,43.06,
+2005-11-26,DMA50,50 DMA,44.26,
+2005-12-02,DMA50,50 DMA,45.13,
+2005-12-09,DMA50,50 DMA,45.81,
+2005-12-16,DMA50,50 DMA,46.55,
+2005-12-23,DMA50,50 DMA,47.55,
+2005-12-30,DMA50,50 DMA,48.34,
+2006-01-06,DMA50,50 DMA,49.24,
+2006-01-13,DMA50,50 DMA,49.64,
+2006-01-20,DMA50,50 DMA,50.34,
+2006-01-27,DMA50,50 DMA,51.24,
+2006-02-03,DMA50,50 DMA,52.66,
+2006-02-10,DMA50,50 DMA,53.44,
+2006-02-17,DMA50,50 DMA,53.90,
+2006-02-24,DMA50,50 DMA,54.68,
+2006-03-03,DMA50,50 DMA,55.53,
+2006-03-10,DMA50,50 DMA,56.06,
+2006-03-17,DMA50,50 DMA,56.49,
+2006-03-24,DMA50,50 DMA,57.09,
+2006-03-31,DMA50,50 DMA,57.89,
+2006-04-07,DMA50,50 DMA,58.58,
+2006-04-13,DMA50,50 DMA,58.63,
+2006-04-21,DMA50,50 DMA,59.35,
+2006-04-29,DMA50,50 DMA,59.65,
+2006-05-05,DMA50,50 DMA,59.84,
+2006-05-12,DMA50,50 DMA,60.07,
+2006-05-19,DMA50,50 DMA,59.83,
+2006-05-26,DMA50,50 DMA,58.53,
+2006-06-02,DMA50,50 DMA,57.35,
+2006-06-09,DMA50,50 DMA,55.95,
+2006-06-16,DMA50,50 DMA,54.28,
+2006-06-25,DMA50,50 DMA,53.53,
+2006-06-30,DMA50,50 DMA,53.79,
+2006-07-07,DMA50,50 DMA,54.09,
+2006-07-14,DMA50,50 DMA,54.50,
+2006-07-21,DMA50,50 DMA,54.18,
+2006-07-28,DMA50,50 DMA,54.15,
+2006-08-04,DMA50,50 DMA,54.59,
+2006-08-11,DMA50,50 DMA,55.02,
+2006-08-18,DMA50,50 DMA,55.42,
+2006-08-25,DMA50,50 DMA,55.85,
+2006-09-01,DMA50,50 DMA,56.37,
+2006-09-08,DMA50,50 DMA,56.71,
+2006-09-15,DMA50,50 DMA,56.81,
+2006-09-22,DMA50,50 DMA,57.10,
+2006-09-29,DMA50,50 DMA,57.40,
+2006-10-06,DMA50,50 DMA,57.51,
+2006-10-13,DMA50,50 DMA,58.01,
+2006-10-21,DMA50,50 DMA,59.12,
+2006-10-27,DMA50,50 DMA,59.53,
+2006-11-03,DMA50,50 DMA,59.74,
+2006-11-10,DMA50,50 DMA,59.83,
+2006-11-17,DMA50,50 DMA,60.19,
+2006-11-24,DMA50,50 DMA,61.08,
+2006-12-01,DMA50,50 DMA,62.16,
+2006-12-08,DMA50,50 DMA,62.89,
+2006-12-15,DMA50,50 DMA,63.02,
+2006-12-22,DMA50,50 DMA,63.20,
+2006-12-29,DMA50,50 DMA,63.94,
+2007-01-05,DMA50,50 DMA,64.64,
+2007-01-12,DMA50,50 DMA,65.20,
+2007-01-19,DMA50,50 DMA,66.30,
+2007-01-25,DMA50,50 DMA,67.04,
+2007-02-02,DMA50,50 DMA,67.60,
+2007-02-09,DMA50,50 DMA,68.40,
+2007-02-15,DMA50,50 DMA,69.12,
+2007-02-23,DMA50,50 DMA,70.01,
+2007-03-02,DMA50,50 DMA,69.36,
+2007-03-09,DMA50,50 DMA,68.27,
+2007-03-16,DMA50,50 DMA,67.50,
+2007-03-23,DMA50,50 DMA,67.24,
+2007-03-30,DMA50,50 DMA,66.74,
+2007-04-05,DMA50,50 DMA,65.87,
+2007-04-13,DMA50,50 DMA,65.24,
+2007-04-20,DMA50,50 DMA,65.24,
+2007-04-27,DMA50,50 DMA,64.90,
+2007-05-04,DMA50,50 DMA,64.83,
+2007-05-11,DMA50,50 DMA,64.32,
+2007-05-18,DMA50,50 DMA,63.74,
+2007-05-25,DMA50,50 DMA,63.14,
+2007-06-01,DMA50,50 DMA,62.76,
+2007-06-08,DMA50,50 DMA,62.41,
+2007-06-15,DMA50,50 DMA,62.03,
+2007-06-22,DMA50,50 DMA,61.46,
+2007-06-29,DMA50,50 DMA,60.82,
+2007-07-06,DMA50,50 DMA,60.27,
+2007-07-13,DMA50,50 DMA,59.89,
+2007-07-20,DMA50,50 DMA,59.36,
+2007-07-27,DMA50,50 DMA,58.90,
+2007-08-03,DMA50,50 DMA,58.03,
+2007-08-10,DMA50,50 DMA,57.14,
+2007-08-17,DMA50,50 DMA,56.64,
+2007-08-24,DMA50,50 DMA,55.67,
+2007-08-31,DMA50,50 DMA,55.25,
+2007-09-07,DMA50,50 DMA,54.93,
+2007-09-14,DMA50,50 DMA,54.29,
+2007-09-21,DMA50,50 DMA,53.51,
+2007-09-28,DMA50,50 DMA,53.04,
+2007-10-05,DMA50,50 DMA,52.90,
+2007-10-12,DMA50,50 DMA,53.28,
+2007-10-19,DMA50,50 DMA,53.69,
+2007-10-26,DMA50,50 DMA,54.06,
+2007-11-02,DMA50,50 DMA,54.56,
+2007-11-09,DMA50,50 DMA,54.39,
+2007-11-16,DMA50,50 DMA,53.90,
+2007-11-23,DMA50,50 DMA,53.22,
+2007-11-30,DMA50,50 DMA,52.85,
+2007-12-07,DMA50,50 DMA,53.45,
+2007-12-14,DMA50,50 DMA,54.03,
+2007-12-20,DMA50,50 DMA,54.17,
+2007-12-28,DMA50,50 DMA,55.12,
+2008-01-04,DMA50,50 DMA,55.53,
+2008-01-11,DMA50,50 DMA,55.44,
+2008-01-18,DMA50,50 DMA,54.77,
+2008-01-25,DMA50,50 DMA,53.62,
+2008-02-01,DMA50,50 DMA,52.49,
+2008-02-08,DMA50,50 DMA,51.86,
+2008-02-15,DMA50,50 DMA,51.02,
+2008-02-22,DMA50,50 DMA,50.35,
+2008-02-29,DMA50,50 DMA,50.26,
+2008-03-07,DMA50,50 DMA,49.90,
+2008-03-14,DMA50,50 DMA,48.69,
+2008-03-19,DMA50,50 DMA,47.83,
+2008-03-28,DMA50,50 DMA,47.96,
+2008-04-04,DMA50,50 DMA,47.89,
+2008-04-11,DMA50,50 DMA,47.67,
+2008-04-17,DMA50,50 DMA,47.94,
+2008-04-25,DMA50,50 DMA,48.44,
+2008-05-02,DMA50,50 DMA,49.33,
+2008-05-09,DMA50,50 DMA,50.55,
+2008-05-16,DMA50,50 DMA,51.69,
+2008-05-23,DMA50,50 DMA,52.22,
+2008-05-30,DMA50,50 DMA,52.99,
+2008-06-06,DMA50,50 DMA,53.76,
+2008-06-13,DMA50,50 DMA,53.81,
+2008-06-20,DMA50,50 DMA,54.00,
+2008-06-27,DMA50,50 DMA,53.71,
+2008-07-04,DMA50,50 DMA,52.77,
+2008-07-11,DMA50,50 DMA,51.96,
+2008-07-18,DMA50,50 DMA,50.29,
+2008-07-25,DMA50,50 DMA,49.33,
+2008-08-01,DMA50,50 DMA,48.92,
+2008-08-08,DMA50,50 DMA,49.13,
+2008-08-14,DMA50,50 DMA,49.11,
+2008-08-22,DMA50,50 DMA,48.95,
+2008-08-29,DMA50,50 DMA,48.75,
+2008-09-05,DMA50,50 DMA,48.87,
+2008-09-12,DMA50,50 DMA,48.79,
+2008-09-19,DMA50,50 DMA,48.17,
+2008-09-26,DMA50,50 DMA,47.06,
+2008-10-03,DMA50,50 DMA,45.83,
+2008-10-10,DMA50,50 DMA,43.93,
+2008-10-17,DMA50,50 DMA,41.64,
+2008-10-24,DMA50,50 DMA,39.65,
+2008-10-31,DMA50,50 DMA,37.93,
+2008-11-07,DMA50,50 DMA,36.46,
+2008-11-14,DMA50,50 DMA,35.26,
+2008-11-21,DMA50,50 DMA,33.58,
+2008-11-28,DMA50,50 DMA,32.56,
+2008-12-05,DMA50,50 DMA,31.36,
+2008-12-12,DMA50,50 DMA,30.84,
+2008-12-19,DMA50,50 DMA,30.23,
+2008-12-26,DMA50,50 DMA,29.71,
+2009-01-02,DMA50,50 DMA,29.19,
+2009-01-09,DMA50,50 DMA,28.98,
+2009-01-16,DMA50,50 DMA,28.58,
+2009-01-23,DMA50,50 DMA,27.93,
+2009-01-30,DMA50,50 DMA,27.64,
+2009-02-06,DMA50,50 DMA,27.18,
+2009-02-13,DMA50,50 DMA,26.83,
+2009-02-20,DMA50,50 DMA,26.35,
+2009-02-27,DMA50,50 DMA,26.01,
+2009-03-06,DMA50,50 DMA,25.51,
+2009-03-13,DMA50,50 DMA,25.37,
+2009-03-20,DMA50,50 DMA,25.48,
+2009-03-27,DMA50,50 DMA,25.91,
+2009-04-02,DMA50,50 DMA,26.30,
+2009-04-09,DMA50,50 DMA,26.84,
+2009-04-17,DMA50,50 DMA,27.42,
+2009-04-24,DMA50,50 DMA,28.42,
+2009-04-29,DMA50,50 DMA,29.34,
+2009-05-08,DMA50,50 DMA,31.51,
+2009-05-15,DMA50,50 DMA,33.33,
+2009-05-22,DMA50,50 DMA,35.22,
+2009-05-29,DMA50,50 DMA,36.50,
+2009-06-05,DMA50,50 DMA,37.94,
+2009-06-12,DMA50,50 DMA,39.63,
+2009-06-19,DMA50,50 DMA,40.36,
+2009-06-26,DMA50,50 DMA,40.80,
+2009-07-03,DMA50,50 DMA,41.19,
+2009-07-10,DMA50,50 DMA,41.44,
+2009-07-17,DMA50,50 DMA,42.32,
+2009-07-24,DMA50,50 DMA,44.00,
+2009-07-31,DMA50,50 DMA,45.73,
+2009-08-07,DMA50,50 DMA,47.55,
+2009-08-14,DMA50,50 DMA,49.38,
+2009-08-21,DMA50,50 DMA,50.70,
+2009-08-28,DMA50,50 DMA,52.81,
+2009-09-04,DMA50,50 DMA,54.56,
+2009-09-11,DMA50,50 DMA,55.88,
+2009-09-18,DMA50,50 DMA,57.24,
+2009-09-25,DMA50,50 DMA,58.33,
+2009-10-01,DMA50,50 DMA,59.36,
+2009-10-09,DMA50,50 DMA,60.42,
+2009-10-17,DMA50,50 DMA,61.23,
+2009-10-23,DMA50,50 DMA,61.92,
+2009-10-30,DMA50,50 DMA,63.20,
+2009-11-06,DMA50,50 DMA,63.77,
+2009-11-13,DMA50,50 DMA,64.79,
+2009-11-20,DMA50,50 DMA,66.22,
+2009-11-27,DMA50,50 DMA,67.25,
+2009-12-04,DMA50,50 DMA,68.06,
+2009-12-11,DMA50,50 DMA,68.95,
+2009-12-18,DMA50,50 DMA,70.10,
+2009-12-24,DMA50,50 DMA,71.18,
+2009-12-31,DMA50,50 DMA,71.82,
+2010-01-08,DMA50,50 DMA,72.84,
+2010-01-15,DMA50,50 DMA,74.18,
+2010-01-22,DMA50,50 DMA,75.53,
+2010-01-29,DMA50,50 DMA,75.49,
+2010-02-06,DMA50,50 DMA,75.18,
+2010-02-11,DMA50,50 DMA,74.89,
+2010-02-19,DMA50,50 DMA,74.95,
+2010-02-26,DMA50,50 DMA,75.13,
+2010-03-05,DMA50,50 DMA,75.60,
+2010-03-12,DMA50,50 DMA,76.28,
+2010-03-19,DMA50,50 DMA,77.39,
+2010-03-26,DMA50,50 DMA,77.97,
+2010-04-01,DMA50,50 DMA,78.31,
+2010-04-09,DMA50,50 DMA,78.75,
+2010-04-16,DMA50,50 DMA,79.07,
+2010-04-23,DMA50,50 DMA,79.05,
+2010-04-30,DMA50,50 DMA,78.82,
+2010-05-07,DMA50,50 DMA,78.03,
+2010-05-14,DMA50,50 DMA,77.63,
+2010-05-21,DMA50,50 DMA,76.85,
+2010-05-28,DMA50,50 DMA,76.24,
+2010-06-04,DMA50,50 DMA,75.86,
+2010-06-11,DMA50,50 DMA,75.26,
+2010-06-18,DMA50,50 DMA,75.56,
+2010-06-25,DMA50,50 DMA,75.60,
+2010-07-02,DMA50,50 DMA,75.04,
+2010-07-09,DMA50,50 DMA,74.93,
+2010-07-16,DMA50,50 DMA,75.09,
+2010-07-23,DMA50,50 DMA,75.50,
+2010-07-30,DMA50,50 DMA,75.96,
+2010-08-06,DMA50,50 DMA,76.65,
+2010-08-13,DMA50,50 DMA,77.12,
+2010-08-20,DMA50,50 DMA,77.31,
+2010-08-27,DMA50,50 DMA,77.04,
+2010-09-03,DMA50,50 DMA,76.75,
+2010-09-09,DMA50,50 DMA,76.75,
+2010-09-17,DMA50,50 DMA,77.11,
+2010-09-24,DMA50,50 DMA,78.05,
+2010-10-01,DMA50,50 DMA,79.18,
+2010-10-08,DMA50,50 DMA,80.58,
+2010-10-15,DMA50,50 DMA,82.17,
+2010-10-22,DMA50,50 DMA,83.05,
+2010-10-29,DMA50,50 DMA,82.57,
+2010-11-05,DMA50,50 DMA,82.38,
+2010-11-12,DMA50,50 DMA,82.12,
+2010-11-19,DMA50,50 DMA,81.60,
+2010-11-26,DMA50,50 DMA,80.84,
+2010-12-03,DMA50,50 DMA,80.54,
+2010-12-10,DMA50,50 DMA,80.88,
+2010-12-16,DMA50,50 DMA,81.66,
+2010-12-24,DMA50,50 DMA,83.24,
+2010-12-31,DMA50,50 DMA,84.83,
+2011-01-07,DMA50,50 DMA,85.92,
+2011-01-14,DMA50,50 DMA,86.13,
+2011-01-21,DMA50,50 DMA,86.57,
+2011-01-28,DMA50,50 DMA,86.04,
+2011-02-04,DMA50,50 DMA,85.34,
+2011-02-11,DMA50,50 DMA,84.28,
+2011-02-18,DMA50,50 DMA,83.68,
+2011-02-25,DMA50,50 DMA,83.44,
+2011-03-04,DMA50,50 DMA,83.39,
+2011-03-11,DMA50,50 DMA,83.62,
+2011-03-18,DMA50,50 DMA,83.64,
+2011-03-25,DMA50,50 DMA,83.49,
+2011-04-01,DMA50,50 DMA,84.42,
+2011-04-08,DMA50,50 DMA,85.24,
+2011-04-15,DMA50,50 DMA,85.39,
+2011-04-21,DMA50,50 DMA,85.44,
+2011-04-29,DMA50,50 DMA,85.47,
+2011-05-06,DMA50,50 DMA,84.95,
+2011-05-13,DMA50,50 DMA,84.46,
+2011-05-20,DMA50,50 DMA,84.25,
+2011-05-27,DMA50,50 DMA,83.92,
+2011-06-03,DMA50,50 DMA,83.86,
+2011-06-10,DMA50,50 DMA,83.67,
+2011-06-17,DMA50,50 DMA,82.95,
+2011-06-24,DMA50,50 DMA,81.85,
+2011-07-01,DMA50,50 DMA,81.35,
+2011-07-08,DMA50,50 DMA,81.19,
+2011-07-15,DMA50,50 DMA,80.62,
+2011-07-22,DMA50,50 DMA,79.87,
+2011-07-29,DMA50,50 DMA,79.06,
+2011-08-05,DMA50,50 DMA,77.66,
+2011-08-12,DMA50,50 DMA,75.54,
+2011-08-19,DMA50,50 DMA,73.63,
+2011-08-26,DMA50,50 DMA,71.48,
+2011-09-02,DMA50,50 DMA,70.47,
+2011-09-09,DMA50,50 DMA,68.97,
+2011-09-16,DMA50,50 DMA,67.95,
+2011-09-23,DMA50,50 DMA,67.41,
+2011-09-30,DMA50,50 DMA,66.95,
+2011-10-07,DMA50,50 DMA,66.26,
+2011-10-14,DMA50,50 DMA,66.22,
+2011-10-21,DMA50,50 DMA,66.28,
+2011-10-28,DMA50,50 DMA,66.72,
+2011-11-04,DMA50,50 DMA,67.28,
+2011-11-11,DMA50,50 DMA,67.67,
+2011-11-18,DMA50,50 DMA,68.25,
+2011-11-25,DMA50,50 DMA,68.52,
+2011-12-02,DMA50,50 DMA,69.08,
+2011-12-09,DMA50,50 DMA,70.07,
+2011-12-16,DMA50,50 DMA,71.36,
+2011-12-23,DMA50,50 DMA,72.13,
+2011-12-30,DMA50,50 DMA,72.74,
+2012-01-07,DMA50,50 DMA,73.67,
+2012-01-13,DMA50,50 DMA,73.94,
+2012-01-20,DMA50,50 DMA,74.48,
+2012-01-27,DMA50,50 DMA,75.09,
+2012-02-03,DMA50,50 DMA,75.73,
+2012-02-10,DMA50,50 DMA,76.91,
+2012-02-17,DMA50,50 DMA,77.95,
+2012-02-24,DMA50,50 DMA,78.70,
+2012-03-03,DMA50,50 DMA,79.02,
+2012-03-09,DMA50,50 DMA,79.40,
+2012-03-16,DMA50,50 DMA,79.66,
+2012-03-23,DMA50,50 DMA,79.75,
+2012-03-30,DMA50,50 DMA,80.02,
+2012-04-04,DMA50,50 DMA,80.42,
+2012-04-13,DMA50,50 DMA,80.75,
+2012-04-20,DMA50,50 DMA,80.53,
+2012-04-28,DMA50,50 DMA,79.98,
+2012-05-04,DMA50,50 DMA,79.53,
+2012-05-11,DMA50,50 DMA,78.97,
+2012-05-18,DMA50,50 DMA,78.15,
+2012-05-25,DMA50,50 DMA,77.19,
+2012-06-01,DMA50,50 DMA,77.06,
+2012-06-08,DMA50,50 DMA,76.79,
+2012-06-15,DMA50,50 DMA,76.39,
+2012-06-22,DMA50,50 DMA,76.15,
+2012-06-29,DMA50,50 DMA,75.97,
+2012-07-06,DMA50,50 DMA,75.72,
+2012-07-13,DMA50,50 DMA,74.67,
+2012-07-20,DMA50,50 DMA,73.51,
+2012-07-27,DMA50,50 DMA,71.79,
+2012-08-03,DMA50,50 DMA,70.37,
+2012-08-10,DMA50,50 DMA,69.48,
+2012-08-17,DMA50,50 DMA,69.03,
+2012-08-24,DMA50,50 DMA,68.83,
+2012-08-31,DMA50,50 DMA,68.77,
+2012-09-08,DMA50,50 DMA,68.99,
+2012-09-14,DMA50,50 DMA,69.56,
+2012-09-21,DMA50,50 DMA,69.73,
+2012-09-28,DMA50,50 DMA,70.01,
+2012-10-05,DMA50,50 DMA,70.21,
+2012-10-12,DMA50,50 DMA,69.77,
+2012-10-19,DMA50,50 DMA,69.02,
+2012-10-26,DMA50,50 DMA,68.29,
+2012-11-02,DMA50,50 DMA,67.98,
+2012-11-09,DMA50,50 DMA,68.23,
+2012-11-16,DMA50,50 DMA,68.27,
+2012-11-23,DMA50,50 DMA,68.34,
+2012-11-30,DMA50,50 DMA,68.91,
+2012-12-07,DMA50,50 DMA,69.52,
+2012-12-14,DMA50,50 DMA,69.77,
+2012-12-21,DMA50,50 DMA,70.04,
+2012-12-28,DMA50,50 DMA,70.45,
+2013-01-04,DMA50,50 DMA,71.23,
+2013-01-11,DMA50,50 DMA,72.07,
+2013-01-18,DMA50,50 DMA,73.23,
+2013-01-25,DMA50,50 DMA,73.67,
+2013-02-01,DMA50,50 DMA,74.33,
+2013-02-08,DMA50,50 DMA,74.76,
+2013-02-15,DMA50,50 DMA,75.01,
+2013-02-22,DMA50,50 DMA,75.37,
+2013-03-01,DMA50,50 DMA,75.97,
+2013-03-08,DMA50,50 DMA,77.14,
+2013-03-15,DMA50,50 DMA,78.14,
+2013-03-22,DMA50,50 DMA,78.75,
+2013-03-28,DMA50,50 DMA,79.11,
+2013-04-05,DMA50,50 DMA,79.97,
+2013-04-12,DMA50,50 DMA,79.28,
+2013-04-18,DMA50,50 DMA,77.98,
+2013-04-26,DMA50,50 DMA,75.78,
+2013-05-03,DMA50,50 DMA,74.27,
+2013-05-11,DMA50,50 DMA,72.59,
+2013-05-17,DMA50,50 DMA,71.20,
+2013-05-24,DMA50,50 DMA,69.80,
+2013-05-31,DMA50,50 DMA,68.58,
+2013-06-07,DMA50,50 DMA,67.34,
+2013-06-14,DMA50,50 DMA,66.76,
+2013-06-21,DMA50,50 DMA,66.35,
+2013-06-28,DMA50,50 DMA,66.11,
+2013-07-05,DMA50,50 DMA,66.01,
+2013-07-12,DMA50,50 DMA,66.43,
+2013-07-19,DMA50,50 DMA,67.46,
+2013-07-26,DMA50,50 DMA,68.33,
+2013-08-02,DMA50,50 DMA,70.51,
+2013-08-08,DMA50,50 DMA,72.55,
+2013-08-16,DMA50,50 DMA,74.57,
+2013-08-23,DMA50,50 DMA,76.27,
+2013-08-30,DMA50,50 DMA,78.39,
+2013-09-06,DMA50,50 DMA,80.36,
+2013-09-13,DMA50,50 DMA,81.47,
+2013-09-20,DMA50,50 DMA,82.71,
+2013-09-27,DMA50,50 DMA,83.97,
+2013-10-04,DMA50,50 DMA,84.82,
+2013-10-11,DMA50,50 DMA,85.84,
+2013-10-18,DMA50,50 DMA,87.10,
+2013-10-25,DMA50,50 DMA,88.04,
+2013-11-03,DMA50,50 DMA,88.55,
+2013-11-08,DMA50,50 DMA,88.80,
+2013-11-14,DMA50,50 DMA,89.07,
+2013-11-22,DMA50,50 DMA,89.36,
+2013-11-29,DMA50,50 DMA,89.25,
+2013-12-06,DMA50,50 DMA,89.68,
+2013-12-13,DMA50,50 DMA,90.91,
+2013-12-20,DMA50,50 DMA,92.41,
+2013-12-27,DMA50,50 DMA,93.97,
+2014-01-03,DMA50,50 DMA,95.78,
+2014-01-10,DMA50,50 DMA,97.11,
+2014-01-17,DMA50,50 DMA,98.54,
+2014-01-24,DMA50,50 DMA,100.22,
+2014-01-31,DMA50,50 DMA,101.47,
+2014-02-07,DMA50,50 DMA,102.19,
+2014-02-14,DMA50,50 DMA,102.75,
+2014-02-21,DMA50,50 DMA,103.31,
+2014-02-28,DMA50,50 DMA,104.50,
+2014-03-07,DMA50,50 DMA,105.36,
+2014-03-14,DMA50,50 DMA,105.26,
+2014-03-22,DMA50,50 DMA,105.07,
+2014-03-28,DMA50,50 DMA,104.80,
+2014-04-04,DMA50,50 DMA,104.73,
+2014-04-11,DMA50,50 DMA,104.78,
+2014-04-17,DMA50,50 DMA,105.28,
+2014-04-25,DMA50,50 DMA,104.40,
+2014-05-02,DMA50,50 DMA,103.55,
+2014-05-09,DMA50,50 DMA,102.22,
+2014-05-16,DMA50,50 DMA,101.26,
+2014-05-23,DMA50,50 DMA,99.51,
+2014-05-30,DMA50,50 DMA,98.70,
+2014-06-06,DMA50,50 DMA,97.78,
+2014-06-13,DMA50,50 DMA,97.93,
+2014-06-20,DMA50,50 DMA,98.37,
+2014-06-27,DMA50,50 DMA,98.72,
+2014-07-04,DMA50,50 DMA,99.37,
+2014-07-11,DMA50,50 DMA,100.05,
+2014-07-18,DMA50,50 DMA,100.24,
+2014-07-25,DMA50,50 DMA,101.13,
+2014-08-01,DMA50,50 DMA,101.33,
+2014-08-08,DMA50,50 DMA,101.66,
+2014-08-14,DMA50,50 DMA,101.76,
+2014-08-22,DMA50,50 DMA,102.05,
+2014-08-28,DMA50,50 DMA,102.42,
+2014-09-05,DMA50,50 DMA,103.33,
+2014-09-12,DMA50,50 DMA,104.38,
+2014-09-19,DMA50,50 DMA,104.95,
+2014-09-26,DMA50,50 DMA,105.84,
+2014-10-01,DMA50,50 DMA,106.64,
+2014-10-10,DMA50,50 DMA,107.38,
+2014-10-17,DMA50,50 DMA,107.46,
+2014-10-23,DMA50,50 DMA,107.33,
+2014-10-31,DMA50,50 DMA,106.84,
+2014-11-07,DMA50,50 DMA,106.61,
+2014-11-14,DMA50,50 DMA,106.29,
+2014-11-21,DMA50,50 DMA,106.33,
+2014-11-28,DMA50,50 DMA,106.83,
+2014-12-05,DMA50,50 DMA,107.51,
+2014-12-12,DMA50,50 DMA,106.81,
+2014-12-19,DMA50,50 DMA,105.82,
+2014-12-26,DMA50,50 DMA,105.42,
+2015-01-02,DMA50,50 DMA,105.13,
+2015-01-09,DMA50,50 DMA,104.72,
+2015-01-16,DMA50,50 DMA,104.67,
+2015-01-23,DMA50,50 DMA,105.83,
+2015-01-30,DMA50,50 DMA,106.92,
+2015-02-06,DMA50,50 DMA,108.95,
+2015-02-13,DMA50,50 DMA,111.21,
+2015-02-20,DMA50,50 DMA,113.06,
+2015-02-28,DMA50,50 DMA,115.20,
+2015-03-05,DMA50,50 DMA,116.63,
+2015-03-13,DMA50,50 DMA,117.66,
+2015-03-20,DMA50,50 DMA,118.15,
+2015-03-27,DMA50,50 DMA,118.48,
+2015-04-01,DMA50,50 DMA,118.41,
+2015-04-10,DMA50,50 DMA,117.93,
+2015-04-17,DMA50,50 DMA,117.25,
+2015-04-24,DMA50,50 DMA,114.69,
+2015-04-30,DMA50,50 DMA,112.61,
+2015-05-08,DMA50,50 DMA,110.53,
+2015-05-15,DMA50,50 DMA,108.80,
+2015-05-22,DMA50,50 DMA,108.02,
+2015-05-29,DMA50,50 DMA,107.40,
+2015-06-05,DMA50,50 DMA,106.74,
+2015-06-12,DMA50,50 DMA,106.04,
+2015-06-19,DMA50,50 DMA,105.50,
+2015-06-26,DMA50,50 DMA,105.36,
+2015-07-03,DMA50,50 DMA,105.01,
+2015-07-10,DMA50,50 DMA,104.66,
+2015-07-17,DMA50,50 DMA,105.05,
+2015-07-24,DMA50,50 DMA,105.63,
+2015-07-31,DMA50,50 DMA,105.62,
+2015-08-07,DMA50,50 DMA,105.83,
+2015-08-14,DMA50,50 DMA,106.05,
+2015-08-21,DMA50,50 DMA,106.44,
+2015-08-28,DMA50,50 DMA,105.86,
+2015-09-04,DMA50,50 DMA,105.77,
+2015-09-11,DMA50,50 DMA,105.55,
+2015-09-18,DMA50,50 DMA,106.00,
+2015-09-24,DMA50,50 DMA,106.84,
+2015-10-01,DMA50,50 DMA,107.53,
+2015-10-09,DMA50,50 DMA,108.23,
+2015-10-16,DMA50,50 DMA,108.36,
+2015-10-23,DMA50,50 DMA,108.24,
+2015-10-30,DMA50,50 DMA,108.13,
+2015-11-06,DMA50,50 DMA,107.99,
+2015-11-13,DMA50,50 DMA,107.44,
+2015-11-20,DMA50,50 DMA,106.94,
+2015-11-27,DMA50,50 DMA,106.88,
+2015-12-04,DMA50,50 DMA,107.05,
+2015-12-11,DMA50,50 DMA,106.94,
+2015-12-18,DMA50,50 DMA,106.52,
+2015-12-24,DMA50,50 DMA,106.19,
+2016-01-01,DMA50,50 DMA,105.97,
+2016-01-08,DMA50,50 DMA,105.63,
+2016-01-15,DMA50,50 DMA,104.98,
+2016-01-22,DMA50,50 DMA,104.53,
+2016-01-29,DMA50,50 DMA,104.40,
+2016-02-05,DMA50,50 DMA,104.57,
+2016-02-12,DMA50,50 DMA,103.59,
+2016-02-19,DMA50,50 DMA,102.96,
+2016-02-26,DMA50,50 DMA,102.52,
+2016-03-04,DMA50,50 DMA,102.13,
+2016-03-11,DMA50,50 DMA,101.96,
+2016-03-18,DMA50,50 DMA,101.86,
+2016-03-23,DMA50,50 DMA,102.11,
+2016-04-01,DMA50,50 DMA,102.62,
+2016-04-08,DMA50,50 DMA,102.94,
+2016-04-13,DMA50,50 DMA,103.46,
+2016-04-22,DMA50,50 DMA,104.14,
+2016-04-29,DMA50,50 DMA,104.12,
+2016-05-06,DMA50,50 DMA,103.65,
+2016-05-13,DMA50,50 DMA,103.20,
+2016-05-20,DMA50,50 DMA,102.89,
+2016-05-27,DMA50,50 DMA,102.70,
+2016-06-03,DMA50,50 DMA,102.64,
+2016-06-10,DMA50,50 DMA,102.46,
+2016-06-17,DMA50,50 DMA,102.48,
+2016-06-24,DMA50,50 DMA,102.94,
+2016-07-01,DMA50,50 DMA,103.06,
+2016-07-08,DMA50,50 DMA,103.40,
+2016-07-15,DMA50,50 DMA,103.95,
+2016-07-22,DMA50,50 DMA,103.58,
+2016-07-29,DMA50,50 DMA,103.42,
+2016-08-05,DMA50,50 DMA,103.36,
+2016-08-12,DMA50,50 DMA,103.18,
+2016-08-19,DMA50,50 DMA,102.54,
+2016-08-26,DMA50,50 DMA,101.26,
+2016-09-02,DMA50,50 DMA,99.40,
+2016-09-09,DMA50,50 DMA,98.01,
+2016-09-16,DMA50,50 DMA,96.80,
+2016-09-23,DMA50,50 DMA,95.61,
+2016-09-30,DMA50,50 DMA,94.58,
+2016-10-07,DMA50,50 DMA,93.72,
+2016-10-14,DMA50,50 DMA,93.23,
+2016-10-21,DMA50,50 DMA,92.96,
+2016-10-30,DMA50,50 DMA,91.94,
+2016-11-04,DMA50,50 DMA,90.95,
+2016-11-11,DMA50,50 DMA,89.66,
+2016-11-18,DMA50,50 DMA,88.66,
+2016-11-25,DMA50,50 DMA,87.94,
+2016-12-02,DMA50,50 DMA,87.77,
+2016-12-09,DMA50,50 DMA,87.39,
+2016-12-16,DMA50,50 DMA,87.28,
+2016-12-23,DMA50,50 DMA,87.18,
+2016-12-30,DMA50,50 DMA,87.28,
+2017-01-06,DMA50,50 DMA,87.53,
+2017-01-13,DMA50,50 DMA,87.94,
+2017-01-20,DMA50,50 DMA,88.36,
+2017-01-27,DMA50,50 DMA,88.46,
+2017-02-03,DMA50,50 DMA,88.01,
+2017-02-10,DMA50,50 DMA,87.80,
+2017-02-17,DMA50,50 DMA,88.08,
+2017-02-23,DMA50,50 DMA,88.31,
+2017-03-03,DMA50,50 DMA,88.97,
+2017-03-10,DMA50,50 DMA,89.52,
+2017-03-17,DMA50,50 DMA,90.15,
+2017-03-24,DMA50,50 DMA,90.95,
+2017-03-31,DMA50,50 DMA,91.85,
+2017-04-07,DMA50,50 DMA,92.44,
+2017-04-13,DMA50,50 DMA,92.70,
+2017-04-21,DMA50,50 DMA,92.73,
+2017-04-28,DMA50,50 DMA,92.69,
+2017-05-05,DMA50,50 DMA,92.79,
+2017-05-12,DMA50,50 DMA,93.12,
+2017-05-19,DMA50,50 DMA,93.77,
+2017-05-26,DMA50,50 DMA,94.78,
+2017-06-02,DMA50,50 DMA,95.96,
+2017-06-09,DMA50,50 DMA,97.24,
+2017-06-16,DMA50,50 DMA,97.20,
+2017-06-23,DMA50,50 DMA,96.94,
+2017-06-30,DMA50,50 DMA,96.92,
+2017-07-07,DMA50,50 DMA,96.93,
+2017-07-14,DMA50,50 DMA,97.28,
+2017-07-21,DMA50,50 DMA,98.19,
+2017-07-28,DMA50,50 DMA,100.09,
+2017-08-04,DMA50,50 DMA,101.73,
+2017-08-11,DMA50,50 DMA,102.87,
+2017-08-18,DMA50,50 DMA,103.67,
+2017-08-24,DMA50,50 DMA,104.38,
+2017-09-01,DMA50,50 DMA,105.43,
+2017-09-08,DMA50,50 DMA,106.60,
+2017-09-15,DMA50,50 DMA,107.16,
+2017-09-22,DMA50,50 DMA,107.55,
+2017-09-29,DMA50,50 DMA,107.57,
+2017-10-06,DMA50,50 DMA,107.41,
+2017-10-13,DMA50,50 DMA,107.66,
+2017-10-19,DMA50,50 DMA,107.93,
+2017-10-27,DMA50,50 DMA,108.65,
+2017-11-03,DMA50,50 DMA,108.92,
+2017-11-10,DMA50,50 DMA,109.71,
+2017-11-17,DMA50,50 DMA,110.02,
+2017-11-24,DMA50,50 DMA,110.05,
+2017-12-01,DMA50,50 DMA,110.07,
+2017-12-08,DMA50,50 DMA,109.42,
+2017-12-15,DMA50,50 DMA,109.20,
+2017-12-22,DMA50,50 DMA,109.59,
+2017-12-29,DMA50,50 DMA,110.47,
+2018-01-05,DMA50,50 DMA,111.73,
+2018-01-12,DMA50,50 DMA,113.17,
+2018-01-19,DMA50,50 DMA,114.79,
+2018-01-25,DMA50,50 DMA,115.31,
+2018-02-02,DMA50,50 DMA,115.12,
+2018-02-09,DMA50,50 DMA,114.05,
+2018-02-16,DMA50,50 DMA,113.35,
+2018-02-23,DMA50,50 DMA,112.68,
+2018-03-01,DMA50,50 DMA,112.22,
+2018-03-09,DMA50,50 DMA,111.36,
+2018-03-16,DMA50,50 DMA,111.17,
+2018-03-23,DMA50,50 DMA,110.73,
+2018-03-28,DMA50,50 DMA,109.93,
+2018-04-06,DMA50,50 DMA,109.38,
+2018-04-13,DMA50,50 DMA,109.11,
+2018-04-20,DMA50,50 DMA,109.16,
+2018-04-27,DMA50,50 DMA,108.78,
+2018-05-04,DMA50,50 DMA,107.87,
+2018-05-11,DMA50,50 DMA,106.82,
+2018-05-18,DMA50,50 DMA,106.02,
+2018-05-25,DMA50,50 DMA,104.78,
+2018-06-01,DMA50,50 DMA,103.58,
+2018-06-08,DMA50,50 DMA,102.54,
+2018-06-15,DMA50,50 DMA,102.07,
+2018-06-22,DMA50,50 DMA,101.28,
+2018-06-29,DMA50,50 DMA,100.46,
+2018-07-06,DMA50,50 DMA,100.08,
+2018-07-13,DMA50,50 DMA,100.56,
+2018-07-20,DMA50,50 DMA,101.65,
+2018-07-27,DMA50,50 DMA,101.84,
+2018-08-03,DMA50,50 DMA,102.21,
+2018-08-10,DMA50,50 DMA,102.59,
+2018-08-17,DMA50,50 DMA,103.03,
+2018-08-24,DMA50,50 DMA,103.83,
+2018-08-31,DMA50,50 DMA,105.25,
+2018-09-07,DMA50,50 DMA,107.76,
+2018-09-14,DMA50,50 DMA,109.96,
+2018-09-21,DMA50,50 DMA,112.15,
+2018-09-28,DMA50,50 DMA,113.88,
+2018-10-05,DMA50,50 DMA,115.17,
+2018-10-12,DMA50,50 DMA,115.83,
+2018-10-19,DMA50,50 DMA,116.53,
+2018-10-26,DMA50,50 DMA,116.88,
+2018-11-02,DMA50,50 DMA,117.93,
+2018-11-09,DMA50,50 DMA,118.50,
+2018-11-16,DMA50,50 DMA,119.09,
+2018-11-22,DMA50,50 DMA,119.14,
+2018-11-30,DMA50,50 DMA,119.04,
+2018-12-07,DMA50,50 DMA,120.09,
+2018-12-14,DMA50,50 DMA,120.86,
+2018-12-21,DMA50,50 DMA,121.64,
+2018-12-28,DMA50,50 DMA,121.82,
+2019-01-04,DMA50,50 DMA,121.94,
+2019-01-11,DMA50,50 DMA,122.04,
+2019-01-18,DMA50,50 DMA,122.53,
+2019-01-25,DMA50,50 DMA,124.01,
+2019-02-01,DMA50,50 DMA,126.28,
+2019-02-08,DMA50,50 DMA,128.66,
+2019-02-15,DMA50,50 DMA,130.85,
+2019-02-22,DMA50,50 DMA,132.49,
+2019-03-01,DMA50,50 DMA,134.18,
+2019-03-08,DMA50,50 DMA,134.22,
+2019-03-15,DMA50,50 DMA,133.45,
+2019-03-22,DMA50,50 DMA,132.89,
+2019-03-29,DMA50,50 DMA,131.92,
+2019-04-05,DMA50,50 DMA,131.68,
+2019-04-12,DMA50,50 DMA,132.92,
+2019-04-18,DMA50,50 DMA,133.97,
+2019-04-26,DMA50,50 DMA,136.21,
+2019-05-03,DMA50,50 DMA,137.44,
+2019-05-10,DMA50,50 DMA,138.94,
+2019-05-17,DMA50,50 DMA,139.64,
+2019-05-24,DMA50,50 DMA,140.15,
+2019-05-31,DMA50,50 DMA,140.56,
+2019-06-07,DMA50,50 DMA,141.44,
+2019-06-14,DMA50,50 DMA,142.81,
+2019-06-21,DMA50,50 DMA,143.44,
+2019-06-28,DMA50,50 DMA,143.13,
+2019-07-05,DMA50,50 DMA,142.64,
+2019-07-12,DMA50,50 DMA,140.81,
+2019-07-19,DMA50,50 DMA,139.10,
+2019-07-26,DMA50,50 DMA,137.80,
+2019-08-02,DMA50,50 DMA,136.83,
+2019-08-09,DMA50,50 DMA,135.83,
+2019-08-16,DMA50,50 DMA,134.76,
+2019-08-23,DMA50,50 DMA,133.20,
+2019-08-30,DMA50,50 DMA,131.75,
+2019-09-06,DMA50,50 DMA,131.07,
+2019-09-13,DMA50,50 DMA,130.04,
+2019-09-20,DMA50,50 DMA,128.63,
+2019-09-27,DMA50,50 DMA,126.93,
+2019-10-04,DMA50,50 DMA,125.66,
+2019-10-11,DMA50,50 DMA,124.70,
+2019-10-18,DMA50,50 DMA,124.46,
+2019-10-27,DMA50,50 DMA,124.81,
+2019-11-01,DMA50,50 DMA,125.36,
+2019-11-08,DMA50,50 DMA,125.98,
+2019-11-15,DMA50,50 DMA,126.11,
+2019-11-22,DMA50,50 DMA,125.71,
+2019-11-29,DMA50,50 DMA,124.63,
+2019-12-06,DMA50,50 DMA,123.84,
+2019-12-13,DMA50,50 DMA,123.19,
+2019-12-20,DMA50,50 DMA,123.30,
+2019-12-27,DMA50,50 DMA,123.62,
+2020-01-03,DMA50,50 DMA,123.72,
+2020-01-10,DMA50,50 DMA,124.27,
+2020-01-17,DMA50,50 DMA,124.61,
+2020-01-24,DMA50,50 DMA,124.45,
+2020-02-01,DMA50,50 DMA,123.66,
+2020-02-07,DMA50,50 DMA,123.15,
+2020-02-14,DMA50,50 DMA,122.82,
+2020-02-20,DMA50,50 DMA,122.80,
+2020-02-28,DMA50,50 DMA,121.91,
+2020-03-06,DMA50,50 DMA,120.24,
+2020-03-13,DMA50,50 DMA,117.67,
+2020-03-20,DMA50,50 DMA,112.00,
+2020-03-27,DMA50,50 DMA,107.80,
+2020-04-03,DMA50,50 DMA,105.72,
+2020-04-09,DMA50,50 DMA,104.73,
+2020-04-17,DMA50,50 DMA,103.12,
+2020-04-24,DMA50,50 DMA,100.67,
+2020-04-30,DMA50,50 DMA,99.35,
+2020-05-08,DMA50,50 DMA,98.18,
+2020-05-15,DMA50,50 DMA,97.26,
+2020-05-22,DMA50,50 DMA,96.50,
+2020-05-29,DMA50,50 DMA,97.08,
+2020-06-05,DMA50,50 DMA,99.02,
+2020-06-12,DMA50,50 DMA,100.66,
+2020-06-19,DMA50,50 DMA,102.09,
+2020-06-26,DMA50,50 DMA,103.54,
+2020-07-03,DMA50,50 DMA,104.86,
+2020-07-10,DMA50,50 DMA,106.05,
+2020-07-17,DMA50,50 DMA,109.35,
+2020-07-24,DMA50,50 DMA,113.91,
+2020-07-31,DMA50,50 DMA,118.42,
+2020-08-07,DMA50,50 DMA,122.29,
+2020-08-14,DMA50,50 DMA,125.25,
+2020-08-21,DMA50,50 DMA,127.76,
+2020-08-28,DMA50,50 DMA,129.24,
+2020-09-04,DMA50,50 DMA,130.76,
+2020-09-11,DMA50,50 DMA,132.86,
+2020-09-18,DMA50,50 DMA,136.98,
+2020-09-25,DMA50,50 DMA,140.38,
+2020-10-01,DMA50,50 DMA,142.72,
+2020-10-09,DMA50,50 DMA,148.34,
+2020-10-16,DMA50,50 DMA,153.73,
+2020-10-23,DMA50,50 DMA,157.05,
+2020-10-30,DMA50,50 DMA,159.18,
+2020-11-06,DMA50,50 DMA,161.24,
+2020-11-14,DMA50,50 DMA,163.75,
+2020-11-20,DMA50,50 DMA,165.09,
+2020-11-27,DMA50,50 DMA,167.18,
+2020-12-04,DMA50,50 DMA,168.96,
+2020-12-11,DMA50,50 DMA,170.78,
+2020-12-18,DMA50,50 DMA,172.13,
+2020-12-24,DMA50,50 DMA,174.18,
+2021-01-01,DMA50,50 DMA,177.54,
+2021-01-08,DMA50,50 DMA,182.50,
+2021-01-15,DMA50,50 DMA,190.30,
+2021-01-22,DMA50,50 DMA,195.67,
+2021-01-29,DMA50,50 DMA,198.75,
+2021-02-05,DMA50,50 DMA,201.50,
+2021-02-12,DMA50,50 DMA,204.73,
+2021-02-19,DMA50,50 DMA,206.94,
+2021-02-26,DMA50,50 DMA,207.29,
+2021-03-05,DMA50,50 DMA,208.52,
+2021-03-12,DMA50,50 DMA,208.90,
+2021-03-19,DMA50,50 DMA,208.99,
+2021-03-26,DMA50,50 DMA,208.14,
+2021-04-01,DMA50,50 DMA,208.13,
+2021-04-09,DMA50,50 DMA,210.02,
+2021-04-16,DMA50,50 DMA,211.38,
+2021-04-23,DMA50,50 DMA,215.35,
+2021-04-30,DMA50,50 DMA,220.52,
+2021-05-07,DMA50,50 DMA,225.70,
+2021-05-14,DMA50,50 DMA,230.19,
+2021-05-21,DMA50,50 DMA,234.53,
+2021-05-28,DMA50,50 DMA,239.91,
+2021-06-04,DMA50,50 DMA,245.46,
+2021-06-11,DMA50,50 DMA,250.86,
+2021-06-18,DMA50,50 DMA,255.82,
+2021-06-25,DMA50,50 DMA,259.04,
+2021-07-02,DMA50,50 DMA,261.26,
+2021-07-09,DMA50,50 DMA,262.06,
+2021-07-16,DMA50,50 DMA,264.81,
+2021-07-23,DMA50,50 DMA,268.67,
+2021-07-30,DMA50,50 DMA,273.46,
+2021-08-06,DMA50,50 DMA,278.05,
+2021-08-13,DMA50,50 DMA,282.48,
+2021-08-20,DMA50,50 DMA,286.90,
+2021-08-27,DMA50,50 DMA,292.14,
+2021-09-03,DMA50,50 DMA,297.63,
+2021-09-09,DMA50,50 DMA,303.22,
+2021-09-17,DMA50,50 DMA,309.00,
+2021-09-24,DMA50,50 DMA,313.72,
+2021-10-01,DMA50,50 DMA,314.91,
+2021-10-08,DMA50,50 DMA,316.37,
+2021-10-14,DMA50,50 DMA,319.42,
+2021-10-22,DMA50,50 DMA,324.95,
+2021-10-29,DMA50,50 DMA,326.02,
+2021-11-04,DMA50,50 DMA,326.15,
+2021-11-12,DMA50,50 DMA,326.32,
+2021-11-18,DMA50,50 DMA,326.74,
+2021-11-26,DMA50,50 DMA,325.14,
+2021-12-03,DMA50,50 DMA,324.06,
+2021-12-10,DMA50,50 DMA,322.99,
+2021-12-17,DMA50,50 DMA,323.28,
+2021-12-24,DMA50,50 DMA,327.00,
+2021-12-31,DMA50,50 DMA,331.89,
+2022-01-07,DMA50,50 DMA,336.44,
+2022-01-14,DMA50,50 DMA,336.40,
+2022-01-21,DMA50,50 DMA,331.93,
+2022-01-28,DMA50,50 DMA,324.08,
+2022-02-04,DMA50,50 DMA,317.67,
+2022-02-11,DMA50,50 DMA,311.24,
+2022-02-18,DMA50,50 DMA,305.54,
+2022-02-25,DMA50,50 DMA,300.77,
+2022-03-04,DMA50,50 DMA,298.02,
+2022-03-11,DMA50,50 DMA,296.94,
+2022-03-17,DMA50,50 DMA,297.13,
+2022-03-25,DMA50,50 DMA,298.29,
+2022-04-01,DMA50,50 DMA,298.54,
+2022-04-08,DMA50,50 DMA,298.09,
+2022-04-13,DMA50,50 DMA,296.20,
+2022-04-22,DMA50,50 DMA,291.14,
+2022-04-29,DMA50,50 DMA,285.62,
+2022-05-06,DMA50,50 DMA,279.85,
+2022-05-13,DMA50,50 DMA,272.15,
+2022-05-20,DMA50,50 DMA,265.32,
+2022-05-27,DMA50,50 DMA,258.75,
+2022-06-03,DMA50,50 DMA,254.89,
+2022-06-10,DMA50,50 DMA,251.22,
+2022-06-17,DMA50,50 DMA,244.75,
+2022-06-24,DMA50,50 DMA,238.25,
+2022-07-01,DMA50,50 DMA,233.32,
+2022-07-08,DMA50,50 DMA,228.91,
+2022-07-15,DMA50,50 DMA,224.04,
+2022-07-22,DMA50,50 DMA,220.56,
+2022-07-29,DMA50,50 DMA,218.06,
+2022-08-05,DMA50,50 DMA,217.82,
+2022-08-12,DMA50,50 DMA,217.79,
+2022-08-19,DMA50,50 DMA,217.88,
+2022-08-26,DMA50,50 DMA,216.18,
+2022-09-02,DMA50,50 DMA,214.46,
+2022-09-09,DMA50,50 DMA,212.72,
+2022-09-16,DMA50,50 DMA,211.78,
+2022-09-23,DMA50,50 DMA,209.63,
+2022-09-30,DMA50,50 DMA,207.49,
+2022-10-07,DMA50,50 DMA,206.73,
+2022-10-14,DMA50,50 DMA,205.08,
+2022-10-21,DMA50,50 DMA,202.30,
+2022-10-28,DMA50,50 DMA,200.76,
+2022-11-04,DMA50,50 DMA,199.75,
+2022-11-11,DMA50,50 DMA,199.26,
+2022-11-18,DMA50,50 DMA,199.08,
+2022-11-25,DMA50,50 DMA,198.68,
+2022-12-02,DMA50,50 DMA,199.73,
+2022-12-09,DMA50,50 DMA,200.25,
+2022-12-16,DMA50,50 DMA,199.81,
+2022-12-23,DMA50,50 DMA,198.63,
+2022-12-30,DMA50,50 DMA,197.79,
+2023-01-06,DMA50,50 DMA,197.23,
+2023-01-13,DMA50,50 DMA,197.14,
+2023-01-20,DMA50,50 DMA,197.76,
+2023-01-27,DMA50,50 DMA,198.32,
+2023-02-03,DMA50,50 DMA,199.02,
+2023-02-10,DMA50,50 DMA,199.68,
+2023-02-17,DMA50,50 DMA,200.28,
+2023-02-24,DMA50,50 DMA,200.06,
+2023-03-03,DMA50,50 DMA,199.09,
+2023-03-10,DMA50,50 DMA,198.58,
+2023-03-17,DMA50,50 DMA,196.83,
+2023-03-24,DMA50,50 DMA,194.19,
+2023-03-31,DMA50,50 DMA,192.13,
+2023-04-06,DMA50,50 DMA,191.21,
+2023-04-13,DMA50,50 DMA,190.36,
+2023-04-21,DMA50,50 DMA,188.87,
+2023-04-28,DMA50,50 DMA,188.86,
+2023-05-05,DMA50,50 DMA,189.33,
+2023-05-12,DMA50,50 DMA,189.71,
+2023-05-19,DMA50,50 DMA,190.19,
+2023-05-26,DMA50,50 DMA,191.78,
+2023-06-02,DMA50,50 DMA,193.61,
+2023-06-09,DMA50,50 DMA,194.82,
+2023-06-16,DMA50,50 DMA,194.97,
+2023-06-23,DMA50,50 DMA,194.26,
+2023-06-30,DMA50,50 DMA,193.90,
+2023-07-07,DMA50,50 DMA,194.54,
+2023-07-14,DMA50,50 DMA,195.07,
+2023-07-21,DMA50,50 DMA,197.26,
+2023-07-28,DMA50,50 DMA,197.86,
+2023-08-04,DMA50,50 DMA,198.67,
+2023-08-11,DMA50,50 DMA,200.31,
+2023-08-18,DMA50,50 DMA,201.43,
+2023-08-25,DMA50,50 DMA,202.42,
+2023-09-01,DMA50,50 DMA,202.86,
+2023-09-08,DMA50,50 DMA,205.21,
+2023-09-15,DMA50,50 DMA,207.59,
+2023-09-22,DMA50,50 DMA,208.55,
+2023-09-29,DMA50,50 DMA,207.96,
+2023-10-06,DMA50,50 DMA,207.25,
+2023-10-13,DMA50,50 DMA,207.09,
+2023-10-20,DMA50,50 DMA,206.06,
+2023-10-27,DMA50,50 DMA,203.79,
+2023-11-03,DMA50,50 DMA,201.51,
+2023-11-12,DMA50,50 DMA,199.27,
+2023-11-17,DMA50,50 DMA,198.76,
+2023-11-24,DMA50,50 DMA,198.98,
+2023-12-01,DMA50,50 DMA,199.58,
+2023-12-08,DMA50,50 DMA,200.99,
+2023-12-15,DMA50,50 DMA,203.45,
+2023-12-22,DMA50,50 DMA,206.70,
+2023-12-29,DMA50,50 DMA,210.92,
+2024-01-05,DMA50,50 DMA,214.54,
+2024-01-12,DMA50,50 DMA,216.79,
+2024-01-20,DMA50,50 DMA,222.21,
+2024-01-25,DMA50,50 DMA,223.81,
+2024-02-02,DMA50,50 DMA,226.36,
+2024-02-09,DMA50,50 DMA,229.86,
+2024-02-16,DMA50,50 DMA,235.19,
+2024-02-23,DMA50,50 DMA,240.71,
+2024-03-02,DMA50,50 DMA,245.20,
+2024-03-07,DMA50,50 DMA,247.06,
+2024-03-15,DMA50,50 DMA,248.78,
+2024-03-22,DMA50,50 DMA,248.72,
+2024-03-28,DMA50,50 DMA,247.59,
+2024-04-05,DMA50,50 DMA,246.61,
+2024-04-12,DMA50,50 DMA,245.32,
+2024-04-19,DMA50,50 DMA,242.40,
+2024-04-26,DMA50,50 DMA,240.33,
+2024-05-03,DMA50,50 DMA,238.80,
+2024-05-10,DMA50,50 DMA,237.07,
+2024-05-18,DMA50,50 DMA,235.49,
+2024-05-24,DMA50,50 DMA,234.90,
+2024-05-31,DMA50,50 DMA,232.79,
+2024-06-07,DMA50,50 DMA,231.98,
+2024-06-14,DMA50,50 DMA,233.23,
+2024-06-21,DMA50,50 DMA,235.13,
+2024-06-28,DMA50,50 DMA,238.02,
+2024-07-05,DMA50,50 DMA,243.29,
+2024-07-12,DMA50,50 DMA,248.37,
+2024-07-19,DMA50,50 DMA,253.23,
+2024-07-26,DMA50,50 DMA,253.37,
+2024-08-02,DMA50,50 DMA,254.39,
+2024-08-09,DMA50,50 DMA,252.70,
+2024-08-16,DMA50,50 DMA,252.17,
+2024-08-23,DMA50,50 DMA,253.61,
+2024-08-30,DMA50,50 DMA,255.70,
+2024-09-06,DMA50,50 DMA,257.05,
+2024-09-13,DMA50,50 DMA,258.29,
+2024-09-20,DMA50,50 DMA,260.64,
+2024-09-27,DMA50,50 DMA,262.25,
+2024-10-04,DMA50,50 DMA,263.23,
+2024-10-11,DMA50,50 DMA,263.42,
+2024-10-18,DMA50,50 DMA,264.46,
+2024-10-25,DMA50,50 DMA,266.03,
+2024-11-01,DMA50,50 DMA,268.35,
+2024-11-08,DMA50,50 DMA,270.16,
+2024-11-14,DMA50,50 DMA,272.35,
+2024-11-22,DMA50,50 DMA,273.57,
+2024-11-29,DMA50,50 DMA,276.61,
+2024-12-06,DMA50,50 DMA,279.95,
+2024-12-13,DMA50,50 DMA,285.05,
+2024-12-20,DMA50,50 DMA,289.52,
+2024-12-27,DMA50,50 DMA,292.08,
+2025-01-03,DMA50,50 DMA,293.64,
+2025-01-10,DMA50,50 DMA,294.04,
+2025-01-17,DMA50,50 DMA,293.18,
+2025-01-24,DMA50,50 DMA,296.15,
+2025-02-01,DMA50,50 DMA,298.74,
+2025-02-07,DMA50,50 DMA,301.99,
+2025-02-14,DMA50,50 DMA,303.73,
+2025-02-21,DMA50,50 DMA,304.92,
+2025-02-28,DMA50,50 DMA,302.62,
+2025-03-07,DMA50,50 DMA,299.23,
+2025-03-13,DMA50,50 DMA,295.28,
+2025-03-21,DMA50,50 DMA,289.60,
+2025-03-28,DMA50,50 DMA,285.74,
+2025-04-04,DMA50,50 DMA,281.48,
+2025-04-11,DMA50,50 DMA,275.58,
+2025-04-17,DMA50,50 DMA,271.86,
+2025-04-25,DMA50,50 DMA,266.10,
+2025-05-02,DMA50,50 DMA,262.48,
+2025-05-09,DMA50,50 DMA,258.85,
+2025-05-16,DMA50,50 DMA,258.07,
+2025-05-23,DMA50,50 DMA,256.43,
+2025-05-30,DMA50,50 DMA,255.11,
+2025-06-06,DMA50,50 DMA,253.73,
+2025-06-13,DMA50,50 DMA,254.35,
+2025-06-20,DMA50,50 DMA,256.10,
+2025-06-27,DMA50,50 DMA,257.94,
+2025-07-04,DMA50,50 DMA,259.59,
+2025-07-11,DMA50,50 DMA,260.66,
+2025-07-18,DMA50,50 DMA,260.66,
+2025-07-25,DMA50,50 DMA,260.63,
+2025-08-01,DMA50,50 DMA,258.42,
+2025-08-08,DMA50,50 DMA,255.54,
+2025-08-14,DMA50,50 DMA,253.69,
+2025-08-22,DMA50,50 DMA,252.73,
+2025-08-29,DMA50,50 DMA,252.53,
+2025-09-05,DMA50,50 DMA,251.67,
+2025-09-12,DMA50,50 DMA,251.52,
+2025-09-19,DMA50,50 DMA,252.06,
+2025-09-26,DMA50,50 DMA,250.63,
+2025-10-03,DMA50,50 DMA,249.10,
+2025-10-10,DMA50,50 DMA,248.38,
+2025-10-17,DMA50,50 DMA,248.25,
+2025-10-24,DMA50,50 DMA,247.40,
+2025-10-31,DMA50,50 DMA,246.46,
+2025-11-07,DMA50,50 DMA,245.31,
+2025-11-14,DMA50,50 DMA,244.96,
+2025-11-21,DMA50,50 DMA,244.86,
+2025-11-28,DMA50,50 DMA,245.52,
+2025-12-05,DMA50,50 DMA,247.17,
+2025-12-12,DMA50,50 DMA,249.37,
+2025-12-19,DMA50,50 DMA,251.69,
+2025-12-26,DMA50,50 DMA,254.32,
+2026-01-02,DMA50,50 DMA,256.37,
+2026-01-09,DMA50,50 DMA,257.88,
+2026-01-16,DMA50,50 DMA,258.76,
+2026-01-23,DMA50,50 DMA,255.50,
+2026-01-27,DMA50,50 DMA,254.68,
+2005-04-01,DMA200,200 DMA,37.95,
+2005-04-08,DMA200,200 DMA,37.94,
+2005-04-15,DMA200,200 DMA,37.86,
+2005-04-22,DMA200,200 DMA,37.68,
+2005-04-29,DMA200,200 DMA,37.60,
+2005-05-06,DMA200,200 DMA,37.51,
+2005-05-13,DMA200,200 DMA,37.45,
+2005-05-20,DMA200,200 DMA,37.43,
+2005-05-27,DMA200,200 DMA,37.52,
+2005-06-04,DMA200,200 DMA,37.68,
+2005-06-10,DMA200,200 DMA,37.84,
+2005-06-17,DMA200,200 DMA,38.01,
+2005-06-24,DMA200,200 DMA,38.23,
+2005-07-01,DMA200,200 DMA,38.44,
+2005-07-08,DMA200,200 DMA,38.57,
+2005-07-15,DMA200,200 DMA,38.63,
+2005-07-22,DMA200,200 DMA,38.71,
+2005-07-29,DMA200,200 DMA,38.79,
+2005-08-05,DMA200,200 DMA,38.90,
+2005-08-12,DMA200,200 DMA,38.98,
+2005-08-19,DMA200,200 DMA,39.05,
+2005-08-26,DMA200,200 DMA,39.13,
+2005-09-02,DMA200,200 DMA,39.22,
+2005-09-09,DMA200,200 DMA,39.34,
+2005-09-16,DMA200,200 DMA,39.51,
+2005-09-23,DMA200,200 DMA,39.61,
+2005-09-30,DMA200,200 DMA,39.73,
+2005-10-07,DMA200,200 DMA,39.96,
+2005-10-14,DMA200,200 DMA,40.12,
+2005-10-21,DMA200,200 DMA,40.24,
+2005-10-28,DMA200,200 DMA,40.32,
+2005-11-02,DMA200,200 DMA,40.35,
+2005-11-11,DMA200,200 DMA,40.52,
+2005-11-18,DMA200,200 DMA,40.75,
+2005-11-26,DMA200,200 DMA,41.21,
+2005-12-02,DMA200,200 DMA,41.60,
+2005-12-09,DMA200,200 DMA,41.95,
+2005-12-16,DMA200,200 DMA,42.34,
+2005-12-23,DMA200,200 DMA,42.81,
+2005-12-30,DMA200,200 DMA,43.25,
+2006-01-06,DMA200,200 DMA,43.74,
+2006-01-13,DMA200,200 DMA,44.07,
+2006-01-20,DMA200,200 DMA,44.52,
+2006-01-27,DMA200,200 DMA,44.99,
+2006-02-03,DMA200,200 DMA,45.67,
+2006-02-10,DMA200,200 DMA,46.16,
+2006-02-17,DMA200,200 DMA,46.64,
+2006-02-24,DMA200,200 DMA,47.20,
+2006-03-03,DMA200,200 DMA,47.79,
+2006-03-10,DMA200,200 DMA,48.31,
+2006-03-17,DMA200,200 DMA,48.73,
+2006-03-24,DMA200,200 DMA,49.27,
+2006-03-31,DMA200,200 DMA,49.87,
+2006-04-07,DMA200,200 DMA,50.36,
+2006-04-13,DMA200,200 DMA,50.62,
+2006-04-21,DMA200,200 DMA,51.20,
+2006-04-29,DMA200,200 DMA,51.76,
+2006-05-05,DMA200,200 DMA,52.12,
+2006-05-12,DMA200,200 DMA,52.56,
+2006-05-19,DMA200,200 DMA,52.86,
+2006-05-26,DMA200,200 DMA,52.85,
+2006-06-02,DMA200,200 DMA,52.81,
+2006-06-09,DMA200,200 DMA,52.66,
+2006-06-16,DMA200,200 DMA,52.37,
+2006-06-25,DMA200,200 DMA,52.27,
+2006-06-30,DMA200,200 DMA,52.40,
+2006-07-07,DMA200,200 DMA,52.55,
+2006-07-14,DMA200,200 DMA,52.73,
+2006-07-21,DMA200,200 DMA,52.74,
+2006-07-28,DMA200,200 DMA,52.80,
+2006-08-04,DMA200,200 DMA,52.98,
+2006-08-11,DMA200,200 DMA,53.17,
+2006-08-18,DMA200,200 DMA,53.35,
+2006-08-25,DMA200,200 DMA,53.57,
+2006-09-01,DMA200,200 DMA,53.82,
+2006-09-08,DMA200,200 DMA,54.03,
+2006-09-15,DMA200,200 DMA,54.19,
+2006-09-22,DMA200,200 DMA,54.40,
+2006-09-29,DMA200,200 DMA,54.61,
+2006-10-06,DMA200,200 DMA,54.75,
+2006-10-13,DMA200,200 DMA,55.01,
+2006-10-21,DMA200,200 DMA,55.49,
+2006-10-27,DMA200,200 DMA,55.71,
+2006-11-03,DMA200,200 DMA,55.95,
+2006-11-10,DMA200,200 DMA,56.16,
+2006-11-17,DMA200,200 DMA,56.44,
+2006-11-24,DMA200,200 DMA,56.86,
+2006-12-01,DMA200,200 DMA,57.35,
+2006-12-08,DMA200,200 DMA,57.78,
+2006-12-15,DMA200,200 DMA,58.07,
+2006-12-22,DMA200,200 DMA,58.36,
+2006-12-29,DMA200,200 DMA,58.74,
+2007-01-05,DMA200,200 DMA,59.14,
+2007-01-12,DMA200,200 DMA,59.55,
+2007-01-19,DMA200,200 DMA,60.12,
+2007-01-25,DMA200,200 DMA,60.56,
+2007-02-02,DMA200,200 DMA,60.96,
+2007-02-09,DMA200,200 DMA,61.50,
+2007-02-15,DMA200,200 DMA,61.96,
+2007-02-23,DMA200,200 DMA,62.55,
+2007-03-02,DMA200,200 DMA,62.74,
+2007-03-09,DMA200,200 DMA,62.77,
+2007-03-16,DMA200,200 DMA,62.83,
+2007-03-23,DMA200,200 DMA,62.99,
+2007-03-30,DMA200,200 DMA,63.02,
+2007-04-05,DMA200,200 DMA,62.94,
+2007-04-13,DMA200,200 DMA,62.91,
+2007-04-20,DMA200,200 DMA,63.02,
+2007-04-27,DMA200,200 DMA,63.04,
+2007-05-04,DMA200,200 DMA,63.08,
+2007-05-11,DMA200,200 DMA,63.03,
+2007-05-18,DMA200,200 DMA,62.93,
+2007-05-25,DMA200,200 DMA,62.81,
+2007-06-01,DMA200,200 DMA,62.72,
+2007-06-08,DMA200,200 DMA,62.63,
+2007-06-15,DMA200,200 DMA,62.52,
+2007-06-22,DMA200,200 DMA,62.34,
+2007-06-29,DMA200,200 DMA,62.13,
+2007-07-06,DMA200,200 DMA,61.91,
+2007-07-13,DMA200,200 DMA,61.73,
+2007-07-20,DMA200,200 DMA,61.50,
+2007-07-27,DMA200,200 DMA,61.27,
+2007-08-03,DMA200,200 DMA,60.93,
+2007-08-10,DMA200,200 DMA,60.54,
+2007-08-17,DMA200,200 DMA,60.28,
+2007-08-24,DMA200,200 DMA,59.84,
+2007-08-31,DMA200,200 DMA,59.52,
+2007-09-07,DMA200,200 DMA,59.23,
+2007-09-14,DMA200,200 DMA,58.85,
+2007-09-21,DMA200,200 DMA,58.41,
+2007-09-28,DMA200,200 DMA,58.05,
+2007-10-05,DMA200,200 DMA,57.81,
+2007-10-12,DMA200,200 DMA,57.68,
+2007-10-19,DMA200,200 DMA,57.57,
+2007-10-26,DMA200,200 DMA,57.48,
+2007-11-02,DMA200,200 DMA,57.45,
+2007-11-09,DMA200,200 DMA,57.27,
+2007-11-16,DMA200,200 DMA,56.99,
+2007-11-23,DMA200,200 DMA,56.66,
+2007-11-30,DMA200,200 DMA,56.39,
+2007-12-07,DMA200,200 DMA,56.38,
+2007-12-14,DMA200,200 DMA,56.39,
+2007-12-20,DMA200,200 DMA,56.34,
+2007-12-28,DMA200,200 DMA,56.51,
+2008-01-04,DMA200,200 DMA,56.55,
+2008-01-11,DMA200,200 DMA,56.48,
+2008-01-18,DMA200,200 DMA,56.25,
+2008-01-25,DMA200,200 DMA,55.87,
+2008-02-01,DMA200,200 DMA,55.45,
+2008-02-08,DMA200,200 DMA,55.14,
+2008-02-15,DMA200,200 DMA,54.75,
+2008-02-22,DMA200,200 DMA,54.39,
+2008-02-29,DMA200,200 DMA,54.17,
+2008-03-07,DMA200,200 DMA,53.92,
+2008-03-14,DMA200,200 DMA,53.40,
+2008-03-19,DMA200,200 DMA,53.04,
+2008-03-28,DMA200,200 DMA,52.82,
+2008-04-04,DMA200,200 DMA,52.56,
+2008-04-11,DMA200,200 DMA,52.28,
+2008-04-17,DMA200,200 DMA,52.21,
+2008-04-25,DMA200,200 DMA,52.13,
+2008-05-02,DMA200,200 DMA,52.22,
+2008-05-09,DMA200,200 DMA,52.41,
+2008-05-16,DMA200,200 DMA,52.62,
+2008-05-23,DMA200,200 DMA,52.73,
+2008-05-30,DMA200,200 DMA,52.91,
+2008-06-06,DMA200,200 DMA,53.12,
+2008-06-13,DMA200,200 DMA,53.16,
+2008-06-20,DMA200,200 DMA,53.25,
+2008-06-27,DMA200,200 DMA,53.21,
+2008-07-04,DMA200,200 DMA,52.98,
+2008-07-11,DMA200,200 DMA,52.75,
+2008-07-18,DMA200,200 DMA,52.27,
+2008-07-25,DMA200,200 DMA,51.91,
+2008-08-01,DMA200,200 DMA,51.67,
+2008-08-08,DMA200,200 DMA,51.59,
+2008-08-14,DMA200,200 DMA,51.49,
+2008-08-22,DMA200,200 DMA,51.33,
+2008-08-29,DMA200,200 DMA,51.17,
+2008-09-05,DMA200,200 DMA,51.10,
+2008-09-12,DMA200,200 DMA,50.97,
+2008-09-19,DMA200,200 DMA,50.70,
+2008-09-26,DMA200,200 DMA,50.28,
+2008-10-03,DMA200,200 DMA,49.83,
+2008-10-10,DMA200,200 DMA,49.17,
+2008-10-17,DMA200,200 DMA,48.30,
+2008-10-24,DMA200,200 DMA,47.45,
+2008-10-31,DMA200,200 DMA,46.68,
+2008-11-07,DMA200,200 DMA,45.86,
+2008-11-14,DMA200,200 DMA,45.18,
+2008-11-21,DMA200,200 DMA,44.24,
+2008-11-28,DMA200,200 DMA,43.55,
+2008-12-05,DMA200,200 DMA,42.69,
+2008-12-12,DMA200,200 DMA,42.11,
+2008-12-19,DMA200,200 DMA,41.40,
+2008-12-26,DMA200,200 DMA,40.82,
+2009-01-02,DMA200,200 DMA,40.14,
+2009-01-09,DMA200,200 DMA,39.65,
+2009-01-16,DMA200,200 DMA,39.02,
+2009-01-23,DMA200,200 DMA,38.34,
+2009-01-30,DMA200,200 DMA,37.86,
+2009-02-06,DMA200,200 DMA,37.23,
+2009-02-13,DMA200,200 DMA,36.65,
+2009-02-20,DMA200,200 DMA,36.04,
+2009-02-27,DMA200,200 DMA,35.57,
+2009-03-06,DMA200,200 DMA,34.97,
+2009-03-13,DMA200,200 DMA,34.65,
+2009-03-20,DMA200,200 DMA,34.23,
+2009-03-27,DMA200,200 DMA,33.92,
+2009-04-02,DMA200,200 DMA,33.70,
+2009-04-09,DMA200,200 DMA,33.63,
+2009-04-17,DMA200,200 DMA,33.51,
+2009-04-24,DMA200,200 DMA,33.48,
+2009-04-29,DMA200,200 DMA,33.57,
+2009-05-08,DMA200,200 DMA,33.95,
+2009-05-15,DMA200,200 DMA,34.32,
+2009-05-22,DMA200,200 DMA,34.78,
+2009-05-29,DMA200,200 DMA,35.15,
+2009-06-05,DMA200,200 DMA,35.60,
+2009-06-12,DMA200,200 DMA,36.17,
+2009-06-19,DMA200,200 DMA,36.54,
+2009-06-26,DMA200,200 DMA,36.84,
+2009-07-03,DMA200,200 DMA,37.14,
+2009-07-10,DMA200,200 DMA,37.40,
+2009-07-17,DMA200,200 DMA,37.83,
+2009-07-24,DMA200,200 DMA,38.51,
+2009-07-31,DMA200,200 DMA,39.24,
+2009-08-07,DMA200,200 DMA,40.04,
+2009-08-14,DMA200,200 DMA,40.90,
+2009-08-21,DMA200,200 DMA,41.67,
+2009-08-28,DMA200,200 DMA,42.67,
+2009-09-04,DMA200,200 DMA,43.64,
+2009-09-11,DMA200,200 DMA,44.53,
+2009-09-18,DMA200,200 DMA,45.44,
+2009-09-25,DMA200,200 DMA,46.20,
+2009-10-01,DMA200,200 DMA,46.82,
+2009-10-09,DMA200,200 DMA,47.73,
+2009-10-17,DMA200,200 DMA,48.56,
+2009-10-23,DMA200,200 DMA,49.24,
+2009-10-30,DMA200,200 DMA,50.20,
+2009-11-06,DMA200,200 DMA,50.86,
+2009-11-13,DMA200,200 DMA,51.76,
+2009-11-20,DMA200,200 DMA,52.78,
+2009-11-27,DMA200,200 DMA,53.72,
+2009-12-04,DMA200,200 DMA,54.59,
+2009-12-11,DMA200,200 DMA,55.49,
+2009-12-18,DMA200,200 DMA,56.45,
+2009-12-24,DMA200,200 DMA,57.28,
+2009-12-31,DMA200,200 DMA,57.85,
+2010-01-08,DMA200,200 DMA,58.81,
+2010-01-15,DMA200,200 DMA,59.85,
+2010-01-22,DMA200,200 DMA,60.92,
+2010-01-29,DMA200,200 DMA,61.48,
+2010-02-06,DMA200,200 DMA,62.21,
+2010-02-11,DMA200,200 DMA,62.64,
+2010-02-19,DMA200,200 DMA,63.26,
+2010-02-26,DMA200,200 DMA,63.87,
+2010-03-05,DMA200,200 DMA,64.44,
+2010-03-12,DMA200,200 DMA,65.17,
+2010-03-19,DMA200,200 DMA,66.01,
+2010-03-26,DMA200,200 DMA,66.61,
+2010-04-01,DMA200,200 DMA,67.15,
+2010-04-09,DMA200,200 DMA,67.81,
+2010-04-16,DMA200,200 DMA,68.32,
+2010-04-23,DMA200,200 DMA,68.84,
+2010-04-30,DMA200,200 DMA,69.28,
+2010-05-07,DMA200,200 DMA,69.53,
+2010-05-14,DMA200,200 DMA,69.84,
+2010-05-21,DMA200,200 DMA,70.01,
+2010-05-28,DMA200,200 DMA,70.18,
+2010-06-04,DMA200,200 DMA,70.37,
+2010-06-11,DMA200,200 DMA,70.48,
+2010-06-18,DMA200,200 DMA,70.79,
+2010-06-25,DMA200,200 DMA,71.04,
+2010-07-02,DMA200,200 DMA,71.11,
+2010-07-09,DMA200,200 DMA,71.27,
+2010-07-16,DMA200,200 DMA,71.50,
+2010-07-23,DMA200,200 DMA,71.78,
+2010-07-30,DMA200,200 DMA,72.08,
+2010-08-06,DMA200,200 DMA,72.46,
+2010-08-13,DMA200,200 DMA,72.79,
+2010-08-20,DMA200,200 DMA,73.05,
+2010-08-27,DMA200,200 DMA,73.19,
+2010-09-03,DMA200,200 DMA,73.30,
+2010-09-09,DMA200,200 DMA,73.43,
+2010-09-17,DMA200,200 DMA,73.69,
+2010-09-24,DMA200,200 DMA,74.11,
+2010-10-01,DMA200,200 DMA,74.60,
+2010-10-08,DMA200,200 DMA,75.20,
+2010-10-15,DMA200,200 DMA,75.89,
+2010-10-22,DMA200,200 DMA,76.43,
+2010-10-29,DMA200,200 DMA,76.63,
+2010-11-05,DMA200,200 DMA,76.87,
+2010-11-12,DMA200,200 DMA,77.07,
+2010-11-19,DMA200,200 DMA,77.13,
+2010-11-26,DMA200,200 DMA,77.14,
+2010-12-03,DMA200,200 DMA,77.24,
+2010-12-10,DMA200,200 DMA,77.49,
+2010-12-16,DMA200,200 DMA,77.83,
+2010-12-24,DMA200,200 DMA,78.44,
+2010-12-31,DMA200,200 DMA,79.10,
+2011-01-07,DMA200,200 DMA,79.68,
+2011-01-14,DMA200,200 DMA,80.04,
+2011-01-21,DMA200,200 DMA,80.45,
+2011-01-28,DMA200,200 DMA,80.56,
+2011-02-04,DMA200,200 DMA,80.63,
+2011-02-11,DMA200,200 DMA,80.58,
+2011-02-18,DMA200,200 DMA,80.60,
+2011-02-25,DMA200,200 DMA,80.69,
+2011-03-04,DMA200,200 DMA,80.78,
+2011-03-11,DMA200,200 DMA,80.97,
+2011-03-18,DMA200,200 DMA,81.11,
+2011-03-25,DMA200,200 DMA,81.19,
+2011-04-01,DMA200,200 DMA,81.55,
+2011-04-08,DMA200,200 DMA,81.91,
+2011-04-15,DMA200,200 DMA,82.05,
+2011-04-21,DMA200,200 DMA,82.19,
+2011-04-29,DMA200,200 DMA,82.36,
+2011-05-06,DMA200,200 DMA,82.37,
+2011-05-13,DMA200,200 DMA,82.37,
+2011-05-20,DMA200,200 DMA,82.41,
+2011-05-27,DMA200,200 DMA,82.41,
+2011-06-03,DMA200,200 DMA,82.47,
+2011-06-10,DMA200,200 DMA,82.49,
+2011-06-17,DMA200,200 DMA,82.35,
+2011-06-24,DMA200,200 DMA,82.08,
+2011-07-01,DMA200,200 DMA,81.94,
+2011-07-08,DMA200,200 DMA,81.87,
+2011-07-15,DMA200,200 DMA,81.68,
+2011-07-22,DMA200,200 DMA,81.43,
+2011-07-29,DMA200,200 DMA,81.14,
+2011-08-05,DMA200,200 DMA,80.66,
+2011-08-12,DMA200,200 DMA,79.95,
+2011-08-19,DMA200,200 DMA,79.27,
+2011-08-26,DMA200,200 DMA,78.42,
+2011-09-02,DMA200,200 DMA,77.95,
+2011-09-09,DMA200,200 DMA,77.18,
+2011-09-16,DMA200,200 DMA,76.50,
+2011-09-23,DMA200,200 DMA,75.94,
+2011-09-30,DMA200,200 DMA,75.40,
+2011-10-07,DMA200,200 DMA,74.89,
+2011-10-14,DMA200,200 DMA,74.45,
+2011-10-21,DMA200,200 DMA,74.06,
+2011-10-28,DMA200,200 DMA,73.88,
+2011-11-04,DMA200,200 DMA,73.68,
+2011-11-11,DMA200,200 DMA,73.59,
+2011-11-18,DMA200,200 DMA,73.46,
+2011-11-25,DMA200,200 DMA,73.28,
+2011-12-02,DMA200,200 DMA,73.19,
+2011-12-09,DMA200,200 DMA,73.29,
+2011-12-16,DMA200,200 DMA,73.48,
+2011-12-23,DMA200,200 DMA,73.59,
+2011-12-30,DMA200,200 DMA,73.68,
+2012-01-07,DMA200,200 DMA,73.88,
+2012-01-13,DMA200,200 DMA,73.94,
+2012-01-20,DMA200,200 DMA,74.09,
+2012-01-27,DMA200,200 DMA,74.27,
+2012-02-03,DMA200,200 DMA,74.48,
+2012-02-10,DMA200,200 DMA,74.85,
+2012-02-17,DMA200,200 DMA,75.23,
+2012-02-24,DMA200,200 DMA,75.53,
+2012-03-03,DMA200,200 DMA,75.81,
+2012-03-09,DMA200,200 DMA,76.03,
+2012-03-16,DMA200,200 DMA,76.27,
+2012-03-23,DMA200,200 DMA,76.46,
+2012-03-30,DMA200,200 DMA,76.69,
+2012-04-04,DMA200,200 DMA,76.89,
+2012-04-13,DMA200,200 DMA,77.16,
+2012-04-20,DMA200,200 DMA,77.27,
+2012-04-28,DMA200,200 DMA,77.32,
+2012-05-04,DMA200,200 DMA,77.30,
+2012-05-11,DMA200,200 DMA,77.26,
+2012-05-18,DMA200,200 DMA,77.12,
+2012-05-25,DMA200,200 DMA,76.91,
+2012-06-01,DMA200,200 DMA,76.89,
+2012-06-08,DMA200,200 DMA,76.83,
+2012-06-15,DMA200,200 DMA,76.72,
+2012-06-22,DMA200,200 DMA,76.64,
+2012-06-29,DMA200,200 DMA,76.57,
+2012-07-06,DMA200,200 DMA,76.47,
+2012-07-13,DMA200,200 DMA,76.16,
+2012-07-20,DMA200,200 DMA,75.77,
+2012-07-27,DMA200,200 DMA,75.20,
+2012-08-03,DMA200,200 DMA,74.65,
+2012-08-10,DMA200,200 DMA,74.20,
+2012-08-17,DMA200,200 DMA,73.90,
+2012-08-24,DMA200,200 DMA,73.65,
+2012-08-31,DMA200,200 DMA,73.40,
+2012-09-08,DMA200,200 DMA,73.19,
+2012-09-14,DMA200,200 DMA,73.13,
+2012-09-21,DMA200,200 DMA,73.04,
+2012-09-28,DMA200,200 DMA,72.95,
+2012-10-05,DMA200,200 DMA,72.89,
+2012-10-12,DMA200,200 DMA,72.64,
+2012-10-19,DMA200,200 DMA,72.30,
+2012-10-26,DMA200,200 DMA,71.98,
+2012-11-02,DMA200,200 DMA,71.72,
+2012-11-09,DMA200,200 DMA,71.60,
+2012-11-16,DMA200,200 DMA,71.48,
+2012-11-23,DMA200,200 DMA,71.34,
+2012-11-30,DMA200,200 DMA,71.37,
+2012-12-07,DMA200,200 DMA,71.42,
+2012-12-14,DMA200,200 DMA,71.39,
+2012-12-21,DMA200,200 DMA,71.39,
+2012-12-28,DMA200,200 DMA,71.44,
+2013-01-04,DMA200,200 DMA,71.60,
+2013-01-11,DMA200,200 DMA,71.81,
+2013-01-18,DMA200,200 DMA,72.13,
+2013-01-25,DMA200,200 DMA,72.30,
+2013-02-01,DMA200,200 DMA,72.55,
+2013-02-08,DMA200,200 DMA,72.75,
+2013-02-15,DMA200,200 DMA,72.92,
+2013-02-22,DMA200,200 DMA,73.12,
+2013-03-01,DMA200,200 DMA,73.39,
+2013-03-08,DMA200,200 DMA,73.82,
+2013-03-15,DMA200,200 DMA,74.25,
+2013-03-22,DMA200,200 DMA,74.61,
+2013-03-28,DMA200,200 DMA,74.82,
+2013-04-05,DMA200,200 DMA,75.26,
+2013-04-12,DMA200,200 DMA,75.31,
+2013-04-18,DMA200,200 DMA,75.12,
+2013-04-26,DMA200,200 DMA,74.65,
+2013-05-03,DMA200,200 DMA,74.30,
+2013-05-11,DMA200,200 DMA,73.84,
+2013-05-17,DMA200,200 DMA,73.40,
+2013-05-24,DMA200,200 DMA,72.92,
+2013-05-31,DMA200,200 DMA,72.44,
+2013-06-07,DMA200,200 DMA,71.92,
+2013-06-14,DMA200,200 DMA,71.54,
+2013-06-21,DMA200,200 DMA,71.19,
+2013-06-28,DMA200,200 DMA,70.89,
+2013-07-05,DMA200,200 DMA,70.63,
+2013-07-12,DMA200,200 DMA,70.52,
+2013-07-19,DMA200,200 DMA,70.59,
+2013-07-26,DMA200,200 DMA,70.68,
+2013-08-02,DMA200,200 DMA,71.14,
+2013-08-08,DMA200,200 DMA,71.66,
+2013-08-16,DMA200,200 DMA,72.23,
+2013-08-23,DMA200,200 DMA,72.80,
+2013-08-30,DMA200,200 DMA,73.54,
+2013-09-06,DMA200,200 DMA,74.31,
+2013-09-13,DMA200,200 DMA,74.84,
+2013-09-20,DMA200,200 DMA,75.50,
+2013-09-27,DMA200,200 DMA,76.19,
+2013-10-04,DMA200,200 DMA,76.72,
+2013-10-11,DMA200,200 DMA,77.39,
+2013-10-18,DMA200,200 DMA,78.05,
+2013-10-25,DMA200,200 DMA,78.75,
+2013-11-03,DMA200,200 DMA,79.43,
+2013-11-08,DMA200,200 DMA,79.86,
+2013-11-14,DMA200,200 DMA,80.28,
+2013-11-22,DMA200,200 DMA,80.79,
+2013-11-29,DMA200,200 DMA,81.18,
+2013-12-06,DMA200,200 DMA,81.68,
+2013-12-13,DMA200,200 DMA,82.40,
+2013-12-20,DMA200,200 DMA,83.22,
+2013-12-27,DMA200,200 DMA,83.99,
+2014-01-03,DMA200,200 DMA,84.97,
+2014-01-10,DMA200,200 DMA,85.85,
+2014-01-17,DMA200,200 DMA,86.78,
+2014-01-24,DMA200,200 DMA,87.81,
+2014-01-31,DMA200,200 DMA,88.75,
+2014-02-07,DMA200,200 DMA,89.56,
+2014-02-14,DMA200,200 DMA,90.33,
+2014-02-21,DMA200,200 DMA,91.09,
+2014-02-28,DMA200,200 DMA,91.88,
+2014-03-07,DMA200,200 DMA,92.73,
+2014-03-14,DMA200,200 DMA,93.32,
+2014-03-22,DMA200,200 DMA,93.84,
+2014-03-28,DMA200,200 DMA,94.32,
+2014-04-04,DMA200,200 DMA,94.81,
+2014-04-11,DMA200,200 DMA,95.21,
+2014-04-17,DMA200,200 DMA,95.63,
+2014-04-25,DMA200,200 DMA,95.77,
+2014-05-02,DMA200,200 DMA,95.89,
+2014-05-09,DMA200,200 DMA,95.91,
+2014-05-16,DMA200,200 DMA,95.96,
+2014-05-23,DMA200,200 DMA,95.74,
+2014-05-30,DMA200,200 DMA,95.71,
+2014-06-06,DMA200,200 DMA,95.61,
+2014-06-13,DMA200,200 DMA,95.75,
+2014-06-20,DMA200,200 DMA,95.98,
+2014-06-27,DMA200,200 DMA,96.18,
+2014-07-04,DMA200,200 DMA,96.48,
+2014-07-11,DMA200,200 DMA,96.81,
+2014-07-18,DMA200,200 DMA,97.01,
+2014-07-25,DMA200,200 DMA,97.41,
+2014-08-01,DMA200,200 DMA,97.61,
+2014-08-08,DMA200,200 DMA,97.88,
+2014-08-14,DMA200,200 DMA,98.06,
+2014-08-22,DMA200,200 DMA,98.31,
+2014-08-28,DMA200,200 DMA,98.56,
+2014-09-05,DMA200,200 DMA,98.99,
+2014-09-12,DMA200,200 DMA,99.48,
+2014-09-19,DMA200,200 DMA,99.87,
+2014-09-26,DMA200,200 DMA,100.36,
+2014-10-01,DMA200,200 DMA,100.73,
+2014-10-10,DMA200,200 DMA,101.16,
+2014-10-17,DMA200,200 DMA,101.43,
+2014-10-23,DMA200,200 DMA,101.63,
+2014-10-31,DMA200,200 DMA,101.77,
+2014-11-07,DMA200,200 DMA,101.86,
+2014-11-14,DMA200,200 DMA,102.01,
+2014-11-21,DMA200,200 DMA,102.23,
+2014-11-28,DMA200,200 DMA,102.56,
+2014-12-05,DMA200,200 DMA,102.95,
+2014-12-12,DMA200,200 DMA,102.99,
+2014-12-19,DMA200,200 DMA,102.91,
+2014-12-26,DMA200,200 DMA,102.92,
+2015-01-02,DMA200,200 DMA,102.96,
+2015-01-09,DMA200,200 DMA,102.96,
+2015-01-16,DMA200,200 DMA,103.03,
+2015-01-23,DMA200,200 DMA,103.42,
+2015-01-30,DMA200,200 DMA,103.80,
+2015-02-06,DMA200,200 DMA,104.50,
+2015-02-13,DMA200,200 DMA,105.32,
+2015-02-20,DMA200,200 DMA,106.04,
+2015-02-28,DMA200,200 DMA,107.04,
+2015-03-05,DMA200,200 DMA,107.74,
+2015-03-13,DMA200,200 DMA,108.45,
+2015-03-20,DMA200,200 DMA,109.03,
+2015-03-27,DMA200,200 DMA,109.57,
+2015-04-01,DMA200,200 DMA,109.81,
+2015-04-10,DMA200,200 DMA,110.10,
+2015-04-17,DMA200,200 DMA,110.23,
+2015-04-24,DMA200,200 DMA,109.89,
+2015-04-30,DMA200,200 DMA,109.53,
+2015-05-08,DMA200,200 DMA,109.12,
+2015-05-15,DMA200,200 DMA,108.72,
+2015-05-22,DMA200,200 DMA,108.52,
+2015-05-29,DMA200,200 DMA,108.33,
+2015-06-05,DMA200,200 DMA,108.10,
+2015-06-12,DMA200,200 DMA,107.85,
+2015-06-19,DMA200,200 DMA,107.61,
+2015-06-26,DMA200,200 DMA,107.47,
+2015-07-03,DMA200,200 DMA,107.28,
+2015-07-10,DMA200,200 DMA,107.07,
+2015-07-17,DMA200,200 DMA,107.06,
+2015-07-24,DMA200,200 DMA,107.11,
+2015-07-31,DMA200,200 DMA,107.04,
+2015-08-07,DMA200,200 DMA,107.02,
+2015-08-14,DMA200,200 DMA,107.02,
+2015-08-21,DMA200,200 DMA,107.08,
+2015-08-28,DMA200,200 DMA,106.89,
+2015-09-04,DMA200,200 DMA,106.82,
+2015-09-11,DMA200,200 DMA,106.71,
+2015-09-18,DMA200,200 DMA,106.78,
+2015-09-24,DMA200,200 DMA,106.97,
+2015-10-01,DMA200,200 DMA,107.15,
+2015-10-09,DMA200,200 DMA,107.36,
+2015-10-16,DMA200,200 DMA,107.44,
+2015-10-23,DMA200,200 DMA,107.44,
+2015-10-30,DMA200,200 DMA,107.45,
+2015-11-06,DMA200,200 DMA,107.45,
+2015-11-13,DMA200,200 DMA,107.32,
+2015-11-20,DMA200,200 DMA,107.19,
+2015-11-27,DMA200,200 DMA,107.17,
+2015-12-04,DMA200,200 DMA,107.20,
+2015-12-11,DMA200,200 DMA,107.16,
+2015-12-18,DMA200,200 DMA,107.04,
+2015-12-24,DMA200,200 DMA,106.93,
+2016-01-01,DMA200,200 DMA,106.84,
+2016-01-08,DMA200,200 DMA,106.70,
+2016-01-15,DMA200,200 DMA,106.48,
+2016-01-22,DMA200,200 DMA,106.28,
+2016-01-29,DMA200,200 DMA,106.18,
+2016-02-05,DMA200,200 DMA,106.14,
+2016-02-12,DMA200,200 DMA,105.80,
+2016-02-19,DMA200,200 DMA,105.52,
+2016-02-26,DMA200,200 DMA,105.28,
+2016-03-04,DMA200,200 DMA,105.04,
+2016-03-11,DMA200,200 DMA,104.88,
+2016-03-18,DMA200,200 DMA,104.71,
+2016-03-23,DMA200,200 DMA,104.69,
+2016-04-01,DMA200,200 DMA,104.70,
+2016-04-08,DMA200,200 DMA,104.69,
+2016-04-13,DMA200,200 DMA,104.77,
+2016-04-22,DMA200,200 DMA,104.90,
+2016-04-29,DMA200,200 DMA,104.86,
+2016-05-06,DMA200,200 DMA,104.70,
+2016-05-13,DMA200,200 DMA,104.53,
+2016-05-20,DMA200,200 DMA,104.38,
+2016-05-27,DMA200,200 DMA,104.25,
+2016-06-03,DMA200,200 DMA,104.16,
+2016-06-10,DMA200,200 DMA,104.04,
+2016-06-17,DMA200,200 DMA,103.97,
+2016-06-24,DMA200,200 DMA,104.02,
+2016-07-01,DMA200,200 DMA,103.99,
+2016-07-08,DMA200,200 DMA,104.05,
+2016-07-15,DMA200,200 DMA,104.17,
+2016-07-22,DMA200,200 DMA,104.06,
+2016-07-29,DMA200,200 DMA,103.99,
+2016-08-05,DMA200,200 DMA,103.95,
+2016-08-12,DMA200,200 DMA,103.87,
+2016-08-19,DMA200,200 DMA,103.68,
+2016-08-26,DMA200,200 DMA,103.28,
+2016-09-02,DMA200,200 DMA,102.68,
+2016-09-09,DMA200,200 DMA,102.18,
+2016-09-16,DMA200,200 DMA,101.70,
+2016-09-23,DMA200,200 DMA,101.14,
+2016-09-30,DMA200,200 DMA,100.60,
+2016-10-07,DMA200,200 DMA,100.07,
+2016-10-14,DMA200,200 DMA,99.75,
+2016-10-21,DMA200,200 DMA,99.36,
+2016-10-30,DMA200,200 DMA,98.72,
+2016-11-04,DMA200,200 DMA,98.19,
+2016-11-11,DMA200,200 DMA,97.49,
+2016-11-18,DMA200,200 DMA,96.92,
+2016-11-25,DMA200,200 DMA,96.32,
+2016-12-02,DMA200,200 DMA,95.86,
+2016-12-09,DMA200,200 DMA,95.37,
+2016-12-16,DMA200,200 DMA,94.95,
+2016-12-23,DMA200,200 DMA,94.55,
+2016-12-30,DMA200,200 DMA,94.21,
+2017-01-06,DMA200,200 DMA,93.94,
+2017-01-13,DMA200,200 DMA,93.74,
+2017-01-20,DMA200,200 DMA,93.57,
+2017-01-27,DMA200,200 DMA,93.39,
+2017-02-03,DMA200,200 DMA,93.03,
+2017-02-10,DMA200,200 DMA,92.73,
+2017-02-17,DMA200,200 DMA,92.56,
+2017-02-23,DMA200,200 DMA,92.45,
+2017-03-03,DMA200,200 DMA,92.42,
+2017-03-10,DMA200,200 DMA,92.40,
+2017-03-17,DMA200,200 DMA,92.46,
+2017-03-24,DMA200,200 DMA,92.56,
+2017-03-31,DMA200,200 DMA,92.72,
+2017-04-07,DMA200,200 DMA,92.84,
+2017-04-13,DMA200,200 DMA,92.90,
+2017-04-21,DMA200,200 DMA,92.89,
+2017-04-28,DMA200,200 DMA,92.87,
+2017-05-05,DMA200,200 DMA,92.89,
+2017-05-12,DMA200,200 DMA,92.98,
+2017-05-19,DMA200,200 DMA,93.16,
+2017-05-26,DMA200,200 DMA,93.46,
+2017-06-02,DMA200,200 DMA,93.84,
+2017-06-09,DMA200,200 DMA,94.28,
+2017-06-16,DMA200,200 DMA,94.42,
+2017-06-23,DMA200,200 DMA,94.49,
+2017-06-30,DMA200,200 DMA,94.58,
+2017-07-07,DMA200,200 DMA,94.69,
+2017-07-14,DMA200,200 DMA,94.90,
+2017-07-21,DMA200,200 DMA,95.26,
+2017-07-28,DMA200,200 DMA,95.91,
+2017-08-04,DMA200,200 DMA,96.56,
+2017-08-11,DMA200,200 DMA,97.11,
+2017-08-18,DMA200,200 DMA,97.55,
+2017-08-24,DMA200,200 DMA,97.98,
+2017-09-01,DMA200,200 DMA,98.57,
+2017-09-08,DMA200,200 DMA,99.22,
+2017-09-15,DMA200,200 DMA,99.74,
+2017-09-22,DMA200,200 DMA,100.20,
+2017-09-29,DMA200,200 DMA,100.57,
+2017-10-06,DMA200,200 DMA,100.80,
+2017-10-13,DMA200,200 DMA,101.19,
+2017-10-19,DMA200,200 DMA,101.51,
+2017-10-27,DMA200,200 DMA,102.02,
+2017-11-03,DMA200,200 DMA,102.42,
+2017-11-10,DMA200,200 DMA,102.94,
+2017-11-17,DMA200,200 DMA,103.36,
+2017-11-24,DMA200,200 DMA,103.69,
+2017-12-01,DMA200,200 DMA,104.01,
+2017-12-08,DMA200,200 DMA,104.13,
+2017-12-15,DMA200,200 DMA,104.33,
+2017-12-22,DMA200,200 DMA,104.67,
+2017-12-29,DMA200,200 DMA,105.09,
+2018-01-05,DMA200,200 DMA,105.70,
+2018-01-12,DMA200,200 DMA,106.38,
+2018-01-19,DMA200,200 DMA,107.14,
+2018-01-25,DMA200,200 DMA,107.58,
+2018-02-02,DMA200,200 DMA,107.91,
+2018-02-09,DMA200,200 DMA,107.98,
+2018-02-16,DMA200,200 DMA,108.03,
+2018-02-23,DMA200,200 DMA,108.11,
+2018-03-01,DMA200,200 DMA,108.16,
+2018-03-09,DMA200,200 DMA,108.13,
+2018-03-16,DMA200,200 DMA,108.24,
+2018-03-23,DMA200,200 DMA,108.26,
+2018-03-28,DMA200,200 DMA,108.13,
+2018-04-06,DMA200,200 DMA,108.07,
+2018-04-13,DMA200,200 DMA,108.06,
+2018-04-20,DMA200,200 DMA,108.12,
+2018-04-27,DMA200,200 DMA,108.07,
+2018-05-04,DMA200,200 DMA,107.86,
+2018-05-11,DMA200,200 DMA,107.58,
+2018-05-18,DMA200,200 DMA,107.33,
+2018-05-25,DMA200,200 DMA,106.93,
+2018-06-01,DMA200,200 DMA,106.50,
+2018-06-08,DMA200,200 DMA,106.08,
+2018-06-15,DMA200,200 DMA,105.78,
+2018-06-22,DMA200,200 DMA,105.39,
+2018-06-29,DMA200,200 DMA,104.97,
+2018-07-06,DMA200,200 DMA,104.64,
+2018-07-13,DMA200,200 DMA,104.55,
+2018-07-20,DMA200,200 DMA,104.64,
+2018-07-27,DMA200,200 DMA,104.55,
+2018-08-03,DMA200,200 DMA,104.52,
+2018-08-10,DMA200,200 DMA,104.50,
+2018-08-17,DMA200,200 DMA,104.55,
+2018-08-24,DMA200,200 DMA,104.70,
+2018-08-31,DMA200,200 DMA,105.04,
+2018-09-07,DMA200,200 DMA,105.72,
+2018-09-14,DMA200,200 DMA,106.38,
+2018-09-21,DMA200,200 DMA,107.10,
+2018-09-28,DMA200,200 DMA,107.81,
+2018-10-05,DMA200,200 DMA,108.40,
+2018-10-12,DMA200,200 DMA,108.91,
+2018-10-19,DMA200,200 DMA,109.36,
+2018-10-26,DMA200,200 DMA,109.80,
+2018-11-02,DMA200,200 DMA,110.43,
+2018-11-09,DMA200,200 DMA,110.88,
+2018-11-16,DMA200,200 DMA,111.41,
+2018-11-22,DMA200,200 DMA,111.73,
+2018-11-30,DMA200,200 DMA,112.06,
+2018-12-07,DMA200,200 DMA,112.68,
+2018-12-14,DMA200,200 DMA,113.25,
+2018-12-21,DMA200,200 DMA,113.83,
+2018-12-28,DMA200,200 DMA,114.19,
+2019-01-04,DMA200,200 DMA,114.59,
+2019-01-11,DMA200,200 DMA,114.98,
+2019-01-18,DMA200,200 DMA,115.45,
+2019-01-25,DMA200,200 DMA,116.19,
+2019-02-01,DMA200,200 DMA,117.17,
+2019-02-08,DMA200,200 DMA,118.26,
+2019-02-15,DMA200,200 DMA,119.35,
+2019-02-22,DMA200,200 DMA,120.35,
+2019-03-01,DMA200,200 DMA,121.40,
+2019-03-08,DMA200,200 DMA,121.92,
+2019-03-15,DMA200,200 DMA,122.31,
+2019-03-22,DMA200,200 DMA,122.60,
+2019-03-29,DMA200,200 DMA,122.84,
+2019-04-05,DMA200,200 DMA,123.22,
+2019-04-12,DMA200,200 DMA,123.96,
+2019-04-18,DMA200,200 DMA,124.50,
+2019-04-26,DMA200,200 DMA,125.56,
+2019-05-03,DMA200,200 DMA,126.20,
+2019-05-10,DMA200,200 DMA,127.15,
+2019-05-17,DMA200,200 DMA,127.91,
+2019-05-24,DMA200,200 DMA,128.63,
+2019-05-31,DMA200,200 DMA,129.30,
+2019-06-07,DMA200,200 DMA,129.97,
+2019-06-14,DMA200,200 DMA,130.90,
+2019-06-21,DMA200,200 DMA,131.65,
+2019-06-28,DMA200,200 DMA,132.15,
+2019-07-05,DMA200,200 DMA,132.55,
+2019-07-12,DMA200,200 DMA,132.55,
+2019-07-19,DMA200,200 DMA,132.50,
+2019-07-26,DMA200,200 DMA,132.47,
+2019-08-02,DMA200,200 DMA,132.47,
+2019-08-09,DMA200,200 DMA,132.41,
+2019-08-16,DMA200,200 DMA,132.23,
+2019-08-23,DMA200,200 DMA,131.93,
+2019-08-30,DMA200,200 DMA,131.60,
+2019-09-06,DMA200,200 DMA,131.43,
+2019-09-13,DMA200,200 DMA,131.15,
+2019-09-20,DMA200,200 DMA,130.71,
+2019-09-27,DMA200,200 DMA,130.16,
+2019-10-04,DMA200,200 DMA,129.69,
+2019-10-11,DMA200,200 DMA,129.28,
+2019-10-18,DMA200,200 DMA,128.99,
+2019-10-27,DMA200,200 DMA,128.86,
+2019-11-01,DMA200,200 DMA,128.85,
+2019-11-08,DMA200,200 DMA,128.85,
+2019-11-15,DMA200,200 DMA,128.77,
+2019-11-22,DMA200,200 DMA,128.53,
+2019-11-29,DMA200,200 DMA,128.11,
+2019-12-06,DMA200,200 DMA,127.72,
+2019-12-13,DMA200,200 DMA,127.36,
+2019-12-20,DMA200,200 DMA,127.18,
+2019-12-27,DMA200,200 DMA,127.11,
+2020-01-03,DMA200,200 DMA,126.97,
+2020-01-10,DMA200,200 DMA,126.96,
+2020-01-17,DMA200,200 DMA,126.92,
+2020-01-24,DMA200,200 DMA,126.77,
+2020-02-01,DMA200,200 DMA,126.42,
+2020-02-07,DMA200,200 DMA,126.15,
+2020-02-14,DMA200,200 DMA,125.91,
+2020-02-20,DMA200,200 DMA,125.78,
+2020-02-28,DMA200,200 DMA,125.41,
+2020-03-06,DMA200,200 DMA,124.79,
+2020-03-13,DMA200,200 DMA,123.93,
+2020-03-20,DMA200,200 DMA,122.10,
+2020-03-27,DMA200,200 DMA,120.47,
+2020-04-03,DMA200,200 DMA,119.43,
+2020-04-09,DMA200,200 DMA,118.76,
+2020-04-17,DMA200,200 DMA,117.79,
+2020-04-24,DMA200,200 DMA,116.41,
+2020-04-30,DMA200,200 DMA,115.44,
+2020-05-08,DMA200,200 DMA,114.34,
+2020-05-15,DMA200,200 DMA,113.31,
+2020-05-22,DMA200,200 DMA,112.32,
+2020-05-29,DMA200,200 DMA,111.85,
+2020-06-05,DMA200,200 DMA,111.65,
+2020-06-12,DMA200,200 DMA,111.48,
+2020-06-19,DMA200,200 DMA,111.33,
+2020-06-26,DMA200,200 DMA,111.27,
+2020-07-03,DMA200,200 DMA,111.25,
+2020-07-10,DMA200,200 DMA,111.25,
+2020-07-17,DMA200,200 DMA,111.87,
+2020-07-24,DMA200,200 DMA,112.98,
+2020-07-31,DMA200,200 DMA,114.23,
+2020-08-07,DMA200,200 DMA,115.48,
+2020-08-14,DMA200,200 DMA,116.61,
+2020-08-21,DMA200,200 DMA,117.71,
+2020-08-28,DMA200,200 DMA,118.60,
+2020-09-04,DMA200,200 DMA,119.52,
+2020-09-11,DMA200,200 DMA,120.63,
+2020-09-18,DMA200,200 DMA,122.33,
+2020-09-25,DMA200,200 DMA,123.96,
+2020-10-01,DMA200,200 DMA,125.23,
+2020-10-09,DMA200,200 DMA,127.58,
+2020-10-16,DMA200,200 DMA,130.05,
+2020-10-23,DMA200,200 DMA,132.10,
+2020-10-30,DMA200,200 DMA,133.89,
+2020-11-06,DMA200,200 DMA,135.68,
+2020-11-14,DMA200,200 DMA,137.85,
+2020-11-20,DMA200,200 DMA,139.22,
+2020-11-27,DMA200,200 DMA,141.05,
+2020-12-04,DMA200,200 DMA,142.54,
+2020-12-11,DMA200,200 DMA,144.32,
+2020-12-18,DMA200,200 DMA,145.97,
+2020-12-24,DMA200,200 DMA,147.53,
+2021-01-01,DMA200,200 DMA,149.74,
+2021-01-08,DMA200,200 DMA,152.41,
+2021-01-15,DMA200,200 DMA,155.99,
+2021-01-22,DMA200,200 DMA,159.10,
+2021-01-29,DMA200,200 DMA,161.35,
+2021-02-05,DMA200,200 DMA,163.92,
+2021-02-12,DMA200,200 DMA,166.62,
+2021-02-19,DMA200,200 DMA,169.07,
+2021-02-26,DMA200,200 DMA,171.01,
+2021-03-05,DMA200,200 DMA,173.11,
+2021-03-12,DMA200,200 DMA,174.60,
+2021-03-19,DMA200,200 DMA,176.30,
+2021-03-26,DMA200,200 DMA,177.67,
+2021-04-01,DMA200,200 DMA,178.57,
+2021-04-09,DMA200,200 DMA,180.51,
+2021-04-16,DMA200,200 DMA,182.02,
+2021-04-23,DMA200,200 DMA,184.22,
+2021-04-30,DMA200,200 DMA,187.13,
+2021-05-07,DMA200,200 DMA,190.14,
+2021-05-14,DMA200,200 DMA,192.73,
+2021-05-21,DMA200,200 DMA,195.72,
+2021-05-28,DMA200,200 DMA,199.05,
+2021-06-04,DMA200,200 DMA,202.54,
+2021-06-11,DMA200,200 DMA,206.08,
+2021-06-18,DMA200,200 DMA,209.60,
+2021-06-25,DMA200,200 DMA,212.72,
+2021-07-02,DMA200,200 DMA,215.58,
+2021-07-09,DMA200,200 DMA,218.03,
+2021-07-16,DMA200,200 DMA,220.89,
+2021-07-23,DMA200,200 DMA,223.63,
+2021-07-30,DMA200,200 DMA,227.12,
+2021-08-06,DMA200,200 DMA,230.61,
+2021-08-13,DMA200,200 DMA,234.11,
+2021-08-20,DMA200,200 DMA,237.18,
+2021-08-27,DMA200,200 DMA,241.01,
+2021-09-03,DMA200,200 DMA,244.97,
+2021-09-09,DMA200,200 DMA,248.53,
+2021-09-17,DMA200,200 DMA,252.75,
+2021-09-24,DMA200,200 DMA,256.76,
+2021-10-01,DMA200,200 DMA,259.86,
+2021-10-08,DMA200,200 DMA,262.93,
+2021-10-14,DMA200,200 DMA,265.83,
+2021-10-22,DMA200,200 DMA,269.94,
+2021-10-29,DMA200,200 DMA,272.92,
+2021-11-04,DMA200,200 DMA,275.04,
+2021-11-12,DMA200,200 DMA,277.58,
+2021-11-18,DMA200,200 DMA,279.60,
+2021-11-26,DMA200,200 DMA,281.48,
+2021-12-03,DMA200,200 DMA,283.31,
+2021-12-10,DMA200,200 DMA,285.00,
+2021-12-17,DMA200,200 DMA,286.93,
+2021-12-24,DMA200,200 DMA,289.69,
+2021-12-31,DMA200,200 DMA,292.82,
+2022-01-07,DMA200,200 DMA,295.95,
+2022-01-14,DMA200,200 DMA,297.94,
+2022-01-21,DMA200,200 DMA,298.63,
+2022-01-28,DMA200,200 DMA,297.86,
+2022-02-04,DMA200,200 DMA,297.41,
+2022-02-11,DMA200,200 DMA,296.67,
+2022-02-18,DMA200,200 DMA,295.84,
+2022-02-25,DMA200,200 DMA,295.04,
+2022-03-04,DMA200,200 DMA,294.53,
+2022-03-11,DMA200,200 DMA,294.40,
+2022-03-17,DMA200,200 DMA,294.55,
+2022-03-25,DMA200,200 DMA,294.99,
+2022-04-01,DMA200,200 DMA,295.22,
+2022-04-08,DMA200,200 DMA,295.27,
+2022-04-13,DMA200,200 DMA,294.86,
+2022-04-22,DMA200,200 DMA,293.56,
+2022-04-29,DMA200,200 DMA,291.97,
+2022-05-06,DMA200,200 DMA,290.19,
+2022-05-13,DMA200,200 DMA,287.62,
+2022-05-20,DMA200,200 DMA,285.03,
+2022-05-27,DMA200,200 DMA,282.31,
+2022-06-03,DMA200,200 DMA,280.12,
+2022-06-10,DMA200,200 DMA,277.90,
+2022-06-17,DMA200,200 DMA,274.88,
+2022-06-24,DMA200,200 DMA,271.66,
+2022-07-01,DMA200,200 DMA,268.71,
+2022-07-08,DMA200,200 DMA,265.79,
+2022-07-15,DMA200,200 DMA,262.69,
+2022-07-22,DMA200,200 DMA,259.87,
+2022-07-29,DMA200,200 DMA,257.27,
+2022-08-05,DMA200,200 DMA,255.29,
+2022-08-12,DMA200,200 DMA,253.81,
+2022-08-19,DMA200,200 DMA,252.43,
+2022-08-26,DMA200,200 DMA,250.28,
+2022-09-02,DMA200,200 DMA,248.49,
+2022-09-09,DMA200,200 DMA,246.36,
+2022-09-16,DMA200,200 DMA,244.47,
+2022-09-23,DMA200,200 DMA,242.30,
+2022-09-30,DMA200,200 DMA,240.13,
+2022-10-07,DMA200,200 DMA,238.65,
+2022-10-14,DMA200,200 DMA,236.66,
+2022-10-21,DMA200,200 DMA,234.37,
+2022-10-28,DMA200,200 DMA,232.71,
+2022-11-04,DMA200,200 DMA,230.88,
+2022-11-11,DMA200,200 DMA,229.53,
+2022-11-18,DMA200,200 DMA,228.00,
+2022-11-25,DMA200,200 DMA,226.48,
+2022-12-02,DMA200,200 DMA,225.40,
+2022-12-09,DMA200,200 DMA,224.30,
+2022-12-16,DMA200,200 DMA,223.01,
+2022-12-23,DMA200,200 DMA,221.56,
+2022-12-30,DMA200,200 DMA,220.21,
+2023-01-06,DMA200,200 DMA,218.97,
+2023-01-13,DMA200,200 DMA,217.89,
+2023-01-20,DMA200,200 DMA,217.04,
+2023-01-27,DMA200,200 DMA,216.44,
+2023-02-03,DMA200,200 DMA,215.74,
+2023-02-10,DMA200,200 DMA,215.10,
+2023-02-17,DMA200,200 DMA,214.50,
+2023-02-24,DMA200,200 DMA,213.76,
+2023-03-03,DMA200,200 DMA,212.83,
+2023-03-10,DMA200,200 DMA,212.16,
+2023-03-17,DMA200,200 DMA,211.03,
+2023-03-24,DMA200,200 DMA,209.62,
+2023-03-31,DMA200,200 DMA,208.47,
+2023-04-06,DMA200,200 DMA,207.75,
+2023-04-13,DMA200,200 DMA,206.88,
+2023-04-21,DMA200,200 DMA,205.67,
+2023-04-28,DMA200,200 DMA,204.85,
+2023-05-05,DMA200,200 DMA,204.34,
+2023-05-12,DMA200,200 DMA,203.71,
+2023-05-19,DMA200,200 DMA,203.16,
+2023-05-26,DMA200,200 DMA,202.95,
+2023-06-02,DMA200,200 DMA,202.90,
+2023-06-09,DMA200,200 DMA,202.78,
+2023-06-16,DMA200,200 DMA,202.43,
+2023-06-23,DMA200,200 DMA,201.88,
+2023-06-30,DMA200,200 DMA,201.48,
+2023-07-07,DMA200,200 DMA,201.28,
+2023-07-14,DMA200,200 DMA,201.09,
+2023-07-21,DMA200,200 DMA,201.39,
+2023-07-28,DMA200,200 DMA,201.35,
+2023-08-04,DMA200,200 DMA,201.40,
+2023-08-11,DMA200,200 DMA,201.71,
+2023-08-18,DMA200,200 DMA,201.95,
+2023-08-25,DMA200,200 DMA,202.19,
+2023-09-01,DMA200,200 DMA,202.32,
+2023-09-08,DMA200,200 DMA,202.98,
+2023-09-15,DMA200,200 DMA,203.73,
+2023-09-22,DMA200,200 DMA,204.14,
+2023-09-29,DMA200,200 DMA,204.20,
+2023-10-06,DMA200,200 DMA,204.16,
+2023-10-13,DMA200,200 DMA,204.26,
+2023-10-20,DMA200,200 DMA,204.13,
+2023-10-27,DMA200,200 DMA,203.60,
+2023-11-03,DMA200,200 DMA,203.00,
+2023-11-12,DMA200,200 DMA,202.30,
+2023-11-17,DMA200,200 DMA,202.04,
+2023-11-24,DMA200,200 DMA,201.94,
+2023-12-01,DMA200,200 DMA,201.98,
+2023-12-08,DMA200,200 DMA,202.24,
+2023-12-15,DMA200,200 DMA,202.83,
+2023-12-22,DMA200,200 DMA,203.73,
+2023-12-29,DMA200,200 DMA,204.97,
+2024-01-05,DMA200,200 DMA,206.24,
+2024-01-12,DMA200,200 DMA,207.25,
+2024-01-20,DMA200,200 DMA,209.29,
+2024-01-25,DMA200,200 DMA,210.08,
+2024-02-02,DMA200,200 DMA,211.44,
+2024-02-09,DMA200,200 DMA,213.11,
+2024-02-16,DMA200,200 DMA,215.35,
+2024-02-23,DMA200,200 DMA,217.80,
+2024-03-02,DMA200,200 DMA,220.36,
+2024-03-07,DMA200,200 DMA,221.83,
+2024-03-15,DMA200,200 DMA,223.52,
+2024-03-22,DMA200,200 DMA,224.74,
+2024-03-28,DMA200,200 DMA,225.16,
+2024-04-05,DMA200,200 DMA,225.99,
+2024-04-12,DMA200,200 DMA,226.46,
+2024-04-19,DMA200,200 DMA,226.42,
+2024-04-26,DMA200,200 DMA,226.64,
+2024-05-03,DMA200,200 DMA,226.78,
+2024-05-10,DMA200,200 DMA,226.90,
+2024-05-18,DMA200,200 DMA,227.06,
+2024-05-24,DMA200,200 DMA,227.23,
+2024-05-31,DMA200,200 DMA,227.04,
+2024-06-07,DMA200,200 DMA,227.09,
+2024-06-14,DMA200,200 DMA,227.66,
+2024-06-21,DMA200,200 DMA,228.39,
+2024-06-28,DMA200,200 DMA,229.48,
+2024-07-05,DMA200,200 DMA,231.32,
+2024-07-12,DMA200,200 DMA,233.26,
+2024-07-19,DMA200,200 DMA,235.14,
+2024-07-26,DMA200,200 DMA,236.06,
+2024-08-02,DMA200,200 DMA,237.18,
+2024-08-09,DMA200,200 DMA,237.56,
+2024-08-16,DMA200,200 DMA,238.01,
+2024-08-23,DMA200,200 DMA,239.09,
+2024-08-30,DMA200,200 DMA,240.35,
+2024-09-06,DMA200,200 DMA,241.47,
+2024-09-13,DMA200,200 DMA,242.55,
+2024-09-20,DMA200,200 DMA,243.96,
+2024-09-27,DMA200,200 DMA,245.20,
+2024-10-04,DMA200,200 DMA,246.13,
+2024-10-11,DMA200,200 DMA,247.02,
+2024-10-18,DMA200,200 DMA,248.10,
+2024-10-25,DMA200,200 DMA,249.32,
+2024-11-01,DMA200,200 DMA,250.76,
+2024-11-08,DMA200,200 DMA,252.10,
+2024-11-14,DMA200,200 DMA,253.39,
+2024-11-22,DMA200,200 DMA,254.45,
+2024-11-29,DMA200,200 DMA,256.20,
+2024-12-06,DMA200,200 DMA,258.09,
+2024-12-13,DMA200,200 DMA,260.53,
+2024-12-20,DMA200,200 DMA,262.93,
+2024-12-27,DMA200,200 DMA,264.65,
+2025-01-03,DMA200,200 DMA,266.41,
+2025-01-10,DMA200,200 DMA,267.84,
+2025-01-17,DMA200,200 DMA,268.90,
+2025-01-24,DMA200,200 DMA,270.86,
+2025-02-01,DMA200,200 DMA,273.04,
+2025-02-07,DMA200,200 DMA,275.17,
+2025-02-14,DMA200,200 DMA,276.95,
+2025-02-21,DMA200,200 DMA,278.57,
+2025-02-28,DMA200,200 DMA,279.01,
+2025-03-07,DMA200,200 DMA,279.24,
+2025-03-13,DMA200,200 DMA,278.99,
+2025-03-21,DMA200,200 DMA,278.25,
+2025-03-28,DMA200,200 DMA,277.77,
+2025-04-04,DMA200,200 DMA,276.96,
+2025-04-11,DMA200,200 DMA,275.58,
+2025-04-17,DMA200,200 DMA,274.61,
+2025-04-25,DMA200,200 DMA,272.92,
+2025-05-02,DMA200,200 DMA,271.69,
+2025-05-09,DMA200,200 DMA,270.27,
+2025-05-16,DMA200,200 DMA,269.50,
+2025-05-23,DMA200,200 DMA,268.50,
+2025-05-30,DMA200,200 DMA,267.56,
+2025-06-06,DMA200,200 DMA,266.58,
+2025-06-13,DMA200,200 DMA,266.11,
+2025-06-20,DMA200,200 DMA,266.01,
+2025-06-27,DMA200,200 DMA,266.02,
+2025-07-04,DMA200,200 DMA,266.06,
+2025-07-11,DMA200,200 DMA,266.04,
+2025-07-18,DMA200,200 DMA,265.77,
+2025-07-25,DMA200,200 DMA,265.51,
+2025-08-01,DMA200,200 DMA,264.69,
+2025-08-08,DMA200,200 DMA,263.61,
+2025-08-14,DMA200,200 DMA,262.80,
+2025-08-22,DMA200,200 DMA,262.10,
+2025-08-29,DMA200,200 DMA,261.68,
+2025-09-05,DMA200,200 DMA,261.01,
+2025-09-12,DMA200,200 DMA,260.50,
+2025-09-19,DMA200,200 DMA,260.21,
+2025-09-26,DMA200,200 DMA,259.44,
+2025-10-03,DMA200,200 DMA,258.69,
+2025-10-10,DMA200,200 DMA,258.02,
+2025-10-17,DMA200,200 DMA,257.52,
+2025-10-24,DMA200,200 DMA,256.93,
+2025-10-31,DMA200,200 DMA,256.21,
+2025-11-07,DMA200,200 DMA,255.52,
+2025-11-14,DMA200,200 DMA,254.93,
+2025-11-21,DMA200,200 DMA,254.41,
+2025-11-28,DMA200,200 DMA,254.12,
+2025-12-05,DMA200,200 DMA,254.14,
+2025-12-12,DMA200,200 DMA,254.39,
+2025-12-19,DMA200,200 DMA,254.77,
+2025-12-26,DMA200,200 DMA,255.35,
+2026-01-02,DMA200,200 DMA,255.85,
+2026-01-09,DMA200,200 DMA,256.28,
+2026-01-16,DMA200,200 DMA,256.57,
+2026-01-23,DMA200,200 DMA,255.81,
+2026-01-27,DMA200,200 DMA,255.60,
+2005-04-01,Volume,Volume,13160671,34.0
+2005-04-08,Volume,Volume,71202195,37.0
+2005-04-15,Volume,Volume,55523272,39.0
+2005-04-22,Volume,Volume,128797733,29.0
+2005-04-29,Volume,Volume,100422876,42.0
+2005-05-06,Volume,Volume,37941730,35.0
+2005-05-13,Volume,Volume,38440595,47.0
+2005-05-20,Volume,Volume,50664690,39.0
+2005-05-27,Volume,Volume,93914498,43.0
+2005-06-04,Volume,Volume,54155724,37.0
+2005-06-10,Volume,Volume,58572781,41.0
+2005-06-17,Volume,Volume,47829589,45.0
+2005-06-24,Volume,Volume,77840908,48.0
+2005-07-01,Volume,Volume,121556337,51.0
+2005-07-08,Volume,Volume,65966081,39.0
+2005-07-15,Volume,Volume,72920179,50.0
+2005-07-22,Volume,Volume,54181875,41.0
+2005-07-29,Volume,Volume,50170963,47.0
+2005-08-05,Volume,Volume,42749175,39.0
+2005-08-12,Volume,Volume,54123037,52.0
+2005-08-19,Volume,Volume,38176454,48.0
+2005-08-26,Volume,Volume,54676039,44.0
+2005-09-02,Volume,Volume,55662389,55.0
+2005-09-09,Volume,Volume,38701327,58.0
+2005-09-16,Volume,Volume,52749668,50.0
+2005-09-23,Volume,Volume,46492818,44.0
+2005-09-30,Volume,Volume,80774825,46.0
+2005-10-07,Volume,Volume,110138440,31.0
+2005-10-14,Volume,Volume,52076291,26.0
+2005-10-21,Volume,Volume,68969719,30.0
+2005-10-28,Volume,Volume,59707181,32.0
+2005-11-02,Volume,Volume,17837535,28.0
+2005-11-11,Volume,Volume,72631317,42.0
+2005-11-18,Volume,Volume,62477063,35.0
+2005-11-26,Volume,Volume,74866139,34.0
+2005-12-02,Volume,Volume,73321306,34.0
+2005-12-09,Volume,Volume,71885938,34.0
+2005-12-16,Volume,Volume,75860637,37.0
+2005-12-23,Volume,Volume,88776348,40.0
+2005-12-30,Volume,Volume,50942718,39.0
+2006-01-06,Volume,Volume,56147780,48.0
+2006-01-13,Volume,Volume,44040771,36.0
+2006-01-20,Volume,Volume,97092011,35.0
+2006-01-27,Volume,Volume,49123117,38.0
+2006-02-03,Volume,Volume,84920218,32.0
+2006-02-10,Volume,Volume,73042033,56.0
+2006-02-17,Volume,Volume,56023709,42.0
+2006-02-24,Volume,Volume,64987543,39.0
+2006-03-03,Volume,Volume,76247996,45.0
+2006-03-10,Volume,Volume,58220749,46.0
+2006-03-17,Volume,Volume,40928783,51.0
+2006-03-24,Volume,Volume,56919664,35.0
+2006-03-31,Volume,Volume,70429851,46.0
+2006-04-07,Volume,Volume,39588173,42.0
+2006-04-13,Volume,Volume,48600169,48.0
+2006-04-21,Volume,Volume,123143358,28.0
+2006-04-29,Volume,Volume,67805451,39.0
+2006-05-05,Volume,Volume,24366934,29.0
+2006-05-12,Volume,Volume,42387197,44.0
+2006-05-19,Volume,Volume,82688697,60.0
+2006-05-26,Volume,Volume,99101741,47.0
+2006-06-02,Volume,Volume,88020746,50.0
+2006-06-09,Volume,Volume,66975555,37.0
+2006-06-16,Volume,Volume,74016017,33.0
+2006-06-25,Volume,Volume,60430749,35.0
+2006-06-30,Volume,Volume,87920509,34.0
+2006-07-07,Volume,Volume,93096001,43.0
+2006-07-14,Volume,Volume,84743350,31.0
+2006-07-21,Volume,Volume,111263942,37.0
+2006-07-28,Volume,Volume,96459034,40.0
+2006-08-04,Volume,Volume,64457033,37.0
+2006-08-11,Volume,Volume,48460878,37.0
+2006-08-18,Volume,Volume,36375296,40.0
+2006-08-25,Volume,Volume,57663011,50.0
+2006-09-01,Volume,Volume,63227616,48.0
+2006-09-08,Volume,Volume,33065268,44.0
+2006-09-15,Volume,Volume,45915206,47.0
+2006-09-22,Volume,Volume,46062631,48.0
+2006-09-29,Volume,Volume,47489658,48.0
+2006-10-06,Volume,Volume,30400689,50.0
+2006-10-13,Volume,Volume,63256427,51.0
+2006-10-21,Volume,Volume,104869152,51.0
+2006-10-27,Volume,Volume,35556962,49.0
+2006-11-03,Volume,Volume,58042349,51.0
+2006-11-10,Volume,Volume,38077645,58.0
+2006-11-17,Volume,Volume,41445425,54.0
+2006-11-24,Volume,Volume,58542524,49.0
+2006-12-01,Volume,Volume,56795289,51.0
+2006-12-08,Volume,Volume,34694808,54.0
+2006-12-15,Volume,Volume,49800159,46.0
+2006-12-22,Volume,Volume,54420983,49.0
+2006-12-29,Volume,Volume,38963824,42.0
+2007-01-05,Volume,Volume,33978178,54.0
+2007-01-12,Volume,Volume,58561453,50.0
+2007-01-19,Volume,Volume,55828241,45.0
+2007-01-25,Volume,Volume,29074727,55.0
+2007-02-02,Volume,Volume,40349215,59.0
+2007-02-09,Volume,Volume,23895382,43.0
+2007-02-15,Volume,Volume,34016008,47.0
+2007-02-23,Volume,Volume,47874605,42.0
+2007-03-02,Volume,Volume,87299099,51.0
+2007-03-09,Volume,Volume,82269353,45.0
+2007-03-16,Volume,Volume,48857179,42.0
+2007-03-23,Volume,Volume,34992578,49.0
+2007-03-30,Volume,Volume,52805810,51.0
+2007-04-05,Volume,Volume,53758293,54.0
+2007-04-13,Volume,Volume,62710441,40.0
+2007-04-20,Volume,Volume,78588843,47.0
+2007-04-27,Volume,Volume,80437837,53.0
+2007-05-04,Volume,Volume,27297820,46.0
+2007-05-11,Volume,Volume,65577791,53.0
+2007-05-18,Volume,Volume,57099818,51.0
+2007-05-25,Volume,Volume,53906413,53.0
+2007-06-01,Volume,Volume,59346400,54.0
+2007-06-08,Volume,Volume,110414669,76.0
+2007-06-15,Volume,Volume,36247927,47.0
+2007-06-22,Volume,Volume,39442999,58.0
+2007-06-29,Volume,Volume,45285165,56.0
+2007-07-06,Volume,Volume,45529567,57.0
+2007-07-13,Volume,Volume,58168467,61.0
+2007-07-20,Volume,Volume,58038012,55.0
+2007-07-27,Volume,Volume,64009419,62.0
+2007-08-03,Volume,Volume,57810818,61.0
+2007-08-10,Volume,Volume,78304315,60.0
+2007-08-17,Volume,Volume,39251459,53.0
+2007-08-24,Volume,Volume,56209703,48.0
+2007-08-31,Volume,Volume,47200840,49.0
+2007-09-07,Volume,Volume,49082340,61.0
+2007-09-14,Volume,Volume,28964840,48.0
+2007-09-21,Volume,Volume,123155580,77.0
+2007-09-28,Volume,Volume,95575031,61.0
+2007-10-05,Volume,Volume,66313473,65.0
+2007-10-12,Volume,Volume,108066803,59.0
+2007-10-19,Volume,Volume,92188742,59.0
+2007-10-26,Volume,Volume,53777489,50.0
+2007-11-02,Volume,Volume,38431088,53.0
+2007-11-09,Volume,Volume,22361764,57.0
+2007-11-16,Volume,Volume,46910987,59.0
+2007-11-23,Volume,Volume,44385454,60.0
+2007-11-30,Volume,Volume,28367816,50.0
+2007-12-07,Volume,Volume,50336844,55.0
+2007-12-14,Volume,Volume,31958338,57.0
+2007-12-20,Volume,Volume,21830606,54.0
+2007-12-28,Volume,Volume,69967110,48.0
+2008-01-04,Volume,Volume,38670276,58.0
+2008-01-11,Volume,Volume,37545501,47.0
+2008-01-18,Volume,Volume,55267850,62.0
+2008-01-25,Volume,Volume,52387468,48.0
+2008-02-01,Volume,Volume,38928968,51.0
+2008-02-08,Volume,Volume,32186357,41.0
+2008-02-15,Volume,Volume,31911762,49.0
+2008-02-22,Volume,Volume,31990819,43.0
+2008-02-29,Volume,Volume,31644486,46.0
+2008-03-07,Volume,Volume,22107838,42.0
+2008-03-14,Volume,Volume,46491475,55.0
+2008-03-19,Volume,Volume,42777454,57.0
+2008-03-28,Volume,Volume,57011130,39.0
+2008-04-04,Volume,Volume,57960956,41.0
+2008-04-11,Volume,Volume,47819728,40.0
+2008-04-17,Volume,Volume,61259341,43.0
+2008-04-25,Volume,Volume,71643172,39.0
+2008-05-02,Volume,Volume,56597863,42.0
+2008-05-09,Volume,Volume,89168629,50.0
+2008-05-16,Volume,Volume,83092101,43.0
+2008-05-23,Volume,Volume,26050047,42.0
+2008-05-30,Volume,Volume,86284337,46.0
+2008-06-06,Volume,Volume,53793966,39.0
+2008-06-13,Volume,Volume,48771782,43.0
+2008-06-20,Volume,Volume,25926699,34.0
+2008-06-27,Volume,Volume,50006683,36.0
+2008-07-04,Volume,Volume,36343790,35.0
+2008-07-11,Volume,Volume,56663523,46.0
+2008-07-18,Volume,Volume,84627468,33.0
+2008-07-25,Volume,Volume,81335259,36.0
+2008-08-01,Volume,Volume,58227225,27.0
+2008-08-08,Volume,Volume,55538893,36.0
+2008-08-14,Volume,Volume,33281174,33.0
+2008-08-22,Volume,Volume,33445214,37.0
+2008-08-29,Volume,Volume,34411752,47.0
+2008-09-05,Volume,Volume,28959749,41.0
+2008-09-12,Volume,Volume,52242573,48.0
+2008-09-19,Volume,Volume,64672802,52.0
+2008-09-26,Volume,Volume,114764326,48.0
+2008-10-03,Volume,Volume,45157905,33.0
+2008-10-10,Volume,Volume,107937964,51.0
+2008-10-17,Volume,Volume,90150602,36.0
+2008-10-24,Volume,Volume,96090973,28.0
+2008-10-31,Volume,Volume,117125592,45.0
+2008-11-07,Volume,Volume,109150402,32.0
+2008-11-14,Volume,Volume,69889576,25.0
+2008-11-21,Volume,Volume,89803206,25.0
+2008-11-28,Volume,Volume,86636714,34.0
+2008-12-05,Volume,Volume,79159762,26.0
+2008-12-12,Volume,Volume,64579252,30.0
+2008-12-19,Volume,Volume,84816057,45.0
+2008-12-26,Volume,Volume,74996056,32.0
+2009-01-02,Volume,Volume,61084479,24.0
+2009-01-09,Volume,Volume,74225677,41.0
+2009-01-16,Volume,Volume,282575325,19.0
+2009-01-23,Volume,Volume,99102592,26.0
+2009-01-30,Volume,Volume,70098241,47.0
+2009-02-06,Volume,Volume,50554858,28.0
+2009-02-13,Volume,Volume,51312835,38.0
+2009-02-20,Volume,Volume,59701083,39.0
+2009-02-27,Volume,Volume,58675335,39.0
+2009-03-06,Volume,Volume,59714589,45.0
+2009-03-13,Volume,Volume,44906547,47.0
+2009-03-20,Volume,Volume,62932834,45.0
+2009-03-27,Volume,Volume,87581622,48.0
+2009-04-02,Volume,Volume,42755623,49.0
+2009-04-09,Volume,Volume,66283304,51.0
+2009-04-17,Volume,Volume,106725489,40.0
+2009-04-24,Volume,Volume,144330156,29.0
+2009-04-29,Volume,Volume,61529978,27.0
+2009-05-08,Volume,Volume,132898833,35.0
+2009-05-15,Volume,Volume,91188459,29.0
+2009-05-22,Volume,Volume,102036573,47.0
+2009-05-29,Volume,Volume,85192190,40.0
+2009-06-05,Volume,Volume,61239004,36.0
+2009-06-12,Volume,Volume,98967300,33.0
+2009-06-19,Volume,Volume,80215806,45.0
+2009-06-26,Volume,Volume,105132690,49.0
+2009-07-03,Volume,Volume,53362255,51.0
+2009-07-10,Volume,Volume,63893002,52.0
+2009-07-17,Volume,Volume,63805284,40.0
+2009-07-24,Volume,Volume,130487279,33.0
+2009-07-31,Volume,Volume,68604332,42.0
+2009-08-07,Volume,Volume,73524160,41.0
+2009-08-14,Volume,Volume,65590752,30.0
+2009-08-21,Volume,Volume,40961455,43.0
+2009-08-28,Volume,Volume,85985773,48.0
+2009-09-04,Volume,Volume,43237984,52.0
+2009-09-11,Volume,Volume,58489467,56.0
+2009-09-18,Volume,Volume,58165577,48.0
+2009-09-25,Volume,Volume,44799245,54.0
+2009-10-01,Volume,Volume,63221573,50.0
+2009-10-09,Volume,Volume,87298009,48.0
+2009-10-17,Volume,Volume,40623566,42.0
+2009-10-23,Volume,Volume,42834934,43.0
+2009-10-30,Volume,Volume,112264848,42.0
+2009-11-06,Volume,Volume,45916354,34.0
+2009-11-13,Volume,Volume,58883954,40.0
+2009-11-20,Volume,Volume,57725576,43.0
+2009-11-27,Volume,Volume,51837079,43.0
+2009-12-04,Volume,Volume,48864730,49.0
+2009-12-11,Volume,Volume,46622979,48.0
+2009-12-18,Volume,Volume,86749425,55.0
+2009-12-24,Volume,Volume,59375982,54.0
+2009-12-31,Volume,Volume,33848576,56.0
+2010-01-08,Volume,Volume,47756993,54.0
+2010-01-15,Volume,Volume,149250385,40.0
+2010-01-22,Volume,Volume,90390442,47.0
+2010-01-29,Volume,Volume,65077495,53.0
+2010-02-06,Volume,Volume,51940546,42.0
+2010-02-11,Volume,Volume,33341961,37.0
+2010-02-19,Volume,Volume,39633663,47.0
+2010-02-26,Volume,Volume,35391343,43.0
+2010-03-05,Volume,Volume,34322122,56.0
+2010-03-12,Volume,Volume,49589393,54.0
+2010-03-19,Volume,Volume,40694383,41.0
+2010-03-26,Volume,Volume,28406080,51.0
+2010-04-01,Volume,Volume,44297707,68.0
+2010-04-09,Volume,Volume,31915029,48.0
+2010-04-16,Volume,Volume,38106477,43.0
+2010-04-23,Volume,Volume,82953249,27.0
+2010-04-30,Volume,Volume,66592618,59.0
+2010-05-07,Volume,Volume,41754871,44.0
+2010-05-14,Volume,Volume,49240738,50.0
+2010-05-21,Volume,Volume,63992137,60.0
+2010-05-28,Volume,Volume,37819161,50.0
+2010-06-04,Volume,Volume,25129896,47.0
+2010-06-11,Volume,Volume,55732058,46.0
+2010-06-18,Volume,Volume,39242772,46.0
+2010-06-25,Volume,Volume,42419471,58.0
+2010-07-02,Volume,Volume,41373565,56.0
+2010-07-09,Volume,Volume,28546396,56.0
+2010-07-16,Volume,Volume,39431026,50.0
+2010-07-23,Volume,Volume,56949218,39.0
+2010-07-30,Volume,Volume,25994480,46.0
+2010-08-06,Volume,Volume,46351600,48.0
+2010-08-13,Volume,Volume,34105091,58.0
+2010-08-20,Volume,Volume,24684434,50.0
+2010-08-27,Volume,Volume,24120911,57.0
+2010-09-03,Volume,Volume,31760656,62.0
+2010-09-09,Volume,Volume,30526642,57.0
+2010-09-17,Volume,Volume,45450610,48.0
+2010-09-24,Volume,Volume,55630199,52.0
+2010-10-01,Volume,Volume,40560732,50.0
+2010-10-08,Volume,Volume,27842462,50.0
+2010-10-15,Volume,Volume,53819085,43.0
+2010-10-22,Volume,Volume,54635453,46.0
+2010-10-29,Volume,Volume,87438101,59.0
+2010-11-05,Volume,Volume,25803152,53.0
+2010-11-12,Volume,Volume,21321573,54.0
+2010-11-19,Volume,Volume,26191465,57.0
+2010-11-26,Volume,Volume,44146541,58.0
+2010-12-03,Volume,Volume,56666133,60.0
+2010-12-10,Volume,Volume,44311471,55.0
+2010-12-16,Volume,Volume,48021137,56.0
+2010-12-24,Volume,Volume,58282771,58.0
+2010-12-31,Volume,Volume,40531646,59.0
+2011-01-07,Volume,Volume,38363488,63.0
+2011-01-14,Volume,Volume,51335135,56.0
+2011-01-21,Volume,Volume,59062288,52.0
+2011-01-28,Volume,Volume,53380764,55.0
+2011-02-04,Volume,Volume,46856227,56.0
+2011-02-11,Volume,Volume,40669528,58.0
+2011-02-18,Volume,Volume,37022494,53.0
+2011-02-25,Volume,Volume,50109430,52.0
+2011-03-04,Volume,Volume,31887348,47.0
+2011-03-11,Volume,Volume,30461687,55.0
+2011-03-18,Volume,Volume,28143581,55.0
+2011-03-25,Volume,Volume,29925162,58.0
+2011-04-01,Volume,Volume,47431054,62.0
+2011-04-08,Volume,Volume,42983985,53.0
+2011-04-15,Volume,Volume,28749595,59.0
+2011-04-21,Volume,Volume,29839968,53.0
+2011-04-29,Volume,Volume,49468445,42.0
+2011-05-06,Volume,Volume,28134343,54.0
+2011-05-13,Volume,Volume,18384816,52.0
+2011-05-20,Volume,Volume,18078043,56.0
+2011-05-27,Volume,Volume,24102439,63.0
+2011-06-03,Volume,Volume,23202100,64.0
+2011-06-10,Volume,Volume,19691157,57.0
+2011-06-17,Volume,Volume,29238602,62.0
+2011-06-24,Volume,Volume,32815329,57.0
+2011-07-01,Volume,Volume,31570741,60.0
+2011-07-08,Volume,Volume,39917000,69.0
+2011-07-15,Volume,Volume,22736926,48.0
+2011-07-22,Volume,Volume,49872865,47.0
+2011-07-29,Volume,Volume,30467030,59.0
+2011-08-05,Volume,Volume,29167258,58.0
+2011-08-12,Volume,Volume,68598563,58.0
+2011-08-19,Volume,Volume,37837981,53.0
+2011-08-26,Volume,Volume,36134407,50.0
+2011-09-02,Volume,Volume,24573843,49.0
+2011-09-09,Volume,Volume,59709084,60.0
+2011-09-16,Volume,Volume,50510564,48.0
+2011-09-23,Volume,Volume,48540790,49.0
+2011-09-30,Volume,Volume,45669563,52.0
+2011-10-07,Volume,Volume,32958167,50.0
+2011-10-14,Volume,Volume,41627847,46.0
+2011-10-21,Volume,Volume,22541045,45.0
+2011-10-28,Volume,Volume,29724365,55.0
+2011-11-04,Volume,Volume,54403163,53.0
+2011-11-11,Volume,Volume,31649206,61.0
+2011-11-18,Volume,Volume,46916214,63.0
+2011-11-25,Volume,Volume,52024216,68.0
+2011-12-02,Volume,Volume,82496964,76.0
+2011-12-09,Volume,Volume,54762931,57.0
+2011-12-16,Volume,Volume,68514782,54.0
+2011-12-23,Volume,Volume,44215529,52.0
+2011-12-30,Volume,Volume,33493792,51.0
+2012-01-07,Volume,Volume,41102751,53.0
+2012-01-13,Volume,Volume,40785485,48.0
+2012-01-20,Volume,Volume,52721344,48.0
+2012-01-27,Volume,Volume,26454576,56.0
+2012-02-03,Volume,Volume,49036242,60.0
+2012-02-10,Volume,Volume,36240972,58.0
+2012-02-17,Volume,Volume,27392702,52.0
+2012-02-24,Volume,Volume,27313883,56.0
+2012-03-03,Volume,Volume,30520163,57.0
+2012-03-09,Volume,Volume,28648348,57.0
+2012-03-16,Volume,Volume,34826599,52.0
+2012-03-23,Volume,Volume,32809589,63.0
+2012-03-30,Volume,Volume,49435901,68.0
+2012-04-04,Volume,Volume,17603853,58.0
+2012-04-13,Volume,Volume,38461509,58.0
+2012-04-20,Volume,Volume,42382481,68.0
+2012-04-28,Volume,Volume,83839925,42.0
+2012-05-04,Volume,Volume,32753007,63.0
+2012-05-11,Volume,Volume,33767260,61.0
+2012-05-18,Volume,Volume,32666558,61.0
+2012-05-25,Volume,Volume,22708286,54.0
+2012-06-01,Volume,Volume,28066958,64.0
+2012-06-08,Volume,Volume,26948774,59.0
+2012-06-15,Volume,Volume,32150652,62.0
+2012-06-22,Volume,Volume,32346079,72.0
+2012-06-29,Volume,Volume,24176574,71.0
+2012-07-06,Volume,Volume,37503084,68.0
+2012-07-13,Volume,Volume,83014716,60.0
+2012-07-20,Volume,Volume,37090523,60.0
+2012-07-27,Volume,Volume,65026541,58.0
+2012-08-03,Volume,Volume,42981748,61.0
+2012-08-10,Volume,Volume,28782270,64.0
+2012-08-17,Volume,Volume,19561123,65.0
+2012-08-24,Volume,Volume,32121604,64.0
+2012-08-31,Volume,Volume,32842534,62.0
+2012-09-08,Volume,Volume,31624124,53.0
+2012-09-14,Volume,Volume,28822304,62.0
+2012-09-21,Volume,Volume,38801264,68.0
+2012-09-28,Volume,Volume,44517075,73.0
+2012-10-05,Volume,Volume,37967977,65.0
+2012-10-12,Volume,Volume,51303070,72.0
+2012-10-19,Volume,Volume,35369721,74.0
+2012-10-26,Volume,Volume,43675472,79.0
+2012-11-02,Volume,Volume,107649353,54.0
+2012-11-09,Volume,Volume,37824688,53.0
+2012-11-16,Volume,Volume,11603776,55.0
+2012-11-23,Volume,Volume,19864553,53.0
+2012-11-30,Volume,Volume,46403855,63.0
+2012-12-07,Volume,Volume,32976612,57.0
+2012-12-14,Volume,Volume,33668334,56.0
+2012-12-21,Volume,Volume,31310911,53.0
+2012-12-28,Volume,Volume,19578393,61.0
+2013-01-04,Volume,Volume,43844201,70.0
+2013-01-11,Volume,Volume,58363198,60.0
+2013-01-18,Volume,Volume,96491850,46.0
+2013-01-25,Volume,Volume,53976828,56.0
+2013-02-01,Volume,Volume,34930652,60.0
+2013-02-08,Volume,Volume,23868303,60.0
+2013-02-15,Volume,Volume,44206884,57.0
+2013-02-22,Volume,Volume,37818798,57.0
+2013-03-01,Volume,Volume,51187155,63.0
+2013-03-08,Volume,Volume,67328020,60.0
+2013-03-15,Volume,Volume,33874207,51.0
+2013-03-22,Volume,Volume,28177483,57.0
+2013-03-28,Volume,Volume,33823810,66.0
+2013-04-05,Volume,Volume,58626545,48.0
+2013-04-12,Volume,Volume,123459564,38.0
+2013-04-18,Volume,Volume,34691945,51.0
+2013-04-26,Volume,Volume,88945171,37.0
+2013-05-03,Volume,Volume,36787391,55.0
+2013-05-11,Volume,Volume,41468064,69.0
+2013-05-17,Volume,Volume,38149559,69.0
+2013-05-24,Volume,Volume,60894400,73.0
+2013-05-31,Volume,Volume,48886055,65.0
+2013-06-07,Volume,Volume,32440628,61.0
+2013-06-14,Volume,Volume,38922925,51.0
+2013-06-21,Volume,Volume,62313210,79.0
+2013-06-28,Volume,Volume,45629785,72.0
+2013-07-05,Volume,Volume,36403316,76.0
+2013-07-12,Volume,Volume,45149221,66.0
+2013-07-19,Volume,Volume,35675210,59.0
+2013-07-26,Volume,Volume,53396693,59.0
+2013-08-02,Volume,Volume,102849243,48.0
+2013-08-08,Volume,Volume,64324192,58.0
+2013-08-16,Volume,Volume,45223505,57.0
+2013-08-23,Volume,Volume,51145223,60.0
+2013-08-30,Volume,Volume,142491942,70.0
+2013-09-06,Volume,Volume,89790600,66.0
+2013-09-13,Volume,Volume,93729928,75.0
+2013-09-20,Volume,Volume,67037852,58.0
+2013-09-27,Volume,Volume,81712097,59.0
+2013-10-04,Volume,Volume,42454125,53.0
+2013-10-11,Volume,Volume,72669792,59.0
+2013-10-18,Volume,Volume,96615827,52.0
+2013-10-25,Volume,Volume,140686398,43.0
+2013-11-03,Volume,Volume,72633616,60.0
+2013-11-08,Volume,Volume,38448331,57.0
+2013-11-14,Volume,Volume,64705617,76.0
+2013-11-22,Volume,Volume,51334442,67.0
+2013-11-29,Volume,Volume,56059349,77.0
+2013-12-06,Volume,Volume,53028585,60.0
+2013-12-13,Volume,Volume,53763364,59.0
+2013-12-20,Volume,Volume,56003217,50.0
+2013-12-27,Volume,Volume,33274139,52.0
+2014-01-03,Volume,Volume,23942127,45.0
+2014-01-10,Volume,Volume,49483229,57.0
+2014-01-17,Volume,Volume,52511845,53.0
+2014-01-24,Volume,Volume,75233452,54.0
+2014-01-31,Volume,Volume,40512044,56.0
+2014-02-07,Volume,Volume,49439203,66.0
+2014-02-14,Volume,Volume,35203222,61.0
+2014-02-21,Volume,Volume,32768829,60.0
+2014-02-28,Volume,Volume,41792784,53.0
+2014-03-07,Volume,Volume,41453357,60.0
+2014-03-14,Volume,Volume,53313861,59.0
+2014-03-22,Volume,Volume,53156535,52.0
+2014-03-28,Volume,Volume,45552664,63.0
+2014-04-04,Volume,Volume,49878678,55.0
+2014-04-11,Volume,Volume,33299136,51.0
+2014-04-17,Volume,Volume,36975944,44.0
+2014-04-25,Volume,Volume,104005143,50.0
+2014-05-02,Volume,Volume,58731541,54.0
+2014-05-09,Volume,Volume,56796281,55.0
+2014-05-16,Volume,Volume,72671569,56.0
+2014-05-23,Volume,Volume,81129749,57.0
+2014-05-30,Volume,Volume,67566753,60.0
+2014-06-06,Volume,Volume,55914181,64.0
+2014-06-13,Volume,Volume,66206992,50.0
+2014-06-20,Volume,Volume,46320455,54.0
+2014-06-27,Volume,Volume,46005385,57.0
+2014-07-04,Volume,Volume,44762159,62.0
+2014-07-11,Volume,Volume,43044160,58.0
+2014-07-18,Volume,Volume,47998916,64.0
+2014-07-25,Volume,Volume,93410098,54.0
+2014-08-01,Volume,Volume,49865775,70.0
+2014-08-08,Volume,Volume,48898706,62.0
+2014-08-14,Volume,Volume,27759567,65.0
+2014-08-22,Volume,Volume,34967913,58.0
+2014-08-28,Volume,Volume,41093426,63.0
+2014-09-05,Volume,Volume,44723272,53.0
+2014-09-12,Volume,Volume,32370941,63.0
+2014-09-19,Volume,Volume,43606831,54.0
+2014-09-26,Volume,Volume,44553941,50.0
+2014-10-01,Volume,Volume,36658286,50.0
+2014-10-10,Volume,Volume,65212734,56.0
+2014-10-17,Volume,Volume,55411744,53.0
+2014-10-23,Volume,Volume,32585030,50.0
+2014-10-31,Volume,Volume,71973311,68.0
+2014-11-07,Volume,Volume,58734335,79.0
+2014-11-14,Volume,Volume,51634551,61.0
+2014-11-21,Volume,Volume,46870933,61.0
+2014-11-28,Volume,Volume,60437570,65.0
+2014-12-05,Volume,Volume,39834563,63.0
+2014-12-12,Volume,Volume,36238884,57.0
+2014-12-19,Volume,Volume,49369394,58.0
+2014-12-26,Volume,Volume,31899023,66.0
+2015-01-02,Volume,Volume,20246309,64.0
+2015-01-09,Volume,Volume,49225831,63.0
+2015-01-16,Volume,Volume,38279385,59.0
+2015-01-23,Volume,Volume,109945211,58.0
+2015-01-30,Volume,Volume,57683126,70.0
+2015-02-06,Volume,Volume,62321518,53.0
+2015-02-13,Volume,Volume,54134726,64.0
+2015-02-20,Volume,Volume,25308752,56.0
+2015-02-28,Volume,Volume,54449435,61.0
+2015-03-05,Volume,Volume,37891688,63.0
+2015-03-13,Volume,Volume,48357002,59.0
+2015-03-20,Volume,Volume,48420771,61.0
+2015-03-27,Volume,Volume,47132139,56.0
+2015-04-01,Volume,Volume,23059379,57.0
+2015-04-10,Volume,Volume,44241910,62.0
+2015-04-17,Volume,Volume,35383877,61.0
+2015-04-24,Volume,Volume,104742814,52.0
+2015-04-30,Volume,Volume,61013173,56.0
+2015-05-08,Volume,Volume,54091750,61.0
+2015-05-15,Volume,Volume,40418036,60.0
+2015-05-22,Volume,Volume,47129992,63.0
+2015-05-29,Volume,Volume,57437437,69.0
+2015-06-05,Volume,Volume,43606381,57.0
+2015-06-12,Volume,Volume,46528264,59.0
+2015-06-19,Volume,Volume,58785360,60.0
+2015-06-26,Volume,Volume,42500906,49.0
+2015-07-03,Volume,Volume,35105582,47.0
+2015-07-10,Volume,Volume,24671551,44.0
+2015-07-17,Volume,Volume,32046702,54.0
+2015-07-24,Volume,Volume,47579797,43.0
+2015-07-31,Volume,Volume,34011159,56.0
+2015-08-07,Volume,Volume,28966196,50.0
+2015-08-14,Volume,Volume,29739951,46.0
+2015-08-21,Volume,Volume,32631018,54.0
+2015-08-28,Volume,Volume,59129258,66.0
+2015-09-04,Volume,Volume,35814396,60.0
+2015-09-11,Volume,Volume,28587199,61.0
+2015-09-18,Volume,Volume,37008686,72.0
+2015-09-24,Volume,Volume,52402205,75.0
+2015-10-01,Volume,Volume,43325334,73.0
+2015-10-09,Volume,Volume,37138663,61.0
+2015-10-16,Volume,Volume,27175840,55.0
+2015-10-23,Volume,Volume,29337591,55.0
+2015-10-30,Volume,Volume,45574532,72.0
+2015-11-06,Volume,Volume,28144414,73.0
+2015-11-13,Volume,Volume,19341840,65.0
+2015-11-20,Volume,Volume,36921753,66.0
+2015-11-27,Volume,Volume,30349150,70.0
+2015-12-04,Volume,Volume,50229547,58.0
+2015-12-11,Volume,Volume,24977079,54.0
+2015-12-18,Volume,Volume,50100511,77.0
+2015-12-24,Volume,Volume,20108967,67.0
+2016-01-01,Volume,Volume,23445835,66.0
+2016-01-08,Volume,Volume,35029234,64.0
+2016-01-15,Volume,Volume,33508786,61.0
+2016-01-22,Volume,Volume,36804108,55.0
+2016-01-29,Volume,Volume,30904446,76.0
+2016-02-05,Volume,Volume,30535874,68.0
+2016-02-12,Volume,Volume,31643277,54.0
+2016-02-19,Volume,Volume,26491910,52.0
+2016-02-26,Volume,Volume,26475793,49.0
+2016-03-04,Volume,Volume,46845977,58.0
+2016-03-11,Volume,Volume,34253504,65.0
+2016-03-18,Volume,Volume,55921455,69.0
+2016-03-23,Volume,Volume,22652951,65.0
+2016-04-01,Volume,Volume,53348615,67.0
+2016-04-08,Volume,Volume,26155358,54.0
+2016-04-13,Volume,Volume,23107881,55.0
+2016-04-22,Volume,Volume,94356468,43.0
+2016-04-29,Volume,Volume,47693297,60.0
+2016-05-06,Volume,Volume,38296009,58.0
+2016-05-13,Volume,Volume,26017570,60.0
+2016-05-20,Volume,Volume,33667188,68.0
+2016-05-27,Volume,Volume,31285470,64.0
+2016-06-03,Volume,Volume,45074639,67.0
+2016-06-10,Volume,Volume,47260036,83.0
+2016-06-17,Volume,Volume,28143191,74.0
+2016-06-24,Volume,Volume,39783310,78.0
+2016-07-01,Volume,Volume,47759033,75.0
+2016-07-08,Volume,Volume,35044199,78.0
+2016-07-15,Volume,Volume,39872977,70.0
+2016-07-22,Volume,Volume,107356569,51.0
+2016-07-29,Volume,Volume,49353928,75.0
+2016-08-05,Volume,Volume,38725399,60.0
+2016-08-12,Volume,Volume,23450428,64.0
+2016-08-19,Volume,Volume,32554890,71.0
+2016-08-26,Volume,Volume,65733773,67.0
+2016-09-02,Volume,Volume,94972194,74.0
+2016-09-09,Volume,Volume,48701729,65.0
+2016-09-16,Volume,Volume,48328215,74.0
+2016-09-23,Volume,Volume,53862759,77.0
+2016-09-30,Volume,Volume,66208795,77.0
+2016-10-07,Volume,Volume,35248973,73.0
+2016-10-14,Volume,Volume,18547430,68.0
+2016-10-21,Volume,Volume,46628651,52.0
+2016-10-30,Volume,Volume,73247331,66.0
+2016-11-04,Volume,Volume,28104244,63.0
+2016-11-11,Volume,Volume,47000198,63.0
+2016-11-18,Volume,Volume,67308987,77.0
+2016-11-25,Volume,Volume,38107622,51.0
+2016-12-02,Volume,Volume,30232949,60.0
+2016-12-09,Volume,Volume,22318844,58.0
+2016-12-16,Volume,Volume,31771038,57.0
+2016-12-23,Volume,Volume,23506262,59.0
+2016-12-30,Volume,Volume,28473461,53.0
+2017-01-06,Volume,Volume,28406260,46.0
+2017-01-13,Volume,Volume,22509687,53.0
+2017-01-20,Volume,Volume,22706988,57.0
+2017-01-27,Volume,Volume,35894061,53.0
+2017-02-03,Volume,Volume,50438754,53.0
+2017-02-10,Volume,Volume,30623584,47.0
+2017-02-17,Volume,Volume,26594475,48.0
+2017-02-23,Volume,Volume,25223243,58.0
+2017-03-03,Volume,Volume,29614511,47.0
+2017-03-10,Volume,Volume,23186428,58.0
+2017-03-17,Volume,Volume,42368771,78.0
+2017-03-24,Volume,Volume,112053197,89.0
+2017-03-31,Volume,Volume,68403058,82.0
+2017-04-07,Volume,Volume,32568163,71.0
+2017-04-13,Volume,Volume,39925891,67.0
+2017-04-21,Volume,Volume,37585790,70.0
+2017-04-28,Volume,Volume,120159626,47.0
+2017-05-05,Volume,Volume,19146699,43.0
+2017-05-12,Volume,Volume,28859481,63.0
+2017-05-19,Volume,Volume,53121130,57.0
+2017-05-26,Volume,Volume,55837478,72.0
+2017-06-02,Volume,Volume,37684560,67.0
+2017-06-09,Volume,Volume,62955098,56.0
+2017-06-16,Volume,Volume,49881450,39.0
+2017-06-23,Volume,Volume,23340930,49.0
+2017-06-30,Volume,Volume,35782934,66.0
+2017-07-07,Volume,Volume,26516316,57.0
+2017-07-14,Volume,Volume,31191724,60.0
+2017-07-21,Volume,Volume,95671119,35.0
+2017-07-28,Volume,Volume,62521080,59.0
+2017-08-04,Volume,Volume,43998067,57.0
+2017-08-11,Volume,Volume,33285557,58.0
+2017-08-18,Volume,Volume,27110362,67.0
+2017-08-24,Volume,Volume,32513719,73.0
+2017-09-01,Volume,Volume,55973200,62.0
+2017-09-08,Volume,Volume,49492140,75.0
+2017-09-15,Volume,Volume,89971770,69.0
+2017-09-22,Volume,Volume,30680999,64.0
+2017-09-29,Volume,Volume,29871748,64.0
+2017-10-06,Volume,Volume,12091764,50.0
+2017-10-13,Volume,Volume,18544275,69.0
+2017-10-19,Volume,Volume,36971117,53.0
+2017-10-27,Volume,Volume,31177193,63.0
+2017-11-03,Volume,Volume,15486353,47.0
+2017-11-10,Volume,Volume,33815501,45.0
+2017-11-17,Volume,Volume,20445696,55.0
+2017-11-24,Volume,Volume,21337279,58.0
+2017-12-01,Volume,Volume,37114693,57.0
+2017-12-08,Volume,Volume,33699867,54.0
+2017-12-15,Volume,Volume,19948168,48.0
+2017-12-22,Volume,Volume,34604185,47.0
+2017-12-29,Volume,Volume,35220633,41.0
+2018-01-05,Volume,Volume,33150019,41.0
+2018-01-12,Volume,Volume,43895192,50.0
+2018-01-19,Volume,Volume,39889957,29.0
+2018-01-25,Volume,Volume,65313589,52.0
+2018-02-02,Volume,Volume,37936829,57.0
+2018-02-09,Volume,Volume,56844857,63.0
+2018-02-16,Volume,Volume,31295965,60.0
+2018-02-23,Volume,Volume,56631548,70.0
+2018-03-01,Volume,Volume,55276536,74.0
+2018-03-09,Volume,Volume,51753981,75.0
+2018-03-16,Volume,Volume,46551398,55.0
+2018-03-23,Volume,Volume,35558887,56.0
+2018-03-28,Volume,Volume,56777936,61.0
+2018-04-06,Volume,Volume,20849318,38.0
+2018-04-13,Volume,Volume,33801385,37.0
+2018-04-20,Volume,Volume,32122680,29.0
+2018-04-27,Volume,Volume,74736297,33.0
+2018-05-04,Volume,Volume,31595177,47.0
+2018-05-11,Volume,Volume,25432805,51.0
+2018-05-18,Volume,Volume,38074536,51.0
+2018-05-25,Volume,Volume,35019810,68.0
+2018-06-01,Volume,Volume,33951963,59.0
+2018-06-08,Volume,Volume,26998429,62.0
+2018-06-15,Volume,Volume,36369424,58.0
+2018-06-22,Volume,Volume,42646482,75.0
+2018-06-29,Volume,Volume,48270557,70.0
+2018-07-06,Volume,Volume,53222188,73.0
+2018-07-13,Volume,Volume,64776719,49.0
+2018-07-20,Volume,Volume,59574330,41.0
+2018-07-27,Volume,Volume,59811991,42.0
+2018-08-03,Volume,Volume,35155948,57.0
+2018-08-10,Volume,Volume,26387325,55.0
+2018-08-17,Volume,Volume,27864753,47.0
+2018-08-24,Volume,Volume,43358859,50.0
+2018-08-31,Volume,Volume,47255761,56.0
+2018-09-07,Volume,Volume,182456665,35.0
+2018-09-14,Volume,Volume,60194615,58.0
+2018-09-21,Volume,Volume,49638696,47.0
+2018-09-28,Volume,Volume,114299959,62.0
+2018-10-05,Volume,Volume,44871446,57.0
+2018-10-12,Volume,Volume,52799971,48.0
+2018-10-19,Volume,Volume,40283990,53.0
+2018-10-26,Volume,Volume,83599093,32.0
+2018-11-02,Volume,Volume,45343130,45.0
+2018-11-09,Volume,Volume,28451482,52.0
+2018-11-16,Volume,Volume,37966082,52.0
+2018-11-22,Volume,Volume,32642989,36.0
+2018-11-30,Volume,Volume,74972595,49.0
+2018-12-07,Volume,Volume,52694426,37.0
+2018-12-14,Volume,Volume,57678210,40.0
+2018-12-21,Volume,Volume,66097859,52.0
+2018-12-28,Volume,Volume,40749327,39.0
+2019-01-04,Volume,Volume,37510013,42.0
+2019-01-11,Volume,Volume,35980522,48.0
+2019-01-18,Volume,Volume,135115179,31.0
+2019-01-25,Volume,Volume,117121847,24.0
+2019-02-01,Volume,Volume,82444831,44.0
+2019-02-08,Volume,Volume,32162855,34.0
+2019-02-15,Volume,Volume,43514114,48.0
+2019-02-22,Volume,Volume,48516841,37.0
+2019-03-01,Volume,Volume,91454117,39.0
+2019-03-08,Volume,Volume,249922525,39.0
+2019-03-15,Volume,Volume,71335639,51.0
+2019-03-22,Volume,Volume,45420564,47.0
+2019-03-29,Volume,Volume,47583159,53.0
+2019-04-05,Volume,Volume,140232044,78.0
+2019-04-12,Volume,Volume,108455057,39.0
+2019-04-18,Volume,Volume,118553293,36.0
+2019-04-26,Volume,Volume,87064140,52.0
+2019-05-03,Volume,Volume,40500203,56.0
+2019-05-10,Volume,Volume,40676792,53.0
+2019-05-17,Volume,Volume,50852545,49.0
+2019-05-24,Volume,Volume,52448374,56.0
+2019-05-31,Volume,Volume,152621963,70.0
+2019-06-07,Volume,Volume,69019270,54.0
+2019-06-14,Volume,Volume,71526066,64.0
+2019-06-21,Volume,Volume,90465079,50.0
+2019-06-28,Volume,Volume,34267722,52.0
+2019-07-05,Volume,Volume,24747681,37.0
+2019-07-12,Volume,Volume,40023730,35.0
+2019-07-19,Volume,Volume,85267845,22.0
+2019-07-26,Volume,Volume,39690602,42.0
+2019-08-02,Volume,Volume,64470823,40.0
+2019-08-09,Volume,Volume,39721686,40.0
+2019-08-16,Volume,Volume,24624482,38.0
+2019-08-23,Volume,Volume,47688550,46.0
+2019-08-30,Volume,Volume,35585065,42.0
+2019-09-06,Volume,Volume,44946647,44.0
+2019-09-13,Volume,Volume,52136950,48.0
+2019-09-20,Volume,Volume,39320364,38.0
+2019-09-27,Volume,Volume,52174336,51.0
+2019-10-04,Volume,Volume,32186136,41.0
+2019-10-11,Volume,Volume,19330918,35.0
+2019-10-18,Volume,Volume,75717297,33.0
+2019-10-27,Volume,Volume,34938404,53.0
+2019-11-01,Volume,Volume,28531927,43.0
+2019-11-08,Volume,Volume,19358967,45.0
+2019-11-15,Volume,Volume,16608142,13.0
+2019-11-22,Volume,Volume,25814344,49.0
+2019-11-29,Volume,Volume,32676967,16.0
+2019-12-06,Volume,Volume,28741152,49.0
+2019-12-13,Volume,Volume,24861231,39.0
+2019-12-20,Volume,Volume,37268455,48.0
+2019-12-27,Volume,Volume,16529380,43.0
+2020-01-03,Volume,Volume,21982775,36.0
+2020-01-10,Volume,Volume,33873427,35.0
+2020-01-17,Volume,Volume,77910551,36.0
+2020-01-24,Volume,Volume,21059515,37.0
+2020-02-01,Volume,Volume,32380154,38.0
+2020-02-07,Volume,Volume,35082331,14.0
+2020-02-14,Volume,Volume,26861827,52.0
+2020-02-20,Volume,Volume,12824302,42.0
+2020-02-28,Volume,Volume,42339198,46.0
+2020-03-06,Volume,Volume,44833097,52.0
+2020-03-13,Volume,Volume,55715108,47.0
+2020-03-20,Volume,Volume,71934851,37.0
+2020-03-27,Volume,Volume,62504036,39.0
+2020-04-03,Volume,Volume,42668515,39.0
+2020-04-09,Volume,Volume,27961338,33.0
+2020-04-17,Volume,Volume,96392474,24.0
+2020-04-24,Volume,Volume,67884631,42.0
+2020-04-30,Volume,Volume,60747719,45.0
+2020-05-08,Volume,Volume,63232957,36.0
+2020-05-15,Volume,Volume,44554018,26.0
+2020-05-22,Volume,Volume,66553201,29.0
+2020-05-29,Volume,Volume,141018936,27.0
+2020-06-05,Volume,Volume,88668918,26.0
+2020-06-12,Volume,Volume,85956129,24.0
+2020-06-19,Volume,Volume,116722124,26.0
+2020-06-26,Volume,Volume,97440020,26.0
+2020-07-03,Volume,Volume,59713322,23.0
+2020-07-10,Volume,Volume,72990149,37.0
+2020-07-17,Volume,Volume,477327222,16.0
+2020-07-24,Volume,Volume,210866005,23.0
+2020-07-31,Volume,Volume,170681276,24.0
+2020-08-07,Volume,Volume,87413567,32.0
+2020-08-14,Volume,Volume,88849341,35.0
+2020-08-21,Volume,Volume,111887618,33.0
+2020-08-28,Volume,Volume,77649759,40.0
+2020-09-04,Volume,Volume,160884006,28.0
+2020-09-11,Volume,Volume,215915314,16.0
+2020-09-18,Volume,Volume,260286117,20.0
+2020-09-25,Volume,Volume,224243994,13.0
+2020-10-01,Volume,Volume,101340546,16.0
+2020-10-09,Volume,Volume,510345190,15.0
+2020-10-16,Volume,Volume,471095599,12.0
+2020-10-23,Volume,Volume,119907093,25.0
+2020-10-30,Volume,Volume,96545469,32.0
+2020-11-06,Volume,Volume,74279448,24.0
+2020-11-14,Volume,Volume,72484678,31.0
+2020-11-20,Volume,Volume,65531598,36.0
+2020-11-27,Volume,Volume,98902859,40.0
+2020-12-04,Volume,Volume,81057209,41.0
+2020-12-11,Volume,Volume,107206879,40.0
+2020-12-18,Volume,Volume,96695138,41.0
+2020-12-24,Volume,Volume,155177635,20.0
+2021-01-01,Volume,Volume,75378606,22.0
+2021-01-08,Volume,Volume,234683845,28.0
+2021-01-15,Volume,Volume,408543656,19.0
+2021-01-22,Volume,Volume,187131151,21.0
+2021-01-29,Volume,Volume,140109352,23.0
+2021-02-05,Volume,Volume,114920968,25.0
+2021-02-12,Volume,Volume,168176534,21.0
+2021-02-19,Volume,Volume,92706721,22.0
+2021-02-26,Volume,Volume,97901268,33.0
+2021-03-05,Volume,Volume,184579160,26.0
+2021-03-12,Volume,Volume,104045912,23.0
+2021-03-19,Volume,Volume,119857836,30.0
+2021-03-26,Volume,Volume,93374112,36.0
+2021-04-01,Volume,Volume,58343139,29.0
+2021-04-09,Volume,Volume,142531609,30.0
+2021-04-16,Volume,Volume,357679749,22.0
+2021-04-23,Volume,Volume,245283298,20.0
+2021-04-30,Volume,Volume,131453237,25.0
+2021-05-07,Volume,Volume,141679651,27.0
+2021-05-14,Volume,Volume,72915188,32.0
+2021-05-21,Volume,Volume,70637215,32.0
+2021-05-28,Volume,Volume,122321783,39.0
+2021-06-04,Volume,Volume,55109588,30.0
+2021-06-11,Volume,Volume,57264324,39.0
+2021-06-18,Volume,Volume,67337765,46.0
+2021-06-25,Volume,Volume,81032433,43.0
+2021-07-02,Volume,Volume,50226595,40.0
+2021-07-09,Volume,Volume,48873432,39.0
+2021-07-16,Volume,Volume,222058335,22.0
+2021-07-23,Volume,Volume,100551901,36.0
+2021-07-30,Volume,Volume,50073927,40.0
+2021-08-06,Volume,Volume,65093996,29.0
+2021-08-13,Volume,Volume,70582618,44.0
+2021-08-20,Volume,Volume,59830282,29.0
+2021-08-27,Volume,Volume,56700511,27.0
+2021-09-03,Volume,Volume,55763356,41.0
+2021-09-09,Volume,Volume,64954165,28.0
+2021-09-17,Volume,Volume,49350794,41.0
+2021-09-24,Volume,Volume,62194023,33.0
+2021-10-01,Volume,Volume,75427304,44.0
+2021-10-08,Volume,Volume,63219195,37.0
+2021-10-14,Volume,Volume,185337245,20.0
+2021-10-22,Volume,Volume,92178368,37.0
+2021-10-29,Volume,Volume,70189555,45.0
+2021-11-04,Volume,Volume,26738995,44.0
+2021-11-12,Volume,Volume,54266540,48.0
+2021-11-18,Volume,Volume,40674828,48.0
+2021-11-26,Volume,Volume,46988145,31.0
+2021-12-03,Volume,Volume,74556123,53.0
+2021-12-10,Volume,Volume,51832828,45.0
+2021-12-17,Volume,Volume,150618833,49.0
+2021-12-24,Volume,Volume,99878391,32.0
+2021-12-31,Volume,Volume,60241896,39.0
+2022-01-07,Volume,Volume,65543899,46.0
+2022-01-14,Volume,Volume,162740257,40.0
+2022-01-21,Volume,Volume,94983672,50.0
+2022-01-28,Volume,Volume,131586882,36.0
+2022-02-04,Volume,Volume,97898066,40.0
+2022-02-11,Volume,Volume,70362919,48.0
+2022-02-18,Volume,Volume,78301359,38.0
+2022-02-25,Volume,Volume,102619305,43.0
+2022-03-04,Volume,Volume,92681913,41.0
+2022-03-11,Volume,Volume,96857113,37.0
+2022-03-17,Volume,Volume,59627253,46.0
+2022-03-25,Volume,Volume,65916562,44.0
+2022-04-01,Volume,Volume,62368457,60.0
+2022-04-08,Volume,Volume,57458674,49.0
+2022-04-13,Volume,Volume,48292768,48.0
+2022-04-22,Volume,Volume,69206763,51.0
+2022-04-29,Volume,Volume,78759767,50.0
+2022-05-06,Volume,Volume,100111129,50.0
+2022-05-13,Volume,Volume,91241479,51.0
+2022-05-20,Volume,Volume,75957073,42.0
+2022-05-27,Volume,Volume,72933947,45.0
+2022-06-03,Volume,Volume,97332752,53.0
+2022-06-10,Volume,Volume,52958049,42.0
+2022-06-17,Volume,Volume,104972686,49.0
+2022-06-24,Volume,Volume,88533037,41.0
+2022-07-01,Volume,Volume,66218263,43.0
+2022-07-08,Volume,Volume,53685734,42.0
+2022-07-15,Volume,Volume,80212734,44.0
+2022-07-22,Volume,Volume,122397936,35.0
+2022-07-29,Volume,Volume,75827553,48.0
+2022-08-05,Volume,Volume,75956174,51.0
+2022-08-12,Volume,Volume,38479933,41.0
+2022-08-19,Volume,Volume,52953728,41.0
+2022-08-26,Volume,Volume,58678304,46.0
+2022-09-02,Volume,Volume,68718600,56.0
+2022-09-09,Volume,Volume,82100032,52.0
+2022-09-16,Volume,Volume,75865273,47.0
+2022-09-23,Volume,Volume,80582751,49.0
+2022-09-30,Volume,Volume,70391788,37.0
+2022-10-07,Volume,Volume,42545831,43.0
+2022-10-14,Volume,Volume,176954830,41.0
+2022-10-21,Volume,Volume,73157228,45.0
+2022-10-28,Volume,Volume,32471456,59.0
+2022-11-04,Volume,Volume,46802567,41.0
+2022-11-11,Volume,Volume,51341211,41.0
+2022-11-18,Volume,Volume,61487316,49.0
+2022-11-25,Volume,Volume,65219944,59.0
+2022-12-02,Volume,Volume,73715565,51.0
+2022-12-09,Volume,Volume,52432049,49.0
+2022-12-16,Volume,Volume,55697214,49.0
+2022-12-23,Volume,Volume,51561911,46.0
+2022-12-30,Volume,Volume,44178296,42.0
+2023-01-06,Volume,Volume,42726634,42.0
+2023-01-13,Volume,Volume,50006249,38.0
+2023-01-20,Volume,Volume,75671684,45.0
+2023-01-27,Volume,Volume,34213828,47.0
+2023-02-03,Volume,Volume,46484175,52.0
+2023-02-10,Volume,Volume,33126455,53.0
+2023-02-17,Volume,Volume,33890193,47.0
+2023-02-24,Volume,Volume,32189303,48.0
+2023-03-03,Volume,Volume,31931566,52.0
+2023-03-10,Volume,Volume,22308656,50.0
+2023-03-17,Volume,Volume,42062927,49.0
+2023-03-24,Volume,Volume,40913436,45.0
+2023-03-31,Volume,Volume,33110625,53.0
+2023-04-06,Volume,Volume,17837835,53.0
+2023-04-13,Volume,Volume,26779212,47.0
+2023-04-21,Volume,Volume,40938263,38.0
+2023-04-28,Volume,Volume,71115053,37.0
+2023-05-05,Volume,Volume,31051762,51.0
+2023-05-12,Volume,Volume,29327419,59.0
+2023-05-19,Volume,Volume,27855336,50.0
+2023-05-26,Volume,Volume,58745136,49.0
+2023-06-02,Volume,Volume,43376457,51.0
+2023-06-09,Volume,Volume,56246243,52.0
+2023-06-16,Volume,Volume,119411788,57.0
+2023-06-23,Volume,Volume,50578710,47.0
+2023-06-30,Volume,Volume,28289422,57.0
+2023-07-07,Volume,Volume,56243596,58.0
+2023-07-14,Volume,Volume,73266202,46.0
+2023-07-21,Volume,Volume,112194613,24.0
+2023-07-28,Volume,Volume,37853356,47.0
+2023-08-04,Volume,Volume,41571238,43.0
+2023-08-11,Volume,Volume,53985025,54.0
+2023-08-18,Volume,Volume,33019421,45.0
+2023-08-25,Volume,Volume,35234934,44.0
+2023-09-01,Volume,Volume,45562489,60.0
+2023-09-08,Volume,Volume,77456430,47.0
+2023-09-15,Volume,Volume,69988409,48.0
+2023-09-22,Volume,Volume,45962561,44.0
+2023-09-29,Volume,Volume,56261698,35.0
+2023-10-06,Volume,Volume,28990143,30.0
+2023-10-13,Volume,Volume,54145003,40.0
+2023-10-20,Volume,Volume,52965778,44.0
+2023-10-27,Volume,Volume,36246627,36.0
+2023-11-03,Volume,Volume,27325648,37.0
+2023-11-12,Volume,Volume,42357510,60.0
+2023-11-17,Volume,Volume,38209928,49.0
+2023-11-24,Volume,Volume,37772880,49.0
+2023-12-01,Volume,Volume,57986232,49.0
+2023-12-08,Volume,Volume,75876683,45.0
+2023-12-15,Volume,Volume,101424097,42.0
+2023-12-22,Volume,Volume,125800059,34.0
+2023-12-29,Volume,Volume,120074430,34.0
+2024-01-05,Volume,Volume,93757713,37.0
+2024-01-12,Volume,Volume,83058104,34.0
+2024-01-20,Volume,Volume,252763101,26.0
+2024-01-25,Volume,Volume,47755213,46.0
+2024-02-02,Volume,Volume,58533954,37.0
+2024-02-09,Volume,Volume,71744280,34.0
+2024-02-16,Volume,Volume,151469463,37.0
+2024-02-23,Volume,Volume,81041818,37.0
+2024-03-02,Volume,Volume,59502119,40.0
+2024-03-07,Volume,Volume,38896403,38.0
+2024-03-15,Volume,Volume,65210780,39.0
+2024-03-22,Volume,Volume,68145782,35.0
+2024-03-28,Volume,Volume,49426247,48.0
+2024-04-05,Volume,Volume,52100201,37.0
+2024-04-12,Volume,Volume,70096659,38.0
+2024-04-19,Volume,Volume,80377734,42.0
+2024-04-26,Volume,Volume,72744251,35.0
+2024-05-03,Volume,Volume,42567855,29.0
+2024-05-10,Volume,Volume,42048769,37.0
+2024-05-18,Volume,Volume,40672192,36.0
+2024-05-24,Volume,Volume,39477336,43.0
+2024-05-31,Volume,Volume,112621807,59.0
+2024-06-07,Volume,Volume,136291469,36.0
+2024-06-14,Volume,Volume,69234552,39.0
+2024-06-21,Volume,Volume,166785585,59.0
+2024-06-28,Volume,Volume,94719776,28.0
+2024-07-05,Volume,Volume,120869169,33.0
+2024-07-12,Volume,Volume,99688410,38.0
+2024-07-19,Volume,Volume,82897247,41.0
+2024-07-26,Volume,Volume,170255984,41.0
+2024-08-02,Volume,Volume,61134374,48.0
+2024-08-09,Volume,Volume,62436423,44.0
+2024-08-16,Volume,Volume,52432269,40.0
+2024-08-23,Volume,Volume,53250282,41.0
+2024-08-30,Volume,Volume,110456672,41.0
+2024-09-06,Volume,Volume,83845404,50.0
+2024-09-13,Volume,Volume,86172272,38.0
+2024-09-20,Volume,Volume,78155347,37.0
+2024-09-27,Volume,Volume,70724467,42.0
+2024-10-04,Volume,Volume,46010739,40.0
+2024-10-11,Volume,Volume,59277087,48.0
+2024-10-18,Volume,Volume,176300673,32.0
+2024-10-25,Volume,Volume,82944335,42.0
+2024-11-01,Volume,Volume,66405213,41.0
+2024-11-08,Volume,Volume,73288996,36.0
+2024-11-14,Volume,Volume,51943784,44.0
+2024-11-22,Volume,Volume,60091435,42.0
+2024-11-29,Volume,Volume,77363955,49.0
+2024-12-06,Volume,Volume,65563574,52.0
+2024-12-13,Volume,Volume,57790344,47.0
+2024-12-20,Volume,Volume,65788938,46.0
+2024-12-27,Volume,Volume,33026858,48.0
+2025-01-03,Volume,Volume,55440359,50.0
+2025-01-10,Volume,Volume,54748026,42.0
+2025-01-17,Volume,Volume,44005354,40.0
+2025-01-24,Volume,Volume,149605629,37.0
+2025-02-01,Volume,Volume,76673691,45.0
+2025-02-07,Volume,Volume,66291817,54.0
+2025-02-14,Volume,Volume,51015058,53.0
+2025-02-21,Volume,Volume,44925364,51.0
+2025-02-28,Volume,Volume,58173487,52.0
+2025-03-07,Volume,Volume,50661946,46.0
+2025-03-13,Volume,Volume,45733482,38.0
+2025-03-21,Volume,Volume,80102365,45.0
+2025-03-28,Volume,Volume,60662211,42.0
+2025-04-04,Volume,Volume,44950455,48.0
+2025-04-11,Volume,Volume,59431488,38.0
+2025-04-17,Volume,Volume,85841249,38.0
+2025-04-25,Volume,Volume,113290603,46.0
+2025-05-02,Volume,Volume,62052733,55.0
+2025-05-09,Volume,Volume,53355366,49.0
+2025-05-16,Volume,Volume,61292131,37.0
+2025-05-23,Volume,Volume,41499820,46.0
+2025-05-30,Volume,Volume,44024217,56.0
+2025-06-06,Volume,Volume,33440602,54.0
+2025-06-13,Volume,Volume,63217830,46.0
+2025-06-20,Volume,Volume,52082655,48.0
+2025-06-27,Volume,Volume,36484305,48.0
+2025-07-04,Volume,Volume,37760219,49.0
+2025-07-11,Volume,Volume,43269559,50.0
+2025-07-18,Volume,Volume,72797358,35.0
+2025-07-25,Volume,Volume,43807912,46.0
+2025-08-01,Volume,Volume,44644687,55.0
+2025-08-08,Volume,Volume,36785706,56.0
+2025-08-14,Volume,Volume,31126184,45.0
+2025-08-22,Volume,Volume,42514678,47.0
+2025-08-29,Volume,Volume,51045949,50.0
+2025-09-05,Volume,Volume,24153251,41.0
+2025-09-12,Volume,Volume,48220643,43.0
+2025-09-19,Volume,Volume,41526355,56.0
+2025-09-26,Volume,Volume,60113792,58.0
+2025-10-03,Volume,Volume,35814781,56.0
+2025-10-10,Volume,Volume,33287830,44.0
+2025-10-17,Volume,Volume,84904115,48.0
+2025-10-24,Volume,Volume,39926459,51.0
+2025-10-31,Volume,Volume,42457526,47.0
+2025-11-07,Volume,Volume,25381362,56.0
+2025-11-14,Volume,Volume,46228387,58.0
+2025-11-21,Volume,Volume,37743775,53.0
+2025-11-28,Volume,Volume,50470354,56.0
+2025-12-05,Volume,Volume,51075461,47.0
+2025-12-12,Volume,Volume,38159147,53.0
+2025-12-19,Volume,Volume,34909675,52.0
+2025-12-26,Volume,Volume,31118903,45.0
+2026-01-02,Volume,Volume,28097865,52.0
+2026-01-09,Volume,Volume,37133187,47.0
+2026-01-16,Volume,Volume,29516035,45.0
+2026-01-23,Volume,Volume,125943169,52.0
+2026-01-27,Volume,Volume,15977821,0.0

@@ -1,0 +1,574 @@
+{
+  "2022-12-01": [
+    {
+      "Revenue ": 45002.0
+    },
+    {
+      "Interest": 20505.0
+    },
+    {
+      "Expenses ": 16682.0
+    },
+    {
+      "FinancingProfit": 7815.0
+    },
+    {
+      "FinancingMargin%": 0.17
+    },
+    {
+      "OtherIncome ": 9121.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 16936.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 12735.0
+    },
+    {
+      "EPSinRs": 11.39
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/12/2022/"
+    }
+  ],
+  "2023-03-01": [
+    {
+      "Revenue ": 47548.0
+    },
+    {
+      "Interest": 22606.0
+    },
+    {
+      "Expenses ": 17770.0
+    },
+    {
+      "FinancingProfit": 7172.0
+    },
+    {
+      "FinancingMargin%": 0.15
+    },
+    {
+      "OtherIncome ": 9610.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 16783.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 12634.0
+    },
+    {
+      "EPSinRs": 11.29
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/3/2023/"
+    }
+  ],
+  "2023-06-01": [
+    {
+      "Revenue ": 51168.0
+    },
+    {
+      "Interest": 25955.0
+    },
+    {
+      "Expenses ": 18470.0
+    },
+    {
+      "FinancingProfit": 6744.0
+    },
+    {
+      "FinancingMargin%": 0.13
+    },
+    {
+      "OtherIncome ": 9853.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 16597.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 12403.0
+    },
+    {
+      "EPSinRs": 11.06
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/6/2023/"
+    }
+  ],
+  "2023-09-01": [
+    {
+      "Revenue ": 75039.0
+    },
+    {
+      "Interest": 41250.0
+    },
+    {
+      "Expenses ": 45349.0
+    },
+    {
+      "FinancingProfit": -11560.0
+    },
+    {
+      "FinancingMargin%": -0.15
+    },
+    {
+      "OtherIncome ": 32528.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 20967.0
+    },
+    {
+      "Tax%": 0.17
+    },
+    {
+      "NetProfit ": 17312.0
+    },
+    {
+      "EPSinRs": 11.09
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/9/2023/"
+    }
+  ],
+  "2023-12-01": [
+    {
+      "Revenue ": 78008.0
+    },
+    {
+      "Interest": 43242.0
+    },
+    {
+      "Expenses ": 50530.0
+    },
+    {
+      "FinancingProfit": -15764.0
+    },
+    {
+      "FinancingMargin%": -0.2
+    },
+    {
+      "OtherIncome ": 37007.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 21243.0
+    },
+    {
+      "Tax%": 0.17
+    },
+    {
+      "NetProfit ": 17718.0
+    },
+    {
+      "EPSinRs": 11.37
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/12/2023/"
+    }
+  ],
+  "2024-03-01": [
+    {
+      "Revenue ": 79434.0
+    },
+    {
+      "Interest": 43692.0
+    },
+    {
+      "Expenses ": 62938.0
+    },
+    {
+      "FinancingProfit": -27196.0
+    },
+    {
+      "FinancingMargin%": -0.34
+    },
+    {
+      "OtherIncome ": 44958.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 17761.0
+    },
+    {
+      "Tax%": -0.01
+    },
+    {
+      "NetProfit ": 18013.0
+    },
+    {
+      "EPSinRs": 11.6
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/3/2024/"
+    }
+  ],
+  "2024-06-01": [
+    {
+      "Revenue ": 81546.0
+    },
+    {
+      "Interest": 44580.0
+    },
+    {
+      "Expenses ": 49690.0
+    },
+    {
+      "FinancingProfit": -12723.0
+    },
+    {
+      "FinancingMargin%": -0.16
+    },
+    {
+      "OtherIncome ": 35450.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 22727.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 17188.0
+    },
+    {
+      "EPSinRs": 10.83
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/6/2024/"
+    }
+  ],
+  "2024-09-01": [
+    {
+      "Revenue ": 83002.0
+    },
+    {
+      "Interest": 45414.0
+    },
+    {
+      "Expenses ": 52074.0
+    },
+    {
+      "FinancingProfit": -14487.0
+    },
+    {
+      "FinancingMargin%": -0.17
+    },
+    {
+      "OtherIncome ": 38455.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 23968.0
+    },
+    {
+      "Tax%": 0.22
+    },
+    {
+      "NetProfit ": 18627.0
+    },
+    {
+      "EPSinRs": 11.68
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/9/2024/"
+    }
+  ],
+  "2024-12-01": [
+    {
+      "Revenue ": 85040.0
+    },
+    {
+      "Interest": 46914.0
+    },
+    {
+      "Expenses ": 41307.0
+    },
+    {
+      "FinancingProfit": -3181.0
+    },
+    {
+      "FinancingMargin%": -0.04
+    },
+    {
+      "OtherIncome ": 27154.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 23973.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 18340.0
+    },
+    {
+      "EPSinRs": 11.54
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/12/2024/"
+    }
+  ],
+  "2025-03-01": [
+    {
+      "Revenue ": 86779.0
+    },
+    {
+      "Interest": 46986.0
+    },
+    {
+      "Expenses ": 47709.0
+    },
+    {
+      "FinancingProfit": -7916.0
+    },
+    {
+      "FinancingMargin%": -0.09
+    },
+    {
+      "OtherIncome ": 33489.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 25573.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 19285.0
+    },
+    {
+      "EPSinRs": 12.31
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/3/2025/"
+    }
+  ],
+  "2025-06-01": [
+    {
+      "Revenue ": 87372.0
+    },
+    {
+      "Interest": 47709.0
+    },
+    {
+      "Expenses ": 64497.0
+    },
+    {
+      "FinancingProfit": -24833.0
+    },
+    {
+      "FinancingMargin%": -0.28
+    },
+    {
+      "OtherIncome ": 45683.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 20850.0
+    },
+    {
+      "Tax%": 0.18
+    },
+    {
+      "NetProfit ": 17090.0
+    },
+    {
+      "EPSinRs": 10.6
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/6/2025/"
+    }
+  ],
+  "2025-09-01": [
+    {
+      "Revenue ": 86994.0
+    },
+    {
+      "Interest": 46741.0
+    },
+    {
+      "Expenses ": 45161.0
+    },
+    {
+      "FinancingProfit": -4908.0
+    },
+    {
+      "FinancingMargin%": -0.06
+    },
+    {
+      "OtherIncome ": 31567.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 26659.0
+    },
+    {
+      "Tax%": 0.24
+    },
+    {
+      "NetProfit ": 20364.0
+    },
+    {
+      "EPSinRs": 12.76
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/9/2025/"
+    }
+  ],
+  "2025-12-01": [
+    {
+      "Revenue ": 87067.0
+    },
+    {
+      "Interest": 45821.0
+    },
+    {
+      "Expenses ": 54145.0
+    },
+    {
+      "FinancingProfit": -12899.0
+    },
+    {
+      "FinancingMargin%": -0.15
+    },
+    {
+      "OtherIncome ": 39860.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 26961.0
+    },
+    {
+      "Tax%": 0.23
+    },
+    {
+      "NetProfit ": 20691.0
+    },
+    {
+      "EPSinRs": 12.87
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/1298/12/2025/"
+    }
+  ]
+}

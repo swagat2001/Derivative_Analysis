@@ -1,0 +1,170 @@
+{
+  "2014-03-01": [
+    {
+      "CashfromOperatingActivity ": 88.0
+    },
+    {
+      "CashfromInvestingActivity ": -109.0
+    },
+    {
+      "CashfromFinancingActivity ": -128.0
+    },
+    {
+      "NetCashFlow": -149.0
+    }
+  ],
+  "2015-03-01": [
+    {
+      "CashfromOperatingActivity ": 122.0
+    },
+    {
+      "CashfromInvestingActivity ": 15.0
+    },
+    {
+      "CashfromFinancingActivity ": -77.0
+    },
+    {
+      "NetCashFlow": 61.0
+    }
+  ],
+  "2016-03-01": [
+    {
+      "CashfromOperatingActivity ": 138.0
+    },
+    {
+      "CashfromInvestingActivity ": -64.0
+    },
+    {
+      "CashfromFinancingActivity ": -83.0
+    },
+    {
+      "NetCashFlow": -9.0
+    }
+  ],
+  "2017-03-01": [
+    {
+      "CashfromOperatingActivity ": 177.0
+    },
+    {
+      "CashfromInvestingActivity ": -220.0
+    },
+    {
+      "CashfromFinancingActivity ": 47.0
+    },
+    {
+      "NetCashFlow": 4.0
+    }
+  ],
+  "2018-03-01": [
+    {
+      "CashfromOperatingActivity ": 191.0
+    },
+    {
+      "CashfromInvestingActivity ": -296.0
+    },
+    {
+      "CashfromFinancingActivity ": 184.0
+    },
+    {
+      "NetCashFlow": 80.0
+    }
+  ],
+  "2019-03-01": [
+    {
+      "CashfromOperatingActivity ": 556.0
+    },
+    {
+      "CashfromInvestingActivity ": -155.0
+    },
+    {
+      "CashfromFinancingActivity ": -143.0
+    },
+    {
+      "NetCashFlow": 258.0
+    }
+  ],
+  "2020-03-01": [
+    {
+      "CashfromOperatingActivity ": 146.0
+    },
+    {
+      "CashfromInvestingActivity ": -151.0
+    },
+    {
+      "CashfromFinancingActivity ": -126.0
+    },
+    {
+      "NetCashFlow": -131.0
+    }
+  ],
+  "2021-03-01": [
+    {
+      "CashfromOperatingActivity ": 442.0
+    },
+    {
+      "CashfromInvestingActivity ": -428.0
+    },
+    {
+      "CashfromFinancingActivity ": 61.0
+    },
+    {
+      "NetCashFlow": 74.0
+    }
+  ],
+  "2022-03-01": [
+    {
+      "CashfromOperatingActivity ": 280.0
+    },
+    {
+      "CashfromInvestingActivity ": -179.0
+    },
+    {
+      "CashfromFinancingActivity ": -304.0
+    },
+    {
+      "NetCashFlow": -203.0
+    }
+  ],
+  "2023-03-01": [
+    {
+      "CashfromOperatingActivity ": 358.0
+    },
+    {
+      "CashfromInvestingActivity ": -931.0
+    },
+    {
+      "CashfromFinancingActivity ": 1311.0
+    },
+    {
+      "NetCashFlow": 738.0
+    }
+  ],
+  "2024-03-01": [
+    {
+      "CashfromOperatingActivity ": 656.0
+    },
+    {
+      "CashfromInvestingActivity ": -712.0
+    },
+    {
+      "CashfromFinancingActivity ": 256.0
+    },
+    {
+      "NetCashFlow": 200.0
+    }
+  ],
+  "2025-03-01": [
+    {
+      "CashfromOperatingActivity ": 558.0
+    },
+    {
+      "CashfromInvestingActivity ": -1463.0
+    },
+    {
+      "CashfromFinancingActivity ": 1283.0
+    },
+    {
+      "NetCashFlow": 378.0
+    }
+  ]
+}

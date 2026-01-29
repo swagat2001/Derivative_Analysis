@@ -1,0 +1,496 @@
+{
+  "2014-03-01": [
+    {
+      "Revenue ": 30736.0
+    },
+    {
+      "Interest": 18703.0
+    },
+    {
+      "Expenses ": 9944.0
+    },
+    {
+      "FinancingProfit": 2089.0
+    },
+    {
+      "FinancingMargin%": 0.07
+    },
+    {
+      "OtherIncome ": 7766.0
+    },
+    {
+      "Depreciation": 375.0
+    },
+    {
+      "Profitbeforetax": 9479.0
+    },
+    {
+      "Tax%": 0.33
+    },
+    {
+      "NetProfit ": 6311.0
+    },
+    {
+      "EPSinRs": 26.86
+    },
+    {
+      "DividendPayout%": 0.15
+    }
+  ],
+  "2015-03-01": [
+    {
+      "Revenue ": 35727.0
+    },
+    {
+      "Interest": 21341.0
+    },
+    {
+      "Expenses ": 11521.0
+    },
+    {
+      "FinancingProfit": 2865.0
+    },
+    {
+      "FinancingMargin%": 0.08
+    },
+    {
+      "OtherIncome ": 8838.0
+    },
+    {
+      "Depreciation": 420.0
+    },
+    {
+      "Profitbeforetax": 11283.0
+    },
+    {
+      "Tax%": 0.34
+    },
+    {
+      "NetProfit ": 7450.0
+    },
+    {
+      "EPSinRs": 31.42
+    },
+    {
+      "DividendPayout%": 0.15
+    }
+  ],
+  "2016-03-01": [
+    {
+      "Revenue ": 41409.0
+    },
+    {
+      "Interest": 24344.0
+    },
+    {
+      "Expenses ": 13869.0
+    },
+    {
+      "FinancingProfit": 3196.0
+    },
+    {
+      "FinancingMargin%": 0.08
+    },
+    {
+      "OtherIncome ": 9955.0
+    },
+    {
+      "Depreciation": 461.0
+    },
+    {
+      "Profitbeforetax": 12690.0
+    },
+    {
+      "Tax%": 0.34
+    },
+    {
+      "NetProfit ": 8358.0
+    },
+    {
+      "EPSinRs": 35.04
+    },
+    {
+      "DividendPayout%": 0.14
+    }
+  ],
+  "2017-03-01": [
+    {
+      "Revenue ": 45175.0
+    },
+    {
+      "Interest": 26789.0
+    },
+    {
+      "Expenses ": 24327.0
+    },
+    {
+      "FinancingProfit": -5941.0
+    },
+    {
+      "FinancingMargin%": -0.13
+    },
+    {
+      "OtherIncome ": 12422.0
+    },
+    {
+      "Depreciation": 527.0
+    },
+    {
+      "Profitbeforetax": 5954.0
+    },
+    {
+      "Tax%": 0.33
+    },
+    {
+      "NetProfit ": 3967.0
+    },
+    {
+      "EPSinRs": 16.51
+    },
+    {
+      "DividendPayout%": 0.3
+    }
+  ],
+  "2018-03-01": [
+    {
+      "Revenue ": 46614.0
+    },
+    {
+      "Interest": 27604.0
+    },
+    {
+      "Expenses ": 29717.0
+    },
+    {
+      "FinancingProfit": -10706.0
+    },
+    {
+      "FinancingMargin%": -0.23
+    },
+    {
+      "OtherIncome ": 11863.0
+    },
+    {
+      "Depreciation": 591.0
+    },
+    {
+      "Profitbeforetax": 566.0
+    },
+    {
+      "Tax%": 0.18
+    },
+    {
+      "NetProfit ": 464.0
+    },
+    {
+      "EPSinRs": 1.78
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ],
+  "2019-03-01": [
+    {
+      "Revenue ": 56044.0
+    },
+    {
+      "Interest": 33883.0
+    },
+    {
+      "Expenses ": 28020.0
+    },
+    {
+      "FinancingProfit": -5860.0
+    },
+    {
+      "FinancingMargin%": -0.1
+    },
+    {
+      "OtherIncome ": 14189.0
+    },
+    {
+      "Depreciation": 737.0
+    },
+    {
+      "Profitbeforetax": 7592.0
+    },
+    {
+      "Tax%": 0.34
+    },
+    {
+      "NetProfit ": 5047.0
+    },
+    {
+      "EPSinRs": 19.59
+    },
+    {
+      "DividendPayout%": 0.05
+    }
+  ],
+  "2020-03-01": [
+    {
+      "Revenue ": 63716.0
+    },
+    {
+      "Interest": 37996.0
+    },
+    {
+      "Expenses ": 35976.0
+    },
+    {
+      "FinancingProfit": -10256.0
+    },
+    {
+      "FinancingMargin%": -0.16
+    },
+    {
+      "OtherIncome ": 16342.0
+    },
+    {
+      "Depreciation": 806.0
+    },
+    {
+      "Profitbeforetax": 5280.0
+    },
+    {
+      "Tax%": 0.64
+    },
+    {
+      "NetProfit ": 1879.0
+    },
+    {
+      "EPSinRs": 6.57
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ],
+  "2021-03-01": [
+    {
+      "Revenue ": 64397.0
+    },
+    {
+      "Interest": 34627.0
+    },
+    {
+      "Expenses ": 32621.0
+    },
+    {
+      "FinancingProfit": -2851.0
+    },
+    {
+      "FinancingMargin%": -0.04
+    },
+    {
+      "OtherIncome ": 13577.0
+    },
+    {
+      "Depreciation": 976.0
+    },
+    {
+      "Profitbeforetax": 9750.0
+    },
+    {
+      "Tax%": 0.26
+    },
+    {
+      "NetProfit ": 7252.0
+    },
+    {
+      "EPSinRs": 23.49
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ],
+  "2022-03-01": [
+    {
+      "Revenue ": 68846.0
+    },
+    {
+      "Interest": 34923.0
+    },
+    {
+      "Expenses ": 31216.0
+    },
+    {
+      "FinancingProfit": 2707.0
+    },
+    {
+      "FinancingMargin%": 0.04
+    },
+    {
+      "OtherIncome ": 17268.0
+    },
+    {
+      "Depreciation": 1046.0
+    },
+    {
+      "Profitbeforetax": 18929.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 14207.0
+    },
+    {
+      "EPSinRs": 45.99
+    },
+    {
+      "DividendPayout%": 0.02
+    }
+  ],
+  "2023-03-01": [
+    {
+      "Revenue ": 87448.0
+    },
+    {
+      "Interest": 43389.0
+    },
+    {
+      "Expenses ": 30641.0
+    },
+    {
+      "FinancingProfit": 13418.0
+    },
+    {
+      "FinancingMargin%": 0.15
+    },
+    {
+      "OtherIncome ": 18349.0
+    },
+    {
+      "Depreciation": 13146.0
+    },
+    {
+      "Profitbeforetax": 18621.0
+    },
+    {
+      "Tax%": 0.42
+    },
+    {
+      "NetProfit ": 10919.0
+    },
+    {
+      "EPSinRs": 35.16
+    },
+    {
+      "DividendPayout%": 0.03
+    }
+  ],
+  "2024-03-01": [
+    {
+      "Revenue ": 112759.0
+    },
+    {
+      "Interest": 61391.0
+    },
+    {
+      "Expenses ": 40036.0
+    },
+    {
+      "FinancingProfit": 11333.0
+    },
+    {
+      "FinancingMargin%": 0.1
+    },
+    {
+      "OtherIncome ": 25230.0
+    },
+    {
+      "Depreciation": 1385.0
+    },
+    {
+      "Profitbeforetax": 35178.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 26492.0
+    },
+    {
+      "EPSinRs": 85.49
+    },
+    {
+      "DividendPayout%": 0.01
+    }
+  ],
+  "2025-03-01": [
+    {
+      "Revenue ": 127374.0
+    },
+    {
+      "Interest": 71036.0
+    },
+    {
+      "Expenses ": 46395.0
+    },
+    {
+      "FinancingProfit": 9943.0
+    },
+    {
+      "FinancingMargin%": 0.08
+    },
+    {
+      "OtherIncome ": 28543.0
+    },
+    {
+      "Depreciation": 1763.0
+    },
+    {
+      "Profitbeforetax": 36722.0
+    },
+    {
+      "Tax%": 0.23
+    },
+    {
+      "NetProfit ": 28191.0
+    },
+    {
+      "EPSinRs": 90.58
+    },
+    {
+      "DividendPayout%": 0.01
+    }
+  ],
+  "TTM": [
+    {
+      "Revenue ": 130820.0
+    },
+    {
+      "Interest": 73116.0
+    },
+    {
+      "Expenses ": 52970.0
+    },
+    {
+      "FinancingProfit": 4733.0
+    },
+    {
+      "FinancingMargin%": 0.04
+    },
+    {
+      "OtherIncome ": 30208.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 34941.0
+    },
+    {
+      "Tax%": 0.0
+    },
+    {
+      "NetProfit ": 26415.0
+    },
+    {
+      "EPSinRs": 84.66
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+<!-- Dashboard Controls -->
+<div class="dashboard-controls">
+  <div class="control-row">
+    <!-- Date Selector -->
+    <div class="control-group">
+      <label for="dateSelect">Date:</label>
+      <select id="dateSelect" name="date"
+        onchange="window.location.href='/dashboard/?date='+this.value+'&mtype={{ mtype }}'">
+        {% for d in dates %}
+        <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="control-group-right">
+      <div class="control-group">
+        <div class="btn-group">
+          <button class="filter-btn {% if mtype == 'TOTAL' %}active{% endif %}" data-mtype="TOTAL"
+            onclick="filterDashboard('TOTAL')">
+            TOTAL
+          </button>
+          <button class="filter-btn {% if mtype == 'ITM' %}active{% endif %}" data-mtype="ITM"
+            onclick="filterDashboard('ITM')">
+            ITM
+          </button>
+          <button class="filter-btn {% if mtype == 'OTM' %}active{% endif %}" data-mtype="OTM"
+            onclick="filterDashboard('OTM')">
+            OTM
+          </button>
+        </div>
+      </div>
+      <div class="control-group">
+        <a href="{{ url_for('dashboard.export_dashboard', date=selected_date, mtype=mtype) }}" class="btn-export"
+          title="Export to Excel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export Excel
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="table-wrapper">
+  <div class="table-container">
+    <table id="derivativesTable" class="derivatives-table dataTable">
+      <thead>
+        <tr>
+          <th rowspan="2" class="col-stock">Stock</th>
+          <th colspan="2">Call Δ+</th>
+          <th colspan="2">Call Δ−</th>
+          <th colspan="2">Call Vega+</th>
+          <th colspan="2">Call Vega−</th>
+          <th rowspan="2">Call ATV</th>
+          <th rowspan="2">Call AMoney</th>
+          <th rowspan="2" class="col-center">Close</th>
+          <th rowspan="2" class="col-center">RSI</th>
+          <th colspan="2">Put Δ+</th>
+          <th colspan="2">Put Δ−</th>
+          <th colspan="2">Put Vega+</th>
+          <th colspan="2">Put Vega−</th>
+          <th rowspan="2">Put ATV</th>
+          <th rowspan="2">Put AMoney</th>
+        </tr>
+        <tr>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+          <th>Strike</th>
+          <th>%</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if data %}
+        {% for row in data %}
+        <tr>
+          <td class="cell-stock"><a href="{{ url_for('stock.stock_detail', ticker=row.stock) }}">{{ row.stock }}</a>
+          </td>
+          <td>{{ row.call_delta_pos_strike }}</td>
+          <td>{{ row.call_delta_pos_pct }}</td>
+          <td>{{ row.call_delta_neg_strike }}</td>
+          <td>{{ row.call_delta_neg_pct }}</td>
+          <td>{{ row.call_vega_pos_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="call" data-metric="vega"
+            data-strike="{{ row.call_vega_pos_strike }}" data-date="{{ selected_date }}">
+            {{ row.call_vega_pos_pct }}
+          </td>
+          <td>{{ row.call_vega_neg_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="call" data-metric="vega"
+            data-strike="{{ row.call_vega_neg_strike }}" data-date="{{ selected_date }}">
+            {{ row.call_vega_neg_pct }}
+          </td>
+          <td>{{ "{:.2f}".format(row.call_total_tradval or 0) }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="call" data-metric="money"
+            data-strike="N/A" data-date="{{ selected_date }}">
+            {{ "{:.2f}".format(row.call_total_money or 0) }}
+          </td>
+          <td class="col-center">{{ "{:.2f}".format(row.closing_price or 0) }}</td>
+          <td class="col-center">{{ "{:.2f}".format(row.rsi or 0) }}</td>
+          <td>{{ row.put_delta_pos_strike }}</td>
+          <td>{{ row.put_delta_pos_pct }}</td>
+          <td>{{ row.put_delta_neg_strike }}</td>
+          <td>{{ row.put_delta_neg_pct }}</td>
+          <td>{{ row.put_vega_pos_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="put" data-metric="vega"
+            data-strike="{{ row.put_vega_pos_strike }}" data-date="{{ selected_date }}">
+            {{ row.put_vega_pos_pct }}
+          </td>
+          <td>{{ row.put_vega_neg_strike }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="put" data-metric="vega"
+            data-strike="{{ row.put_vega_neg_strike }}" data-date="{{ selected_date }}">
+            {{ row.put_vega_neg_pct }}
+          </td>
+          <td>{{ "{:.2f}".format(row.put_total_tradval or 0) }}</td>
+          <td class="money-clickable" data-stock="{{ row.stock }}" data-option-type="put" data-metric="money"
+            data-strike="N/A" data-date="{{ selected_date }}">
+            {{ "{:.2f}".format(row.put_total_money or 0) }}
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="23" style="text-align: center; padding: 20px;">No data available</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard_table.js') }}"></script>

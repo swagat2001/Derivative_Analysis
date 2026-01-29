@@ -1,5 +1,7 @@
 # controllers/stock_controller.py
 import json
+import os
+from pathlib import Path
 
 import pandas as pd
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
@@ -18,33 +20,134 @@ from ..models.stock_model import (
 
 stock_bp = Blueprint("stock", __name__)
 
-
 # ==============================
-# � Stock Search/Selection Page
+# 📊 Fundamental Data Functions
 # ==============================
-@stock_bp.route("/stock-search")
-def stock_search():
-    """
-    Stock search page - allows user to select a stock symbol
-    """
-    try:
-        dates = get_available_dates()
-        all_symbols = get_filtered_tickers()
-        selected_date = request.args.get("date", dates[0] if dates else None)
+# Path to Data_scraper data directory
+FUNDAMENTAL_DATA_DIR = Path(__file__).resolve().parent.parent.parent.parent / "Data_scraper" / "data"
 
-        return render_template(
-            "stock_search.html",
-            dates=dates,
-            selected_date=selected_date,
-            all_symbols=all_symbols,
-            stock_list=get_filtered_tickers(),
-        )
-    except Exception as e:
-        print(f"[ERROR] Stock search route failed: {e}")
-        import traceback
 
-        traceback.print_exc()
-        return jsonify({"error": f"Stock search failed: {str(e)}"}), 500
+def load_fundamental_json(symbol, data_type):
+    """Load JSON data for a symbol from fundamental data directory"""
+    file_path = FUNDAMENTAL_DATA_DIR / data_type / f"{symbol}.json"
+    if file_path.exists():
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
+
+def load_fundamental_csv(symbol, data_type):
+    """Load CSV data for a symbol from fundamental data directory"""
+    file_path = FUNDAMENTAL_DATA_DIR / data_type / f"{symbol}.csv"
+    if file_path.exists():
+        return pd.read_csv(file_path)
+    return None
+
+
+def calculate_fundamental_metrics(symbol):
+    """Calculate key metrics for a stock from fundamental data"""
+    metrics = {
+        "current_price": 0,
+        "price_change": 0,
+        "high_52w": 0,
+        "low_52w": 0,
+        "market_cap": 0,
+        "stock_pe": 0,
+        "book_value": 0,
+        "roce": 0,
+        "roe": 0,
+        "dividend_yield": 0,
+        "face_value": 10.0,
+        "eps": 0,
+        "sales": 0,
+        "net_profit": 0,
+    }
+
+    # Load price data
+    price_data = load_fundamental_csv(symbol, "price")
+    if price_data is not None and not price_data.empty:
+        price_df = price_data[price_data["metric"] == "Price"].copy()
+        if not price_df.empty:
+            price_df["value"] = pd.to_numeric(price_df["value"], errors="coerce")
+            latest_price = price_df.iloc[-1]["value"]
+            prev_price = price_df.iloc[-2]["value"] if len(price_df) > 1 else latest_price
+            metrics["current_price"] = latest_price
+            metrics["price_change"] = ((latest_price - prev_price) / prev_price * 100) if prev_price else 0
+            metrics["high_52w"] = price_df["value"].max()
+            metrics["low_52w"] = price_df["value"].min()
+
+    # Load P&L data
+    pnl_data = load_fundamental_json(symbol, "pnl")
+    if pnl_data:
+        dates = sorted(pnl_data.keys(), reverse=True)
+        if dates:
+            latest_data = pnl_data[dates[0]]
+            for item in latest_data:
+                for key, value in item.items():
+                    key_lower = key.lower()
+                    if "sales" in key_lower or "revenue" in key_lower:
+                        metrics["sales"] = value
+                    elif "netprofit" in key_lower.replace(" ", "") or "net profit" in key_lower:
+                        metrics["net_profit"] = value
+                    elif key == "EPS" or "eps" in key_lower:
+                        metrics["eps"] = value
+
+    # Load ratios
+    ratios_data = load_fundamental_json(symbol, "ratios")
+    if ratios_data:
+        dates = sorted(ratios_data.keys(), reverse=True)
+        if dates:
+            latest_ratios = ratios_data[dates[0]]
+            for item in latest_ratios:
+                for key, value in item.items():
+                    key_lower = key.lower()
+                    if "roce" in key_lower:
+                        if isinstance(value, (int, float)):
+                            metrics["roce"] = value / 100 if value > 1 else value
+                    elif "roe" in key_lower:
+                        if isinstance(value, (int, float)):
+                            metrics["roe"] = value / 100 if value > 1 else value
+
+    # Load balance sheet for book value and market cap
+    bs_data = load_fundamental_json(symbol, "balance_sheet")
+    if bs_data:
+        dates = sorted(bs_data.keys(), reverse=True)
+        if dates and len(dates) > 0:
+            latest_bs = bs_data[dates[0]]
+            equity = None
+            reserves = None
+
+            for item in latest_bs:
+                for key, value in item.items():
+                    key_lower = key.lower()
+                    if "equity" in key_lower and "capital" in key_lower:
+                        equity = value
+                    elif "reserve" in key_lower:
+                        reserves = value
+
+            if equity and isinstance(equity, (int, float)) and equity > 0:
+                shares_crores = equity / 10
+                metrics["shares_outstanding"] = shares_crores
+
+                if metrics["current_price"] and metrics["current_price"] > 0:
+                    metrics["market_cap"] = shares_crores * metrics["current_price"]
+
+                if reserves and isinstance(reserves, (int, float)):
+                    book_value = (equity + reserves) / shares_crores
+                    metrics["book_value"] = book_value
+
+            if metrics["current_price"] and metrics["current_price"] > 0 and metrics["eps"] and metrics["eps"] > 0:
+                metrics["stock_pe"] = metrics["current_price"] / metrics["eps"]
+
+    return metrics
+
+
+def get_available_fundamental_stocks():
+    """Get list of stocks that have fundamental data available"""
+    quarterly_dir = FUNDAMENTAL_DATA_DIR / "quarterly"
+    if quarterly_dir.exists():
+        return sorted([f.stem for f in quarterly_dir.glob("*.json")])
+    return []
 
 
 @stock_bp.route("/stock/<ticker>")
@@ -209,3 +312,80 @@ def api_stock_chart(ticker):
         return jsonify({"success": True, "data": chart_data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ==============================
+# 📊 Fundamental Analysis Page
+# ==============================
+@stock_bp.route("/stock/<ticker>/fundamental")
+def stock_fundamental(ticker):
+    """
+    Fundamental analysis page - displays financial data from Data_scraper
+    """
+    try:
+        # Load all fundamental data
+        quarterly = load_fundamental_json(ticker, "quarterly")
+        pnl = load_fundamental_json(ticker, "pnl")
+        balance_sheet = load_fundamental_json(ticker, "balance_sheet")
+        cashflow = load_fundamental_json(ticker, "cashflow")
+        ratios = load_fundamental_json(ticker, "ratios")
+        shareholding = load_fundamental_json(ticker, "shareholding")
+        price_data = load_fundamental_csv(ticker, "price")
+
+        # Calculate metrics
+        metrics = calculate_fundamental_metrics(ticker)
+
+        # Process price data for chart
+        chart_data = []
+        if price_data is not None and not price_data.empty:
+            price_df = price_data[price_data["metric"] == "Price"].copy()
+            price_df["value"] = pd.to_numeric(price_df["value"], errors="coerce")
+            chart_data = price_df[["date", "value"]].to_dict("records")
+
+        return render_template(
+            "fundamental.html",
+            symbol=ticker,
+            quarterly=quarterly,
+            pnl=pnl,
+            balance_sheet=balance_sheet,
+            cashflow=cashflow,
+            ratios=ratios,
+            shareholding=shareholding,
+            chart_data=chart_data,
+            metrics=metrics,
+            indices=get_live_indices(),
+            stock_list=get_filtered_tickers(),
+            available_stocks=get_available_fundamental_stocks(),
+        )
+    except Exception as e:
+        print(f"[ERROR] Fundamental page failed for {ticker}: {e}")
+        import traceback
+
+        traceback.print_exc()
+        return render_template(
+            "fundamental.html",
+            symbol=ticker,
+            quarterly=None,
+            pnl=None,
+            balance_sheet=None,
+            cashflow=None,
+            ratios=None,
+            shareholding=None,
+            chart_data=[],
+            metrics={
+                "current_price": 0,
+                "price_change": 0,
+                "high_52w": 0,
+                "low_52w": 0,
+                "market_cap": 0,
+                "stock_pe": 0,
+                "book_value": 0,
+                "roce": 0,
+                "roe": 0,
+                "dividend_yield": 0,
+                "face_value": 10.0,
+            },
+            indices=get_live_indices(),
+            stock_list=get_filtered_tickers(),
+            available_stocks=get_available_fundamental_stocks(),
+        )

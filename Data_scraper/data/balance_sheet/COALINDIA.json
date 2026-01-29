@@ -1,0 +1,418 @@
+{
+  "2014-03-01": [
+    {
+      "EquityCapital": 6316.0
+    },
+    {
+      "Reserves": 36088.0
+    },
+    {
+      "Borrowings ": 178.0
+    },
+    {
+      "OtherLiabilities ": 62356.0
+    },
+    {
+      "TotalLiabilities": 104938.0
+    },
+    {
+      "FixedAssets ": 14784.0
+    },
+    {
+      "CWIP": 4316.0
+    },
+    {
+      "Investments": 3775.0
+    },
+    {
+      "OtherAssets ": 82063.0
+    },
+    {
+      "TotalAssets": 104938.0
+    }
+  ],
+  "2015-03-01": [
+    {
+      "EquityCapital": 6316.0
+    },
+    {
+      "Reserves": 34037.0
+    },
+    {
+      "Borrowings ": 408.0
+    },
+    {
+      "OtherLiabilities ": 70505.0
+    },
+    {
+      "TotalLiabilities": 111267.0
+    },
+    {
+      "FixedAssets ": 16115.0
+    },
+    {
+      "CWIP": 5159.0
+    },
+    {
+      "Investments": 2813.0
+    },
+    {
+      "OtherAssets ": 87179.0
+    },
+    {
+      "TotalAssets": 111267.0
+    }
+  ],
+  "2016-03-01": [
+    {
+      "EquityCapital": 6316.0
+    },
+    {
+      "Reserves": 28517.0
+    },
+    {
+      "Borrowings ": 1199.0
+    },
+    {
+      "OtherLiabilities ": 77528.0
+    },
+    {
+      "TotalLiabilities": 113560.0
+    },
+    {
+      "FixedAssets ": 22082.0
+    },
+    {
+      "CWIP": 4553.0
+    },
+    {
+      "Investments": 2906.0
+    },
+    {
+      "OtherAssets ": 84018.0
+    },
+    {
+      "TotalAssets": 113560.0
+    }
+  ],
+  "2017-03-01": [
+    {
+      "EquityCapital": 6207.0
+    },
+    {
+      "Reserves": 18311.0
+    },
+    {
+      "Borrowings ": 3014.0
+    },
+    {
+      "OtherLiabilities ": 91054.0
+    },
+    {
+      "TotalLiabilities": 118587.0
+    },
+    {
+      "FixedAssets ": 23811.0
+    },
+    {
+      "CWIP": 8585.0
+    },
+    {
+      "Investments": 1483.0
+    },
+    {
+      "OtherAssets ": 84708.0
+    },
+    {
+      "TotalAssets": 118587.0
+    }
+  ],
+  "2018-03-01": [
+    {
+      "EquityCapital": 6207.0
+    },
+    {
+      "Reserves": 13971.0
+    },
+    {
+      "Borrowings ": 1538.0
+    },
+    {
+      "OtherLiabilities ": 103754.0
+    },
+    {
+      "TotalLiabilities": 125471.0
+    },
+    {
+      "FixedAssets ": 27574.0
+    },
+    {
+      "CWIP": 10273.0
+    },
+    {
+      "Investments": 1704.0
+    },
+    {
+      "OtherAssets ": 85920.0
+    },
+    {
+      "TotalAssets": 125471.0
+    }
+  ],
+  "2019-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 20292.0
+    },
+    {
+      "Borrowings ": 2210.0
+    },
+    {
+      "OtherLiabilities ": 104356.0
+    },
+    {
+      "TotalLiabilities": 133021.0
+    },
+    {
+      "FixedAssets ": 32618.0
+    },
+    {
+      "CWIP": 9658.0
+    },
+    {
+      "Investments": 3170.0
+    },
+    {
+      "OtherAssets ": 87576.0
+    },
+    {
+      "TotalAssets": 133021.0
+    }
+  ],
+  "2020-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 25994.0
+    },
+    {
+      "Borrowings ": 6434.0
+    },
+    {
+      "OtherLiabilities ": 111430.0
+    },
+    {
+      "TotalLiabilities": 150020.0
+    },
+    {
+      "FixedAssets ": 36784.0
+    },
+    {
+      "CWIP": 8328.0
+    },
+    {
+      "Investments": 1973.0
+    },
+    {
+      "OtherAssets ": 102936.0
+    },
+    {
+      "TotalAssets": 150020.0
+    }
+  ],
+  "2021-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 30355.0
+    },
+    {
+      "Borrowings ": 5884.0
+    },
+    {
+      "OtherLiabilities ": 118649.0
+    },
+    {
+      "TotalLiabilities": 161051.0
+    },
+    {
+      "FixedAssets ": 42405.0
+    },
+    {
+      "CWIP": 10490.0
+    },
+    {
+      "Investments": 5950.0
+    },
+    {
+      "OtherAssets ": 102206.0
+    },
+    {
+      "TotalAssets": 161051.0
+    }
+  ],
+  "2022-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 36980.0
+    },
+    {
+      "Borrowings ": 3514.0
+    },
+    {
+      "OtherLiabilities ": 132780.0
+    },
+    {
+      "TotalLiabilities": 179436.0
+    },
+    {
+      "FixedAssets ": 46677.0
+    },
+    {
+      "CWIP": 12897.0
+    },
+    {
+      "Investments": 8921.0
+    },
+    {
+      "OtherAssets ": 110942.0
+    },
+    {
+      "TotalAssets": 179436.0
+    }
+  ],
+  "2023-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 54680.0
+    },
+    {
+      "Borrowings ": 4331.0
+    },
+    {
+      "OtherLiabilities ": 156222.0
+    },
+    {
+      "TotalLiabilities": 221396.0
+    },
+    {
+      "FixedAssets ": 64547.0
+    },
+    {
+      "CWIP": 17622.0
+    },
+    {
+      "Investments": 7139.0
+    },
+    {
+      "OtherAssets ": 132087.0
+    },
+    {
+      "TotalAssets": 221396.0
+    }
+  ],
+  "2024-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 76567.0
+    },
+    {
+      "Borrowings ": 6523.0
+    },
+    {
+      "OtherLiabilities ": 147217.0
+    },
+    {
+      "TotalLiabilities": 236470.0
+    },
+    {
+      "FixedAssets ": 75668.0
+    },
+    {
+      "CWIP": 18960.0
+    },
+    {
+      "Investments": 7110.0
+    },
+    {
+      "OtherAssets ": 134731.0
+    },
+    {
+      "TotalAssets": 236470.0
+    }
+  ],
+  "2025-03-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 92942.0
+    },
+    {
+      "Borrowings ": 9146.0
+    },
+    {
+      "OtherLiabilities ": 150735.0
+    },
+    {
+      "TotalLiabilities": 258985.0
+    },
+    {
+      "FixedAssets ": 82865.0
+    },
+    {
+      "CWIP": 22385.0
+    },
+    {
+      "Investments": 7591.0
+    },
+    {
+      "OtherAssets ": 146144.0
+    },
+    {
+      "TotalAssets": 258985.0
+    }
+  ],
+  "2025-09-01": [
+    {
+      "EquityCapital": 6163.0
+    },
+    {
+      "Reserves": 99200.0
+    },
+    {
+      "Borrowings ": 13786.0
+    },
+    {
+      "OtherLiabilities ": 146468.0
+    },
+    {
+      "TotalLiabilities": 265618.0
+    },
+    {
+      "FixedAssets ": 87065.0
+    },
+    {
+      "CWIP": 17238.0
+    },
+    {
+      "Investments": 9556.0
+    },
+    {
+      "OtherAssets ": 151759.0
+    },
+    {
+      "TotalAssets": 265618.0
+    }
+  ]
+}

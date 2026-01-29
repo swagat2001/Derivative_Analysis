@@ -47,6 +47,52 @@ engine_cash = create_engine(
 )
 
 # =============================================================
+# DATABASE TABLE LIST HELPER
+# =============================================================
+
+_table_list_cache = []
+_table_list_cache_time = None
+TABLE_LIST_CACHE_TTL = 300  # Cache for 5 minutes
+
+
+def get_table_list():
+    """
+    Get list of all tables in the F&O database.
+    Results are cached for 5 minutes to avoid repeated queries.
+    """
+    global _table_list_cache, _table_list_cache_time
+    import time
+
+    from sqlalchemy import text
+
+    current_time = time.time()
+
+    # Check if cache is valid
+    if _table_list_cache_time is None or current_time - _table_list_cache_time > TABLE_LIST_CACHE_TTL:
+        try:
+            with engine.connect() as conn:
+                result = conn.execute(
+                    text(
+                        """
+                    SELECT table_name
+                    FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                    ORDER BY table_name
+                """
+                    )
+                )
+                _table_list_cache = [row[0] for row in result.fetchall()]
+                _table_list_cache_time = current_time
+                print(f"[INFO] Loaded {len(_table_list_cache)} tables from database")
+        except Exception as e:
+            print(f"[WARNING] Could not load table list: {e}")
+            if not _table_list_cache:
+                return []
+
+    return _table_list_cache.copy()
+
+
+# =============================================================
 # CACHED EXCEL FILE READER
 # =============================================================
 

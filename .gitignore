@@ -191,3 +191,7 @@ temp/
 
 # Keep templates
 !.env.template
+
+# Large data files (exceeds pre-commit 1000KB limit)
+Data_scraper/data/corporate_announcements/
+Data_scraper/data/market_announcements/

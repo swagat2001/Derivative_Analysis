@@ -1,0 +1,62 @@
+{
+  "2011-12-01": [
+    {
+      "DebtorDays": 152.0
+    },
+    {
+      "InventoryDays": 69.0
+    },
+    {
+      "DaysPayable": 146.0
+    },
+    {
+      "CashConversionCycle": 75.0
+    },
+    {
+      "WorkingCapitalDays": 39.0
+    },
+    {
+      "ROCE%": 0.0
+    }
+  ],
+  "2012-12-01": [
+    {
+      "DebtorDays": 157.0
+    },
+    {
+      "InventoryDays": 68.0
+    },
+    {
+      "DaysPayable": 141.0
+    },
+    {
+      "CashConversionCycle": 84.0
+    },
+    {
+      "WorkingCapitalDays": 43.0
+    },
+    {
+      "ROCE%": 0.1
+    }
+  ],
+  "2024-12-01": [
+    {
+      "DebtorDays": 0.0
+    },
+    {
+      "InventoryDays": 0.0
+    },
+    {
+      "DaysPayable": 0.0
+    },
+    {
+      "CashConversionCycle": 0.0
+    },
+    {
+      "WorkingCapitalDays": 0.0
+    },
+    {
+      "ROCE%": 0.0
+    }
+  ]
+}

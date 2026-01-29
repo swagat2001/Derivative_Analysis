@@ -22,6 +22,7 @@ from .controllers.screener.technical_screener.controller import technical_screen
 from .controllers.screener.top_gainers_losers.controller import cache as gainers_cache
 from .controllers.screener.top_gainers_losers.controller import gainers_losers_bp
 from .controllers.stock_controller import stock_bp
+from .controllers.voice_api_controller import voice_api_bp
 from .health_check import health_bp
 
 
@@ -60,6 +61,7 @@ def create_app():
     app.register_blueprint(futures_oi_bp)  # Futures OI at /screener/futures-oi
     app.register_blueprint(technical_screener_bp)  # Technical at /screener/technical
     app.register_blueprint(index_screener_bp)  # Index screeners at /screener/index/
+    app.register_blueprint(voice_api_bp)  # Voice API at /api/voice/
 
     # Add custom Jinja2 filter for expiry date formatting
     def format_expiry_date(date_str):
