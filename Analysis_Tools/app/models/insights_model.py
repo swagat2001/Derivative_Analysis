@@ -210,7 +210,7 @@ def classify_industry(industry: str) -> str:
 
 def _load_sector_master():
     """Load sector data from nse_sector_master.csv file."""
-    global _sector_cache, _sector_cache_loaded
+    global _sector_cache_loaded
 
     if _sector_cache_loaded:
         return

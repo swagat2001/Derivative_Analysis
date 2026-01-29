@@ -61,8 +61,6 @@ def scanner_page():
 @signal_scanner_bp.route("/api/scan")
 def api_scan():
     """Run the scanner and return results."""
-    global _scanner_results_cache
-
     start_date = request.args.get("start_date")
     days_back = int(request.args.get("days_back", 30))
 
@@ -109,8 +107,6 @@ def api_scan():
 @signal_scanner_bp.route("/api/filter")
 def api_filter():
     """Filter existing scanner results without re-running."""
-    global _scanner_results_cache
-
     if "signals" not in _scanner_results_cache:
         return jsonify({"success": False, "error": "Run scanner first"}), 400
 
@@ -153,8 +149,6 @@ def api_dates():
 @signal_scanner_bp.route("/api/symbols")
 def api_symbols():
     """Get unique symbols from scanner results."""
-    global _scanner_results_cache
-
     if "signals" not in _scanner_results_cache:
         return jsonify({"success": True, "symbols": []})
 
