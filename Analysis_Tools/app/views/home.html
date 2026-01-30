@@ -217,42 +217,74 @@
 
     <div class="features-grid">
       <a href="{{ url_for('screener.screener_landing') }}" class="feature-card">
-        <div class="feature-icon">🔍</div>
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </div>
         <h3>50+ Readymade Screeners</h3>
         <p>Fundamental, Technical, Intraday & Derivative screeners built by experts. Filter stocks with razor-sharp efficiency.</p>
         <span class="feature-link">Explore Screeners →</span>
       </a>
 
       <a href="{{ url_for('dashboard.dashboard') }}" class="feature-card">
-        <div class="feature-icon">📈</div>
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
         <h3>Derivatives Dashboard</h3>
         <p>Complete options analysis with Delta, Vega, OI tracking. Monitor Call & Put activity across all strikes.</p>
         <span class="feature-link">Open Dashboard →</span>
       </a>
 
       <a href="{{ url_for('insights.insights_page') }}" class="feature-card">
-        <div class="feature-icon">🗺️</div>
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </div>
         <h3>Market Insights</h3>
         <p>Heatmaps, FII/DII activity, delivery data, 52-week analysis & volume breakouts in one place.</p>
         <span class="feature-link">View Insights →</span>
       </a>
 
       <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="feature-card">
-        <div class="feature-icon">📊</div>
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="20" x2="12" y2="10"/>
+            <line x1="18" y1="20" x2="18" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+        </div>
         <h3>Top Gainers & Losers</h3>
         <p>40 categories of market movers - OI, IV, Moneyness analysis for Calls, Puts & Futures in real-time.</p>
         <span class="feature-link">See Rankings →</span>
       </a>
 
       <a href="{{ url_for('signal_analysis.signal_analysis') }}" class="feature-card">
-        <div class="feature-icon">🎯</div>
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="6"/>
+            <circle cx="12" cy="12" r="2"/>
+          </svg>
+        </div>
         <h3>Signal Analysis</h3>
         <p>Advanced bullish/bearish classification with multi-factor scoring. AI-powered trade signals.</p>
         <span class="feature-link">Check Signals →</span>
       </a>
 
       <a href="{{ url_for('technical_screener.technical_screener') }}" class="feature-card">
-        <div class="feature-icon">⚡</div>
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
         <h3>Technical Indicators</h3>
         <p>RSI, MACD, SMA crossovers, ADX trends. Interactive heatmaps for quick technical analysis.</p>
         <span class="feature-link">Analyze Now →</span>
@@ -280,10 +312,34 @@
           <h3>Fundamental Screeners</h3>
           <p>For traders and investors who want to look at cold hard facts about a company's financial health. Screen stocks based on EPS, P/E, Working Capital, and more for better stock picking.</p>
           <ul class="screener-list">
-            <li>📌 Nifty 50 Analysis</li>
-            <li>📌 Bank Nifty Constituents</li>
-            <li>📌 High OI Buildup Stocks</li>
-            <li>📌 IV Spike Alerts</li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Nifty 50 Analysis
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Bank Nifty Constituents
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              High OI Buildup Stocks
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              IV Spike Alerts
+            </li>
           </ul>
           <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View All Screeners</a>
         </div>
@@ -323,10 +379,34 @@
           <h3>Technical Screeners</h3>
           <p>Built to help you capture stocks when they trend towards specific price points and zones. Ideal for traders who want to identify Crossovers, Breakouts, and momentum shifts.</p>
           <ul class="screener-list">
-            <li>📌 Golden Crossover (50/200 SMA)</li>
-            <li>📌 RSI Overbought/Oversold</li>
-            <li>📌 MACD Signal Crossover</li>
-            <li>📌 Strong ADX Trending</li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Golden Crossover (50/200 SMA)
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              RSI Overbought/Oversold
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              MACD Signal Crossover
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Strong ADX Trending
+            </li>
           </ul>
           <a href="{{ url_for('technical_screener.technical_screener') }}" class="btn-outline">View Technical Screeners</a>
         </div>
@@ -356,10 +436,34 @@
           <h3>Intraday Screeners</h3>
           <p>Move quickly between 9:15 to 3:30 with day trading screeners. Choose from High Volume Stocks, Intraday Recovery, Gap Up/Down, and more.</p>
           <ul class="screener-list">
-            <li>📌 Price Gainers Today</li>
-            <li>📌 Price Losers Today</li>
-            <li>📌 High Volume Alerts</li>
-            <li>📌 Breakout Scanner</li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Price Gainers Today
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Price Losers Today
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              High Volume Alerts
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Breakout Scanner
+            </li>
           </ul>
           <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View Intraday Screeners</a>
         </div>
@@ -390,10 +494,34 @@
           <h3>Derivative Screeners</h3>
           <p>Advanced F&O analysis with OI buildup, IV tracking, and options flow. Perfect for options traders looking for edge in the market.</p>
           <ul class="screener-list">
-            <li>📌 Top Gainers & Losers (40 Tables)</li>
-            <li>📌 Signal Analysis</li>
-            <li>📌 Futures OI Analysis</li>
-            <li>📌 Options Chain Insights</li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Top Gainers & Losers (40 Tables)
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Signal Analysis
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Futures OI Analysis
+            </li>
+            <li>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Options Chain Insights
+            </li>
           </ul>
           <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="btn-outline">View Derivative Screeners</a>
         </div>
@@ -516,7 +644,13 @@
     <div class="footer-content">
       <div class="footer-brand">
         <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine" class="footer-logo">
-        <h4>📍 Registered Office:</h4>
+        <h4>
+          <svg class="footer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Registered Office:
+        </h4>
         <p>
             Unit no. 111–111, 11th Floor,<br>
             Block no. 53-E, Dalal Street Building (BSE Tower),<br>

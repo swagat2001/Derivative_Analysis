@@ -48,35 +48,69 @@
             <!-- Main Categories -->
             <a href="{{ url_for('news.news_page', category='top') }}"
                class="category-tab {% if selected_category == 'top' %}active{% endif %}">
-                <span class="cat-icon">🔥</span> Top Stories
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                </svg>
+                Top Stories
             </a>
             <a href="{{ url_for('news.news_page', category='market') }}"
                class="category-tab {% if selected_category == 'market' %}active{% endif %}">
-                <span class="cat-icon">📈</span> Markets
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                    <polyline points="16 7 22 7 22 13"/>
+                </svg>
+                Markets
             </a>
             <a href="{{ url_for('news.news_page', category='corporate') }}"
                class="category-tab {% if selected_category == 'corporate' %}active{% endif %}">
-                <span class="cat-icon">🏢</span> Corporate
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18"/>
+                    <path d="M9 21V9"/>
+                </svg>
+                Corporate
             </a>
             <a href="{{ url_for('news.news_page', category='earnings') }}"
                class="category-tab {% if selected_category == 'earnings' %}active{% endif %}">
-                <span class="cat-icon">📊</span> Earnings
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"/>
+                    <line x1="18" y1="20" x2="18" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="16"/>
+                </svg>
+                Earnings
             </a>
             <a href="{{ url_for('news.news_page', category='ipo') }}"
                class="category-tab {% if selected_category == 'ipo' %}active{% endif %}">
-                <span class="cat-icon">🎯</span> IPO
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                </svg>
+                IPO
             </a>
             <a href="{{ url_for('news.news_page', category='fii') }}"
                class="category-tab {% if selected_category == 'fii' %}active{% endif %}">
-                <span class="cat-icon">💹</span> FII/DII
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                </svg>
+                FII/DII
             </a>
             <a href="{{ url_for('news.news_page', category='policy') }}"
                class="category-tab {% if selected_category == 'policy' %}active{% endif %}">
-                <span class="cat-icon">🏛️</span> Policy
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Policy
             </a>
             <a href="{{ url_for('news.news_page', category='economy') }}"
                class="category-tab {% if selected_category == 'economy' %}active{% endif %}">
-                <span class="cat-icon">💰</span> Economy
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                Economy
             </a>
 
             <span class="category-divider"></span>
@@ -84,35 +118,75 @@
             <!-- Sector Categories -->
             <a href="{{ url_for('news.news_page', category='banking') }}"
                class="category-tab {% if selected_category == 'banking' %}active{% endif %}">
-                <span class="cat-icon">🏦</span> Banking
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="22" x2="21" y2="22"/>
+                    <path d="M6 18V11"/>
+                    <path d="M10 18V11"/>
+                    <path d="M14 18V11"/>
+                    <path d="M18 18V11"/>
+                    <polygon points="12 2 20 7 4 7"/>
+                </svg>
+                Banking
             </a>
             <a href="{{ url_for('news.news_page', category='it') }}"
                class="category-tab {% if selected_category == 'it' %}active{% endif %}">
-                <span class="cat-icon">💻</span> IT
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                IT
             </a>
             <a href="{{ url_for('news.news_page', category='pharma') }}"
                class="category-tab {% if selected_category == 'pharma' %}active{% endif %}">
-                <span class="cat-icon">💊</span> Pharma
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                    <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                </svg>
+                Pharma
             </a>
             <a href="{{ url_for('news.news_page', category='auto') }}"
                class="category-tab {% if selected_category == 'auto' %}active{% endif %}">
-                <span class="cat-icon">🚗</span> Auto
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/>
+                    <circle cx="6.5" cy="16.5" r="2.5"/>
+                    <circle cx="16.5" cy="16.5" r="2.5"/>
+                </svg>
+                Auto
             </a>
             <a href="{{ url_for('news.news_page', category='energy') }}"
                class="category-tab {% if selected_category == 'energy' %}active{% endif %}">
-                <span class="cat-icon">⛽</span> Energy
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                Energy
             </a>
             <a href="{{ url_for('news.news_page', category='metals') }}"
                class="category-tab {% if selected_category == 'metals' %}active{% endif %}">
-                <span class="cat-icon">🔩</span> Metals
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6m5.2-14.2L13.5 8.5m-3 3L7 15m14.2-1.8L17.5 9.5m-3-3L11 10m7 7.2l-3.7-3.7m-3-3L7.8 6.8m8.4 10.4l-3.7-3.7m-3-3L6.8 7.8"/>
+                </svg>
+                Metals
             </a>
             <a href="{{ url_for('news.news_page', category='realty') }}"
                class="category-tab {% if selected_category == 'realty' %}active{% endif %}">
-                <span class="cat-icon">🏠</span> Realty
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Realty
             </a>
             <a href="{{ url_for('news.news_page', category='fmcg') }}"
                class="category-tab {% if selected_category == 'fmcg' %}active{% endif %}">
-                <span class="cat-icon">🛒</span> FMCG
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                FMCG
             </a>
 
             <span class="category-divider"></span>
@@ -120,23 +194,47 @@
             <!-- Other Categories -->
             <a href="{{ url_for('news.news_page', category='global') }}"
                class="category-tab {% if selected_category == 'global' %}active{% endif %}">
-                <span class="cat-icon">🌍</span> Global
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Global
             </a>
             <a href="{{ url_for('news.news_page', category='commodities') }}"
                class="category-tab {% if selected_category == 'commodities' %}active{% endif %}">
-                <span class="cat-icon">🥇</span> Commodities
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                    <path d="M4 22h16"/>
+                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+                </svg>
+                Commodities
             </a>
             <a href="{{ url_for('news.news_page', category='forex') }}"
                class="category-tab {% if selected_category == 'forex' %}active{% endif %}">
-                <span class="cat-icon">💱</span> Forex
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Forex
             </a>
             <a href="{{ url_for('news.news_page', category='crypto') }}"
                class="category-tab {% if selected_category == 'crypto' %}active{% endif %}">
-                <span class="cat-icon">₿</span> Crypto
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 4.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/>
+                </svg>
+                Crypto
             </a>
             <a href="{{ url_for('news.news_page', category='mf') }}"
                class="category-tab {% if selected_category == 'mf' %}active{% endif %}">
-                <span class="cat-icon">📁</span> Mutual Funds
+                <svg class="cat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                Mutual Funds
             </a>
         </div>
     </div>

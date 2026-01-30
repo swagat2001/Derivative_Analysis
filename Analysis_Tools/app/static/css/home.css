@@ -611,8 +611,24 @@
 }
 
 .feature-icon {
-  font-size: 40px;
+  width: 40px;
+  height: 40px;
   margin-bottom: 16px;
+  color: var(--goldmine-maroon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: currentColor;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon svg {
+  transform: scale(1.1);
 }
 
 .feature-card h3 {
@@ -730,6 +746,15 @@
   padding: 8px 0;
   font-size: 14px;
   color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-icon {
+  flex-shrink: 0;
+  color: var(--goldmine-maroon);
+  stroke: currentColor;
 }
 
 .tab-visual {
@@ -1169,6 +1194,14 @@
   margin-bottom: 15px;
   border-top: 1px solid #3c3c3c;
   padding-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-icon {
+  flex-shrink: 0;
+  stroke: currentColor;
 }
 .footer-brand p {
   font-size: 14px;

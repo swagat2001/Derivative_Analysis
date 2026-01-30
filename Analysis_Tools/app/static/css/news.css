@@ -156,7 +156,18 @@
 }
 
 .cat-icon {
-    font-size: 15px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.category-tab:hover .cat-icon {
+    transform: scale(1.1);
+}
+
+.category-tab.active .cat-icon {
+    stroke: currentColor;
 }
 
 .category-divider {
@@ -522,7 +533,8 @@
     }
 
     .cat-icon {
-        font-size: 13px;
+        width: 14px;
+        height: 14px;
     }
 
     .category-divider {
