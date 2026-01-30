@@ -1351,11 +1351,30 @@
     }
 
     function formatNumber(num) {
-        if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
-        if (num >= 1e7) return (num / 1e7).toFixed(1) + 'Cr';
-        if (num >= 1e5) return (num / 1e5).toFixed(1) + 'L';
-        if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K';
-        return num.toLocaleString();
+        // Handle null, undefined, or non-numeric values
+        if (num === null || num === undefined || isNaN(num)) return '0';
+
+        // Convert to number if it's a string
+        const numValue = typeof num === 'string' ? parseFloat(num.replace(/[^0-9.-]/g, '')) : num;
+
+        // Handle NaN after conversion
+        if (isNaN(numValue)) return '0';
+
+        const absNum = Math.abs(numValue);
+        const sign = numValue < 0 ? '-' : '';
+
+        // Format large numbers consistently in Crores
+        if (absNum >= 1e7) {
+            return sign + (absNum / 1e7).toFixed(2) + 'Cr';
+        }
+        if (absNum >= 1e5) {
+            return sign + (absNum / 1e5).toFixed(2) + 'L';
+        }
+        if (absNum >= 1e3) {
+            return sign + (absNum / 1e3).toFixed(0) + 'K';
+        }
+
+        return sign + absNum.toLocaleString('en-IN');
     }
 
     function formatPrice(price) { return '₹' + parseFloat(price).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -1685,9 +1704,29 @@
         try {
             const response = await fetch(`/insights/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${currentIndex}`);
             const data = await response.json();
-            if (!data.success || !data.data.length) { container.innerHTML = '<div class="empty-state"><p>No delivery data</p></div>'; return; }
+
+            if (!data.success) {
+                container.innerHTML = '<div class="empty-state"><h3>❌ Error Loading Delivery Data</h3><p>Unable to load delivery data. Please try again.</p></div>';
+                return;
+            }
+
+            if (!data.data || data.data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📦 No Delivery Data Available</h3>
+                        <p>Delivery percentage data is not available for ${currentDate}.</p>
+                        <p style="color: #6b7280; margin-top: 12px; font-size: 14px;">This data comes from the cash market database and may not be available for all dates.</p>
+                        <p style="color: #6b7280; font-size: 14px;">Try selecting a different date or check if the cash database has been updated.</p>
+                    </div>
+                `;
+                return;
+            }
+
             container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat"><span class="stat-value">${data.summary.total_stocks}</span><span class="stat-label">Total</span></div><div class="summary-stat"><span class="stat-value">${data.summary.avg_delivery_pct}%</span><span class="stat-label">Avg Delivery</span></div><div class="summary-stat advances"><span class="stat-value">${data.summary.high_delivery_count}</span><span class="stat-label">High Delivery</span></div></div><div class="delivery-grid">${data.data.map(s => `<div class="delivery-card"><div class="delivery-info"><a href="/stock/${s.symbol}" target="_blank" class="delivery-symbol">${s.symbol}</a><span class="delivery-sector">${s.sector}</span><span class="delivery-price">₹${s.close.toLocaleString()}</span></div><div class="delivery-pct"><span class="pct-value">${s.delivery_pct.toFixed(1)}%</span><span class="pct-label">Delivery</span></div></div>`).join('')}</div>`;
-        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+        } catch (e) {
+            console.error('Error loading delivery data:', e);
+            container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load delivery data. Please check the console for details.</p></div>';
+        }
     }
 
     async function load52Week() {

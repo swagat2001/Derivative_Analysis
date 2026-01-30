@@ -225,9 +225,9 @@ def api_fii_dii():
 
     fii_dii_data = get_fii_dii_data(start_date, end_date)
 
-    # Calculate summary
-    total_ce_change = sum(d["ce_oi_change"] for d in fii_dii_data)
-    total_pe_change = sum(d["pe_oi_change"] for d in fii_dii_data)
+    # Calculate summary - ensure all values are integers
+    total_ce_change = int(sum(d["ce_oi_change"] for d in fii_dii_data))
+    total_pe_change = int(sum(d["pe_oi_change"] for d in fii_dii_data))
     net_total = total_pe_change - total_ce_change
 
     return jsonify(
@@ -259,9 +259,30 @@ def api_delivery():
         selected_date = dates[0] if dates else None
 
     if not selected_date:
-        return jsonify({"error": "No data available"}), 404
+        return (
+            jsonify({"success": False, "error": "No data available", "message": "No dates available in database"}),
+            404,
+        )
+
+    print(f"[API] Fetching delivery data for {selected_date}, min_pct={min_pct}, index={selected_index}")
 
     delivery_data = get_delivery_data(selected_date, min_pct)
+
+    if not delivery_data:
+        print(f"[API] No delivery data returned for {selected_date}")
+        return jsonify(
+            {
+                "success": True,
+                "date": selected_date,
+                "data": [],
+                "summary": {
+                    "total_stocks": 0,
+                    "avg_delivery_pct": 0,
+                    "high_delivery_count": 0,
+                },
+                "message": "No delivery data available for this date. The cash database may not have data for this date.",
+            }
+        )
 
     # Filter by index
     delivery_data = filter_stocks_by_index(delivery_data, selected_index)
@@ -279,6 +300,8 @@ def api_delivery():
     else:
         avg_delivery = 0
         high_delivery = 0
+
+    print(f"[API] Returning {len(delivery_data)} stocks with delivery data")
 
     return jsonify(
         {
