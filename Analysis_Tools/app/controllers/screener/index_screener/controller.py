@@ -11,7 +11,7 @@ from flask import Blueprint, jsonify, render_template, request
 from flask_caching import Cache
 
 from ....controllers.dashboard_controller import get_live_indices
-from ....models.index_constituents_model import get_banknifty_stocks_with_data, get_nifty50_stocks_with_data
+from ....models.index_model import get_banknifty_stocks_with_data, get_nifty50_stocks_with_data
 from ....models.stock_model import get_filtered_tickers
 
 # Import from centralized signal service (SINGLE SOURCE OF TRUTH)

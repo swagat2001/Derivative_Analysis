@@ -15,7 +15,13 @@ from flask import Blueprint, jsonify, render_template, request
 from flask_caching import Cache
 
 from ...controllers.dashboard_controller import get_live_indices
-from ...models.index_config import filter_stocks_by_index, get_dynamic_indices, get_index_info, get_index_list
+from ...models.index_model import (
+    filter_stocks_by_index,
+    get_dynamic_indices,
+    get_index_info,
+    get_index_list,
+    get_index_stocks,
+)
 from ...models.insights_model import (
     clear_insights_cache,
     get_52_week_analysis,
@@ -328,8 +334,6 @@ def api_52_week():
 
     # Filter by index if needed
     if selected_index != "all":
-        from ...models.index_config import get_index_stocks
-
         index_stocks = get_index_stocks(selected_index)
         if index_stocks:
             index_stocks_upper = set(s.upper() for s in index_stocks)

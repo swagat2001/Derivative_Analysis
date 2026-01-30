@@ -1,9 +1,12 @@
 """
 MASTER SCRIPT - Complete BhavCopy Data Pipeline
-This script performs all 3 steps:
+This script performs all steps:
 1. Download CSV from NSE
 2. Upload to PostgreSQL database
 3. Calculate Greeks and create DERIVED tables
+4. Pre-calculate screener cache data
+5. Pre-calculate dashboard data
+6. Fetch index constituents from NSE (for instant web app loading)
 """
 
 import os
@@ -687,6 +690,22 @@ def main():
             print("\n⚠️ precalculate_data module not found. Skipping Step 5.")
         except Exception as e:
             print(f"\n⚠️ Dashboard data error: {e}")
+            print("   Continuing with pipeline...")
+
+        # Step 6: Fetch Index Constituents (for instant loading in web app)
+        try:
+            import index_constituents_cache
+
+            fetch_index_constituents = index_constituents_cache.fetch_index_constituents_cache
+            print("\n" + "=" * 80)
+            print("STEP 6: FETCHING INDEX CONSTITUENTS FROM NSE")
+            print("=" * 80 + "\n")
+            fetch_index_constituents()
+            print("✓ Index constituents cache updated")
+        except ImportError:
+            print("\n⚠️ index_constituents_cache module not found. Skipping Step 6.")
+        except Exception as e:
+            print(f"\n⚠️ Index constituents error: {e}")
             print("   Continuing with pipeline...")
 
         print("\n" + "=" * 80)
