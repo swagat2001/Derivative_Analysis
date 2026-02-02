@@ -106,8 +106,7 @@ def download_csv_data():
 
     for i in range(delta_days + 1):
         d = start_date + timedelta(days=i)
-        if d.weekday() < 5:
-            date_range.append(d)
+        date_range.append(d)
 
     if not date_range:
         print("✅ No new weekday dates to download.")
