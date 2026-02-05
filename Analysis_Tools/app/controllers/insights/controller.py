@@ -26,10 +26,13 @@ from ...models.insights_model import (
     clear_insights_cache,
     get_52_week_analysis,
     get_delivery_data,
+    get_enhanced_heatmap_data,
+    get_fii_derivatives_data,
     get_fii_dii_data,
     get_heatmap_data,
     get_insights_dates,
     get_market_stats,
+    get_nifty50_data,
     get_sector_performance,
     get_volume_breakouts,
 )
@@ -92,6 +95,7 @@ def api_heatmap():
     """API endpoint for heatmap data with index filtering."""
     selected_date = request.args.get("date")
     comparison_date = request.args.get("compare_date")
+    period = request.args.get("period", "1D")
     sort_by = request.args.get("sort", "change")
     selected_index = request.args.get("index", "all")
 
@@ -103,7 +107,8 @@ def api_heatmap():
         return jsonify({"error": "No data available"}), 404
 
     # Get ALL heatmap data first
-    all_heatmap_data = get_heatmap_data(selected_date, comparison_date)
+    # Pass period to the model
+    all_heatmap_data = get_heatmap_data(selected_date, period=period, comparison_date=comparison_date)
 
     # Build dynamic index list
     available_symbols = [s["symbol"] for s in all_heatmap_data]
@@ -207,9 +212,18 @@ def api_indices():
 
 @insights_bp.route("/api/fii-dii")
 def api_fii_dii():
-    """API endpoint for FII/DII data."""
+    """
+    API endpoint for FII/DII institutional activity data.
+
+    Supports time period filters:
+    - period: daily (default), weekly, monthly, yearly
+    - days: number of days to fetch (for daily period)
+    - start_date / end_date: custom date range
+    """
     end_date = request.args.get("end_date")
     days = int(request.args.get("days", 30))
+    period = request.args.get("period", "daily")  # daily, weekly, monthly, yearly
+    custom_start = request.args.get("start_date")  # For custom range
 
     if not end_date:
         dates = get_insights_dates()
@@ -218,32 +232,246 @@ def api_fii_dii():
     if not end_date:
         return jsonify({"error": "No data available"}), 404
 
-    # Calculate start date
+    # Calculate start date based on period or custom range
     end_dt = datetime.strptime(end_date, "%Y-%m-%d")
-    start_dt = end_dt - timedelta(days=days)
-    start_date = start_dt.strftime("%Y-%m-%d")
+
+    if custom_start:
+        start_date = custom_start
+    elif period == "yearly":
+        start_dt = end_dt - timedelta(days=365)
+        start_date = start_dt.strftime("%Y-%m-%d")
+    elif period == "monthly":
+        start_dt = end_dt - timedelta(days=90)  # ~3 months of data
+        start_date = start_dt.strftime("%Y-%m-%d")
+    elif period == "weekly":
+        start_dt = end_dt - timedelta(days=60)  # ~2 months of weekly data
+        start_date = start_dt.strftime("%Y-%m-%d")
+    else:
+        start_dt = end_dt - timedelta(days=days)
+        start_date = start_dt.strftime("%Y-%m-%d")
 
     fii_dii_data = get_fii_dii_data(start_date, end_date)
 
-    # Calculate summary - ensure all values are integers
-    total_ce_change = int(sum(d["ce_oi_change"] for d in fii_dii_data))
-    total_pe_change = int(sum(d["pe_oi_change"] for d in fii_dii_data))
-    net_total = total_pe_change - total_ce_change
+    # Fetch derivatives data
+    derivatives_data = get_fii_derivatives_data(start_date, end_date)
+
+    # Fetch Nifty 50 index data for overlay
+    nifty50_data = get_nifty50_data(start_date, end_date)
+
+    # Check if we have real FII/DII data OR Derivatives Data
+    if not fii_dii_data and not derivatives_data:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": "No FII/DII data available",
+                    "message": "FII/DII data table is empty. Please run: python fii_dii_update_database.py",
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "period": period,
+                    "data": [],
+                    "derivatives": {},
+                    "nifty50": {},
+                    "summary": {
+                        "total_fii_net": 0,
+                        "total_dii_net": 0,
+                        "combined_net": 0,
+                        "overall_sentiment": "No Data",
+                    },
+                }
+            ),
+            200,
+        )
+
+    # Aggregate data based on period
+    aggregated_data = _aggregate_fii_dii_data(fii_dii_data, period)
+    aggregated_derivatives = _aggregate_derivatives_data(derivatives_data, period)
+    aggregated_nifty = _aggregate_nifty_data(nifty50_data, period)
+
+    # Calculate summary from aggregated data
+    total_fii_buy = sum(d["fii_buy_value"] for d in aggregated_data)
+    total_fii_sell = sum(d["fii_sell_value"] for d in aggregated_data)
+    total_fii_net = sum(d["fii_net_value"] for d in aggregated_data)
+    total_dii_buy = sum(d["dii_buy_value"] for d in aggregated_data)
+    total_dii_sell = sum(d["dii_sell_value"] for d in aggregated_data)
+    total_dii_net = sum(d["dii_net_value"] for d in aggregated_data)
+    combined_net = total_fii_net + total_dii_net
+
+    # Determine overall sentiment
+    if combined_net > 500:
+        sentiment = "Bullish"
+    elif combined_net < -500:
+        sentiment = "Bearish"
+    else:
+        sentiment = "Neutral"
 
     return jsonify(
         {
             "success": True,
             "start_date": start_date,
             "end_date": end_date,
-            "data": fii_dii_data,
+            "period": period,
+            "data": aggregated_data,
+            "derivatives": aggregated_derivatives,
+            "nifty50": aggregated_nifty,
             "summary": {
-                "total_ce_oi_change": total_ce_change,
-                "total_pe_oi_change": total_pe_change,
-                "net_index_oi": net_total,
-                "overall_sentiment": "Bullish" if net_total > 0 else "Bearish" if net_total < 0 else "Neutral",
+                "total_fii_buy": round(total_fii_buy, 2),
+                "total_fii_sell": round(total_fii_sell, 2),
+                "total_fii_net": round(total_fii_net, 2),
+                "total_dii_buy": round(total_dii_buy, 2),
+                "total_dii_sell": round(total_dii_sell, 2),
+                "total_dii_net": round(total_dii_net, 2),
+                "combined_net": round(combined_net, 2),
+                "overall_sentiment": sentiment,
+                "days_count": len(fii_dii_data),
+                "periods_count": len(aggregated_data),
             },
         }
     )
+
+
+def _aggregate_fii_dii_data(data, period):
+    """Aggregate FII/DII data based on time period."""
+    if period == "daily" or not data:
+        return data
+
+    import pandas as pd
+
+    df = pd.DataFrame(data)
+    df["date"] = pd.to_datetime(df["date"])
+
+    if period == "weekly":
+        df["period"] = df["date"].dt.to_period("W").apply(lambda x: x.start_time)
+    elif period == "monthly":
+        df["period"] = df["date"].dt.to_period("M").apply(lambda x: x.start_time)
+    elif period == "yearly":
+        df["period"] = df["date"].dt.to_period("Y").apply(lambda x: x.start_time)
+    else:
+        return data
+
+    # Aggregate by period
+    agg_df = (
+        df.groupby("period")
+        .agg(
+            {
+                "fii_buy_value": "sum",
+                "fii_sell_value": "sum",
+                "fii_net_value": "sum",
+                "dii_buy_value": "sum",
+                "dii_sell_value": "sum",
+                "dii_net_value": "sum",
+                "total_net_value": "sum",
+            }
+        )
+        .reset_index()
+    )
+
+    agg_df["date"] = agg_df["period"].dt.strftime("%Y-%m-%d")
+    agg_df["sentiment"] = agg_df["total_net_value"].apply(
+        lambda x: "Bullish" if x > 100 else ("Bearish" if x < -100 else "Neutral")
+    )
+
+    return agg_df.drop(columns=["period"]).to_dict("records")
+
+
+def _aggregate_derivatives_data(data, period):
+    """Aggregate derivatives data based on time period."""
+    if period == "daily" or not data:
+        return data
+
+    import pandas as pd
+
+    # Flatten the nested structure
+    records = []
+    for date, items in data.items():
+        for item in items:
+            records.append({"date": date, **item})
+
+    if not records:
+        return data
+
+    df = pd.DataFrame(records)
+    df["date"] = pd.to_datetime(df["date"])
+
+    if period == "weekly":
+        df["period"] = df["date"].dt.to_period("W").apply(lambda x: x.start_time)
+    elif period == "monthly":
+        df["period"] = df["date"].dt.to_period("M").apply(lambda x: x.start_time)
+    elif period == "yearly":
+        df["period"] = df["date"].dt.to_period("Y").apply(lambda x: x.start_time)
+    else:
+        return data
+
+    # Aggregate by period and category
+    agg_df = (
+        df.groupby(["period", "category", "participant_type"])
+        .agg(
+            {
+                "buy_value": "sum",
+                "sell_value": "sum",
+                "net_value": "sum",
+                "oi_value": "last",
+                "oi_contracts": "last",
+                "oi_long": "last",
+                "oi_short": "last",
+            }
+        )
+        .reset_index()
+    )
+
+    agg_df["period_str"] = agg_df["period"].dt.strftime("%Y-%m-%d")
+
+    # Rebuild nested structure
+    result = {}
+    for _, row in agg_df.iterrows():
+        period_key = row["period_str"]
+        if period_key not in result:
+            result[period_key] = []
+        result[period_key].append(
+            {
+                "category": row["category"],
+                "participant_type": row["participant_type"],
+                "buy_value": float(row["buy_value"]),
+                "sell_value": float(row["sell_value"]),
+                "net_value": float(row["net_value"]),
+                "oi_value": float(row["oi_value"]) if row["oi_value"] else 0,
+                "oi_contracts": int(row["oi_contracts"]) if row["oi_contracts"] else 0,
+                "oi_long": int(row["oi_long"]) if row["oi_long"] else 0,
+                "oi_short": int(row["oi_short"]) if row["oi_short"] else 0,
+            }
+        )
+
+    return result
+
+
+def _aggregate_nifty_data(data, period):
+    """Aggregate Nifty 50 data based on time period (returns last close for period)."""
+    if period == "daily" or not data:
+        return data
+
+    import pandas as pd
+
+    records = [{"date": k, "close": v} for k, v in data.items()]
+    if not records:
+        return data
+
+    df = pd.DataFrame(records)
+    df["date"] = pd.to_datetime(df["date"])
+
+    if period == "weekly":
+        df["period"] = df["date"].dt.to_period("W").apply(lambda x: x.start_time)
+    elif period == "monthly":
+        df["period"] = df["date"].dt.to_period("M").apply(lambda x: x.start_time)
+    elif period == "yearly":
+        df["period"] = df["date"].dt.to_period("Y").apply(lambda x: x.start_time)
+    else:
+        return data
+
+    # Take last close for each period
+    agg_df = df.sort_values("date").groupby("period").agg({"close": "last"}).reset_index()
+    agg_df["period_str"] = agg_df["period"].dt.strftime("%Y-%m-%d")
+
+    return dict(zip(agg_df["period_str"], agg_df["close"]))
 
 
 @insights_bp.route("/api/delivery")

@@ -23,7 +23,8 @@ from .controllers.screener.top_gainers_losers.controller import cache as gainers
 from .controllers.screener.top_gainers_losers.controller import gainers_losers_bp
 from .controllers.stock_controller import stock_bp
 from .controllers.voice_api_controller import voice_api_bp
-from .health_check import health_bp
+
+# from .health_check import health_bp
 
 
 def create_app():
@@ -47,7 +48,7 @@ def create_app():
     ensure_initialized()
 
     # Register blueprints
-    app.register_blueprint(health_bp)  # Health check at /health
+    # app.register_blueprint(health_bp)  # Health check at /health
     app.register_blueprint(auth_bp)
     app.register_blueprint(home_bp)  # Home page at /
     app.register_blueprint(news_bp)  # News at /news

@@ -4,6 +4,48 @@
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
+<script>
+    // GLOBAL ERROR HANDLER FOR DEBUGGING
+    window.onerror = function (msg, url, line, col, error) {
+        var extra = !col ? '' : '\ncolumn: ' + col;
+        extra += !error ? '' : '\nerror: ' + error;
+        var errStr = "Error: " + msg + "\nurl: " + url + "\nline: " + line + extra;
+        showDebugError(errStr);
+        return false;
+    };
+
+    window.addEventListener("unhandledrejection", function (promiseRejectionEvent) {
+        showDebugError("Unhandled Rejection: " + promiseRejectionEvent.reason);
+    });
+
+    function showDebugError(msg) {
+        var box = document.getElementById('debug-error-box');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'debug-error-box';
+            box.style.position = 'fixed';
+            box.style.top = '10px';
+            box.style.left = '10px';
+            box.style.right = '10px';
+            box.style.zIndex = '99999';
+            box.style.background = '#fee2e2';
+            box.style.border = '2px solid #ef4444';
+            box.style.color = '#b91c1c';
+            box.style.padding = '15px';
+            box.style.fontFamily = 'monospace';
+            box.style.whiteSpace = 'pre-wrap';
+            box.style.maxHeight = '50vh';
+            box.style.overflow = 'auto';
+            document.body.appendChild(box);
+        }
+        var line = document.createElement('div');
+        line.style.marginBottom = '10px';
+        line.style.borderBottom = '1px solid #fecaca';
+        line.innerText = new Date().toLocaleTimeString() + ": " + msg;
+        box.appendChild(line);
+    }
+    console.log("Debug handler initialized");
+</script>
 <style>
     /* ============================================
    INSIGHTS PAGE - SCANX TREEMAP STYLE
@@ -178,6 +220,58 @@
         border-color: #8B2432;
     }
 
+    .fii-tabs-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .fii-tab-btn {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .fii-tab-btn:hover {
+        background: #f8fafc;
+        color: #334155;
+    }
+
+    .fii-tab-btn.active {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #3b82f6;
+        font-weight: 600;
+    }
+
+    .fii-filters-row .control-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .fii-filters-row label {
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #64748b;
+        margin-right: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    .fii-filters-row select {
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #334155;
+        outline: none;
+    }
+
     /* Heat Scale */
     .heat-scale {
         display: flex;
@@ -238,6 +332,8 @@
         margin-bottom: 16px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         overflow: hidden;
+        justify-content: center;
+        /* Center items */
     }
 
     .summary-stat {
@@ -249,6 +345,8 @@
         padding: 14px 12px;
         border-right: 1px solid #f1f5f9;
         text-align: center;
+        max-width: 400px;
+        /* Prevent excessive stretching */
     }
 
     .summary-stat:last-child {
@@ -1083,6 +1181,58 @@
         .sector-heatmap {
             grid-template-columns: 1fr;
         }
+
+        .charts-grid-2 {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    /* FII/DII Specific Styles */
+    .toggle-switch {
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 8px;
+        display: inline-flex;
+        gap: 4px;
+    }
+
+    .toggle-btn {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        color: #64748b;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 13px;
+    }
+
+    .toggle-btn.active {
+        background: white;
+        color: #2563eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .charts-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .chart-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #1e293b;
+        margin-bottom: 12px;
     }
 </style>
 {% endblock %}
@@ -1109,7 +1259,8 @@
         </div>
 
         <!-- Controls Bar (ScanX Style) -->
-        <div class="controls-bar scanx-controls" id="heatmapControls">
+        <div class="controls-bar scanx-controls" id="heatmapControls" {% if active_tab !='heatmap'
+            %}style="display:none;" {% endif %}>
             <div class="control-group">
                 <label>Index :</label>
                 <select id="indexSelect" onchange="changeIndex(this.value)">
@@ -1165,61 +1316,7 @@
             </div>
         </div>
 
-        <!-- Tabs (Hidden on Heatmap view for clean layout) -->
-        <div class="insights-tabs {% if active_tab == 'heatmap' %}d-none{% endif %}" id="insightsTabs">
-            <button class="tab-btn {% if active_tab == 'heatmap' %}active{% endif %}" onclick="switchTab('heatmap')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7" />
-                    <rect x="14" y="3" width="7" height="7" />
-                    <rect x="14" y="14" width="7" height="7" />
-                    <rect x="3" y="14" width="7" height="7" />
-                </svg>
-                Heatmap
-            </button>
-            <button class="tab-btn {% if active_tab == 'fii-dii' %}active{% endif %}" onclick="switchTab('fii-dii')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <path d="M12 20V10" />
-                    <path d="M18 20V4" />
-                    <path d="M6 20v-4" />
-                </svg>
-                FII/DII Activity
-            </button>
-            <button class="tab-btn {% if active_tab == 'delivery' %}active{% endif %}" onclick="switchTab('delivery')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <path
-                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                </svg>
-                Delivery Data
-            </button>
-            <button class="tab-btn {% if active_tab == '52week' %}active{% endif %}" onclick="switchTab('52week')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                    <polyline points="16 7 22 7 22 13" />
-                </svg>
-                52-Week High/Low
-            </button>
-            <button class="tab-btn {% if active_tab == 'volume' %}active{% endif %}" onclick="switchTab('volume')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                    <polyline points="2 17 12 22 22 17" />
-                    <polyline points="2 12 12 17 22 12" />
-                </svg>
-                Volume Breakouts
-            </button>
-            <button class="tab-btn {% if active_tab == 'sectors' %}active{% endif %}" onclick="switchTab('sectors')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
-                    <path d="M22 12A10 10 0 0 0 12 2v10z" />
-                </svg>
-                Sector Performance
-            </button>
-        </div>
+
 
         <!-- Tab Contents -->
         <div id="heatmap-tab" class="tab-content {% if active_tab == 'heatmap' %}active{% endif %}">
@@ -1231,20 +1328,672 @@
         </div>
 
         <div id="fii-dii-tab" class="tab-content {% if active_tab == 'fii-dii' %}active{% endif %}">
-            <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
-                <div class="control-group"><label>Period:</label><select id="fiiDiiPeriod" onchange="loadFiiDii()">
-                        <option value="7">Last 7 Days</option>
-                        <option value="15">Last 15 Days</option>
-                        <option value="30" selected>Last 30 Days</option>
-                        <option value="60">Last 60 Days</option>
-                    </select></div>
+            <div class="controls-bar"
+                style="margin-bottom: 16px;padding: 10px 16px; flex-wrap: wrap; gap: 12px; height: auto;">
+                <!-- Granular Tabs -->
+                <div class="fii-tabs-group">
+                    <button class="fii-tab-btn active" onclick="switchFiiTab('equity')" id="btn-equity">Equity</button>
+                    <button class="fii-tab-btn" onclick="switchFiiTab('index_futures')" id="btn-index_futures">Index
+                        Futures</button>
+                    <button class="fii-tab-btn" onclick="switchFiiTab('index_options')" id="btn-index_options">Index
+                        Options</button>
+                    <button class="fii-tab-btn" onclick="switchFiiTab('stock_futures')" id="btn-stock_futures">Stock
+                        Futures</button>
+                    <button class="fii-tab-btn" onclick="switchFiiTab('stock_options')" id="btn-stock_options">Stock
+                        Options</button>
+                </div>
+
+                <!-- Filters Row -->
+                <div class="fii-filters-row"
+                    style="display: flex; gap: 16px; width: 100%; align-items: center; margin-top: 12px;">
+                    <div class="control-group">
+                        <label>Participant:</label>
+                        <select id="fiiParticipant" onchange="updateParticipant()">
+                            <option value="both">Both FII & DII</option>
+                            <option value="fii">FII Only</option>
+                            <option value="dii">DII Only</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Time View:</label>
+                        <select id="fiiTimePeriod" onchange="updateTimePeriod()">
+                            <option value="daily" selected>Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Period:</label>
+                        <select id="fiiDiiPeriod" onchange="loadFiiDiiEnhanced()">
+                            <option value="7">Last 7 Days</option>
+                            <option value="15">Last 15 Days</option>
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="60">Last 60 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="180">Last 6 Months</option>
+                            <option value="365">Last 1 Year</option>
+                        </select>
+                    </div>
+                </div>
             </div>
+
             <div id="fii-dii-container">
                 <div class="loading-spinner">
                     <div class="spinner"></div>
                 </div>
             </div>
         </div>
+
+        <div id="delivery-tab" class="tab-content {% if active_tab == 'delivery' %}active{% endif %}">
+            <div class="controls-bar scanx-controls">
+                <div class="control-group">
+                    <label>Min Delivery % :</label>
+                    <select id="minDelivery" onchange="loadDelivery()">
+                        <option value="0">All</option>
+                        <option value="30"> > 30%</option>
+                        <option value="50" selected> > 50%</option>
+                        <option value="70"> > 70%</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Sort By :</label>
+                    <select id="deliverySort" onchange="loadDelivery()">
+                        <option value="delivery_pct" selected>High Delivery %</option>
+                        <option value="volume">High Volume</option>
+                        <option value="turnover">High Turnover</option>
+                    </select>
+                </div>
+            </div>
+            <div id="delivery-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="52week-tab" class="tab-content {% if active_tab == '52week' %}active{% endif %}">
+            <div id="week52-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="volume-tab" class="tab-content {% if active_tab == 'volume' %}active{% endif %}">
+            <div class="controls-bar scanx-controls">
+                <div class="control-group">
+                    <label>Multiplier :</label>
+                    <select id="volumeMultiplier" onchange="loadVolume()">
+                        <option value="1.5"> > 1.5x Avg</option>
+                        <option value="2.0" selected> > 2.0x Avg</option>
+                        <option value="3.0"> > 3.0x Avg</option>
+                        <option value="5.0"> > 5.0x Avg</option>
+                    </select>
+                </div>
+            </div>
+            <div id="volume-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectors-tab" class="tab-content {% if active_tab == 'sectors' %}active{% endif %}">
+            <div id="sectors-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // State Variables
+            let activeFiiSubTab = 'equity';
+            let selectedParticipant = 'both';
+            let globalFiiData = null;
+
+            function switchFiiSubTab(tab) {
+                // Map frontend ID to backend category key if needed
+                const map = {
+                    'equity': 'equity',
+                    'idxFut': 'index_futures',
+                    'idxOpt': 'index_options',
+                    'stkFut': 'stock_futures',
+                    'stkOpt': 'stock_options'
+                };
+
+                activeFiiSubTab = map[tab] || tab;
+
+                document.querySelectorAll('.fii-tab-btn').forEach(b => b.classList.remove('active'));
+
+                // Highlight button - handle mapped IDs
+                const btnId = 'btn-' + tab;
+                const btn = document.getElementById(btnId);
+                if (btn) btn.classList.add('active');
+
+                renderFiiDiiData();
+            }
+
+            function updateFiiParticipant() {
+                selectedParticipant = document.getElementById('fiiParticipant').value;
+                renderFiiDiiData();
+            }
+
+            async function loadFiiDii() {
+                const container = document.getElementById('fii-dii-container');
+                const days = document.getElementById('fiiDiiPeriod').value;
+                if (!globalFiiData) container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>'; // Only spinner on first load
+                try {
+                    const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
+                    const response = await fetch(`/insights/api/fii-dii?end_date=${dateParam}&days=${days}`);
+                    const data = await response.json();
+
+                    if ((!data.data || !data.data.length) && (!data.derivatives || !Object.keys(data.derivatives).length)) {
+                        container.innerHTML = '<div class="empty-state"><p>No FII/DII Data Available</p></div>';
+                        return;
+                    }
+                    globalFiiData = data;
+                    renderFiiDiiData();
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>';
+                }
+            }
+
+            function renderFiiDiiData() {
+                if (!globalFiiData) return;
+                const container = document.getElementById('fii-dii-container');
+                const data = globalFiiData;
+
+                if (activeFiiSubTab === 'equity') {
+                    renderEquity(container, data);
+                } else {
+                    renderDerivative(container, data, activeFiiSubTab);
+                }
+            }
+
+            function renderEquity(container, data) {
+                // Filter Logic
+                let showFii = (selectedParticipant === 'both' || selectedParticipant === 'fii');
+                let showDii = (selectedParticipant === 'both' || selectedParticipant === 'dii');
+                let isBoth = selectedParticipant === 'both';
+
+                const summary = data.summary;
+                const sentimentClass = summary.overall_sentiment === 'Bullish' ? 'bullish' :
+                    summary.overall_sentiment === 'Bearish' ? 'bearish' : 'neutral';
+
+                let fiiCard = `
+                            <div class="summary-stat ${summary.total_fii_net >= 0 ? 'advances' : 'declines'}" style="${showFii ? '' : 'display:none'}">
+                                <span class="stat-value">₹${formatNumber(summary.total_fii_net)} Cr</span>
+                                <span class="stat-label">FII Net</span>
+                            </div>`;
+                let diiCard = `
+                            <div class="summary-stat ${summary.total_dii_net >= 0 ? 'advances' : 'declines'}" style="${showDii ? '' : 'display:none'}">
+                                <span class="stat-value">₹${formatNumber(summary.total_dii_net)} Cr</span>
+                                <span class="stat-label">DII Net</span>
+                            </div>`;
+
+                // Table Headers & Rows Logic
+                let tableHeaders = '';
+                let tableRows = '';
+
+                if (selectedParticipant === 'fii') {
+                    tableHeaders = `
+                        <th>Date</th>
+                        <th>FII Buy Cash (Cr)</th>
+                        <th>FII Sell Cash (Cr)</th>
+                        <th>FII Net Cash (Cr)</th>
+                    `;
+                    tableRows = data.data.map(row => `
+                        <tr>
+                            <td>${row.date}</td>
+                            <td>${formatNumber(row.fii_buy_value)}</td>
+                            <td>${formatNumber(row.fii_sell_value)}</td>
+                            <td class="${row.fii_net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(row.fii_net_value)}</td>
+                        </tr>
+                    `).join('');
+                } else if (selectedParticipant === 'dii') {
+                    tableHeaders = `
+                        <th>Date</th>
+                        <th>DII Buy Cash (Cr)</th>
+                        <th>DII Sell Cash (Cr)</th>
+                        <th>DII Net Cash (Cr)</th>
+                    `;
+                    tableRows = data.data.map(row => `
+                        <tr>
+                            <td>${row.date}</td>
+                            <td>${formatNumber(row.dii_buy_value)}</td>
+                            <td>${formatNumber(row.dii_sell_value)}</td>
+                            <td class="${row.dii_net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(row.dii_net_value)}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    // Both - Keep condensed view
+                    tableHeaders = `
+                        <th>Date</th>
+                        <th>FII Net</th>
+                        <th>DII Net</th>
+                        <th>Total Net</th>
+                    `;
+                    tableRows = data.data.map(row => `
+                        <tr>
+                            <td>${row.date}</td>
+                            <td class="${row.fii_net_value >= 0 ? 'positive' : 'negative'}">${formatNumber(row.fii_net_value)}</td>
+                            <td class="${row.dii_net_value >= 0 ? 'positive' : 'negative'}">${formatNumber(row.dii_net_value)}</td>
+                            <td class="${row.total_net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(row.total_net_value)}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                container.innerHTML = `
+                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                    <span class="chart-title" style="margin:0">🏦 Cash Market Summary</span>
+                    <span style="font-size:11px;color:#64748b;">(${summary.days_count} days)</span>
+                </div>
+
+                <!-- Market Summary Bar Removed as per user request -->
+
+                <div class="charts-grid-2">
+                     <div class="chart-card">
+                        <div class="chart-title">Daily Net Activity</div>
+                        <div id="dailyNetChart" style="height: 300px; width: 100%;"></div>
+                    </div>
+                     <div class="chart-card">
+                        <div class="chart-title">Cumulative Trend</div>
+                        <div id="cumulativeChart" style="height: 300px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="screener-card" style="margin-top:16px">
+                    <div class="card-header"><span class="card-title">Detailed Logs (${selectedParticipant.toUpperCase()})</span></div>
+                    <table class="card-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>${selectedParticipant === 'fii' ? 'FII Net (Cr)' : selectedParticipant === 'dii' ? 'DII Net (Cr)' : 'Total Net (Cr)'}</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             ${data.data.slice().reverse().map(row => {
+                    let val = 0;
+                    if (selectedParticipant === 'fii') val = row.fii_net_value;
+                    else if (selectedParticipant === 'dii') val = row.dii_net_value;
+                    else val = row.total_net_value;
+
+                    return `
+                                    <tr>
+                                        <td>${row.date}</td>
+                                        <td class="${val >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(val)}</td>
+                                        <td><span class="badge ${val >= 0 ? 'bg-success' : 'bg-danger'}">${val >= 0 ? 'Buy' : 'Sell'}</span></td>
+                                    </tr>
+                                `;
+                }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+
+                initCashCharts(data.data, showFii, showDii);
+            }
+
+            // Implement missing renderDerivative function
+            function renderDerivative(container, data, category) {
+                // Ensure we have derivative data
+                if (!data.derivatives || !Object.keys(data.derivatives).length) {
+                    container.innerHTML = '<div class="empty-state"><p>No Derivative Data Available</p></div>';
+                    return;
+                }
+
+                const subCategories = {
+                    'index_futures': 'Index Futures',
+                    'index_options': 'Index Options',
+                    'stock_futures': 'Stock Futures',
+                    'stock_options': 'Stock Options'
+                };
+
+                const title = subCategories[category] || 'Derivatives';
+                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII'; // Default to FII as DIIs rarely do derivatives aggressively
+
+                container.innerHTML = `
+                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                    <span class="chart-title" style="margin:0">📊 ${title} Analysis (${participant})</span>
+                </div>
+
+                <div class="charts-grid-2">
+                     <div class="chart-card">
+                        <div class="chart-title">Net Value (Cr)</div>
+                        <div id="derivNetChart" style="height: 300px; width: 100%;"></div>
+                    </div>
+                     <div class="chart-card">
+                        <div class="chart-title">Open Interest (Contracts)</div>
+                        <div id="derivOiChart" style="height: 300px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="screener-card" style="margin-top:16px">
+                    <div class="card-header"><span class="card-title">Detailed Logs</span></div>
+                    <table class="card-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Buy Value</th>
+                                <th>Sell Value</th>
+                                <th>Net Value</th>
+                                <th>OI Contracts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${getDerivativeRows(data.derivatives, category, participant)}
+                        </tbody>
+                    </table>
+                </div>`;
+
+                // Initialize charts
+                // Use a default timeout to ensure DOM is ready
+                setTimeout(() => {
+                    initDerivativeCharts(data.derivatives, category, participant);
+                }, 0);
+            }
+
+            function getDerivativeRows(derivData, category, participant) {
+                const dates = Object.keys(derivData).sort().reverse();
+                let rows = '';
+
+                dates.forEach(date => {
+                    const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
+                    items.forEach(item => {
+                        rows += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${item.participant_type}</td>
+                            <td>${formatNumber(item.buy_value)}</td>
+                            <td>${formatNumber(item.sell_value)}</td>
+                            <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
+                            <td>${formatNumber(item.oi_contracts)}</td>
+                        </tr>`;
+                    });
+                });
+                if (!rows) return `<tr><td colspan="6" style="text-align:center;">No data for ${participant} in ${category}</td></tr>`;
+                return rows;
+            }
+
+            // Implement missing renderDerivative function
+            function renderDerivative(container, data, category) {
+                // Ensure we have derivative data
+                if (!data.derivatives || !Object.keys(data.derivatives).length) {
+                    container.innerHTML = '<div class="empty-state"><p>No Derivative Data Available</p></div>';
+                    return;
+                }
+
+                const subCategories = {
+                    'index_futures': 'Index Futures',
+                    'index_options': 'Index Options',
+                    'stock_futures': 'Stock Futures',
+                    'stock_options': 'Stock Options'
+                };
+
+                const title = subCategories[category] || 'Derivatives';
+                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII'; // Default to FII as DIIs rarely do derivatives aggressively
+
+                container.innerHTML = `
+                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                    <span class="chart-title" style="margin:0">📊 ${title} Analysis (${participant})</span>
+                </div>
+
+                <div class="charts-grid-2">
+                     <div class="chart-card">
+                        <div class="chart-title">Net Value (Cr)</div>
+                        <div id="derivNetChart" style="height: 300px; width: 100%;"></div>
+                    </div>
+                     <div class="chart-card">
+                        <div class="chart-title">Open Interest (Contracts)</div>
+                        <div id="derivOiChart" style="height: 300px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="screener-card" style="margin-top:16px">
+                    <div class="card-header"><span class="card-title">Detailed Logs</span></div>
+                    <table class="card-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Buy Value</th>
+                                <th>Sell Value</th>
+                                <th>Net Value</th>
+                                <th>OI Contracts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${getDerivativeRows(data.derivatives, category, participant)}
+                        </tbody>
+                    </table>
+                </div>`;
+
+                // Initialize charts
+                // Use a default timeout to ensure DOM is ready
+                setTimeout(() => {
+                    initDerivativeCharts(data.derivatives, category, participant);
+                }, 0);
+            }
+
+            function getDerivativeRows(derivData, category, participant) {
+                const dates = Object.keys(derivData).sort().reverse();
+                let rows = '';
+
+                dates.forEach(date => {
+                    const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
+                    items.forEach(item => {
+                        rows += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${item.participant_type}</td>
+                            <td>${formatNumber(item.buy_value)}</td>
+                            <td>${formatNumber(item.sell_value)}</td>
+                            <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
+                            <td>${formatNumber(item.oi_contracts)}</td>
+                        </tr>`;
+                    });
+                });
+                if (!rows) return '<tr><td colspan="6" style="text-align:center;">No data for ${participant} in ${category}</td></tr>';
+                return rows;
+            }
+
+            // Updated init signature
+            function initDerivativeCharts(derivData, category, participant) {
+                const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
+                const labels = dates.map(d => d.split('-')[2] + '/' + d.split('-')[1]);
+
+                const getData = (key) => dates.map(d => {
+                    const item = derivData[d].find(x => x.category === category && x.participant_type === participant);
+                    return item ? item[key] : 0;
+                });
+
+                const netData = getData('net_value');
+                const oiData = getData('oi_contracts');
+
+                const hasNetValue = participant === 'FII';
+
+                const commonOptions = {
+                    chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' } },
+                    title: { text: null },
+                    xAxis: { categories: labels, crosshair: true, labels: { style: { color: '#64748b' } } },
+                    yAxis: { gridLineColor: '#f1f5f9', title: { text: null }, labels: { style: { color: '#64748b' } } },
+                    tooltip: {
+                        shared: true,
+                        useHTML: true,
+                        headerFormat: '<div style="font-size:12px;font-weight:700;margin-bottom:5px;">{point.key}</div><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y}</b></td></tr>',
+                        footerFormat: '</table>',
+                    },
+                    credits: { enabled: false },
+                    legend: { enabled: false }
+                };
+
+                // Net Value Chart (Column) - Only if FII
+                if (hasNetValue) {
+                    Highcharts.chart('derivNetChart', {
+                        ...commonOptions,
+                        chart: { ...commonOptions.chart, type: 'column' },
+                        tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>₹{point.y:,.0f} Cr</b></td></tr>' },
+                        series: [{
+                            name: 'Net Value',
+                            data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
+                            borderWidth: 0
+                        }]
+                    });
+                }
+
+                // OI Chart (Line/Area)
+                Highcharts.chart('derivOiChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'area' },
+                    tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:,.0f} Contracts</b></td></tr>' },
+                    series: [{
+                        name: 'Open Interest',
+                        data: oiData,
+                        color: participant === 'FII' ? '#8b5cf6' : '#f97316', // Orange for DII to match theme
+                        fillColor: {
+                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                            stops: [[0, participant === 'FII' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(249, 115, 22, 0.2)'], [1, 'rgba(0,0,0,0)']]
+                        },
+                        marker: { radius: 3 }
+                    }]
+                });
+            }
+
+            function initCashCharts(dailyData, showFii, showDii) {
+                const labels = dailyData.map(d => d.date.split('-')[2] + '/' + d.date.split('-')[1]).reverse();
+                const fiiNet = dailyData.map(d => d.fii_net_value).reverse();
+                const diiNet = dailyData.map(d => d.dii_net_value).reverse();
+
+                // Cumulative logic (recalc based on visibility? No, cumulative is usually total trend.
+                // Scanx cumulative likely matches the filter. Let's recalc based on what is shown.)
+
+                let combinedFlow = dailyData.map(d => {
+                    let val = 0;
+                    if (showFii) val += d.fii_net_value;
+                    if (showDii) val += d.dii_net_value;
+                    return val;
+                }).reverse();
+
+                let cumVal = 0;
+                const cumData = combinedFlow.map(v => { cumVal += v; return cumVal; });
+
+                // Common Highcharts Theme Settings
+                const commonOptions = {
+                    chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' } },
+                    title: { text: null },
+                    xAxis: { categories: labels, crosshair: true, labels: { style: { color: '#64748b' } } },
+                    yAxis: { gridLineColor: '#f1f5f9', title: { text: null }, labels: { style: { color: '#64748b' } } },
+                    tooltip: { shared: true, backgroundColor: 'rgba(255, 255, 255, 0.95)', shadow: true, borderRadius: 8 },
+                    credits: { enabled: false },
+                    legend: { itemStyle: { color: '#475569', fontWeight: '500' } }
+                };
+
+                // Daily Net Activity Chart
+                const seriesData = [];
+                if (showFii) {
+                    seriesData.push({
+                        name: 'FII Net',
+                        data: fiiNet.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
+                        borderWidth: 0
+                    });
+                }
+                if (showDii) {
+                    seriesData.push({
+                        name: 'DII Net',
+                        data: diiNet.map(v => ({ y: v, color: '#f97316' })),
+                        borderWidth: 0
+                    });
+                }
+
+                Highcharts.chart('dailyNetChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'column' },
+                    series: seriesData
+                });
+
+                // Cumulative Trend Chart
+                Highcharts.chart('cumulativeChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'area' },
+                    series: [{
+                        name: 'Cumulative Flow',
+                        data: cumData,
+                        color: showFii && !showDii ? '#22c55e' : showDii && !showFii ? '#f97316' : '#3b82f6', // Blue for mix
+                        fillColor: {
+                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                            stops: [[0, showFii && !showDii ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)'], [1, 'rgba(0,0,0,0)']]
+                        },
+                        threshold: null
+                    }]
+                });
+            }
+
+            function initDerivativeCharts(derivData, category) {
+                const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
+                const labels = dates.map(d => d.split('-')[2] + '/' + d.split('-')[1]);
+
+                const getData = (key) => dates.map(d => {
+                    const item = derivData[d].find(x => x.category === category);
+                    return item ? item[key] : 0;
+                });
+
+                const netData = getData('net_value');
+                const oiData = getData('oi_contracts');
+
+                const commonOptions = {
+                    chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' } },
+                    title: { text: null },
+                    xAxis: { categories: labels, crosshair: true, labels: { style: { color: '#64748b' } } },
+                    yAxis: { gridLineColor: '#f1f5f9', title: { text: null }, labels: { style: { color: '#64748b' } } },
+                    tooltip: {
+                        shared: true,
+                        useHTML: true,
+                        headerFormat: '<div style="font-size:12px;font-weight:700;margin-bottom:5px;">{point.key}</div><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y}</b></td></tr>',
+                        footerFormat: '</table>',
+                    },
+                    credits: { enabled: false },
+                    legend: { enabled: false }
+                };
+
+                // Net Value Chart (Column)
+                Highcharts.chart('derivNetChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'column' },
+                    tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>₹{point.y:,.0f} Cr</b></td></tr>' },
+                    series: [{
+                        name: 'Net Value',
+                        data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
+                        borderWidth: 0
+                    }]
+                });
+
+                // OI Chart (Line/Area)
+                Highcharts.chart('derivOiChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'area' },
+                    tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:,.0f} Contracts</b></td></tr>' },
+                    series: [{
+                        name: 'Open Interest',
+                        data: oiData,
+                        color: '#8b5cf6',
+                        fillColor: {
+                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                            stops: [[0, 'rgba(139, 92, 246, 0.2)'], [1, 'rgba(139, 92, 246, 0.0)']]
+                        },
+                        marker: { radius: 3 }
+                    }]
+                });
+            }
+        </script>
+
 
         <div id="delivery-tab" class="tab-content {% if active_tab == 'delivery' %}active{% endif %}">
             <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
@@ -1304,10 +2053,17 @@
 {% endblock %}
 
 {% block page_js %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <script>
     let currentDate = '{{ selected_date }}';
+    if (currentDate === 'None') currentDate = '';
+
     let currentTab = '{{ active_tab }}';
+    if (currentTab === 'None') currentTab = 'heatmap';
+
     let currentIndex = '{{ selected_index }}';
+    if (currentIndex === 'None' || !currentIndex) currentIndex = 'all';
 
     const indexIcons = { 'all': '📊', 'nifty50': '🏆', 'niftynext50': '📈', 'niftybank': '🏦', 'niftyit': '💻', 'niftypharma': '💊', 'niftyauto': '🚗', 'niftymetal': '⚙️', 'niftyfmcg': '🛒', 'niftyenergy': '⚡', 'niftypsubank': '🏛️', 'niftyfinancial': '💰', 'sensex': '🎯' };
 
@@ -1315,8 +2071,46 @@
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById(tab + '-tab').classList.add('active');
-        event.target.closest('.tab-btn').classList.add('active');
+
+        // Robustly set active class on button - FIX for TypeError
+        let btn = null;
+        if (typeof event !== 'undefined' && event && event.target && typeof event.target.closest === 'function') {
+            btn = event.target.closest('.tab-btn');
+        }
+
+        // Fallback: find button by data attribute if explicit event didn't work
+        if (!btn) {
+            btn = document.querySelector(`.tab-btn[onclick*="'${tab}'"]`) || document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        }
+
+        if (btn) btn.classList.add('active');
+
         currentTab = tab;
+
+        // UI Updates based on Tab
+        const heatmapControls = document.getElementById('heatmapControls');
+        const titleText = document.getElementById('heatmapTitleText');
+        const indexBoxes = document.getElementById('indexPriceBox'); // The right side index info
+
+        if (tab === 'heatmap') {
+            heatmapControls.style.display = 'flex';
+            titleText.textContent = 'Nifty 50 Heatmap'; // Will be updated by loadHeatmap dynamic index name
+            if (indexBoxes) indexBoxes.style.display = 'flex';
+        } else {
+            heatmapControls.style.display = 'none';
+            if (indexBoxes) indexBoxes.style.display = 'none';
+
+            // Set Titles
+            const titles = {
+                'fii-dii': 'FII/DII Activity',
+                'delivery': 'Delivery Percentage Analysis',
+                '52week': '52-Week High/Low Analysis',
+                'volume': 'Volume Breakout Scanner',
+                'sectors': 'Sector Performance'
+            };
+            titleText.textContent = titles[tab] || 'Market Insights';
+        }
+
         const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDii, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors };
         if (loaders[tab]) loaders[tab]();
     }
@@ -1503,14 +2297,30 @@
         return worst;
     }
 
+    // OPTIMIZATION: Client-side cache to enable instant tab switching
+    const heatmapDataCache = new Map();
+
     async function loadHeatmap() {
         const container = document.getElementById('heatmap-container');
         const view = document.getElementById('heatmapView').value;
         const sort = document.getElementById('heatmapSort').value;
+
+        // Construct cache key
+        const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
+        const cacheKey = `${dateParam}_${sort}_${currentIndex}_${currentPerformance}_${view}`;
+
+        // Check Cache First
+        if (heatmapDataCache.has(cacheKey)) {
+            // console.log("[CACHE] Loading heatmap from JS cache"); // Debug
+            const data = heatmapDataCache.get(cacheKey);
+            renderHeatmapWithData(data, view, sort);
+            return;
+        }
+
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
         try {
-            const response = await fetch(`/insights/api/heatmap?date=${currentDate}&sort=${sort}&index=${currentIndex}`);
+            const response = await fetch(`/insights/api/heatmap?date=${dateParam}&sort=${sort}&index=${currentIndex}&period=${currentPerformance}`);
             const data = await response.json();
 
             if (!data.success || !data.stocks.length) {
@@ -1518,21 +2328,30 @@
                 return;
             }
 
-            if (data.indices) updateIndexDropdown(data.indices);
-            updateMarketSummary(data.stats);
+            // Save to Cache
+            heatmapDataCache.set(cacheKey, data);
 
-            if (view === 'sector') renderSectorHeatmap(data.stocks);
-            else renderTreemapHeatmap(data.stocks, sort);
+            renderHeatmapWithData(data, view, sort);
+
         } catch (error) {
             console.error('Error:', error);
             container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>';
         }
     }
 
+    function renderHeatmapWithData(data, view, sort) {
+        if (data.indices) updateIndexDropdown(data.indices);
+        updateMarketSummary(data.stats);
+
+        if (view === 'sector') renderSectorHeatmap(data.stocks);
+        else renderTreemapHeatmap(data.stocks, sort);
+    }
+
     function updateIndexDropdown(indices) {
         const select = document.getElementById('indexSelect');
-        const currentVal = select.value;
-        select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === currentVal ? 'selected' : ''}>${idx.name}</option>`).join('');
+        // Use global currentIndex if available, else fallback
+        const selectedVal = currentIndex || select.value || 'all';
+        select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === selectedVal ? 'selected' : ''}>${idx.name}</option>`).join('');
     }
 
     function updateMarketSummary(stats) {
@@ -1687,18 +2506,6 @@
         container.innerHTML = html;
     }
 
-    async function loadFiiDii() {
-        const container = document.getElementById('fii-dii-container');
-        const days = document.getElementById('fiiDiiPeriod').value;
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        try {
-            const response = await fetch(`/insights/api/fii-dii?end_date=${currentDate}&days=${days}`);
-            const data = await response.json();
-            if (!data.success || !data.data.length) { container.innerHTML = '<div class="empty-state"><p>No FII/DII data</p></div>'; return; }
-            const sentimentClass = data.summary.overall_sentiment === 'Bullish' ? 'positive' : 'negative';
-            container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Index Options OI Activity</span></div><div style="padding:16px"><div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat declines"><span class="stat-value">${formatNumber(Math.abs(data.summary.total_ce_oi_change))}</span><span class="stat-label">CE OI Change</span></div><div class="summary-stat advances"><span class="stat-value">${formatNumber(Math.abs(data.summary.total_pe_oi_change))}</span><span class="stat-label">PE OI Change</span></div><div class="summary-stat ${sentimentClass}"><span class="stat-value">${data.summary.overall_sentiment}</span><span class="stat-label">Sentiment</span></div></div></div></div><div class="screener-card"><div class="card-header"><span class="card-title">Daily Activity</span></div><table class="card-table"><thead><tr><th>Date</th><th>CE OI Δ</th><th>PE OI Δ</th><th>Net OI</th><th>Sentiment</th></tr></thead><tbody>${data.data.map(row => `<tr><td>${row.date}</td><td class="negative">${formatNumber(row.ce_oi_change)}</td><td class="positive">${formatNumber(row.pe_oi_change)}</td><td class="${row.net_index_oi >= 0 ? 'positive' : 'negative'}">${formatNumber(row.net_index_oi)}</td><td><span class="${row.sentiment === 'Bullish' ? 'positive' : 'negative'}">${row.sentiment}</span></td></tr>`).join('')}</tbody></table></div>`;
-        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
-    }
 
     async function loadDelivery() {
         const container = document.getElementById('delivery-container');
@@ -1767,14 +2574,78 @@
         } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
     }
 
+    // Update globalFiiDiiState period when user changes selection
+    function updateFiiPeriodSelection() {
+        if (typeof globalFiiDiiState !== 'undefined') {
+            globalFiiDiiState.selectedDays = parseInt(document.getElementById('fiiDiiPeriod').value);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-        // Load the current tab's data on page load
-        const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDii, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors };
-        if (loaders[currentTab]) {
-            loaders[currentTab]();
+        // Initialize tab UI state and load data
+        if (currentTab && currentTab !== 'None') {
+            switchTab(currentTab);
         } else {
-            loadHeatmap();
+            switchTab('heatmap');
         }
     });
+    // OPTIMIZATION: Client-Side Tab Switching
+    window.switchMainTab = function (tabName) {
+        if (event) event.preventDefault();
+
+        // 1. Update URL without reload
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('tab', tabName);
+        window.history.pushState({}, '', newUrl);
+
+        // 2. Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.insights-sidebar .menu-item').forEach(el => el.classList.remove('active'));
+
+        // 3. Show selected tab
+        const tabContent = document.getElementById(tabName + '-tab');
+        if (tabContent) tabContent.classList.add('active');
+
+        // 4. Update Sidebar Active State
+        const sidebarLink = document.getElementById('nav-' + tabName);
+        if (sidebarLink) sidebarLink.classList.add('active');
+
+        // 5. Load Data
+        if (tabName === 'heatmap') loadHeatmap();
+        else if (tabName === 'fii-dii') {
+            // Use existing wrapper if available
+            if (window.switchTab) window.switchTab('fii-dii');
+            else if (window.initEnhancedFiiDii) window.initEnhancedFiiDii();
+        }
+        else if (tabName === 'delivery') loadDelivery();
+        else if (tabName === '52week') load52Week();
+        else if (tabName === 'volume') loadVolume();
+        else if (tabName === 'sectors') loadSectors();
+
+        // Handle control visibility
+        const heatmapControls = document.getElementById('heatmapControls');
+        if (heatmapControls) {
+            heatmapControls.style.display = (tabName === 'heatmap') ? 'flex' : 'none';
+        }
+    };
+</script>
+
+<!-- Enhanced FII/DII Module -->
+<script src="{{ url_for('static', filename='js/fii_dii_enhanced.js') }}?v=11.0"></script>
+<script>
+    // Initialize enhanced FII/DII module when tab is activated
+    const originalSwitchTab = window.switchTab;
+    window.switchTab = function (tab) {
+        if (typeof originalSwitchTab === 'function') {
+            originalSwitchTab(tab);
+        }
+
+        // Initialize enhanced FII/DII module if switching to that tab
+        if (tab === 'fii-dii' && typeof initEnhancedFiiDii === 'function') {
+            setTimeout(() => {
+                initEnhancedFiiDii();
+            }, 100);
+        }
+    };
 </script>
 {% endblock %}

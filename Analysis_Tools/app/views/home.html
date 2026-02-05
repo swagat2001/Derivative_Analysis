@@ -4,8 +4,8 @@
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 <!-- Slick Slider CSS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
 {% endblock %}
 
 
@@ -219,20 +219,21 @@
       <a href="{{ url_for('screener.screener_landing') }}" class="feature-card">
         <div class="feature-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
           </svg>
         </div>
         <h3>50+ Readymade Screeners</h3>
-        <p>Fundamental, Technical, Intraday & Derivative screeners built by experts. Filter stocks with razor-sharp efficiency.</p>
+        <p>Fundamental, Technical, Intraday & Derivative screeners built by experts. Filter stocks with razor-sharp
+          efficiency.</p>
         <span class="feature-link">Explore Screeners →</span>
       </a>
 
       <a href="{{ url_for('dashboard.dashboard') }}" class="feature-card">
         <div class="feature-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-            <polyline points="16 7 22 7 22 13"/>
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
           </svg>
         </div>
         <h3>Derivatives Dashboard</h3>
@@ -243,9 +244,9 @@
       <a href="{{ url_for('insights.insights_page') }}" class="feature-card">
         <div class="feature-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-            <polyline points="2 17 12 22 22 17"/>
-            <polyline points="2 12 12 17 22 12"/>
+            <polygon points="12 2 2 7 12 12 22 7 12 2" />
+            <polyline points="2 17 12 22 22 17" />
+            <polyline points="2 12 12 17 22 12" />
           </svg>
         </div>
         <h3>Market Insights</h3>
@@ -256,9 +257,9 @@
       <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="feature-card">
         <div class="feature-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="20" x2="12" y2="10"/>
-            <line x1="18" y1="20" x2="18" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="16"/>
+            <line x1="12" y1="20" x2="12" y2="10" />
+            <line x1="18" y1="20" x2="18" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="16" />
           </svg>
         </div>
         <h3>Top Gainers & Losers</h3>
@@ -269,9 +270,9 @@
       <a href="{{ url_for('signal_analysis.signal_analysis') }}" class="feature-card">
         <div class="feature-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <circle cx="12" cy="12" r="6"/>
-            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="6" />
+            <circle cx="12" cy="12" r="2" />
           </svg>
         </div>
         <h3>Signal Analysis</h3>
@@ -282,7 +283,7 @@
       <a href="{{ url_for('technical_screener.technical_screener') }}" class="feature-card">
         <div class="feature-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
           </svg>
         </div>
         <h3>Technical Indicators</h3>
@@ -310,33 +311,38 @@
       <div class="tab-content active" id="fundamental">
         <div class="tab-description">
           <h3>Fundamental Screeners</h3>
-          <p>For traders and investors who want to look at cold hard facts about a company's financial health. Screen stocks based on EPS, P/E, Working Capital, and more for better stock picking.</p>
+          <p>For traders and investors who want to look at cold hard facts about a company's financial health. Screen
+            stocks based on EPS, P/E, Working Capital, and more for better stock picking.</p>
           <ul class="screener-list">
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Nifty 50 Analysis
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Bank Nifty Constituents
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               High OI Buildup Stocks
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               IV Spike Alerts
             </li>
@@ -377,38 +383,44 @@
       <div class="tab-content" id="technical">
         <div class="tab-description">
           <h3>Technical Screeners</h3>
-          <p>Built to help you capture stocks when they trend towards specific price points and zones. Ideal for traders who want to identify Crossovers, Breakouts, and momentum shifts.</p>
+          <p>Built to help you capture stocks when they trend towards specific price points and zones. Ideal for traders
+            who want to identify Crossovers, Breakouts, and momentum shifts.</p>
           <ul class="screener-list">
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Golden Crossover (50/200 SMA)
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               RSI Overbought/Oversold
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               MACD Signal Crossover
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Strong ADX Trending
             </li>
           </ul>
-          <a href="{{ url_for('technical_screener.technical_screener') }}" class="btn-outline">View Technical Screeners</a>
+          <a href="{{ url_for('technical_screener.technical_screener') }}" class="btn-outline">View Technical
+            Screeners</a>
         </div>
         <div class="tab-visual">
           <div class="indicator-cards">
@@ -434,33 +446,38 @@
       <div class="tab-content" id="intraday">
         <div class="tab-description">
           <h3>Intraday Screeners</h3>
-          <p>Move quickly between 9:15 to 3:30 with day trading screeners. Choose from High Volume Stocks, Intraday Recovery, Gap Up/Down, and more.</p>
+          <p>Move quickly between 9:15 to 3:30 with day trading screeners. Choose from High Volume Stocks, Intraday
+            Recovery, Gap Up/Down, and more.</p>
           <ul class="screener-list">
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Price Gainers Today
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Price Losers Today
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               High Volume Alerts
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Breakout Scanner
             </li>
@@ -492,33 +509,38 @@
       <div class="tab-content" id="derivative">
         <div class="tab-description">
           <h3>Derivative Screeners</h3>
-          <p>Advanced F&O analysis with OI buildup, IV tracking, and options flow. Perfect for options traders looking for edge in the market.</p>
+          <p>Advanced F&O analysis with OI buildup, IV tracking, and options flow. Perfect for options traders looking
+            for edge in the market.</p>
           <ul class="screener-list">
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Top Gainers & Losers (40 Tables)
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Signal Analysis
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Futures OI Analysis
             </li>
             <li>
-              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+              <svg class="list-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
               Options Chain Insights
             </li>
@@ -565,11 +587,15 @@
         <div class="insight-content">
           <div class="activity-row">
             <span class="activity-label">FII (Net)</span>
-            <span class="activity-value down">-₹2,345 Cr</span>
+            <span class="activity-value {{ 'up' if fii_dii.fii_net >= 0 else 'down' }}" id="fiiNetValue">
+              {{ '+' if fii_dii.fii_net >= 0 else '' }}₹{{ '{:,.0f}'.format(fii_dii.fii_net|abs) }} Cr
+            </span>
           </div>
           <div class="activity-row">
             <span class="activity-label">DII (Net)</span>
-            <span class="activity-value up">+₹1,890 Cr</span>
+            <span class="activity-value {{ 'up' if fii_dii.dii_net >= 0 else 'down' }}" id="diiNetValue">
+              {{ '+' if fii_dii.dii_net >= 0 else '' }}₹{{ '{:,.0f}'.format(fii_dii.dii_net|abs) }} Cr
+            </span>
           </div>
           <p class="insight-note">Check the money flow by FIIs and DIIs. This reveals the true strength of markets.</p>
         </div>
@@ -645,17 +671,18 @@
       <div class="footer-brand">
         <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine" class="footer-logo">
         <h4>
-          <svg class="footer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
+          <svg class="footer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
           </svg>
           Registered Office:
         </h4>
         <p>
-            Unit no. 111–111, 11th Floor,<br>
-            Block no. 53-E, Dalal Street Building (BSE Tower),<br>
-            Road 5E, Zone-5, Gift City,<br>
-            Gandhinagar – 382050, Gujarat
+          Unit no. 111–111, 11th Floor,<br>
+          Block no. 53-E, Dalal Street Building (BSE Tower),<br>
+          Road 5E, Zone-5, Gift City,<br>
+          Gandhinagar – 382050, Gujarat
         </p>
       </div>
       <div class="footer-links">
@@ -682,8 +709,10 @@
         </div>
       </div>
       <div class="footer-certified">
-          <p>SEBI REG. No.: INZ000182938  |  NSE MEMBER ID : 08846  |  BSE MEMBER ID : 3020  |  MCX MEMBER ID : 12760  |  SEBI DP REG. No: IN-DP-483-2020  |
-  SEBI RESEARCH ANALYST REG. No.: INH000005625  |  BSE RA Code: 5273  |  AMFI REG. No. : ARN-78635  |  CIN : U65910GJ1994PTC023523</p>
+        <p>SEBI REG. No.: INZ000182938 | NSE MEMBER ID : 08846 | BSE MEMBER ID : 3020 | MCX MEMBER ID : 12760 | SEBI DP
+          REG. No: IN-DP-483-2020 |
+          SEBI RESEARCH ANALYST REG. No.: INH000005625 | BSE RA Code: 5273 | AMFI REG. No. : ARN-78635 | CIN :
+          U65910GJ1994PTC023523</p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -701,18 +730,19 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <!-- Chart.js for market index charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script src="{{ url_for('static', filename='js/home_fii_dii_updates.js') }}"></script>
 
 <!-- Market data from Flask backend -->
 <script>
-const marketData = {
-  nifty50: { value: 24677.80, change: 0.42, open: 25840.40, high: 25940.60, low: 25623.00 },
-  banknifty: { value: 51234.50, change: -0.18, open: 51450.00, high: 51550.30, low: 51100.20 },
-  sensex: { value: 83758.43, change: 1.23, open: 83200.00, high: 83900.50, low: 83150.00 },
-  niftyfin: { value: 23890.40, change: 0.67, open: 23750.00, high: 23950.00, low: 23700.00 },
-  niftynext50: { value: 68499.30, change: -1.01, open: 69200.00, high: 69350.00, low: 68400.00 },
-  niftyfinservice: { value: 27388.75, change: -1.03, open: 27680.00, high: 27750.00, low: 27350.00 },
-  nifty100: { value: 26260.30, change: -0.76, open: 26450.00, high: 26500.00, low: 26200.00 }
-};
+  const marketData = {
+    nifty50: { value: 24677.80, change: 0.42, open: 25840.40, high: 25940.60, low: 25623.00 },
+    banknifty: { value: 51234.50, change: -0.18, open: 51450.00, high: 51550.30, low: 51100.20 },
+    sensex: { value: 83758.43, change: 1.23, open: 83200.00, high: 83900.50, low: 83150.00 },
+    niftyfin: { value: 23890.40, change: 0.67, open: 23750.00, high: 23950.00, low: 23700.00 },
+    niftynext50: { value: 68499.30, change: -1.01, open: 69200.00, high: 69350.00, low: 68400.00 },
+    niftyfinservice: { value: 27388.75, change: -1.03, open: 27680.00, high: 27750.00, low: 27350.00 },
+    nifty100: { value: 26260.30, change: -0.76, open: 26450.00, high: 26500.00, low: 26200.00 }
+  };
 </script>
 
 <!-- Market charts initialization -->
@@ -723,51 +753,51 @@ const marketData = {
 <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
 
 <script>
-// Timeframe button switching
-document.querySelectorAll('.timeframe-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    // Update buttons
-    document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
+  // Timeframe button switching
+  document.querySelectorAll('.timeframe-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      // Update buttons
+      document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
 
-    // Here you can add logic to update chart data based on timeframe
-    const timeframe = this.dataset.timeframe;
-    console.log('Selected timeframe:', timeframe);
-    // TODO: Update chart with new timeframe data
+      // Here you can add logic to update chart data based on timeframe
+      const timeframe = this.dataset.timeframe;
+      console.log('Selected timeframe:', timeframe);
+      // TODO: Update chart with new timeframe data
+    });
   });
-});
 
-// Tab switching
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const tabId = this.dataset.tab;
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const tabId = this.dataset.tab;
 
-    // Update buttons
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
+      // Update buttons
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
 
-    // Update content
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
+      // Update content
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    });
   });
-});
 
-// Animate on scroll (simple version)
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
+  // Animate on scroll (simple version)
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('animate-in');
-    }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.feature-card, .insight-card').forEach(el => {
+    observer.observe(el);
   });
-}, observerOptions);
-
-document.querySelectorAll('.feature-card, .insight-card').forEach(el => {
-  observer.observe(el);
-});
 </script>
 {% endblock %}

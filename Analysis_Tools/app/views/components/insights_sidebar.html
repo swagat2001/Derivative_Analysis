@@ -66,12 +66,35 @@
     height: 16px;
   }
 
-  .icon-heatmap { background: #fef3c7; color: #d97706; }
-  .icon-fii { background: #dbeafe; color: #2563eb; }
-  .icon-delivery { background: #d1fae5; color: #059669; }
-  .icon-52week { background: #fce7f3; color: #db2777; }
-  .icon-volume { background: #ede9fe; color: #7c3aed; }
-  .icon-sector { background: #ffedd5; color: #ea580c; }
+  .icon-heatmap {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .icon-fii {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+
+  .icon-delivery {
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  .icon-52week {
+    background: #fce7f3;
+    color: #db2777;
+  }
+
+  .icon-volume {
+    background: #ede9fe;
+    color: #7c3aed;
+  }
+
+  .icon-sector {
+    background: #ffedd5;
+    color: #ea580c;
+  }
 
   @media (max-width: 1024px) {
     .insights-sidebar {
@@ -82,68 +105,85 @@
       gap: 6px;
       padding: 12px;
     }
-    .insights-sidebar h3 { width: 100%; margin-bottom: 8px; }
-    .insights-sidebar hr { display: none; }
-    .insights-sidebar .menu-item { padding: 8px 12px; margin-bottom: 0; }
+
+    .insights-sidebar h3 {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .insights-sidebar hr {
+      display: none;
+    }
+
+    .insights-sidebar .menu-item {
+      padding: 8px 12px;
+      margin-bottom: 0;
+    }
   }
 </style>
 
 <aside class="insights-sidebar">
   <h3>Market Insights</h3>
-  <a href="{{ url_for('insights.insights_page') }}?tab=heatmap"
-     class="menu-item {% if active_tab == 'heatmap' %}active{% endif %}">
+  <a href="#" onclick="switchMainTab('heatmap'); return false;" id="nav-heatmap"
+    class="menu-item {% if active_tab == 'heatmap' %}active{% endif %}">
     <span class="menu-icon icon-heatmap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
       </svg>
     </span>
     Heatmap
   </a>
-  <a href="{{ url_for('insights.insights_page') }}?tab=fii-dii"
-     class="menu-item {% if active_tab == 'fii-dii' %}active{% endif %}">
+  <a href="#" onclick="switchMainTab('fii-dii'); return false;" id="nav-fii-dii"
+    class="menu-item {% if active_tab == 'fii-dii' %}active{% endif %}">
     <span class="menu-icon icon-fii">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+        <path d="M12 20V10" />
+        <path d="M18 20V4" />
+        <path d="M6 20v-4" />
       </svg>
     </span>
     FII/DII Activity
   </a>
-  <a href="{{ url_for('insights.insights_page') }}?tab=delivery"
-     class="menu-item {% if active_tab == 'delivery' %}active{% endif %}">
+  <a href="#" onclick="switchMainTab('delivery'); return false;" id="nav-delivery"
+    class="menu-item {% if active_tab == 'delivery' %}active{% endif %}">
     <span class="menu-icon icon-delivery">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <path
+          d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
       </svg>
     </span>
     Delivery Data
   </a>
-  <a href="{{ url_for('insights.insights_page') }}?tab=52week"
-     class="menu-item {% if active_tab == '52week' %}active{% endif %}">
+  <a href="#" onclick="switchMainTab('52week'); return false;" id="nav-52week"
+    class="menu-item {% if active_tab == '52week' %}active{% endif %}">
     <span class="menu-icon icon-52week">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-        <polyline points="16 7 22 7 22 13"/>
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+        <polyline points="16 7 22 7 22 13" />
       </svg>
     </span>
     52-Week High/Low
   </a>
-  <a href="{{ url_for('insights.insights_page') }}?tab=volume"
-     class="menu-item {% if active_tab == 'volume' %}active{% endif %}">
+  <a href="#" onclick="switchMainTab('volume'); return false;" id="nav-volume"
+    class="menu-item {% if active_tab == 'volume' %}active{% endif %}">
     <span class="menu-icon icon-volume">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-        <polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
       </svg>
     </span>
     Volume Breakouts
   </a>
-  <a href="{{ url_for('insights.insights_page') }}?tab=sectors"
-     class="menu-item {% if active_tab == 'sectors' %}active{% endif %}">
+  <a href="#" onclick="switchMainTab('sectors'); return false;" id="nav-sectors"
+    class="menu-item {% if active_tab == 'sectors' %}active{% endif %}">
     <span class="menu-icon icon-sector">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
-        <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+        <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+        <path d="M22 12A10 10 0 0 0 12 2v10z" />
       </svg>
     </span>
     Sector Performance
@@ -152,7 +192,8 @@
   <a href="{{ url_for('screener.screener_landing') }}" class="menu-item">
     <span class="menu-icon" style="background:#f3f4f6;color:#6b7280;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
       </svg>
     </span>
     Back to Screeners

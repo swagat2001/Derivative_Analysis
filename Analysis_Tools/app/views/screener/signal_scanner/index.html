@@ -5,142 +5,602 @@
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <style>
-/* ===== SCANNER CONTAINER ===== */
-.scanner-container { padding: 20px 25px; max-width: 1800px; margin: 0 auto; }
-.scanner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-.scanner-title { font-size: 20px; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 10px; }
-.scanner-title svg { color: #8B2432; }
-.scanner-subtitle { font-size: 13px; color: #6b7280; margin-left: 34px; margin-top: -10px; margin-bottom: 15px; }
+    /* ===== SCANNER CONTAINER ===== */
+    .scanner-container {
+        padding: 20px 25px;
+        max-width: 1800px;
+        margin: 0 auto;
+    }
 
-/* ===== CONTROLS BAR ===== */
-.scanner-controls { display: flex; gap: 12px; padding: 16px 20px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 10px; border: 1px solid #e5e7eb; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-.control-group { display: flex; align-items: center; gap: 8px; }
-.control-group label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; white-space: nowrap; }
-.control-group select, .control-group input { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; font-weight: 500; background: white; min-width: 100px; }
-.control-group select:focus, .control-group input:focus { outline: none; border-color: #8B2432; box-shadow: 0 0 0 2px rgba(139,36,50,0.1); }
+    .scanner-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
 
-.scan-btn { padding: 10px 24px; background: linear-gradient(135deg, #8B2432 0%, #6d1c28 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; margin-left: auto; }
-.scan-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139,36,50,0.3); }
-.scan-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-.scan-btn svg { width: 16px; height: 16px; }
+    .scanner-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-/* ===== SUMMARY CARDS ===== */
-.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.summary-card { background: white; border-radius: 10px; border: 1px solid #e5e7eb; padding: 14px 12px; text-align: center; transition: all 0.2s; }
-.summary-card:hover { border-color: #8B2432; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transform: translateY(-2px); }
-.summary-card .value { font-size: 22px; font-weight: 700; color: #1f2937; }
-.summary-card .label { font-size: 10px; color: #6b7280; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
-.summary-card.bullish .value { color: #16a34a; }
-.summary-card.bearish .value { color: #dc2626; }
-.summary-card.highlight .value { color: #8B2432; }
-.summary-card.info .value { color: #2563eb; }
+    .scanner-title svg {
+        color: #8B2432;
+    }
 
-/* ===== FILTER TABS ===== */
-.filter-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
-.filter-tab { padding: 8px 14px; border: 1px solid #e5e7eb; background: white; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-.filter-tab:hover { border-color: #8B2432; background: #fef2f2; }
-.filter-tab.active { background: #8B2432; color: white; border-color: #8B2432; }
-.filter-tab .count { font-size: 10px; opacity: 0.8; }
+    .scanner-subtitle {
+        font-size: 13px;
+        color: #6b7280;
+        margin-left: 34px;
+        margin-top: -10px;
+        margin-bottom: 15px;
+    }
 
-/* ===== RESULTS TABLE ===== */
-.results-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-.results-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-bottom: 1px solid #e5e7eb; }
-.results-title { font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 8px; }
-.results-title svg { color: #8B2432; }
-.results-count { font-size: 13px; color: #6b7280; background: #f3f4f6; padding: 4px 10px; border-radius: 20px; }
+    /* ===== CONTROLS BAR ===== */
+    .scanner-controls {
+        display: flex;
+        gap: 12px;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
 
-.results-table-wrapper { overflow-x: auto; max-height: 650px; overflow-y: auto; }
-.results-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.results-table thead { position: sticky; top: 0; background: #f9fafb; z-index: 10; }
-.results-table th { padding: 10px 8px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb; white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
-.results-table th:hover { background: #f3f4f6; }
-.results-table td { padding: 10px 8px; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
-.results-table tbody tr:hover { background: #f9fafb; }
-.results-table tbody tr:nth-child(even) { background: #fcfcfc; }
-.results-table tbody tr:nth-child(even):hover { background: #f9fafb; }
+    .control-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-/* Table Cell Styles */
-.symbol-link { color: #2563eb; text-decoration: none; font-weight: 600; }
-.symbol-link:hover { text-decoration: underline; }
-.num-cell { font-family: 'SF Mono', Monaco, monospace; font-size: 11px; color: #374151; }
-.positive { color: #16a34a !important; }
-.negative { color: #dc2626 !important; }
+    .control-group label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
 
-/* ===== SIGNAL BADGES ===== */
-.signal-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-.signal-badge.high-vol { background: #dbeafe; color: #1d4ed8; }
-.signal-badge.oi-spike { background: #fef3c7; color: #b45309; }
-.signal-badge.pivot-support { background: #dcfce7; color: #15803d; }
-.signal-badge.pivot-resist { background: #fee2e2; color: #b91c1c; }
-.signal-badge.bull-div { background: #d1fae5; color: #047857; }
-.signal-badge.bear-div { background: #fecaca; color: #dc2626; }
-.signal-badge.rsi-up { background: #bbf7d0; color: #166534; }
-.signal-badge.rsi-down { background: #fca5a5; color: #991b1b; }
-.signal-badge.oversold { background: #86efac; color: #14532d; }
-.signal-badge.overbought { background: #f87171; color: #7f1d1d; }
-.signal-badge.ce { background: #dcfce7; color: #166534; }
-.signal-badge.pe { background: #fee2e2; color: #991b1b; }
-.signal-badge.fut { background: #e0e7ff; color: #3730a3; }
+    .control-group select,
+    .control-group input {
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        background: white;
+        min-width: 100px;
+    }
 
-/* ===== RSI CELL ===== */
-.rsi-cell { display: flex; align-items: center; gap: 6px; }
-.rsi-value { font-weight: 600; font-size: 12px; min-width: 32px; }
-.rsi-bar { width: 50px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
-.rsi-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-.rsi-fill.oversold { background: linear-gradient(90deg, #22c55e, #4ade80); }
-.rsi-fill.overbought { background: linear-gradient(90deg, #ef4444, #f87171); }
-.rsi-fill.neutral { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .control-group select:focus,
+    .control-group input:focus {
+        outline: none;
+        border-color: #8B2432;
+        box-shadow: 0 0 0 2px rgba(139, 36, 50, 0.1);
+    }
 
-/* ===== PIVOT CELL ===== */
-.pivot-cell { font-size: 10px; line-height: 1.4; }
-.pivot-cell .support { color: #16a34a; }
-.pivot-cell .resist { color: #dc2626; }
-.pivot-cell .pp { color: #8B2432; font-weight: 600; }
+    .scan-btn {
+        padding: 10px 24px;
+        background: linear-gradient(135deg, #8B2432 0%, #6d1c28 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        margin-left: auto;
+    }
 
-/* ===== VP CELL ===== */
-.vp-cell { font-size: 10px; line-height: 1.4; }
-.vp-cell .poc { color: #8B2432; font-weight: 600; }
-.vp-cell .vah { color: #dc2626; }
-.vp-cell .val { color: #16a34a; }
+    .scan-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(139, 36, 50, 0.3);
+    }
 
-/* ===== SIGNALS COLUMN ===== */
-.signals-cell { display: flex; flex-wrap: wrap; gap: 4px; max-width: 200px; }
+    .scan-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
 
-/* ===== LOADING & EMPTY STATES ===== */
-.loading-spinner { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 300px; gap: 16px; }
-.spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #8B2432; border-radius: 50%; animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { color: #6b7280; font-size: 14px; }
-.empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
-.empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
-.empty-state h3 { font-size: 16px; color: #374151; margin-bottom: 8px; }
+    .scan-btn svg {
+        width: 16px;
+        height: 16px;
+    }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1200px) {
-    .summary-grid { grid-template-columns: repeat(5, 1fr); }
-}
-@media (max-width: 1024px) {
-    .scanner-controls { flex-direction: column; align-items: stretch; }
-    .control-group { width: 100%; }
-    .control-group select, .control-group input { flex: 1; }
-    .scan-btn { width: 100%; justify-content: center; margin-left: 0; margin-top: 8px; }
-    .summary-grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 768px) {
-    .summary-grid { grid-template-columns: repeat(2, 1fr); }
-    .filter-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px; }
-}
+    /* ===== SUMMARY CARDS ===== */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 14px 12px;
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+    .summary-card:hover {
+        border-color: #8B2432;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .summary-card .value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .summary-card .label {
+        font-size: 10px;
+        color: #6b7280;
+        text-transform: uppercase;
+        margin-top: 4px;
+        letter-spacing: 0.5px;
+    }
+
+    .summary-card.bullish .value {
+        color: #16a34a;
+    }
+
+    .summary-card.bearish .value {
+        color: #dc2626;
+    }
+
+    .summary-card.highlight .value {
+        color: #8B2432;
+    }
+
+    .summary-card.info .value {
+        color: #2563eb;
+    }
+
+    /* ===== FILTER TABS ===== */
+    .filter-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 8px 14px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-tab:hover {
+        border-color: #8B2432;
+        background: #fef2f2;
+    }
+
+    .filter-tab.active {
+        background: #8B2432;
+        color: white;
+        border-color: #8B2432;
+    }
+
+    .filter-tab .count {
+        font-size: 10px;
+        opacity: 0.8;
+    }
+
+    /* ===== RESULTS TABLE ===== */
+    .results-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .results-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .results-title svg {
+        color: #8B2432;
+    }
+
+    .results-count {
+        font-size: 13px;
+        color: #6b7280;
+        background: #f3f4f6;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+
+    .results-table-wrapper {
+        overflow-x: auto;
+        max-height: 650px;
+        overflow-y: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .results-table thead {
+        position: sticky;
+        top: 0;
+        background: #f9fafb;
+        z-index: 10;
+    }
+
+    .results-table th {
+        padding: 10px 8px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+        white-space: nowrap;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+
+    .results-table th:hover {
+        background: #f3f4f6;
+    }
+
+    .results-table td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #f3f4f6;
+        white-space: nowrap;
+    }
+
+    .results-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .results-table tbody tr:nth-child(even) {
+        background: #fcfcfc;
+    }
+
+    .results-table tbody tr:nth-child(even):hover {
+        background: #f9fafb;
+    }
+
+    /* Table Cell Styles */
+    .symbol-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .symbol-link:hover {
+        text-decoration: underline;
+    }
+
+    .num-cell {
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 11px;
+        color: #374151;
+    }
+
+    .positive {
+        color: #16a34a !important;
+    }
+
+    .negative {
+        color: #dc2626 !important;
+    }
+
+    /* ===== SIGNAL BADGES ===== */
+    .signal-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .signal-badge.high-vol {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .signal-badge.oi-spike {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .signal-badge.pivot-support {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .signal-badge.pivot-resist {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .signal-badge.bull-div {
+        background: #d1fae5;
+        color: #047857;
+    }
+
+    .signal-badge.bear-div {
+        background: #fecaca;
+        color: #dc2626;
+    }
+
+    .signal-badge.rsi-up {
+        background: #bbf7d0;
+        color: #166534;
+    }
+
+    .signal-badge.rsi-down {
+        background: #fca5a5;
+        color: #991b1b;
+    }
+
+    .signal-badge.oversold {
+        background: #86efac;
+        color: #14532d;
+    }
+
+    .signal-badge.overbought {
+        background: #f87171;
+        color: #7f1d1d;
+    }
+
+    .signal-badge.ce {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .signal-badge.pe {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .signal-badge.fut {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    /* ===== RSI CELL ===== */
+    .rsi-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .rsi-value {
+        font-weight: 600;
+        font-size: 12px;
+        min-width: 32px;
+    }
+
+    .rsi-bar {
+        width: 50px;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .rsi-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s;
+    }
+
+    .rsi-fill.oversold {
+        background: linear-gradient(90deg, #22c55e, #4ade80);
+    }
+
+    .rsi-fill.overbought {
+        background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    .rsi-fill.neutral {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+
+    /* ===== PIVOT CELL ===== */
+    .pivot-cell {
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .pivot-cell .support {
+        color: #16a34a;
+    }
+
+    .pivot-cell .resist {
+        color: #dc2626;
+    }
+
+    .pivot-cell .pp {
+        color: #8B2432;
+        font-weight: 600;
+    }
+
+    /* ===== VP CELL ===== */
+    .vp-cell {
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .vp-cell .poc {
+        color: #8B2432;
+        font-weight: 600;
+    }
+
+    .vp-cell .vah {
+        color: #dc2626;
+    }
+
+    .vp-cell .val {
+        color: #16a34a;
+    }
+
+    /* ===== SIGNALS COLUMN ===== */
+    .signals-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 200px;
+    }
+
+    /* ===== LOADING & EMPTY STATES ===== */
+    .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        gap: 16px;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e5e7eb;
+        border-top-color: #8B2432;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loading-text {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+    }
+
+    .empty-state svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        font-size: 16px;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+        .summary-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .scanner-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .control-group {
+            width: 100%;
+        }
+
+        .control-group select,
+        .control-group input {
+            flex: 1;
+        }
+
+        .scan-btn {
+            width: 100%;
+            justify-content: center;
+            margin-left: 0;
+            margin-top: 8px;
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-tabs {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 8px;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="screener-page-wrapper" style="display: flex; gap: 24px; padding: 20px 25px; max-width: 1800px; margin: 0 auto;">
+<div class="screener-page-wrapper"
+    style="display: flex; gap: 24px; padding: 20px 25px; max-width: 1800px; margin: 0 auto;">
     {% include 'components/screener_sidebar.html' %}
 
     <div class="scanner-main-content" style="flex: 1; min-width: 0;">
         <div class="scanner-header">
             <h1 class="scanner-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                </svg>
                 F&O Signal Scanner
             </h1>
             <span id="lastUpdated" style="font-size: 12px; color: #6b7280;"></span>
@@ -182,29 +642,44 @@
                 </select>
             </div>
             <button class="scan-btn" id="scanBtn" onclick="runScanner()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
                 Run Scanner
             </button>
         </div>
 
         <!-- Summary Cards -->
         <div class="summary-grid" id="summaryGrid">
-            <div class="summary-card highlight"><span class="value" id="totalSignals">-</span><span class="label">Total Signals</span></div>
-            <div class="summary-card info"><span class="value" id="uniqueSymbols">-</span><span class="label">Symbols</span></div>
-            <div class="summary-card bullish"><span class="value" id="highVolume">-</span><span class="label">High Volume</span></div>
-            <div class="summary-card bullish"><span class="value" id="oiSpike">-</span><span class="label">OI Spike</span></div>
-            <div class="summary-card"><span class="value" id="pivotSignals">-</span><span class="label">Pivot Signals</span></div>
-            <div class="summary-card bullish"><span class="value" id="bullDiv">-</span><span class="label">Bull Divergence</span></div>
-            <div class="summary-card bearish"><span class="value" id="bearDiv">-</span><span class="label">Bear Divergence</span></div>
-            <div class="summary-card bullish"><span class="value" id="rsiUp">-</span><span class="label">RSI Cross Up</span></div>
-            <div class="summary-card bearish"><span class="value" id="rsiDown">-</span><span class="label">RSI Cross Down</span></div>
-            <div class="summary-card bullish"><span class="value" id="oversold">-</span><span class="label">Oversold</span></div>
+            <div class="summary-card highlight"><span class="value" id="totalSignals">-</span><span class="label">Total
+                    Signals</span></div>
+            <div class="summary-card info"><span class="value" id="uniqueSymbols">-</span><span
+                    class="label">Symbols</span></div>
+            <div class="summary-card bullish"><span class="value" id="highVolume">-</span><span class="label">High
+                    Volume</span></div>
+            <div class="summary-card bullish"><span class="value" id="oiSpike">-</span><span class="label">OI
+                    Spike</span></div>
+            <div class="summary-card"><span class="value" id="pivotSignals">-</span><span class="label">Pivot
+                    Signals</span></div>
+            <div class="summary-card bullish"><span class="value" id="bullDiv">-</span><span class="label">Bull
+                    Divergence</span></div>
+            <div class="summary-card bearish"><span class="value" id="bearDiv">-</span><span class="label">Bear
+                    Divergence</span></div>
+            <div class="summary-card bullish"><span class="value" id="rsiUp">-</span><span class="label">RSI Cross
+                    Up</span></div>
+            <div class="summary-card bearish"><span class="value" id="rsiDown">-</span><span class="label">RSI Cross
+                    Down</span></div>
+            <div class="summary-card bullish"><span class="value" id="oversold">-</span><span
+                    class="label">Oversold</span></div>
         </div>
 
         <!-- Filter Tabs -->
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-tab active" data-type="all" onclick="filterByType('all')">All Signals</button>
-            <button class="filter-tab" data-type="high_volume" onclick="filterByType('high_volume')">High Volume</button>
+            <button class="filter-tab" data-type="high_volume" onclick="filterByType('high_volume')">High
+                Volume</button>
             <button class="filter-tab" data-type="oi_spike" onclick="filterByType('oi_spike')">OI Spike</button>
             <button class="filter-tab" data-type="pivot" onclick="filterByType('pivot')">Pivot Levels</button>
             <button class="filter-tab" data-type="divergence" onclick="filterByType('divergence')">Divergence</button>
@@ -217,14 +692,22 @@
         <div class="results-card">
             <div class="results-header">
                 <span class="results-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
                     Scanner Results
                 </span>
                 <span class="results-count" id="resultsCount">0 signals</span>
             </div>
             <div class="results-table-wrapper" id="resultsContainer">
                 <div class="empty-state">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
                     <h3>Ready to Scan</h3>
                     <p>Click "Run Scanner" to detect F&O signals</p>
                 </div>
@@ -236,83 +719,83 @@
 
 {% block page_js %}
 <script>
-let currentSignalType = 'all';
-let allSignals = [];
+    let currentSignalType = 'all';
+    let allSignals = [];
 
-function formatNumber(num) {
-    if (num === null || num === undefined || isNaN(num)) return '-';
-    if (num >= 1e7) return (num / 1e7).toFixed(2) + ' Cr';
-    if (num >= 1e5) return (num / 1e5).toFixed(2) + ' L';
-    if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-    return num.toLocaleString();
-}
-
-function getRsiClass(rsi) {
-    if (rsi < 30) return 'oversold';
-    if (rsi > 70) return 'overbought';
-    return 'neutral';
-}
-
-function getOptionBadge(type) {
-    if (type === 'CE') return '<span class="signal-badge ce">CE</span>';
-    if (type === 'PE') return '<span class="signal-badge pe">PE</span>';
-    if (!type || type === '') return '<span class="signal-badge fut">FUT</span>';
-    return '';
-}
-
-function getSignalBadges(signal) {
-    let badges = [];
-
-    if (signal.high_volume) badges.push('<span class="signal-badge high-vol">High Vol</span>');
-    if (signal.oi_spike) badges.push('<span class="signal-badge oi-spike">OI Spike</span>');
-
-    if (signal.pivot_signal) {
-        if (['S1','S2','S3'].includes(signal.pivot_signal)) {
-            badges.push(`<span class="signal-badge pivot-support">${signal.pivot_signal}</span>`);
-        } else {
-            badges.push(`<span class="signal-badge pivot-resist">${signal.pivot_signal}</span>`);
-        }
+    function formatNumber(num) {
+        if (num === null || num === undefined || isNaN(num)) return '-';
+        if (num >= 1e7) return (num / 1e7).toFixed(2) + ' Cr';
+        if (num >= 1e5) return (num / 1e5).toFixed(2) + ' L';
+        if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+        return num.toLocaleString();
     }
 
-    if (signal.divergence === 'BULL') badges.push('<span class="signal-badge bull-div">Bull Div</span>');
-    if (signal.divergence === 'BEAR') badges.push('<span class="signal-badge bear-div">Bear Div</span>');
+    function getRsiClass(rsi) {
+        if (rsi < 30) return 'oversold';
+        if (rsi > 70) return 'overbought';
+        return 'neutral';
+    }
 
-    if (signal.rsi_cross === 'UP') badges.push('<span class="signal-badge rsi-up">RSI ↑30</span>');
-    if (signal.rsi_cross === 'DOWN') badges.push('<span class="signal-badge rsi-down">RSI ↓70</span>');
+    function getOptionBadge(type) {
+        if (type === 'CE') return '<span class="signal-badge ce">CE</span>';
+        if (type === 'PE') return '<span class="signal-badge pe">PE</span>';
+        if (!type || type === '') return '<span class="signal-badge fut">FUT</span>';
+        return '';
+    }
 
-    if (signal.rsi_trend === 'OVERSOLD') badges.push('<span class="signal-badge oversold">Oversold</span>');
-    if (signal.rsi_trend === 'OVERBOUGHT') badges.push('<span class="signal-badge overbought">Overbought</span>');
+    function getSignalBadges(signal) {
+        let badges = [];
 
-    return badges.join(' ');
-}
+        if (signal.high_volume) badges.push('<span class="signal-badge high-vol">High Vol</span>');
+        if (signal.oi_spike) badges.push('<span class="signal-badge oi-spike">OI Spike</span>');
 
-function updateSummary(summary) {
-    document.getElementById('totalSignals').textContent = (summary.total_signals || 0).toLocaleString();
-    document.getElementById('uniqueSymbols').textContent = (summary.unique_symbols || 0).toLocaleString();
-    document.getElementById('highVolume').textContent = (summary.high_volume_count || 0).toLocaleString();
-    document.getElementById('oiSpike').textContent = (summary.oi_spike_count || 0).toLocaleString();
-    document.getElementById('pivotSignals').textContent = (summary.pivot_signals || 0).toLocaleString();
-    document.getElementById('bullDiv').textContent = (summary.bull_divergence || 0).toLocaleString();
-    document.getElementById('bearDiv').textContent = (summary.bear_divergence || 0).toLocaleString();
-    document.getElementById('rsiUp').textContent = (summary.rsi_cross_up || 0).toLocaleString();
-    document.getElementById('rsiDown').textContent = (summary.rsi_cross_down || 0).toLocaleString();
-    document.getElementById('oversold').textContent = (summary.oversold_count || 0).toLocaleString();
-}
+        if (signal.pivot_signal) {
+            if (['S1', 'S2', 'S3'].includes(signal.pivot_signal)) {
+                badges.push(`<span class="signal-badge pivot-support">${signal.pivot_signal}</span>`);
+            } else {
+                badges.push(`<span class="signal-badge pivot-resist">${signal.pivot_signal}</span>`);
+            }
+        }
 
-function renderTable(signals) {
-    const container = document.getElementById('resultsContainer');
-    document.getElementById('resultsCount').textContent = `${signals.length.toLocaleString()} signals`;
+        if (signal.divergence === 'BULL') badges.push('<span class="signal-badge bull-div">Bull Div</span>');
+        if (signal.divergence === 'BEAR') badges.push('<span class="signal-badge bear-div">Bear Div</span>');
 
-    if (!signals.length) {
-        container.innerHTML = `<div class="empty-state">
+        if (signal.rsi_cross === 'UP') badges.push('<span class="signal-badge rsi-up">RSI ↑30</span>');
+        if (signal.rsi_cross === 'DOWN') badges.push('<span class="signal-badge rsi-down">RSI ↓70</span>');
+
+        if (signal.rsi_trend === 'OVERSOLD') badges.push('<span class="signal-badge oversold">Oversold</span>');
+        if (signal.rsi_trend === 'OVERBOUGHT') badges.push('<span class="signal-badge overbought">Overbought</span>');
+
+        return badges.join(' ');
+    }
+
+    function updateSummary(summary) {
+        document.getElementById('totalSignals').textContent = (summary.total_signals || 0).toLocaleString();
+        document.getElementById('uniqueSymbols').textContent = (summary.unique_symbols || 0).toLocaleString();
+        document.getElementById('highVolume').textContent = (summary.high_volume_count || 0).toLocaleString();
+        document.getElementById('oiSpike').textContent = (summary.oi_spike_count || 0).toLocaleString();
+        document.getElementById('pivotSignals').textContent = (summary.pivot_signals || 0).toLocaleString();
+        document.getElementById('bullDiv').textContent = (summary.bull_divergence || 0).toLocaleString();
+        document.getElementById('bearDiv').textContent = (summary.bear_divergence || 0).toLocaleString();
+        document.getElementById('rsiUp').textContent = (summary.rsi_cross_up || 0).toLocaleString();
+        document.getElementById('rsiDown').textContent = (summary.rsi_cross_down || 0).toLocaleString();
+        document.getElementById('oversold').textContent = (summary.oversold_count || 0).toLocaleString();
+    }
+
+    function renderTable(signals) {
+        const container = document.getElementById('resultsContainer');
+        document.getElementById('resultsCount').textContent = `${signals.length.toLocaleString()} signals`;
+
+        if (!signals.length) {
+            container.innerHTML = `<div class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
             <h3>No Signals Found</h3>
             <p>Try adjusting your filters or date range</p>
         </div>`;
-        return;
-    }
+            return;
+        }
 
-    let html = `<table class="results-table">
+        let html = `<table class="results-table">
         <thead>
             <tr>
                 <th>Date</th>
@@ -331,11 +814,11 @@ function renderTable(signals) {
         </thead>
         <tbody>`;
 
-    signals.forEach(s => {
-        const rsiClass = getRsiClass(s.rsi);
-        const rsiWidth = Math.min(Math.max(s.rsi, 0), 100);
+        signals.forEach(s => {
+            const rsiClass = getRsiClass(s.rsi);
+            const rsiWidth = Math.min(Math.max(s.rsi, 0), 100);
 
-        html += `<tr>
+            html += `<tr>
             <td class="num-cell">${s.signal_date || '-'}</td>
             <td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td>
             <td>${getOptionBadge(s.option_type)}</td>
@@ -362,106 +845,106 @@ function renderTable(signals) {
             </td>
             <td class="signals-cell">${getSignalBadges(s)}</td>
         </tr>`;
-    });
+        });
 
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-function filterByType(type) {
-    currentSignalType = type;
-
-    document.querySelectorAll('.filter-tab').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.type === type);
-    });
-
-    applyFilters();
-}
-
-async function applyFilters() {
-    const symbolFilter = document.getElementById('symbolFilter').value;
-    const optionType = document.getElementById('optionType').value;
-    const sortBy = document.getElementById('sortBy').value;
-
-    const url = `/screener/signal-scanner/api/filter?signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
-
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.success) {
-            renderTable(data.signals);
-            updateSummary(data.summary);
-        }
-    } catch (error) {
-        console.error('Filter error:', error);
+        html += '</tbody></table>';
+        container.innerHTML = html;
     }
-}
 
-async function runScanner() {
-    const btn = document.getElementById('scanBtn');
-    const container = document.getElementById('resultsContainer');
+    function filterByType(type) {
+        currentSignalType = type;
 
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Scanning...';
-    container.innerHTML = `<div class="loading-spinner">
+        document.querySelectorAll('.filter-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === type);
+        });
+
+        applyFilters();
+    }
+
+    async function applyFilters() {
+        const symbolFilter = document.getElementById('symbolFilter').value;
+        const optionType = document.getElementById('optionType').value;
+        const sortBy = document.getElementById('sortBy').value;
+
+        const url = `/screener/signal-scanner/api/filter?signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.success) {
+                renderTable(data.signals);
+                updateSummary(data.summary);
+            }
+        } catch (error) {
+            console.error('Filter error:', error);
+        }
+    }
+
+    async function runScanner() {
+        const btn = document.getElementById('scanBtn');
+        const container = document.getElementById('resultsContainer');
+
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Scanning...';
+        container.innerHTML = `<div class="loading-spinner">
         <div class="spinner"></div>
         <span class="loading-text">Scanning F&O data for signals...</span>
     </div>`;
 
-    const daysBack = document.getElementById('daysBack').value;
-    const symbolFilter = document.getElementById('symbolFilter').value;
-    const optionType = document.getElementById('optionType').value;
-    const sortBy = document.getElementById('sortBy').value;
+        const daysBack = document.getElementById('daysBack').value;
+        const symbolFilter = document.getElementById('symbolFilter').value;
+        const optionType = document.getElementById('optionType').value;
+        const sortBy = document.getElementById('sortBy').value;
 
-    try {
-        const url = `/screener/signal-scanner/api/scan?days_back=${daysBack}&signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
-        const response = await fetch(url);
-        const data = await response.json();
+        try {
+            const url = `/screener/signal-scanner/api/scan?days_back=${daysBack}&signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
+            const response = await fetch(url);
+            const data = await response.json();
 
-        if (data.success) {
-            allSignals = data.signals;
-            updateSummary(data.summary);
-            renderTable(data.signals);
-            document.getElementById('lastUpdated').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
-        } else {
-            container.innerHTML = `<div class="empty-state">
+            if (data.success) {
+                allSignals = data.signals;
+                updateSummary(data.summary);
+                renderTable(data.signals);
+                document.getElementById('lastUpdated').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+            } else {
+                container.innerHTML = `<div class="empty-state">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
                 <h3>Error</h3>
                 <p>${data.error || 'Failed to load data'}</p>
             </div>`;
-        }
-    } catch (error) {
-        console.error('Scanner error:', error);
-        container.innerHTML = `<div class="empty-state">
+            }
+        } catch (error) {
+            console.error('Scanner error:', error);
+            container.innerHTML = `<div class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
             <h3>Connection Error</h3>
             <p>Please check your connection and try again</p>
         </div>`;
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Run Scanner`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Run Scanner`;
+        }
     }
-}
 
-// Event listeners for live filtering
-document.getElementById('symbolFilter').addEventListener('input', debounce(applyFilters, 300));
-document.getElementById('optionType').addEventListener('change', applyFilters);
-document.getElementById('sortBy').addEventListener('change', applyFilters);
+    // Event listeners for live filtering
+    document.getElementById('symbolFilter').addEventListener('input', debounce(applyFilters, 300));
+    document.getElementById('optionType').addEventListener('change', applyFilters);
+    document.getElementById('sortBy').addEventListener('change', applyFilters);
 
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
             clearTimeout(timeout);
-            func(...args);
+            timeout = setTimeout(later, wait);
         };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+    }
 
-// Auto-run on page load (optional - uncomment if desired)
-// document.addEventListener('DOMContentLoaded', runScanner);
+    // Auto-run on page load (optional - uncomment if desired)
+    // document.addEventListener('DOMContentLoaded', runScanner);
 </script>
 {% endblock %}

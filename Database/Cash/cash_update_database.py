@@ -484,6 +484,25 @@ def main():
         print("\n✓ All steps completed successfully")
         print(f"\nYour CashStocks_Database is now updated!")
         print(f"Tables: TBL_RELIANCE, TBL_TCS, TBL_INFY, etc.")
+
+        # ===========================================
+        # 🚀 STEP 3: UPDATE HEATMAP CACHE
+        # ===========================================
+        print("\n" + "=" * 80)
+        print("🚀 STEP 3: UPDATING HEATMAP CACHE (For Insights)")
+        print("=" * 80 + "\n")
+        try:
+            import subprocess
+
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            heatmap_script = os.path.join(script_dir, "heatmap_cache.py")
+
+            print(f"▶ Running: {heatmap_script}")
+            subprocess.run([sys.executable, heatmap_script], check=False)
+            print("\n✅ Heatmap Cache Update Triggered")
+        except Exception as e:
+            print(f"⚠️ Failed to run heatmap cache update: {e}")
+
         print("=" * 80 + "\n")
 
         return True

@@ -441,12 +441,13 @@ def create_screener_pdf(screener_data, selected_date):
 
     IMPROVEMENTS:
     1. Futures tables exclude Strike column (pass is_future=True)
-    2. Uses correct paths from original controller
+    2. Dynamic paths using current_app.root_path
     3. Inserts final_signal_table AFTER all 40 tables and BEFORE disclaimer
     """
     try:
         import tempfile
 
+        from flask import current_app
         from playwright.sync_api import sync_playwright
         from PyPDF2 import PdfMerger
 
@@ -469,34 +470,46 @@ def create_screener_pdf(screener_data, selected_date):
             cover_date = f"{d}{suf} {yesterday.strftime('%b').upper()} {yesterday.year}"
 
         # ============================================================
-        # PATHS (Using correct paths from your project structure)
+        # PATHS (Using DYNAMIC paths)
         # ============================================================
         print("[INFO] Setting up paths...")
-        base_views = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\views\screener\top_gainers_losers"
+
+        # dynamic path resolution
+        base_views = os.path.join(current_app.root_path, "views", "screener", "top_gainers_losers")
+        static_images = os.path.join(current_app.root_path, "static", "image")
+
         cover_path = os.path.join(base_views, "screener_cover_a4.html")
         table_path = os.path.join(base_views, "screener_table_pages.html")
-        asset = r"C:\Users\Admin\Desktop\Derivative_Analysis\Analysis_Tools\app\static\image"
+
+        if not os.path.exists(cover_path):
+            raise FileNotFoundError(f"Cover template not found at {cover_path}")
+        if not os.path.exists(table_path):
+            raise FileNotFoundError(f"Table template not found at {table_path}")
 
         # ============================================================
         # CONVERT IMAGES TO BASE64
         # ============================================================
         print("[INFO] Encoding images to base64...")
 
-        def img_to_base64(img_path):
+        def img_to_base64(img_filename):
             """Convert image file to base64 data URL"""
+            img_path = os.path.join(static_images, img_filename)
             try:
+                if not os.path.exists(img_path):
+                    print(f"[WARN] Image not found: {img_path}")
+                    return ""
                 with open(img_path, "rb") as f:
                     return f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
             except Exception as e:
                 print(f"[WARN] Failed to encode {img_path}: {e}")
                 return ""
 
-        logo_b64 = img_to_base64(os.path.join(asset, "screener_cover_page_logo.png"))
-        bull_b64 = img_to_base64(os.path.join(asset, "bull.png"))
-        fb_b64 = img_to_base64(os.path.join(asset, "facebook_icon.png"))
-        ig_b64 = img_to_base64(os.path.join(asset, "instagram_icon.png"))
-        li_b64 = img_to_base64(os.path.join(asset, "linkedin_icon.png"))
-        yt_b64 = img_to_base64(os.path.join(asset, "youtube_icon.png"))
+        logo_b64 = img_to_base64("screener_cover_page_logo.png")
+        bull_b64 = img_to_base64("bull.png")
+        fb_b64 = img_to_base64("facebook_icon.png")
+        ig_b64 = img_to_base64("instagram_icon.png")
+        li_b64 = img_to_base64("linkedin_icon.png")
+        yt_b64 = img_to_base64("youtube_icon.png")
 
         # ============================================================
         # HELPER FUNCTIONS
@@ -891,8 +904,9 @@ def create_screener_pdf(screener_data, selected_date):
                 tables_file.write(tables_html)
                 tables_temp_path = tables_file.name
 
-            cover_url = f'file:///{cover_temp_path.replace(chr(92), "/")}'
-            tables_url = f'file:///{tables_temp_path.replace(chr(92), "/")}'
+            # Use file:/// URI with forward slashes
+            cover_url = f'file:///{cover_temp_path.replace(os.path.sep, "/")}'
+            tables_url = f'file:///{tables_temp_path.replace(os.path.sep, "/")}'
 
             page.goto(cover_url)
             page.wait_for_load_state("networkidle")
@@ -936,14 +950,18 @@ def create_screener_pdf(screener_data, selected_date):
 
         final_buffer.seek(0)
         print("[INFO] PDF generation complete!")
-        return final_buffer
+        return final_buffer, None
 
     except Exception as e:
         print(f"[ERROR] create_screener_pdf: {e}")
         import traceback
 
         traceback.print_exc()
-        return None
+        return None, str(e)
+        import traceback
+
+        traceback.print_exc()
+        return None, str(e)
 
 
 # ========================================================================
@@ -966,10 +984,10 @@ def export_screener_pdf():
         if not screener_data:
             return jsonify({"error": "No data available for selected date"}), 404
 
-        pdf_buffer = create_screener_pdf(screener_data, selected_date)
+        pdf_buffer, error_msg = create_screener_pdf(screener_data, selected_date)
 
         if not pdf_buffer:
-            return jsonify({"error": "PDF generation failed"}), 500
+            return jsonify({"error": f"PDF generation failed: {error_msg}"}), 500
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"Goldmine_Screener_Report_{selected_date}_{timestamp}.pdf"
@@ -981,4 +999,4 @@ def export_screener_pdf():
         import traceback
 
         traceback.print_exc()
-        return jsonify({"error": "PDF export failed"}), 500
+        return jsonify({"error": f"PDF export failed: {str(e)}"}), 500
