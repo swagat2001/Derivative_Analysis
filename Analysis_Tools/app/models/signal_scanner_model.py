@@ -227,236 +227,109 @@ def _load_fo_data(start_date: str):
 def run_signal_scanner(start_date: str = None, days_back: int = 30):
     """
     Run the signal scanner and return results.
-
-    Returns list of signal dictionaries with:
-    - Symbol, Expiry, Strike, OptionType, Spot
-    - High, Low, Close, Volume, OI
-    - Pivot Levels, Volume Profile
-    - RSI signals, Volume/OI signals
+    OPTIMIZED: Reads from 'daily_signal_scanner' cache table.
     """
     if not start_date:
         # Default to 30 days back
         start_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
 
-    print(f"[INFO] Running signal scanner from {start_date}...")
+    print(f"[INFO] Fetching cached signals from {start_date}...")
 
-    # Load data
-    data = _load_fo_data(start_date)
+    # Query Cache Table - Multi-Contract
+    # JSONB columns are returned as dicts by psycopg2 automatically
+    query = text(
+        """
+        SELECT
+            date, symbol, expiry, strike, option_type,
+            close, volume, oi, rsi, indicators, signals, metadata
+        FROM daily_signal_scanner
+        WHERE date >= :start_date
+        ORDER BY date DESC, symbol ASC, expiry ASC, strike ASC
+    """
+    )
 
-    if data.empty:
-        print("[WARN] No data loaded for scanner")
-        return []
+    import json
 
-    # Convert numeric columns
-    numeric_cols = ["HghPric", "LwPric", "ClsPric", "OpnPric", "Volume", "OI", "Strike", "Spot"]
-    for col in numeric_cols:
-        if col in data.columns:
-            data[col] = pd.to_numeric(data[col], errors="coerce")
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(query, {"start_date": start_date})
+            rows = result.fetchall()
 
-    # Filter zero volume
-    data = data[data["Volume"] > 0]
+        if not rows:
+            print("[WARN] No cached data found. Please run signal_scanner_cache.py")
+            return []
 
-    # Sort by symbol and date
-    data = data.sort_values(["Symbol", "Timestamp"]).reset_index(drop=True)
+        print(f"[DEBUG] Fetched {len(rows)} rows from database")
 
-    symbols = data["Symbol"].unique()
-    print(f"[INFO] Processing {len(symbols)} symbols...")
+        # Transform to expected dict format
+        output_rows = []
+        for row in rows:
+            # 0:date, 1:symbol, 2:expiry, 3:strike, 4:option_type
+            # 5:close, 6:volume, 7:oi, 8:rsi, 9:indicators, 10:signals, 11:metadata
 
-    output_rows = []
-    skipped_min_data = 0
-    skipped_na_close = 0
-    skipped_rsi = 0
-    skipped_vol_profile = 0
+            # psycopg2 returns JSONB columns as dicts automatically
+            indicators = row[9] if row[9] else {}
+            signals = row[10] if row[10] else {}
+            meta = row[11] if row[11] else {}
 
-    for symbol in symbols:
-        df = data[data["Symbol"] == symbol].reset_index(drop=True)
+            # Helper safely gets keys
+            def get_ind(k, default=0.0):
+                val = indicators.get(k, default)
+                if val is None:
+                    return default
+                return float(val)
 
-        if len(df) < MIN_DATA_POINTS:
-            skipped_min_data += 1
-            continue
+            item = {
+                "signal_date": str(row[0]),
+                "symbol": str(row[1]),
+                "expiry": str(row[2]),
+                "strike": float(row[3] or 0),
+                "option_type": str(row[4] or ""),
+                "close": float(row[5] or 0),
+                "volume": int(row[6] or 0),
+                "oi": int(row[7] or 0),
+                "rsi": float(row[8] or 0),
+                # Indicators
+                "pp": get_ind("pp"),
+                "r1": get_ind("r1"),
+                "s1": get_ind("s1"),
+                "r2": get_ind("r2"),
+                "s2": get_ind("s2"),
+                "r3": get_ind("r3"),
+                "s3": get_ind("s3"),
+                "poc": get_ind("poc"),
+                "vah": get_ind("vah"),
+                "val": get_ind("val"),
+                # Signals
+                "high_volume": bool(signals.get("high_volume")),
+                "oi_spike": bool(signals.get("oi_spike")),
+                "rsi_trend": str(signals.get("rsi_trend") or "NEUTRAL"),
+                "rsi_cross": signals.get("rsi_cross"),  # string or None
+                "pivot_signal": signals.get("pivot_signal"),
+                "divergence": signals.get("divergence"),
+                # Metadata (Fallback/Extras)
+                "high": float(meta.get("high") or 0),
+                "low": float(meta.get("low") or 0),
+                "spot": float(meta.get("spot") or 0),
+            }
+            output_rows.append(item)
 
-        if df["ClsPric"].isna().all():
-            skipped_na_close += 1
-            continue
-
-        # Calculate RSI
-        try:
-            df["RSI"] = calc_rsi(df["ClsPric"])
-        except:
-            skipped_rsi += 1
-            continue
-
-        # Calculate Volume Profile
-        try:
-            poc, vah, val = calc_volume_profile(df, bins=BINS)
-            if poc is None:
-                skipped_vol_profile += 1
-                continue
-        except:
-            skipped_vol_profile += 1
-            continue
-
-        # Process each day (starting from day 15 for enough history)
-        for i in range(15, len(df)):
-            today = df.iloc[i]
-            prev = df.iloc[i - 1]
-
-            high = today.get("HghPric", 0)
-            low = today.get("LwPric", 0)
-            close = today.get("ClsPric", 0)
-            volume = today.get("Volume", 0)
-            oi = today.get("OI", 0)
-            rsi = today.get("RSI", 0)
-
-            # Skip invalid data
-            if pd.isna(high) or pd.isna(low) or pd.isna(close) or high == low or close == 0:
-                continue
-
-            if volume < MIN_VOLUME:
-                continue
-
-            # Calculate Pivot Levels
-            pp, r1, s1, r2, s2, r3, s3 = calc_pivot_levels(high, low, close)
-
-            # Detect Pivot Signals (within 20% of day's range)
-            day_range = high - low
-            tolerance = day_range * 0.20
-
-            s1_sup = abs(close - s1) <= tolerance
-            s2_sup = abs(close - s2) <= tolerance
-            s3_sup = abs(close - s3) <= tolerance
-            r1_res = abs(close - r1) <= tolerance
-            r2_res = abs(close - r2) <= tolerance
-            r3_res = abs(close - r3) <= tolerance
-
-            # High Volume (>1.5x previous)
-            prev_vol = prev.get("Volume", 0)
-            high_vol = volume > prev_vol * 1.5 if prev_vol > 0 else False
-
-            # OI Spike (>15% increase)
-            prev_oi = prev.get("OI", 0)
-            oi_spike = prev_oi > 0 and oi > 0 and (oi - prev_oi) / prev_oi >= 0.15
-
-            # RSI Divergence
-            bull_div = False
-            bear_div = False
-            if i >= 2 and not pd.isna(rsi) and not pd.isna(df.iloc[i - 2]["RSI"]):
-                price_LL = close < df.iloc[i - 2]["ClsPric"]
-                price_HH = close > df.iloc[i - 2]["ClsPric"]
-                rsi_HL = rsi > df.iloc[i - 2]["RSI"]
-                rsi_LH = rsi < df.iloc[i - 2]["RSI"]
-                bull_div = price_LL and rsi_HL
-                bear_div = price_HH and rsi_LH
-
-            # RSI Trend
-            if pd.isna(rsi):
-                rsi_signal = "NEUTRAL"
-            elif rsi < 30:
-                rsi_signal = "OVERSOLD"
-            elif rsi > 70:
-                rsi_signal = "OVERBOUGHT"
-            else:
-                rsi_signal = "NEUTRAL"
-
-            # RSI Cross Signals
-            prev_rsi = prev.get("RSI", 0)
-            rsi_cross_up = False
-            rsi_cross_down = False
-            if not pd.isna(prev_rsi):
-                rsi_cross_up = prev_rsi < 30 and rsi > 30
-                rsi_cross_down = prev_rsi > 70 and rsi < 70
-
-            # Pivot Signal Label
-            if s1_sup:
-                pivot_signal = "S1"
-            elif s2_sup:
-                pivot_signal = "S2"
-            elif s3_sup:
-                pivot_signal = "S3"
-            elif r1_res:
-                pivot_signal = "R1"
-            elif r2_res:
-                pivot_signal = "R2"
-            elif r3_res:
-                pivot_signal = "R3"
-            else:
-                pivot_signal = None
-
-            # RSI Cross Label
-            if rsi_cross_up:
-                rsi_cross = "UP"
-            elif rsi_cross_down:
-                rsi_cross = "DOWN"
-            else:
-                rsi_cross = None
-
-            # Divergence Label
-            if bull_div:
-                divergence = "BULL"
-            elif bear_div:
-                divergence = "BEAR"
-            else:
-                divergence = None
-
-            # Only store if any signal is present
-            if high_vol or oi_spike or pivot_signal or rsi_cross or divergence:
-                signal_date = today.get("Timestamp", "")
-                if hasattr(signal_date, "strftime"):
-                    signal_date = signal_date.strftime("%Y-%m-%d")
-
-                expiry = today.get("Expiry", "")
-                if hasattr(expiry, "strftime"):
-                    expiry = expiry.strftime("%Y-%m-%d")
-
-                # Helper to safely convert numpy types to Python native types
-                def to_python_int(val):
-                    if pd.isna(val) or val is None:
-                        return 0
-                    return int(float(val))  # float first handles numpy types
-
-                def to_python_float(val, decimals=2):
-                    if pd.isna(val) or val is None:
-                        return 0.0
-                    return round(float(val), decimals)
-
-                output_rows.append(
-                    {
-                        "signal_date": str(signal_date) if signal_date else "",
-                        "expiry": str(expiry) if expiry else "",
-                        "symbol": str(symbol),
-                        "spot": to_python_float(today.get("Spot", 0)),
-                        "strike": to_python_float(today.get("Strike", 0)),
-                        "option_type": str(today.get("OptionType", "") or ""),
-                        "high": to_python_float(high),
-                        "low": to_python_float(low),
-                        "close": to_python_float(close),
-                        "volume": to_python_int(volume),
-                        "oi": to_python_int(oi),
-                        "pp": to_python_float(pp),
-                        "r1": to_python_float(r1),
-                        "s1": to_python_float(s1),
-                        "r2": to_python_float(r2),
-                        "s2": to_python_float(s2),
-                        "r3": to_python_float(r3),
-                        "s3": to_python_float(s3),
-                        "poc": to_python_float(poc),
-                        "vah": to_python_float(vah),
-                        "val": to_python_float(val),
-                        "rsi": to_python_float(rsi) if not pd.isna(rsi) else 0.0,
-                        "rsi_trend": str(rsi_signal) if rsi_signal else "NEUTRAL",
-                        "rsi_cross": str(rsi_cross) if rsi_cross else None,
-                        "high_volume": bool(high_vol),
-                        "oi_spike": bool(oi_spike),
-                        "pivot_signal": str(pivot_signal) if pivot_signal else None,
-                        "divergence": str(divergence) if divergence else None,
-                    }
+            if len(output_rows) <= 3:
+                print(
+                    f"[DEBUG] Processed row {len(output_rows)}: {item['symbol']} {item['option_type']} Strike:{item['strike']}"
                 )
 
-    print(
-        f"[DEBUG] Skipped: min_data={skipped_min_data}, na_close={skipped_na_close}, rsi={skipped_rsi}, vol_profile={skipped_vol_profile}"
-    )
-    print(f"[INFO] Scanner complete: {len(output_rows)} signals found")
-    return output_rows
+        print(f"[INFO] Loaded {len(output_rows)} cached signals in < 0.1s")
+        return output_rows
+
+    except Exception as e:
+        print(f"[ERROR] run_signal_scanner failed: {e}")
+        import traceback
+
+        traceback.print_exc()
+        print(f"[DEBUG] Exception type: {type(e)}")
+        print(f"[DEBUG] Exception args: {e.args}")
+        return []
 
 
 def get_scanner_summary(signals: list):

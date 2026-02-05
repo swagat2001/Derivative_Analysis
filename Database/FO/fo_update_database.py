@@ -667,6 +667,21 @@ def main():
             print(f"\n⚠️ Technical Screener cache error: {e}")
             print("   Continuing with pipeline...")
 
+        # Step 4d: Pre-calculate Signal Scanner cache (New Optimization)
+        try:
+            import signal_scanner_cache
+
+            print("\n" + "=" * 80)
+            print("STEP 4d: PRE-CALCULATING SIGNAL SCANNER CACHE")
+            print("=" * 80 + "\n")
+            signal_scanner_cache.update_signal_scanner_cache()
+            print("✓ Signal Scanner cache updated")
+        except ImportError:
+            print("\n⚠️ signal_scanner_cache module not found. Skipping Step 4d.")
+        except Exception as e:
+            print(f"\n⚠️ Signal Scanner cache error: {e}")
+            print("   Continuing with pipeline...")
+
         # Step 5: Pre-calculate dashboard data (OPTIONAL)
         try:
             print("\n" + "=" * 80)

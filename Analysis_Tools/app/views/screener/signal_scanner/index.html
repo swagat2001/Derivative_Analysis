@@ -286,9 +286,25 @@
     }
 
     .results-table td {
-        padding: 10px 8px;
+        padding: 8px 12px;
         border-bottom: 1px solid #f3f4f6;
         white-space: nowrap;
+        vertical-align: middle;
+        /* Ensure vertical centering */
+        height: 50px;
+        /* Try to enforce a consistent min-height */
+    }
+
+    /* ===== SIGNALS COLUMN ===== */
+    .signals-cell {
+        display: flex;
+        flex-wrap: wrap;
+        /* Allow wrapping */
+        gap: 6px;
+        min-width: 250px;
+        /* Ensure enough width to minimize wrapping */
+        white-space: normal;
+        align-items: center;
     }
 
     .results-table tbody tr:hover {
@@ -483,12 +499,14 @@
         color: #16a34a;
     }
 
-    /* ===== SIGNALS COLUMN ===== */
-    .signals-cell {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        max-width: 200px;
+    /* Deleted duplicate signals-cell style */
+
+    .vp-cell {
+        font-size: 10px;
+        line-height: 1.4;
+        white-space: normal;
+        /* Allow text to wrap if needed */
+        min-width: 140px;
     }
 
     /* ===== LOADING & EMPTY STATES ===== */
