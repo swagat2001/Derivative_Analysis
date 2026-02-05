@@ -56,14 +56,20 @@ def clear_cache():
 # ========================================================================
 
 
-@cache.memoize(timeout=3600)
 def get_screener_data_formatted(selected_date):
     """
-    Single data fetch - cached for 1 hour.
-    Returns None if no data available.
+    Single data fetch - cached manually for 1 hour.
+    Only caches if data is NOT None to prevent empty cache issues.
 
     NOTE: Signal computation uses centralized service from app.services.signal_service
     """
+    cache_key = f"screener_formatted_{selected_date}"
+    cached_data = cache.get(cache_key)
+
+    if cached_data:
+        # print(f"[INFO] Serving {selected_date} from cache")
+        return cached_data
+
     try:
         all_data = get_all_screener_data(selected_date)
 
@@ -128,6 +134,10 @@ def get_screener_data_formatted(selected_date):
 
         # Build final signals using CENTRALIZED signal service (SINGLE SOURCE OF TRUTH)
         screener_data["final_signals"] = compute_signals_from_screener_data(screener_data)
+
+        # ONLY CACHE IF DATA IS VALID
+        if screener_data:
+            cache.set(cache_key, screener_data, timeout=3600)
 
         return screener_data
 

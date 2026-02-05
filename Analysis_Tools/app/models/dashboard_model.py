@@ -5,23 +5,13 @@
 # =============================================================
 
 import json
-from functools import lru_cache
 
 import pandas as pd
 from sqlalchemy import text
 
 from .db_config import engine, get_stock_list_from_excel
 
-# =============================================================
-# DATABASE CONNECTION (imported from shared db_config)
-# =============================================================
 
-# =============================================================
-# 1️⃣ AVAILABLE DATES (with caching)
-# =============================================================
-
-
-@lru_cache(maxsize=1)
 def _get_available_dates_cached():
     """Internal cached function for dates."""
     try:
