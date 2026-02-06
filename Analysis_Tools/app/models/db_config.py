@@ -83,7 +83,7 @@ def get_table_list():
                 )
                 _table_list_cache = [row[0] for row in result.fetchall()]
                 _table_list_cache_time = current_time
-                print(f"[INFO] Loaded {len(_table_list_cache)} tables from database")
+                # print(f"[INFO] Loaded {len(_table_list_cache)} tables from database")
         except Exception as e:
             print(f"[WARNING] Could not load table list: {e}")
             if not _table_list_cache:
@@ -139,7 +139,7 @@ def get_stock_list_from_excel():
                 _excel_cache = [str(s).strip().upper() for s in first_col if str(s).strip()]
 
                 # Debug: Print first 5 stocks loaded
-                print(f"[INFO] Loaded {len(_excel_cache)} stocks from Excel. First 5: {_excel_cache[:5]}")
+                # print(f"[INFO] Loaded {len(_excel_cache)} stocks from Excel. First 5: {_excel_cache[:5]}")
             else:
                 _excel_cache = []
                 print("[WARNING] Excel file has no columns")

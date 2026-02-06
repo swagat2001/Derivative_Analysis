@@ -10,6 +10,7 @@ from .controllers.insights.controller import cache as insights_cache
 from .controllers.insights.controller import insights_bp
 from .controllers.news_controller import news_bp
 from .controllers.screener import screener_bp
+from .controllers.screener.fundamental_screener.controller import fundamental_screener_bp
 from .controllers.screener.futures_oi.controller import cache as futures_cache
 from .controllers.screener.futures_oi.controller import futures_oi_bp
 from .controllers.screener.index_screener.controller import index_screener_bp
@@ -62,6 +63,7 @@ def create_app():
     app.register_blueprint(futures_oi_bp)  # Futures OI at /screener/futures-oi
     app.register_blueprint(technical_screener_bp)  # Technical at /screener/technical
     app.register_blueprint(index_screener_bp)  # Index screeners at /screener/index/
+    app.register_blueprint(fundamental_screener_bp)  # Fundamental screeners
     app.register_blueprint(voice_api_bp)  # Voice API at /api/voice/
 
     # Add custom Jinja2 filter for expiry date formatting

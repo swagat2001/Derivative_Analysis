@@ -87,23 +87,60 @@ def get_dashboard_data(selected_date, mtype="TOTAL"):
         if allowed_stocks and "stock" in dashboard_df.columns:
             # Normalize both sides for comparison (strip whitespace, uppercase)
             allowed_stocks_normalized = set(s.strip().upper() for s in allowed_stocks)
+
+            # --- SYMBOL MAPPING FIX ---
+            # Map Excel symbols to DB symbols to prevent false "missing" flags
+            # M&M -> M_M, BAJAJ-AUTO -> BAJAJ_AUTO
+            symbol_map = {"M&M": "M_M", "BAJAJ-AUTO": "BAJAJ_AUTO", "ARE&M": "ARE_M"}
+
+            # Update allowed_stocks_normalized with mapped values
+            # logic: if "M&M" is in allowed, also add "M_M" (or replace it)
+            mapped_additions = set()
+            for excel_sym, db_sym in symbol_map.items():
+                if excel_sym in allowed_stocks_normalized:
+                    mapped_additions.add(db_sym)
+
+            allowed_stocks_normalized.update(mapped_additions)
+            # ---------------------------
+
             dashboard_df["stock_upper"] = dashboard_df["stock"].str.strip().str.upper()
 
             # Debug: Log stocks that don't match
-            all_stocks = set(dashboard_df["stock_upper"].tolist())
-            missing_from_excel = all_stocks - allowed_stocks_normalized
-            missing_from_db = allowed_stocks_normalized - all_stocks
+            # all_stocks = set(dashboard_df["stock_upper"].tolist())
 
-            if missing_from_excel:
-                print(f"[DEBUG] Stocks in DB but NOT in Excel (first 10): {list(missing_from_excel)[:10]}")
-            if missing_from_db:
-                print(f"[DEBUG] Stocks in Excel but NOT in DB (first 10): {list(missing_from_db)[:10]}")
+            # missing_from_excel = all_stocks - allowed_stocks_normalized
+            # missing_from_db = allowed_stocks_normalized - all_stocks (We refine this below)
 
+            # Identify valid misses (exclude mapped ones)
+            # filtered_out_stocks = set()
+            # for s in allowed_stocks_normalized:
+            #     if s in all_stocks:
+            #         continue
+            #     # If s is "M&M" and we mapped it to "M_M", check if "M_M" is in all_stocks
+            #     if s in symbol_map and symbol_map[s] in all_stocks:
+            #         continue
+            #     # If s IS the "M_M" (mapped value) and works, ignore.
+            #     # But 'allowed_stocks_normalized' has mixed original + mapped now (from .update)
+            #     filtered_out_stocks.add(s)
+
+            # if filtered_out_stocks:
+            # Filter out pure mapped DB keys (like "M_M") from the error message if they are just artifacts
+            # But 'allowed' has them.
+            # Simplification: Only report if NEITHER s NOR its map is found.
+            # final_missing = []
+            # for s in sorted(list(filtered_out_stocks)):
+            # Don't report "M_M" if "M&M" is the user-facing one (or vice versa? No, report whatever is broken)
+            # Actually, if "M_M" is in allowed (added by us) and not in DB, it's missing.
+            # If "M&M" is in allowed and not in DB, it's missing (but handled above).
+            # Just print.
+            # final_missing.append(s)
+
+            # if final_missing:
+            #     print(f"[INFO] The following {len(final_missing)} stocks from Excel are MISSING in Market Data:\n{final_missing}")
+
+            # Apply filter
             dashboard_df = dashboard_df[dashboard_df["stock_upper"].isin(allowed_stocks_normalized)]
             dashboard_df = dashboard_df.drop(columns=["stock_upper"])
-            print(
-                f"[INFO] Filtered to {len(dashboard_df)} stocks from Excel list (Excel has {len(allowed_stocks_normalized)} stocks)"
-            )
 
         # Standardize column naming
         rename_map = {

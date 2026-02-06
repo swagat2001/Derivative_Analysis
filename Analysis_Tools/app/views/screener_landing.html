@@ -64,33 +64,7 @@
         </div>
       </div>
 
-      <!-- Filter Tags -->
-      <div class="detail-filters">
-        <div class="detail-tag active" id="detailTag">Nifty 50</div>
-        <div class="detail-tag" onclick="filterStocks('all')">All Stocks</div>
-        <div class="detail-tag" onclick="filterStocks('bullish')">Bullish</div>
-        <div class="detail-tag" onclick="filterStocks('bearish')">Bearish</div>
-      </div>
 
-      <!-- Stats Bar -->
-      <div class="stats-bar">
-        <div class="stat-item">
-          <span class="stat-value" id="statTotal">0</span>
-          <span class="stat-label">Total Stocks</span>
-        </div>
-        <div class="stat-item bullish">
-          <span class="stat-value" id="statBullish">0</span>
-          <span class="stat-label">Bullish</span>
-        </div>
-        <div class="stat-item bearish">
-          <span class="stat-value" id="statBearish">0</span>
-          <span class="stat-label">Bearish</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="statNeutral">0</span>
-          <span class="stat-label">Neutral</span>
-        </div>
-      </div>
 
       <!-- Table -->
       <div class="table-wrap">
@@ -106,7 +80,7 @@
               <th onclick="sortTable('oi')">Open Interest</th>
               <th onclick="sortTable('iv')">IV %</th>
               <th>Signal</th>
-              <th>Action</th>
+
             </tr>
           </thead>
           <tbody id="stocksTableBody">
@@ -319,39 +293,66 @@
     ],
     "Fundamental Screeners": [
       {
-        title: "Nifty 50 Analysis",
-        description: "Comprehensive derivative analysis for Nifty 50 stocks",
+        title: "Best Annual Results",
+        description: "Companies with consistent sales & profit growth",
+        icon: ICONS.chart,
+        dataKey: "scanx-growth",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='best_results') }}",
+        badge: "Hot",
+        inline: true
+      },
+      {
+        title: "CapEx Boost",
+        description: "Businesses ramping up capital expenditures",
+        icon: ICONS.rocket,
+        dataKey: "scanx-capex",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='capex_boost') }}",
+        badge: "New",
+        inline: true
+      },
+      {
+        title: "Mighty Midcap Stocks",
+        description: "Mid-caps with robust fundamentals and growth",
+        icon: ICONS.strength,
+        dataKey: "scanx-midcap",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='mighty_midcap') }}",
+        badge: null,
+        inline: true
+      },
+      {
+        title: "Titan Largecap Stocks",
+        description: "Stable market leaders with strong positions",
         icon: ICONS.trophy,
-        dataKey: "nifty50",
-        apiUrl: "{{ url_for('index_screener.api_nifty50') }}",
+        dataKey: "scanx-largecap",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='titan_largecap') }}",
         badge: null,
         inline: true
       },
       {
-        title: "Bank Nifty Analysis",
-        description: "Derivative analysis for Bank Nifty constituents",
-        icon: ICONS.bank,
-        dataKey: "banknifty",
-        apiUrl: "{{ url_for('index_screener.api_banknifty') }}",
+        title: "Stellar Smallcap Stocks",
+        description: "High-performing small-caps with upside",
+        icon: ICONS.sparkles,
+        dataKey: "scanx-smallcap",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='stellar_smallcap') }}",
         badge: null,
         inline: true
       },
       {
-        title: "High OI Buildup",
-        description: "Stocks showing significant Open Interest accumulation",
-        icon: ICONS.download,
-        dataKey: "high-oi",
-        apiUrl: "{{ url_for('index_screener.api_high_oi') }}",
-        badge: null,
-        inline: true
-      },
-      {
-        title: "IV Spike Alert",
-        description: "Stocks with unusual Implied Volatility movement",
+        title: "Negative Working Capital",
+        description: "Efficient liquidity management",
         icon: ICONS.zap,
-        dataKey: "iv-spike",
-        apiUrl: "{{ url_for('index_screener.api_iv_spike') }}",
+        dataKey: "scanx-nwc",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='negative_working_capital') }}",
         badge: null,
+        inline: true
+      },
+      {
+        title: "Potential Multibagger",
+        description: "High growth metrics with upside potential",
+        icon: ICONS.target,
+        dataKey: "scanx-multi",
+        apiUrl: "{{ url_for('fundamental_screener.get_scan_results', category='potential_multibagger') }}",
+        badge: "Pop",
         inline: true
       }
     ],
@@ -387,6 +388,42 @@
         url: "{{ url_for('technical_screener.technical_screener') }}?filter=breakout",
         badge: "Beta",
         inline: false
+      },
+      {
+        title: "Nifty 50 Analysis",
+        description: "Comprehensive derivative analysis for Nifty 50 stocks",
+        icon: ICONS.trophy,
+        dataKey: "nifty50",
+        apiUrl: "{{ url_for('index_screener.api_nifty50') }}",
+        badge: null,
+        inline: true
+      },
+      {
+        title: "Bank Nifty Analysis",
+        description: "Derivative analysis for Bank Nifty constituents",
+        icon: ICONS.bank,
+        dataKey: "banknifty",
+        apiUrl: "{{ url_for('index_screener.api_banknifty') }}",
+        badge: null,
+        inline: true
+      },
+      {
+        title: "High OI Buildup",
+        description: "Stocks showing significant Open Interest accumulation",
+        icon: ICONS.download,
+        dataKey: "high-oi",
+        apiUrl: "{{ url_for('index_screener.api_high_oi') }}",
+        badge: null,
+        inline: true
+      },
+      {
+        title: "IV Spike Alert",
+        description: "Stocks with unusual Implied Volatility movement",
+        icon: ICONS.zap,
+        dataKey: "iv-spike",
+        apiUrl: "{{ url_for('index_screener.api_iv_spike') }}",
+        badge: null,
+        inline: true
       }
     ]
   };
@@ -647,31 +684,7 @@
       </div>
     </div>
 
-    <div class="detail-filters">
-      <div class="detail-tag" onclick="filterStocks('all')" style="cursor: pointer;">All</div>
-      <div class="detail-tag" onclick="filterStocks('bullish')" style="cursor: pointer;">Bullish</div>
-      <div class="detail-tag" onclick="filterStocks('bearish')" style="cursor: pointer;">Bearish</div>
-      <div class="detail-tag" onclick="filterStocks('neutral')" style="cursor: pointer;">Neutral</div>
-    </div>
 
-    <div class="stats-bar">
-      <div class="stat-item">
-        <span class="stat-value" id="statTotal">0</span>
-        <span class="stat-label">Total Stocks</span>
-      </div>
-      <div class="stat-item bullish">
-        <span class="stat-value" id="statBullish">0</span>
-        <span class="stat-label">Bullish</span>
-      </div>
-      <div class="stat-item bearish">
-        <span class="stat-value" id="statBearish">0</span>
-        <span class="stat-label">Bearish</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-value" id="statNeutral">0</span>
-        <span class="stat-label">Neutral</span>
-      </div>
-    </div>
 
     <div class="table-wrap">
       <table class="detail-table" id="stocksTable">
@@ -680,13 +693,14 @@
             <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"/></th>
             <th onclick="sortTable('name')">Name</th>
             <th onclick="sortTable('price')">Price</th>
+            <th onclick="sortTable('market_cap')">Market Cap (Cr)</th>
+            <th onclick="sortTable('pe')">P/E Ratio</th>
             <th onclick="sortTable('change')">Day Change</th>
             <th onclick="sortTable('change_pct')">Change %</th>
             <th onclick="sortTable('volume')">Volume</th>
-            <th onclick="sortTable('oi')">Open Interest</th>
-            <th onclick="sortTable('iv')">IV %</th>
+            <th>Key Metric</th>
             <th>Signal</th>
-            <th>Action</th>
+
           </tr>
         </thead>
         <tbody id="stocksTableBody"></tbody>
@@ -715,23 +729,13 @@
     const bearish = currentStocks.filter(s => s.signal === 'BEARISH').length;
     const neutral = currentStocks.filter(s => s.signal === 'NEUTRAL').length;
 
-    // Update filter tabs with counts
-    const filterTags = detailView.querySelectorAll('.detail-tag');
-    filterTags[0].innerHTML = `All (${currentStocks.length})`;
-    filterTags[1].innerHTML = `Bullish (${bullish})`;
-    filterTags[2].innerHTML = `Bearish (${bearish})`;
-    filterTags[3].innerHTML = `Neutral (${neutral})`;
 
-    document.getElementById('statTotal').textContent = currentStocks.length;
-    document.getElementById('statBullish').textContent = bullish;
-    document.getElementById('statBearish').textContent = bearish;
-    document.getElementById('statNeutral').textContent = neutral;
 
     // Render table
     renderStocksTable(currentStocks);
 
     // Set first filter tab (All) as active
-    document.querySelectorAll('.detail-tag')[0].classList.add('active');
+
 
     // Show detail view, hide list
     screenerListView.classList.add('hidden');
@@ -762,20 +766,14 @@
         <span class="exchange">NSE</span>
       </td>
       <td>₹${parseFloat(stock.price || 0).toFixed(2)}</td>
+      <td>₹${parseInt(stock.market_cap || 0).toLocaleString()} Cr</td>
+      <td>${stock.pe ? parseFloat(stock.pe).toFixed(2) : '-'}</td>
       <td class="${changeClass}">${changeSign}${parseFloat(stock.change || 0).toFixed(2)}</td>
       <td class="${changeClass}">${changeSign}${parseFloat(stock.change_pct || 0).toFixed(2)}%</td>
       <td>${parseInt(stock.volume || 0).toLocaleString()}</td>
-      <td>${parseInt(stock.oi || 0).toLocaleString()}</td>
-      <td>${parseFloat(stock.iv || 0).toFixed(1)}%</td>
+      <td style="font-weight: 500; color: #3498db;">${stock.custom_metric_value || '-'}</td>
       <td><span class="signal-badge ${signalClass}">${stock.signal}</span></td>
-      <td>
-        <a href="/stock/${stock.ticker}" class="action-btn" title="View Details">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </a>
-      </td>
+
     `;
 
       // Double click to navigate
