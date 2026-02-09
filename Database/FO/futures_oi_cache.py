@@ -7,21 +7,18 @@ Stores in futures_oi_cache table for fast retrieval
 INCREMENTAL MODE: Only processes NEW dates, never drops existing data
 """
 
+import os
+import sys
 from datetime import datetime
+from dotenv import load_dotenv
 from urllib.parse import quote_plus
 
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine, inspect, text
-
-# Database config
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
-db_password_enc = quote_plus(db_password)
-engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+load_dotenv()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from Analysis_Tools.app.models.db_config import engine
 
 
 def create_futures_oi_cache_table():

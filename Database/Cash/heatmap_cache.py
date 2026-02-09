@@ -7,6 +7,14 @@ Target: daily_market_heatmap table in CashStocks_Database
 """
 
 import os
+import sys
+
+# Add project root to path to allow imports from Analysis_Tools
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+from dotenv import load_dotenv
+
+load_dotenv()
 import time
 from datetime import datetime
 from urllib.parse import quote_plus
@@ -15,30 +23,32 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 
 # =============================================================
-# CONFIGURATION
-# =============================================================
+# Database Config
+from Analysis_Tools.app.models.db_config import engine_cash as engine_cash
 
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name_cash = "CashStocks_Database"
-db_password_enc = quote_plus(db_password)
-
-# Create engine for Cash/Equity database
-engine_cash = create_engine(
-    f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name_cash}",
-    pool_size=10,
-    max_overflow=20,
-    pool_pre_ping=True,
-    echo=False,
-)
+# Hardcoded constants removed - using shared engine
+# db_user = "postgres"
+# db_password = os.getenv("DB_PASSWORD")
+# db_host = "localhost"
+# db_port = "5432"
+# db_name_cash = "CashStocks_Database"
+#
+# db_password_enc = quote_plus(db_password)
+# engine_cash = create_engine(
+#     f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name_cash}",
+#     pool_size=10,
+#     max_overflow=20,
+#     pool_pre_ping=True,
+#     echo=False,
+# )
 
 # Sector Master Paths
+# Sector Master Paths
 SECTOR_MASTER_PATHS = [
+    os.getenv("SECTOR_MASTER_PATH"),
     "C:/NSE_EOD_CASH_WITH_INDICATORS/nse_sector_master.csv",
     "C:/Users/Admin/Desktop/Derivative_Analysis/SMA/nse_sector_master.csv",
-    # Fallback to current dir if needed, but above absolute paths are better
+    os.path.join(os.getcwd(), "nse_sector_master.csv"),
 ]
 
 # =============================================================
@@ -169,7 +179,7 @@ def load_sector_master():
 
     csv_path = None
     for path in SECTOR_MASTER_PATHS:
-        if os.path.exists(path):
+        if path and os.path.exists(path):
             csv_path = path
             break
 

@@ -9,7 +9,16 @@ DATABASE-ONLY APPROACH:
 4. AUTO-APPENDS only NEW dates (no manual clearing needed)
 """
 
+import os
+import sys
+
+# Add project root to path to allow imports from Analysis_Tools
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 from urllib.parse import quote_plus
 
 import pandas as pd
@@ -27,13 +36,16 @@ except ImportError:
     print("Install with: pip install pandas_ta")
 
 # Database config
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
-db_password_enc = quote_plus(db_password)
-engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+from Analysis_Tools.app.models.db_config import engine
+
+# Hardcoded constants removed - using shared engine
+# db_user = "postgres"
+# db_password = os.getenv("DB_PASSWORD")
+# db_host = "localhost"
+# db_port = "5432"
+# db_name = "BhavCopy_Database"
+# db_password_enc = quote_plus(db_password)
+# engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
 
 def calculate_rsi_from_database(table_name, current_date, all_dates, rsi_period=14):

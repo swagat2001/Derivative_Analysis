@@ -47,25 +47,25 @@
         <div class="market-statistics">
           <div class="stats-header">
             <h3>Market Statistics</h3>
-            <span class="stats-timestamp">As on 09-Jan-2026 15:36 IST</span>
+            <span class="stats-timestamp">As on {{ market_stats.date }}</span>
           </div>
 
           <div class="stats-grid-top">
             <div class="stat-card purple">
               <div class="stat-label">Stock Traded</div>
-              <div class="stat-value">3,240</div>
+              <div class="stat-value">{{ "{:,}".format(market_stats.stock_traded) }}</div>
             </div>
             <div class="stat-card green">
               <div class="stat-label">Advances</div>
-              <div class="stat-value">747</div>
+              <div class="stat-value">{{ "{:,}".format(market_stats.advances) }}</div>
             </div>
             <div class="stat-card red">
               <div class="stat-label">Declines</div>
-              <div class="stat-value">2,395</div>
+              <div class="stat-value">{{ "{:,}".format(market_stats.declines) }}</div>
             </div>
             <div class="stat-card orange">
               <div class="stat-label">Unchanged</div>
-              <div class="stat-value">98</div>
+              <div class="stat-value">{{ "{:,}".format(market_stats.unchanged) }}</div>
             </div>
           </div>
 
@@ -73,12 +73,12 @@
             <div class="stat-item">
               <div class="stat-item-label">No. of Stocks at</div>
               <div class="stat-item-title">52 Week High</div>
-              <div class="stat-item-value up">▲ 27</div>
+              <div class="stat-item-value up">▲ {{ market_stats.week52_high }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-item-label">No. of Stocks at</div>
               <div class="stat-item-title">52 Week Low</div>
-              <div class="stat-item-value down">307 ▼</div>
+              <div class="stat-item-value down">{{ market_stats.week52_low }} ▼</div>
             </div>
             <div class="stat-center-icon">
               <img src="../static/image/favicon.png" alt="" />
@@ -86,12 +86,12 @@
             <div class="stat-item">
               <div class="stat-item-label">No. of Stocks in</div>
               <div class="stat-item-title">Upper Circuit</div>
-              <div class="stat-item-value up">40</div>
+              <div class="stat-item-value up">{{ market_stats.upper_circuits }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-item-label">No. of Stocks in</div>
               <div class="stat-item-title">Lower Circuit</div>
-              <div class="stat-item-value down">84</div>
+              <div class="stat-item-value down">{{ market_stats.lower_circuits }}</div>
             </div>
           </div>
         </div>
@@ -609,11 +609,11 @@
         <div class="insight-content">
           <div class="breadth-visual">
             <div class="breadth-bar">
-              <div class="advance" style="width: 55%">
-                <span>1,245</span>
+              <div class="advance" data-width="{{ market_stats.adv_width | default('50%') }}">
+                <span>{{ "{:,}".format(market_stats.advances) }}</span>
               </div>
-              <div class="decline" style="width: 45%">
-                <span>1,023</span>
+              <div class="decline" data-width="{{ market_stats.dec_width | default('50%') }}">
+                <span>{{ "{:,}".format(market_stats.declines) }}</span>
               </div>
             </div>
             <div class="breadth-labels">
@@ -630,15 +630,16 @@
           <span class="insight-badge">Valuation</span>
         </div>
         <div class="insight-content">
-          <div class="pe-value">22.4</div>
+          <div class="pe-value">{{ nifty_pe.pe }}</div>
           <div class="pe-status">
-            <span class="status-dot yellow"></span>
-            <span>Fairly Valued</span>
+            <span class="status-dot {{ nifty_pe.color }}"></span>
+            <span>{{ nifty_pe.status }}</span>
           </div>
+
           <div class="pe-range">
             <span>15</span>
             <div class="range-bar">
-              <div class="range-marker" style="left: 50%"></div>
+              <div class="range-marker" data-left="{{ nifty_pe.pe_left_style }}"></div>
             </div>
             <span>30</span>
           </div>
@@ -724,6 +725,12 @@
 {% endblock %}
 
 {% block page_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('[data-width]').forEach(el => el.style.width = el.getAttribute('data-width'));
+    document.querySelectorAll('[data-left]').forEach(el => el.style.left = el.getAttribute('data-left'));
+  });
+</script>
 <!-- jQuery (required for Slick Slider) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Slick Slider JS -->

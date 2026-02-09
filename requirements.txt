@@ -43,3 +43,6 @@ colorama>=0.4.6
 grpcio>=1.60.0
 grpcio-tools>=1.60.0
 protobuf>=4.25.0
+
+# Testing
+pytest>=7.4.0

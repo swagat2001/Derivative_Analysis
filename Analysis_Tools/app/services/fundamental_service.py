@@ -212,7 +212,12 @@ class FundamentalService:
         # Ratios
         if ticker in self._ratios_data:
             rData = self._ratios_data[ticker]
-            data["roce"] = self._get_latest_metric(rData, "ROCE%") or 0
+            # Try ROCE first, then fallback to ROE (common for financial stocks)
+            roce = self._get_latest_metric(rData, "ROCE%") or 0
+            if roce == 0:
+                roce = self._get_latest_metric(rData, "ROE%") or 0
+
+            data["roce"] = roce
             data["inventory_days"] = self._get_latest_metric(rData, "InventoryDays") or 0
             data["working_capital_days"] = self._get_latest_metric(rData, "WorkingCapitalDays") or 0
 

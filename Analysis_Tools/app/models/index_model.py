@@ -970,6 +970,27 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
 
         result = stocks_df.to_dict("records")
 
+        # Enrich with Fundamental Data (Market Cap, PE, etc.)
+        try:
+            from ..services.fundamental_service import fundamental_service
+
+            # Batch fetch fundamentals is not available, so we do it one by one (cached in memory)
+            for stock in result:
+                ticker = stock.get("ticker")
+                # Get fundamental data
+                fund_data = fundamental_service.get_stock_fundamentals(ticker)
+
+                # Add Market Cap and PE
+                stock["market_cap"] = fund_data.get("market_cap", 0)
+                stock["pe"] = fund_data.get("pe", 0)
+
+                # For "Key Metric", we can use something relevant like 3yr Profit Growth or ROCE
+                # Using ROCE as a quality metric
+                stock["custom_metric_value"] = f"ROCE: {fund_data.get('roce', 0):.2f}%"
+
+        except Exception as e:
+            print(f"[WARNING] Failed to enrich with fundamental data: {e}")
+
         # Log stats
         stocks_with_data = len(stocks_df[stocks_df["price"] > 0])
         print(f"[INFO] Loaded {len(result)} {index_key} stocks from cache ({stocks_with_data} with data)")

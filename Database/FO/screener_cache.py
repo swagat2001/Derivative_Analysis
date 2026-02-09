@@ -5,7 +5,16 @@ Pre-calculates all screener data (OI, Moneyness, IV changes) with strike prices
 Added: Bullish/Bearish classification injected and final_signal attached to cache rows
 """
 
+import os
+import sys
+
+# Add project root to path to allow imports from Analysis_Tools
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 from datetime import datetime
 from urllib.parse import quote_plus
 
@@ -13,14 +22,21 @@ import pandas as pd
 from sqlalchemy import create_engine, inspect, text
 
 # Database config
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
-db_password_enc = quote_plus(db_password)
-engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+from Analysis_Tools.app.models.db_config import engine
 
+# Hardcoded constants removed - using shared engine
+# db_user = "postgres"
+# db_password = os.getenv("DB_PASSWORD")
+# db_host = "localhost"
+# db_port = "5432"
+# db_name = "BhavCopy_Database"
+# db_password_enc = quote_plus(db_password)
+# engine = create_engine(
+#     f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}",
+#     poolclass=NullPool,
+#     pool_pre_ping=True,
+#     echo=False,
+# )
 # ==================================================================================
 # BULLISH / BEARISH CATEGORY DEFINITIONS (reference)
 # Note: we will derive category names programmatically per-row (see build below)

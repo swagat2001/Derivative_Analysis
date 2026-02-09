@@ -11,6 +11,14 @@ Similar to fo_update_database.py structure
 """
 
 import os
+import sys
+
+# Add project root to path to allow imports from Analysis_Tools
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+from dotenv import load_dotenv
+
+load_dotenv()
 import re
 import socket
 import sys
@@ -19,20 +27,25 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus
+from Analysis_Tools.app.utils.logger import logger
 
 import pandas as pd
 from sqlalchemy import create_engine, inspect, text
 
+# Import shared database engine
+from Analysis_Tools.app.models.db_config import engine_cash as engine
+
 # ===========================================
 # 🔧 Configuration
 # ===========================================
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "CashStocks_Database"  # Cash/Equity database
+# Hardcoded constants removed - using shared engine
+# db_user = "postgres"
+# db_password = os.getenv("DB_PASSWORD")
+# db_host = "localhost"
+# db_port = "5432"
+# db_name = "CashStocks_Database"  # Cash/Equity database
 
-save_folder = "C:/NSE_EOD_CASH"  # Where CSV files are stored
+save_folder = os.getenv("CASH_DATA_PATH", "data_cash_eod")  # Where CSV files are stored
 
 # Timeout settings for download
 DOWNLOAD_TIMEOUT = 30
@@ -68,6 +81,7 @@ def download_with_timeout(url, filepath, timeout=DOWNLOAD_TIMEOUT):
             raise Exception(f"HTTP Error {e.code}")
 
     except Exception as e:
+        logger.error(f"❌ Download failed: {str(e)[:50]}")
         raise Exception(f"Download failed: {str(e)[:50]}")
 
 
@@ -75,13 +89,13 @@ def download_with_timeout(url, filepath, timeout=DOWNLOAD_TIMEOUT):
 # 📥 STEP 1: Download CSV Data
 # ===========================================
 def download_csv_data():
-    print("\n" + "=" * 80)
-    print("STEP 1: DOWNLOADING CASH BHAVCOPY DATA FROM NSE")
-    print("=" * 80 + "\n")
+    logger.info("=" * 80)
+    logger.info("STEP 1: DOWNLOADING CASH BHAVCOPY DATA FROM NSE")
+    logger.info("=" * 80 + "\n")
 
     # Connect to database to get latest date
-    db_password_enc = quote_plus(db_password)
-    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+    # db_password_enc = quote_plus(db_password)
+    # engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
     # Check existing tables to find latest date
     latest_db_date = None
@@ -104,14 +118,14 @@ def download_csv_data():
                 else:
                     latest_db_date = result
     except Exception as e:
-        print(f"⚠️ Could not check database: {e}")
+        logger.error(f"⚠️ Could not check database: {e}")
 
     # Decide start date
     if latest_db_date:
-        print(f"📌 Latest date in database: {latest_db_date}")
+        logger.info(f"📌 Latest date in database: {latest_db_date}")
         start_date = latest_db_date + timedelta(days=1)
     else:
-        print("⚠ No data in database. Enter start date for initial download.")
+        logger.warning("⚠ No data in database. Enter start date for initial download.")
         start_date_str = input("Start date (DD-MM-YYYY) [e.g., 01-01-2024]: ").strip()
 
         if not start_date_str:
@@ -127,7 +141,7 @@ def download_csv_data():
     end_date = today
 
     if start_date > end_date:
-        print("✅ Database is already up to date. No download needed.")
+        logger.info("✅ Database is already up to date. No download needed.")
         return True
 
     # Create save folder
@@ -142,10 +156,10 @@ def download_csv_data():
         date_range.append(d)
 
     if not date_range:
-        print("✅ No new weekday dates to download.")
+        logger.info("✅ No new weekday dates to download.")
         return True
 
-    print(f"📅 Downloading data for {len(date_range)} date(s)")
+    logger.info(f"📅 Downloading data for {len(date_range)} date(s)")
     print(f"⏱️  Timeout: {DOWNLOAD_TIMEOUT}s per file | Retries: {MAX_RETRIES}\n")
     print("=" * 80)
 
@@ -265,13 +279,38 @@ def upload_to_database():
     print("STEP 2: UPLOADING CASH DATA TO DATABASE (Per-Symbol Tables)")
     print("=" * 80 + "\n")
 
-    db_password_enc = quote_plus(db_password)
-    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+    # db_password_enc = quote_plus(db_password)
+    # engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
     # Helper: sanitize table names (like FO pipeline)
     def sanitize_table_name(name):
         clean = re.sub(r"\W+", "_", str(name)).strip("_").upper()
         return f"TBL_{clean}" if clean else "TBL_UNKNOWN"
+
+    # Helper: Data Validation
+    def validate_data(df, filename):
+        """Validate DataFrame before upload."""
+        errors = []
+
+        # 1. Check required columns (critical ones)
+        required_cols = ["SYMBOL", "OPEN_PRICE", "HIGH_PRICE", "LOW_PRICE", "CLOSE_PRICE"]
+        missing_cols = [c for c in required_cols if c not in df.columns]
+        if missing_cols:
+            errors.append(f"Missing columns: {missing_cols}")
+
+        if not df.empty:
+            # 2. Check for negative prices (sanity check)
+            price_cols = ["OPEN_PRICE", "HIGH_PRICE", "LOW_PRICE", "CLOSE_PRICE"]
+            for col in price_cols:
+                if col in df.columns and pd.to_numeric(df[col], errors='coerce').min() < 0:
+                    errors.append(f"Negative values found in {col}")
+
+        if errors:
+            print(f"❌ Validation FAILED for {filename}:")
+            for e in errors:
+                print(f"   - {e}")
+            return False
+        return True
 
     # Get existing tables
     inspector = inspect(engine)
@@ -326,6 +365,11 @@ def upload_to_database():
             # Standardize column names
             df.columns = df.columns.str.strip()
 
+            # Validate Data
+            if not validate_data(df, file_name):
+                print(f"   ⚠️ Skipping invalid file: {file_name}")
+                continue
+
             # Extract date from FILENAME (same approach as cash_calcu.py)
             # Filename format: sec_bhavdata_full_DDMMYYYY.csv
             try:
@@ -363,11 +407,11 @@ def upload_to_database():
 
             # Get unique symbols
             if "SYMBOL" not in df.columns:
-                print("   ⚠️ SYMBOL column not found, skipping")
+                logger.warning("   ⚠️ SYMBOL column not found, skipping")
                 continue
 
             unique_symbols = df["SYMBOL"].dropna().unique()
-            print(f"   📊 Found {len(unique_symbols)} unique symbols")
+            logger.info(f"   📊 Found {len(unique_symbols)} unique symbols")
 
             # Create tables for each symbol and upload data
             for symbol in unique_symbols:
@@ -394,7 +438,8 @@ def upload_to_database():
                         "TtlTrfVal" NUMERIC,
                         "TtlNbOfTxsExctd" INTEGER,
                         "DlvryQty" BIGINT,
-                        "DlvryPer" NUMERIC
+                        "DlvryPer" NUMERIC,
+                        UNIQUE ("BizDt", "SERIES")
                     );
                     """
                     with engine.begin() as conn:
@@ -434,21 +479,37 @@ def upload_to_database():
                     upload_df = upload_df[upload_df["BizDt"].astype(str) > str(latest_db_date)]
 
                 if not upload_df.empty:
-                    upload_df.to_sql(table_name, con=engine, if_exists="append", index=False)
+                    # Deduplicate within the batch
+                    upload_df.drop_duplicates(subset=["BizDt", "TckrSymb", "SERIES"], keep="last", inplace=True)
+
+                    try:
+                         # FIXED: Transactional upload - Atomic per symbol/date batch
+                         with engine.begin() as conn:
+                            # FIXED: Idempotency - Delete existing data for these dates before appending
+                            unique_dates = upload_df["BizDt"].unique()
+                            if len(unique_dates) > 0:
+                                 delete_sql = text(f'DELETE FROM public."{table_name}" WHERE "BizDt" = :bizdt')
+                                 for d in unique_dates:
+                                     conn.execute(delete_sql, {"bizdt": d})
+
+                            upload_df.to_sql(table_name, con=conn, if_exists="append", index=False)
+                    except Exception as e:
+                         print(f"   ❌ Failed to upload batch for {symbol}: {e}")
+                         # Continue to next symbol instead of breaking entire script, but log error
 
             upload_count += 1
             print(f"   ✅ Processed ({len(unique_symbols)} symbols)")
 
         except Exception as e:
-            print(f"   ❌ Error: {e}")
+            logger.error(f"   ❌ Error: {e}")
             import traceback
 
-            traceback.print_exc()
+            logger.error(traceback.format_exc())
 
-    print(f"\n✅ Upload complete!")
-    print(f"   Files processed: {upload_count}")
-    print(f"   Tables created: {tables_created}")
-    print(f"   Total tables: {len([t for t in existing_tables if t.startswith('TBL_')])}")
+    logger.info(f"\n✅ Upload complete!")
+    logger.info(f"   Files processed: {upload_count}")
+    logger.info(f"   Tables created: {tables_created}")
+    logger.info(f"   Total tables: {len([t for t in existing_tables if t.startswith('TBL_')])}")
     return True
 
 
@@ -457,7 +518,7 @@ def upload_to_database():
 # ===========================================
 def main():
     print("\n" + "=" * 80)
-    print("             🚀 CASH BHAVCOPY COMPLETE DATA PIPELINE")
+    logger.info("             🚀 CASH BHAVCOPY COMPLETE DATA PIPELINE")
     print("=" * 80)
     print("\nThis script will:")
     print("  1. Download latest Cash Bhavcopy CSV data from NSE")
@@ -469,27 +530,27 @@ def main():
         # Step 1: Download CSV
         download_result = download_csv_data()
         if download_result is False:
-            print("\n❌ CSV download failed!")
+            logger.error("\n❌ CSV download failed!")
             return False
 
         # Step 2: Upload to database
         upload_result = upload_to_database()
         if upload_result is False:
-            print("\n❌ Database upload failed!")
+            logger.error("\n❌ Database upload failed!")
             return False
 
         print("\n" + "=" * 80)
-        print("             ✅ PIPELINE COMPLETE!")
+        logger.info("             ✅ PIPELINE COMPLETE!")
         print("=" * 80)
-        print("\n✓ All steps completed successfully")
-        print(f"\nYour CashStocks_Database is now updated!")
-        print(f"Tables: TBL_RELIANCE, TBL_TCS, TBL_INFY, etc.")
+        logger.info("\n✓ All steps completed successfully")
+        logger.info(f"\nYour CashStocks_Database is now updated!")
+        logger.info(f"Tables: TBL_RELIANCE, TBL_TCS, TBL_INFY, etc.")
 
         # ===========================================
         # 🚀 STEP 3: UPDATE HEATMAP CACHE
         # ===========================================
         print("\n" + "=" * 80)
-        print("🚀 STEP 3: UPDATING HEATMAP CACHE (For Insights)")
+        logger.info("🚀 STEP 3: UPDATING HEATMAP CACHE (For Insights)")
         print("=" * 80 + "\n")
         try:
             import subprocess
@@ -497,21 +558,21 @@ def main():
             script_dir = os.path.dirname(os.path.abspath(__file__))
             heatmap_script = os.path.join(script_dir, "heatmap_cache.py")
 
-            print(f"▶ Running: {heatmap_script}")
+            logger.info(f"▶ Running: {heatmap_script}")
             subprocess.run([sys.executable, heatmap_script], check=False)
-            print("\n✅ Heatmap Cache Update Triggered")
+            logger.info("\n✅ Heatmap Cache Update Triggered")
         except Exception as e:
-            print(f"⚠️ Failed to run heatmap cache update: {e}")
+            logger.error(f"⚠️ Failed to run heatmap cache update: {e}")
 
         print("=" * 80 + "\n")
 
         return True
 
     except Exception as e:
-        print(f"\n❌ Fatal Error: {e}")
+        logger.error(f"\n❌ Fatal Error: {e}")
         import traceback
 
-        traceback.print_exc()
+        logger.error(traceback.format_exc())
         return False
 
 

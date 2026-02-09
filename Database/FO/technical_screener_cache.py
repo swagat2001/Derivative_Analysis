@@ -7,7 +7,16 @@ Stores in technical_screener_cache table for fast retrieval
 INCREMENTAL MODE: Only processes NEW dates, never drops existing data
 """
 
+import os
+import sys
+
+# Add project root to path to allow imports from Analysis_Tools
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 from urllib.parse import quote_plus
 
 import numpy as np
@@ -15,13 +24,16 @@ import pandas as pd
 from sqlalchemy import create_engine, inspect, text
 
 # Database config
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
-db_password_enc = quote_plus(db_password)
-engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+from Analysis_Tools.app.models.db_config import engine
+
+# Hardcoded constants removed - using shared engine
+# db_user = "postgres"
+# db_password = os.getenv("DB_PASSWORD")
+# db_host = "localhost"
+# db_port = "5432"
+# db_name = "BhavCopy_Database"
+# db_password_enc = quote_plus(db_password)
+# engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
 
 
 def create_technical_screener_table():
@@ -83,6 +95,84 @@ def create_technical_screener_table():
         print("✓ technical_screener_cache table ready")
     except Exception as e:
         print(f"✗ Error creating table: {e}")
+
+    # Add new columns for pivot points, breakouts, momentum, and BB squeeze
+    alter_queries = """
+    -- Pivot Points
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS pivot_point NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS r1 NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS r2 NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS r3 NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS s1 NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS s2 NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS s3 NUMERIC;
+
+    -- Breakout Detection Flags
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS r1_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS r2_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS r3_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS s1_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS s2_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS s3_breakout BOOLEAN DEFAULT FALSE;
+
+    -- Momentum and Squeeze
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS momentum_score NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_high_momentum BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS bb_squeeze BOOLEAN DEFAULT FALSE;
+
+    -- NEW: Price & Volume Screener Columns
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS open_price NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS high_price NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS low_price NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS volume BIGINT;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS price_change_pct NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS volume_change_pct NUMERIC;
+
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS week1_high NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS week1_low NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS week4_high NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS week4_low NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS week52_high NUMERIC;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS week52_low NUMERIC;
+
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_week1_high_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_week1_low_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_week4_high_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_week4_low_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_week52_high_breakout BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_week52_low_breakout BOOLEAN DEFAULT FALSE;
+
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_potential_high_vol BOOLEAN DEFAULT FALSE;
+    ALTER TABLE public.technical_screener_cache ADD COLUMN IF NOT EXISTS is_unusually_high_vol BOOLEAN DEFAULT FALSE;
+
+    -- Indexes for new columns
+    CREATE INDEX IF NOT EXISTS idx_tech_r1_breakout ON public.technical_screener_cache(r1_breakout) WHERE r1_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_r2_breakout ON public.technical_screener_cache(r2_breakout) WHERE r2_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_r3_breakout ON public.technical_screener_cache(r3_breakout) WHERE r3_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_s1_breakout ON public.technical_screener_cache(s1_breakout) WHERE s1_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_s2_breakout ON public.technical_screener_cache(s2_breakout) WHERE s2_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_s3_breakout ON public.technical_screener_cache(s3_breakout) WHERE s3_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_momentum ON public.technical_screener_cache(is_high_momentum) WHERE is_high_momentum = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_squeeze ON public.technical_screener_cache(bb_squeeze) WHERE bb_squeeze = TRUE;
+
+    CREATE INDEX IF NOT EXISTS idx_tech_w1_hi_bo ON public.technical_screener_cache(is_week1_high_breakout) WHERE is_week1_high_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_w1_lo_bo ON public.technical_screener_cache(is_week1_low_breakout) WHERE is_week1_low_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_w4_hi_bo ON public.technical_screener_cache(is_week4_high_breakout) WHERE is_week4_high_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_w4_lo_bo ON public.technical_screener_cache(is_week4_low_breakout) WHERE is_week4_low_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_w52_hi_bo ON public.technical_screener_cache(is_week52_high_breakout) WHERE is_week52_high_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_w52_lo_bo ON public.technical_screener_cache(is_week52_low_breakout) WHERE is_week52_low_breakout = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_pot_hi_vol ON public.technical_screener_cache(is_potential_high_vol) WHERE is_potential_high_vol = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_tech_unu_hi_vol ON public.technical_screener_cache(is_unusually_high_vol) WHERE is_unusually_high_vol = TRUE;
+    """
+    try:
+        with engine.begin() as conn:
+            for stmt in alter_queries.strip().split(';'):
+                stmt = stmt.strip()
+                if stmt:
+                    conn.execute(text(stmt))
+        print("✓ New columns (pivot points, breakouts, momentum, squeeze) added")
+    except Exception as e:
+        print(f"⚠ Column addition note: {e}")
 
 
 def get_cached_dates():
@@ -176,6 +266,38 @@ def calculate_adx(close, period=14):
     return adx
 
 
+def calculate_pivot_points(close):
+    """
+    Calculate classic pivot points using previous day's close.
+    Since we only have close prices, we approximate high/low as close +/- 2%.
+    Returns: pivot, r1, r2, r3, s1, s2, s3 (all as Series)
+    """
+    prev_close = close.shift(1)
+    prev_high = prev_close * 1.02   # Approximate high
+    prev_low = prev_close * 0.98    # Approximate low
+
+    pivot = (prev_high + prev_low + prev_close) / 3
+
+    r1 = (2 * pivot) - prev_low
+    r2 = pivot + (prev_high - prev_low)
+    r3 = prev_high + 2 * (pivot - prev_low)
+
+    s1 = (2 * pivot) - prev_high
+    s2 = pivot - (prev_high - prev_low)
+    s3 = prev_low - 2 * (prev_high - pivot)
+
+    return pivot, r1, r2, r3, s1, s2, s3
+
+
+def calculate_momentum_score(close, lookback=10):
+    """
+    Calculate momentum score based on price change percentage over N days.
+    Momentum = Price Change % over lookback period
+    """
+    price_change_pct = ((close - close.shift(lookback)) / close.shift(lookback)) * 100
+    return price_change_pct
+
+
 def precalculate_technical_screener_cache():
     """
     INCREMENTAL: Only processes NEW dates, appends to existing cache
@@ -225,7 +347,8 @@ def precalculate_technical_screener_cache():
             # Get all price history for this ticker
             q = text(
                 f"""
-                SELECT DISTINCT "BizDt" AS date, "UndrlygPric" AS close
+                SELECT DISTINCT "BizDt" AS date, "UndrlygPric" AS close,
+                       "OpnPric" AS open, "HghPric" AS high, "LwPric" AS low, "TtlTradgVol" AS volume
                 FROM "{table}"
                 WHERE "BizDt" IS NOT NULL AND "FinInstrmTp" = 'STF'
                 ORDER BY "BizDt"
@@ -240,6 +363,10 @@ def precalculate_technical_screener_cache():
             df["date"] = pd.to_datetime(df["date"])
             df = df.sort_values("date").drop_duplicates(subset=["date"], keep="first")
             df["close"] = pd.to_numeric(df["close"], errors="coerce")
+            df["open"] = pd.to_numeric(df["open"], errors="coerce")
+            df["high"] = pd.to_numeric(df["high"], errors="coerce")
+            df["low"] = pd.to_numeric(df["low"], errors="coerce")
+            df["volume"] = pd.to_numeric(df["volume"], errors="coerce").fillna(0)
             df = df.dropna(subset=["close"])
             df = df.set_index("date")
 
@@ -256,6 +383,10 @@ def precalculate_technical_screener_cache():
             sma_200 = calculate_sma(close, 200)
             bb_upper, bb_middle, bb_lower, bb_width = calculate_bollinger_bands(close, 20, 2)
             adx = calculate_adx(close, 14)
+
+            # NEW: Calculate pivot points, momentum, and squeeze
+            pivot, r1, r2, r3, s1, s2, s3 = calculate_pivot_points(close)
+            momentum = calculate_momentum_score(close, lookback=10)
 
             # Create cache rows for NEW dates only
             ticker_rows = 0
@@ -297,10 +428,153 @@ def precalculate_technical_screener_cache():
                         if prev_macd > prev_signal and latest_macd < latest_signal:
                             macd_neg_cross = True
 
+                # NEW: Get pivot, momentum values for this row
+                latest_pivot = pivot.iloc[i] if i < len(pivot) and pd.notnull(pivot.iloc[i]) else None
+                latest_r1 = r1.iloc[i] if i < len(r1) and pd.notnull(r1.iloc[i]) else None
+                latest_r2 = r2.iloc[i] if i < len(r2) and pd.notnull(r2.iloc[i]) else None
+                latest_r3 = r3.iloc[i] if i < len(r3) and pd.notnull(r3.iloc[i]) else None
+                latest_s1 = s1.iloc[i] if i < len(s1) and pd.notnull(s1.iloc[i]) else None
+                latest_s2 = s2.iloc[i] if i < len(s2) and pd.notnull(s2.iloc[i]) else None
+                latest_s3 = s3.iloc[i] if i < len(s3) and pd.notnull(s3.iloc[i]) else None
+                latest_momentum = momentum.iloc[i] if i < len(momentum) and pd.notnull(momentum.iloc[i]) else None
+
+                # NEW: Price & Volume Metrics
+                # ---------------------------
+                # Rolling Highs/Lows for Breakouts
+                # We need historical data up to this point 'i'
+                # 5-day (1 week), 20-day (4 weeks), 250-day (52 weeks)
+
+                # Get history window ending at i (inclusive)
+                # Ensure we have enough data points
+
+                week1_high = week1_low = None
+                week4_high = week4_low = None
+                week52_high = week52_low = None
+
+                vol_sma_20 = None
+                is_week1_high_bo = is_week1_low_bo = False
+                is_week4_high_bo = is_week4_low_bo = False
+                is_week52_high_bo = is_week52_low_bo = False
+
+                is_pot_high_vol = False
+                is_unusually_high_vol = False
+
+                try:
+                    # Rolling windows calculation (using array slicing for speed)
+                    # We need PREVIOUS highs to check for breakout (i.e. Close > Max of prev N days)
+                    # But typically breakout means Close > Max of Last N Days (including today? or excluding?)
+                    # ScanX "Breakouts" usually mean "Crossed above the High of last N days TODAY"
+                    # So we compare Today's Close vs Max of (Day-1 to Day-N)
+
+                    if i >= 5:
+                         prev_5_high = close.iloc[i-5:i].max()
+                         prev_5_low = close.iloc[i-5:i].min()
+                         week1_high = prev_5_high
+                         week1_low = prev_5_low
+                         is_week1_high_bo = bool(latest_close > prev_5_high)
+                         is_week1_low_bo = bool(latest_close < prev_5_low)
+
+                    if i >= 20:
+                         prev_20_high = close.iloc[i-20:i].max()
+                         prev_20_low = close.iloc[i-20:i].min()
+                         week4_high = prev_20_high
+                         week4_low = prev_20_low
+                         is_week4_high_bo = bool(latest_close > prev_20_high)
+                         is_week4_low_bo = bool(latest_close < prev_20_low)
+
+                         # Volume SMA 20
+                         if 'volume' in df.columns:
+                             vol_window = df['volume'].iloc[i-20:i]
+                             vol_sma_20 = vol_window.mean()
+                             current_vol = df['volume'].iloc[i]
+
+                             if vol_sma_20 and vol_sma_20 > 0:
+                                 if current_vol > (1.5 * vol_sma_20):
+                                     is_pot_high_vol = True
+                                 if current_vol > (2.5 * vol_sma_20):
+                                     is_unusually_high_vol = True
+
+                    if i >= 250:
+                         prev_250_high = close.iloc[i-250:i].max()
+                         prev_250_low = close.iloc[i-250:i].min()
+                         week52_high = prev_250_high
+                         week52_low = prev_250_low
+                         is_week52_high_bo = bool(latest_close > prev_250_high)
+                         is_week52_low_bo = bool(latest_close < prev_250_low)
+                    elif i >= 50: # Partial 52-week (fallback to max available if > 50 days)
+                         prev_max = close.iloc[:i].max()
+                         prev_min = close.iloc[:i].min()
+                         week52_high = prev_max
+                         week52_low = prev_min
+                         is_week52_high_bo = bool(latest_close > prev_max)
+                         is_week52_low_bo = bool(latest_close < prev_min)
+
+                except Exception as e:
+                    # Safety net for calculation errors
+                    pass
+
+                # Basic Price/Volume Data
+                # -----------------------
+                latest_open = df.iloc[i].get('open') if 'open' in df.columns else None
+                latest_high = df.iloc[i].get('high') if 'high' in df.columns else None
+                latest_low = df.iloc[i].get('low') if 'low' in df.columns else None
+                latest_volume = df.iloc[i].get('volume') if 'volume' in df.columns else None
+
+                # Change %
+                price_change_pct = 0
+                vol_change_pct = 0
+
+                if i > 0:
+                    prev_close = close.iloc[i-1]
+                    price_change_pct = ((latest_close - prev_close) / prev_close) * 100
+
+                    if 'volume' in df.columns:
+                        prev_vol = df['volume'].iloc[i-1]
+                        if prev_vol > 0:
+                            vol_change_pct = ((latest_volume - prev_vol) / prev_vol) * 100
+
+
+                # Breakout detection
+                r1_bo = bool(latest_close > latest_r1) if latest_r1 is not None else False
+                r2_bo = bool(latest_close > latest_r2) if latest_r2 is not None else False
+                r3_bo = bool(latest_close > latest_r3) if latest_r3 is not None else False
+                s1_bo = bool(latest_close < latest_s1) if latest_s1 is not None else False
+                s2_bo = bool(latest_close < latest_s2) if latest_s2 is not None else False
+                s3_bo = bool(latest_close < latest_s3) if latest_s3 is not None else False
+
+                # BB Squeeze detection (width < 2%)
+                bb_squeeze_flag = bool(latest_bb_width < 5.0) if pd.notnull(latest_bb_width) else False
+
+                # High momentum (score > 5)
+                high_momentum_flag = bool(latest_momentum > 5.0) if latest_momentum is not None else False
+
                 row = {
                     "cache_date": date_str,
                     "ticker": ticker,
                     "underlying_price": latest_close,
+
+                    # NEW: Price & Volume
+                    "open_price": latest_open,
+                    "high_price": latest_high,
+                    "low_price": latest_low,
+                    "volume": int(latest_volume) if latest_volume is not None and pd.notnull(latest_volume) else 0,
+                    "price_change_pct": price_change_pct,
+                    "volume_change_pct": vol_change_pct,
+
+                    "week1_high": week1_high, "week1_low": week1_low,
+                    "week4_high": week4_high, "week4_low": week4_low,
+                    "week52_high": week52_high, "week52_low": week52_low,
+                    #"vol_sma_20": vol_sma_20,
+
+                    "is_week1_high_breakout": is_week1_high_bo,
+                    "is_week1_low_breakout": is_week1_low_bo,
+                    "is_week4_high_breakout": is_week4_high_bo,
+                    "is_week4_low_breakout": is_week4_low_bo,
+                    "is_week52_high_breakout": is_week52_high_bo,
+                    "is_week52_low_breakout": is_week52_low_bo,
+                    "is_potential_high_vol": is_pot_high_vol,
+                    "is_unusually_high_vol": is_unusually_high_vol,
+
                     "rsi_14": latest_rsi if pd.notnull(latest_rsi) else None,
                     "rsi_above_80": bool(latest_rsi > 80) if pd.notnull(latest_rsi) else False,
                     "rsi_60_80": bool(60 < latest_rsi <= 80) if pd.notnull(latest_rsi) else False,
@@ -330,6 +604,25 @@ def precalculate_technical_screener_cache():
                     "bb_width": latest_bb_width if pd.notnull(latest_bb_width) else None,
                     "adx_14": latest_adx if pd.notnull(latest_adx) else None,
                     "strong_trend": bool(latest_adx > 25) if pd.notnull(latest_adx) else False,
+                    # NEW: Pivot points
+                    "pivot_point": latest_pivot,
+                    "r1": latest_r1,
+                    "r2": latest_r2,
+                    "r3": latest_r3,
+                    "s1": latest_s1,
+                    "s2": latest_s2,
+                    "s3": latest_s3,
+                    # NEW: Breakout flags
+                    "r1_breakout": r1_bo,
+                    "r2_breakout": r2_bo,
+                    "r3_breakout": r3_bo,
+                    "s1_breakout": s1_bo,
+                    "s2_breakout": s2_bo,
+                    "s3_breakout": s3_bo,
+                    # NEW: Momentum and squeeze
+                    "momentum_score": latest_momentum,
+                    "is_high_momentum": high_momentum_flag,
+                    "bb_squeeze": bb_squeeze_flag,
                 }
 
                 all_cache_rows.append(row)

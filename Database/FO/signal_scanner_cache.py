@@ -6,7 +6,10 @@ Source: BhavCopy_Database (TBL_*)
 Target: daily_signal_scanner table in BhavCopy_Database
 """
 
+import os
+import sys
 import json
+from dotenv import load_dotenv
 import logging
 import math
 import sys
@@ -19,6 +22,8 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool
+load_dotenv()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
@@ -28,24 +33,19 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================
 
+# Database Config
+from Analysis_Tools.app.models.db_config import engine
+
+# Hardcoded constants removed - using shared engine
 DB_USER = "postgres"
-DB_PASS = "Gallop@3104"
+DB_PASS = os.getenv("DB_PASSWORD")
 DB_HOST = "localhost"
 DB_PORT = "5432"
 DB_NAME = "BhavCopy_Database"
 
-MIN_DATA_POINTS = 25  # POC requirement: minimum 25 data points per symbol
-MIN_VOLUME = 10  # POC requirement: skip contracts with volume < 10
+MIN_DATA_POINTS = 25
+MIN_VOLUME = 10
 BINS = 50
-
-# Create DB Engine
-db_password_enc = quote_plus(DB_PASS)
-engine = create_engine(
-    f"postgresql+psycopg2://{DB_USER}:{db_password_enc}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
-    poolclass=NullPool,
-    pool_pre_ping=True,
-    echo=False,
-)
 
 # =============================================================
 # CALCULATION LOGIC (Cloned from signal_scanner_model.py)

@@ -16,8 +16,12 @@ Automation:
     Linux/Mac Cron: 30 18 * * 1-5 python fii_dii_daily_updater.py
 """
 
+import os
 import argparse
 import random
+from dotenv import load_dotenv
+
+load_dotenv()
 import sys
 import time
 from datetime import datetime, timedelta
@@ -31,7 +35,7 @@ from sqlalchemy import create_engine, text
 # DATABASE CONFIGURATION
 # =============================================================
 db_user = "postgres"
-db_password = "Gallop@3104"
+db_password = os.getenv("DB_PASSWORD")
 db_host = "localhost"
 db_port = "5432"
 db_name = "BhavCopy_Database"

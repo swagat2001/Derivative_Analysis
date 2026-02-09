@@ -14,9 +14,13 @@ from datetime import datetime
 from functools import lru_cache
 
 import pandas as pd
+from flask_caching import Cache
 from sqlalchemy import inspect, text
 
 from .db_config import engine, get_stock_list_from_excel
+
+# Initialize cache with 5-minute timeout
+cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
 
 # -------------------------
 # DB engine (imported from shared db_config)
@@ -71,7 +75,7 @@ def clear_table_cache():
     print("[INFO] Table cache cleared")
 
 
-@lru_cache(maxsize=1)
+@cache.memoize(timeout=300)
 def _get_table_list_cached():
     """Cached table list to avoid repeated inspector calls."""
     try:
@@ -85,7 +89,7 @@ def _get_table_list_cached():
         return None
 
 
-@lru_cache(maxsize=1)
+@cache.memoize(timeout=300)
 def _get_available_dates_stock_cached():
     """Internal cached function for dates."""
     try:
@@ -100,7 +104,7 @@ def _get_available_dates_stock_cached():
         dates = [d.strftime("%Y-%m-%d") if hasattr(d, "strftime") else str(d) for d in df["BizDt"]]
         return tuple(dates)
     except Exception as e:
-        print(f"[ERROR] get_available_dates(): {e}")
+        print(f"[ERROR] _get_available_dates_stock_cached(): {e}")
         return tuple()
 
 
@@ -114,15 +118,21 @@ def get_available_dates():
 
 def clear_date_cache():
     """Clear date and table cache - useful when new data is added to database."""
-    _get_available_dates_stock_cached.cache_clear()
-    _get_table_list_cached.cache_clear()
-    _get_all_tickers_cached.cache_clear()
-    _get_stock_chart_data_cached.cache_clear()  # Also clear chart data cache
-    _get_stock_expiry_data_cached.cache_clear()  # Also clear expiry data cache
-    _get_stock_stats_cached.cache_clear()  # Also clear stats cache
-    _get_stock_detail_data_cached.cache_clear()  # Also clear detail data cache
+    # With flask_caching, we can clear the entire cache or specific keys
+    # For now, clearing everything is safest as everything depends on DB state
+    cache.clear()
+
+    # Also clear internal python caches just in case
+    _get_available_dates_stock_cached.delete_memoized()
+    _get_table_list_cached.delete_memoized()
+    _get_all_tickers_cached.delete_memoized()
+    _get_stock_chart_data_cached.delete_memoized()
+    _get_stock_expiry_data_cached.delete_memoized()
+    _get_stock_stats_cached.delete_memoized()
+    _get_stock_detail_data_cached.delete_memoized()
+
     clear_table_cache()  # Also clear table cache
-    print("[INFO] Stock date, table, chart, expiry, stats, and detail cache cleared")
+    print("[INFO] Stock cache cleared")
 
 
 def _get_prev_date(selected_date, dates_list):
@@ -141,18 +151,33 @@ def _get_prev_date(selected_date, dates_list):
 # -------------------------
 # Utilities
 # -------------------------
+# Utilities
+# -------------------------
+def _clean_ticker(ticker: str) -> str:
+    """Sanitize ticker to prevent SQL injection."""
+    if not ticker:
+        return ""
+    # Allow alphanumeric, &, and -
+    return "".join(c for c in ticker.upper() if c.isalnum() or c in ['&', '-'])
+
+
 def _derived_table_name(ticker: str) -> str:
-    return f"TBL_{ticker.upper()}_DERIVED"
+    ticker = _clean_ticker(ticker)
+    return f"TBL_{ticker}_DERIVED"
 
 
 def _base_table_name(ticker: str) -> str:
-    return f"TBL_{ticker.upper()}"
+    ticker = _clean_ticker(ticker)
+    return f"TBL_{ticker}"
 
 
 # -------------------------
 # Core functions
 # -------------------------
-@lru_cache(maxsize=1024)  # Cache up to 1024 different stock/date/expiry combinations
+# -------------------------
+# Core functions
+# -------------------------
+@cache.memoize(timeout=300)
 def _get_stock_detail_data_cached(
     ticker: str,
     selected_date: str,
@@ -464,8 +489,6 @@ def _get_stock_detail_data_cached(
                 round(float(r.get("Gamma")), 6) if "Gamma" in r and pd.notna(r.get("Gamma")) else None,
                 round(float(r.get("Theta")), 6) if "Theta" in r and pd.notna(r.get("Theta")) else None,
                 round(float(r.get("IV")) * 100, 2)
-                if "IV" in r and pd.notna(r.get("IV")) and float(r.get("IV")) < 1
-                else round(float(r.get("IV")), 2)
                 if "IV" in r and pd.notna(r.get("IV"))
                 else None,
                 int(r.get("PrevOI")) if pd.notna(r.get("PrevOI")) else None,
@@ -611,7 +634,7 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
         return []
 
 
-@lru_cache(maxsize=512)  # Cache expiry data - increased for better performance
+@cache.memoize(timeout=300)
 def _get_stock_expiry_data_cached(ticker: str, selected_date: str, table_name: str, prev_date: str):
     """Cached internal function for expiry data."""
     try:
@@ -749,7 +772,7 @@ def get_stock_expiry_data(ticker: str, selected_date: str):
         return []
 
 
-@lru_cache(maxsize=512)  # Cache stats data - increased for better performance
+@cache.memoize(timeout=300)
 def _get_stock_stats_cached(ticker: str, selected_date: str, selected_expiry: str, table_name: str):
     """Cached internal function for stats data."""
     try:
@@ -962,7 +985,7 @@ def get_stock_stats(ticker: str, selected_date: str, selected_expiry: str = None
         return {}
 
 
-@lru_cache(maxsize=128)  # Cache up to 128 different ticker/days combinations
+@cache.memoize(timeout=300)
 def _get_stock_chart_data_cached(ticker: str, days: int, table_name: str):
     """Cached internal function for chart data with moneyness change."""
     try:
@@ -985,11 +1008,13 @@ def _get_stock_chart_data_cached(ticker: str, days: int, table_name: str):
                 "UndrlygPric",
                 "OpnIntrst",
                 "TtlTradgVol",
-                "iv"
+                "iv",
+                "OpnPric",
+                "HghPric",
+                "LwPric",
+                "ClsPric"
             FROM public."{table_name}"
             WHERE "BizDt" IN ({date_placeholders})
-            AND "UndrlygPric" IS NOT NULL
-            AND "OptnTp" IN ('CE', 'PE')
             ORDER BY "BizDt" ASC
         """
         )
@@ -1000,7 +1025,7 @@ def _get_stock_chart_data_cached(ticker: str, days: int, table_name: str):
             return tuple()
 
         # Convert to numeric
-        for col in ["StrkPric", "UndrlygPric", "OpnIntrst", "TtlTradgVol", "iv"]:
+        for col in ["StrkPric", "UndrlygPric", "OpnIntrst", "TtlTradgVol", "iv", "OpnPric", "HghPric", "LwPric", "ClsPric"]:
             if col in df_all.columns:
                 df_all[col] = pd.to_numeric(df_all[col], errors="coerce")
 
@@ -1019,29 +1044,99 @@ def _get_stock_chart_data_cached(ticker: str, days: int, table_name: str):
                 continue
 
             # Basic aggregations
-            close = df_curr["UndrlygPric"].max()
-            oi = df_curr["OpnIntrst"].sum()
-            volume = df_curr["TtlTradgVol"].sum()
+            # Separate Options and Underlying (Cash/Futures)
+            # Options have OptnTp='CE' or 'PE'
+            # Underlying/Futures have OptnTp=None or other values
+            df_options = df_curr[df_curr["OptnTp"].isin(["CE", "PE"])]
+            df_others = df_curr[~df_curr["OptnTp"].isin(["CE", "PE"])]
 
+            # Basic aggregations
+            # For Close/OHLC: Prefer 'df_others' (Cash/Futures) which has real OHLC
+            # If not available, fallback to 'UndrlygPric' from options (which is Spot Close)
+
+            open_price = 0
+            high_price = 0
+            low_price = 0
+            close_price = 0
+
+            if not df_others.empty:
+                # Use the first row from others (assuming it's the valid underlying/future)
+                # Ideally, we should filter for EQ or 'XX' if multiple exist
+                row = df_others.iloc[0]
+                open_price = float(row["OpnPric"]) if pd.notna(row["OpnPric"]) else 0
+                high_price = float(row["HghPric"]) if pd.notna(row["HghPric"]) else 0
+                low_price = float(row["LwPric"]) if pd.notna(row["LwPric"]) else 0
+                close_price = float(row["ClsPric"]) if pd.notna(row["ClsPric"]) else 0
+
+            # If df_others is empty (common for F&O tables), query Cash market table for OHLC
+            if (open_price == 0 or high_price == 0 or low_price == 0 or close_price == 0):
+                try:
+                    from .db_config import engine_cash
+
+                    # Query cash market table for this ticker and date
+                    cash_query = text(f'''
+                        SELECT "OpnPric", "HghPric", "LwPric", "ClsPric"
+                        FROM public."TBL_{ticker}"
+                        WHERE "BizDt" = '{curr_date}'
+                        LIMIT 1
+                    ''')
+
+                    with engine_cash.connect() as cash_conn:
+                        cash_result = cash_conn.execute(cash_query)
+                        cash_row = cash_result.fetchone()
+
+                        if cash_row:
+                            # Use cash market OHLC data
+                            if open_price == 0 and cash_row[0]:
+                                open_price = float(cash_row[0])
+                            if high_price == 0 and cash_row[1]:
+                                high_price = float(cash_row[1])
+                            if low_price == 0 and cash_row[2]:
+                                low_price = float(cash_row[2])
+                            if close_price == 0 and cash_row[3]:
+                                close_price = float(cash_row[3])
+                except Exception:
+                    # If cash table query fails, continue with fallback
+                    pass
+
+            # Final fallback: Use spot close from options if still no data
+            if close_price == 0 and not df_options.empty:
+                spot_close = df_options["UndrlygPric"].max()
+                close_price = float(spot_close) if pd.notna(spot_close) else 0
+                # Only set OHLC to close if we have absolutely no other data
+                if open_price == 0: open_price = close_price
+                if high_price == 0: high_price = close_price
+                if low_price == 0: low_price = close_price
+
+            # Metrics
+            oi = df_options["OpnIntrst"].sum()
+            volume = df_options["TtlTradgVol"].sum()
+
+            # Use df_options for IV and PCR logic
             # IV calculation
-            iv_values = df_curr[df_curr["iv"].notna() & (df_curr["iv"] > 0)]["iv"]
+            iv_values = df_options[df_options["iv"].notna() & (df_options["iv"] > 0)]["iv"]
             avg_iv = iv_values.mean() if not iv_values.empty else 0
-            if avg_iv < 1 and avg_iv > 0:
+            if avg_iv > 0:
                 avg_iv *= 100
 
             # PCR calculation
-            ce_oi = df_curr[df_curr["OptnTp"] == "CE"]["OpnIntrst"].sum()
-            pe_oi = df_curr[df_curr["OptnTp"] == "PE"]["OpnIntrst"].sum()
+            ce_oi = df_options[df_options["OptnTp"] == "CE"]["OpnIntrst"].sum()
+            pe_oi = df_options[df_options["OptnTp"] == "PE"]["OpnIntrst"].sum()
             pcr = pe_oi / ce_oi if ce_oi > 0 else 0
 
             # Moneyness change calculation
             moneyness_change = 0
+            df_prev_options = pd.DataFrame()
             df_prev = df_all[df_all["date"] == prev_date].copy()
+
             if not df_prev.empty:
+                df_prev_options = df_prev[df_prev["OptnTp"].isin(["CE", "PE"])]
+
+            if not df_options.empty and not df_prev_options.empty:
                 # Merge curr and prev on Strike and OptionType
                 dm = pd.merge(
-                    df_curr[["StrkPric", "OptnTp", "UndrlygPric"]],
-                    df_prev[["StrkPric", "OptnTp", "UndrlygPric"]],
+                    df_options[["StrkPric", "OptnTp", "UndrlygPric"]],
+                    df_prev_options[["StrkPric", "OptnTp", "UndrlygPric"]],
                     on=["StrkPric", "OptnTp"],
                     suffixes=("_c", "_p"),
                     how="inner",
@@ -1059,10 +1154,10 @@ def _get_stock_chart_data_cached(ticker: str, days: int, table_name: str):
             result.append(
                 (
                     curr_date,
-                    float(close) if pd.notna(close) else 0,
-                    float(close) if pd.notna(close) else 0,  # open = close
-                    float(close) if pd.notna(close) else 0,  # high = close
-                    float(close) if pd.notna(close) else 0,  # low = close
+                    float(open_price),
+                    float(high_price),
+                    float(low_price),
+                    float(close_price),
                     int(oi) if pd.notna(oi) else 0,
                     int(volume) if pd.notna(volume) else 0,
                     round(float(avg_iv), 2) if pd.notna(avg_iv) else 0,
@@ -1130,7 +1225,7 @@ def get_stock_chart_data(ticker: str, days: int = 40):
         return []
 
 
-@lru_cache(maxsize=1)
+@cache.memoize(timeout=3600)  # Tickers don't change often, cache for 1 hour
 def _get_all_tickers_cached():
     """Cached function to get all tickers."""
     try:

@@ -19,6 +19,14 @@ Usage:
 
 import io
 import os
+import sys
+
+# Add project root to path to allow imports from Analysis_Tools
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+from dotenv import load_dotenv
+
+load_dotenv()
 import random
 import sys
 import time
@@ -34,17 +42,7 @@ from sqlalchemy import create_engine, text
 # =============================================================
 # DATABASE CONFIGURATION
 # =============================================================
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
-
-db_password_enc = quote_plus(db_password)
-engine = create_engine(
-    f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}",
-    pool_pre_ping=True,
-)
+from Analysis_Tools.app.models.db_config import engine
 
 # =============================================================
 # NSE CONFIGURATION

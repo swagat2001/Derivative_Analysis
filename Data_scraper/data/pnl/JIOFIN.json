@@ -1,0 +1,154 @@
+{
+  "2023-03-01": [
+    {
+      "Sales ": 45.0
+    },
+    {
+      "Expenses ": 6.0
+    },
+    {
+      "OperatingProfit": 39.0
+    },
+    {
+      "OPM%": 0.88
+    },
+    {
+      "OtherIncome ": 10.0
+    },
+    {
+      "Interest": 0.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 49.0
+    },
+    {
+      "Tax%": 0.37
+    },
+    {
+      "NetProfit ": 31.0
+    },
+    {
+      "EPSinRs": 0.0
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ],
+  "2024-03-01": [
+    {
+      "Sales ": 1855.0
+    },
+    {
+      "Expenses ": 296.0
+    },
+    {
+      "OperatingProfit": 1559.0
+    },
+    {
+      "OPM%": 0.84
+    },
+    {
+      "OtherIncome ": 429.0
+    },
+    {
+      "Interest": 10.0
+    },
+    {
+      "Depreciation": 22.0
+    },
+    {
+      "Profitbeforetax": 1956.0
+    },
+    {
+      "Tax%": 0.18
+    },
+    {
+      "NetProfit ": 1605.0
+    },
+    {
+      "EPSinRs": 2.53
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ],
+  "2025-03-01": [
+    {
+      "Sales ": 2043.0
+    },
+    {
+      "Expenses ": 495.0
+    },
+    {
+      "OperatingProfit": 1549.0
+    },
+    {
+      "OPM%": 0.76
+    },
+    {
+      "OtherIncome ": 428.0
+    },
+    {
+      "Interest": 8.0
+    },
+    {
+      "Depreciation": 23.0
+    },
+    {
+      "Profitbeforetax": 1947.0
+    },
+    {
+      "Tax%": 0.17
+    },
+    {
+      "NetProfit ": 1613.0
+    },
+    {
+      "EPSinRs": 2.54
+    },
+    {
+      "DividendPayout%": 0.2
+    }
+  ],
+  "TTM": [
+    {
+      "Sales ": 2988.0
+    },
+    {
+      "Expenses ": 950.0
+    },
+    {
+      "OperatingProfit": 2038.0
+    },
+    {
+      "OPM%": 0.68
+    },
+    {
+      "OtherIncome ": 413.0
+    },
+    {
+      "Interest": 455.0
+    },
+    {
+      "Depreciation": 27.0
+    },
+    {
+      "Profitbeforetax": 1969.0
+    },
+    {
+      "Tax%": 0.0
+    },
+    {
+      "NetProfit ": 1605.0
+    },
+    {
+      "EPSinRs": 2.52
+    },
+    {
+      "DividendPayout%": 0.0
+    }
+  ]
+}

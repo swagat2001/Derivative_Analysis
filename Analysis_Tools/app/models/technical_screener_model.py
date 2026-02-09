@@ -279,6 +279,188 @@ def get_golden_crossover_stocks(date, limit=50):
         return []
 
 
+# ====== NEW SCREENER QUERY FUNCTIONS ======
+
+def get_rsi_overbought_stocks(date, limit=100):
+    """Get stocks with RSI > 75 (ScanX threshold for overbought)"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, rsi_14, adx_14, macd,
+                   bb_upper, bb_lower, sma_50, sma_200
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND rsi_14 > 75
+            ORDER BY rsi_14 DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting RSI overbought stocks: {e}")
+        return []
+
+
+def get_rsi_oversold_stocks(date, limit=100):
+    """Get stocks with RSI < 25 (ScanX threshold for oversold)"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, rsi_14, adx_14, macd,
+                   bb_upper, bb_lower, sma_50, sma_200
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND rsi_14 < 25
+            ORDER BY rsi_14 ASC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting RSI oversold stocks: {e}")
+        return []
+
+
+def get_r1_breakout_stocks(date, limit=100):
+    """Get stocks breaking above R1 resistance"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, r1, rsi_14, adx_14,
+                   ROUND(((underlying_price - r1) / r1 * 100)::numeric, 2) as breakout_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND r1_breakout = TRUE
+            ORDER BY breakout_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting R1 breakouts: {e}")
+        return []
+
+
+def get_r2_breakout_stocks(date, limit=100):
+    """Get stocks breaking above R2 resistance"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, r2, rsi_14, adx_14,
+                   ROUND(((underlying_price - r2) / r2 * 100)::numeric, 2) as breakout_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND r2_breakout = TRUE
+            ORDER BY breakout_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting R2 breakouts: {e}")
+        return []
+
+
+def get_r3_breakout_stocks(date, limit=100):
+    """Get stocks breaking above R3 resistance"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, r3, rsi_14, adx_14,
+                   ROUND(((underlying_price - r3) / r3 * 100)::numeric, 2) as breakout_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND r3_breakout = TRUE
+            ORDER BY breakout_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting R3 breakouts: {e}")
+        return []
+
+
+def get_s1_breakout_stocks(date, limit=100):
+    """Get stocks breaking below S1 support"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, s1, rsi_14, adx_14,
+                   ROUND(((s1 - underlying_price) / s1 * 100)::numeric, 2) as breakdown_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND s1_breakout = TRUE
+            ORDER BY breakdown_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting S1 breakouts: {e}")
+        return []
+
+
+def get_s2_breakout_stocks(date, limit=100):
+    """Get stocks breaking below S2 support"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, s2, rsi_14, adx_14,
+                   ROUND(((s2 - underlying_price) / s2 * 100)::numeric, 2) as breakdown_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND s2_breakout = TRUE
+            ORDER BY breakdown_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting S2 breakouts: {e}")
+        return []
+
+
+def get_s3_breakout_stocks(date, limit=100):
+    """Get stocks breaking below S3 support"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, s3, rsi_14, adx_14,
+                   ROUND(((s3 - underlying_price) / s3 * 100)::numeric, 2) as breakdown_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND s3_breakout = TRUE
+            ORDER BY breakdown_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting S3 breakouts: {e}")
+        return []
+
+
+def get_momentum_stocks(date, limit=100):
+    """Get stocks with high momentum score"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, momentum_score, rsi_14, adx_14,
+                   sma_50, sma_200
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_high_momentum = TRUE
+            ORDER BY momentum_score DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting momentum stocks: {e}")
+        return []
+
+
+def get_squeezing_range_stocks(date, limit=100):
+    """Get stocks with Bollinger Band squeeze (tightening bands)"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, bb_width, bb_upper, bb_lower,
+                   bb_middle, rsi_14, adx_14
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND bb_squeeze = TRUE
+            ORDER BY bb_width ASC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting squeezing range stocks: {e}")
+        return []
+
+
 def get_death_crossover_stocks(date, limit=50):
     """
     Get stocks with Death Crossover (50-day SMA crosses below 200-day SMA)
@@ -310,4 +492,143 @@ def get_death_crossover_stocks(date, limit=50):
         return df.to_dict("records")
     except Exception as e:
         print(f"Error getting death crossover: {e}")
+        return []
+
+
+
+
+# ====== PRICE & VOLUME SCREENER QUERIES ======
+
+def get_week1_high_breakout_stocks(date, limit=100):
+    """Stocks breaking above 1-week high"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, week1_high, rsi_14, adx_14, volume,
+                ROUND(((underlying_price - week1_high) / week1_high * 100)::numeric, 2) as breakout_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_week1_high_breakout = TRUE
+            ORDER BY breakout_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting week1 high breakout: {e}")
+        return []
+
+def get_week1_low_breakout_stocks(date, limit=100):
+    """Stocks breaking below 1-week low"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, week1_low, rsi_14, adx_14, volume,
+                ROUND(((week1_low - underlying_price) / week1_low * 100)::numeric, 2) as breakdown_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_week1_low_breakout = TRUE
+            ORDER BY breakdown_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting week1 low breakout: {e}")
+        return []
+
+def get_week4_high_breakout_stocks(date, limit=100):
+    """Stocks breaking above 4-week high"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, week4_high, rsi_14, adx_14, volume,
+                ROUND(((underlying_price - week4_high) / week4_high * 100)::numeric, 2) as breakout_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_week4_high_breakout = TRUE
+            ORDER BY breakout_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting week4 high breakout: {e}")
+        return []
+
+def get_week4_low_breakout_stocks(date, limit=100):
+    """Stocks breaking below 4-week low"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, week4_low, rsi_14, adx_14, volume,
+                ROUND(((week4_low - underlying_price) / week4_low * 100)::numeric, 2) as breakdown_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_week4_low_breakout = TRUE
+            ORDER BY breakdown_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting week4 low breakout: {e}")
+        return []
+
+def get_week52_high_breakout_stocks(date, limit=100):
+    """Stocks breaking above 52-week high"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, week52_high, rsi_14, adx_14, volume,
+                ROUND(((underlying_price - week52_high) / week52_high * 100)::numeric, 2) as breakout_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_week52_high_breakout = TRUE
+            ORDER BY breakout_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting week52 high breakout: {e}")
+        return []
+
+def get_week52_low_breakout_stocks(date, limit=100):
+    """Stocks breaking below 52-week low"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, week52_low, rsi_14, adx_14, volume,
+                ROUND(((week52_low - underlying_price) / week52_low * 100)::numeric, 2) as breakdown_pct
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_week52_low_breakout = TRUE
+            ORDER BY breakdown_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting week52 low breakout: {e}")
+        return []
+
+def get_potential_high_volume_stocks(date, limit=100):
+    """Stocks with potential high volume (>1.5x avg)"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, volume, volume_change_pct, rsi_14, adx_14
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_potential_high_vol = TRUE
+            ORDER BY volume_change_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting potential high volume: {e}")
+        return []
+
+def get_unusually_high_volume_stocks(date, limit=100):
+    """Stocks with unusually high volume (>2.5x avg)"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, volume, volume_change_pct, rsi_14, adx_14
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND is_unusually_high_vol = TRUE
+            ORDER BY volume_change_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting unusually high volume: {e}")
         return []

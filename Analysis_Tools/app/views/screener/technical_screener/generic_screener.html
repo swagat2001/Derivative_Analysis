@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}{{ screener_title }} - Technical Screener{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
+<style>
+    /* Dynamic signal color variable */
+    .screener-card {
+        --signal-color: {
+                {
+                signal_color
+            }
+        }
+
+        ;
+    }
+
+    .metric-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--signal-color);
+    }
+
+    /* Signal Badges */
+    .signal-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .signal-badge.bullish {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .signal-badge.bearish {
+        background: #fde2e2;
+        color: #991b1b;
+    }
+
+    .signal-badge.neutral {
+        background: #fef3c7;
+        color: #92400e;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="screener-container">
+
+    {% include 'components/screener_sidebar.html' %}
+
+    <main class="screener-main">
+
+        <!-- Back Button -->
+        <div class="back-button-container" style="margin-bottom: 20px;">
+            <button class="back-btn" data-url="{{ url_for('screener.screener_landing') }}"
+                onclick="window.location.href=this.dataset.url">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back to Screeners
+            </button>
+        </div>
+
+        {% if stocks %}
+        <section class="screener-section">
+            <div class="screener-card">
+                <div class="card-header"
+                    style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        <div class="card-title">{{ screener_icon|safe }} {{ screener_title }}</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label
+                                style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT
+                                DATE:</label>
+                            <select onchange="window.location.href='?date='+this.value;"
+                                style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                                {% for d in dates %}
+                                <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 30px;">
+                        <div style="text-align: center;">
+                            <div class="metric-value">{{ stocks|length }}</div>
+                            <div
+                                style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Total Stocks</div>
+                        </div>
+                        {% if avg_metric %}
+                        <div style="text-align: center;">
+                            <div class="metric-value">{{ avg_metric }}</div>
+                            <div
+                                style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">
+                                {{ avg_metric_label }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div style="padding: 10px 20px 5px; font-size: 13px; color: #6b7280;">
+                    {{ screener_desc }}
+                </div>
+
+                <table class="card-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            {% for col in table_columns %}
+                            <th>{{ col.label }}</th>
+                            {% endfor %}
+                            <th>RSI</th>
+                            <th>ADX</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in stocks %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td><a href="/stock/{{ stock.ticker }}" class="symbol-link">{{ stock.ticker }}</a></td>
+                            <td>₹{{ "%.2f"|format(stock.underlying_price) }}</td>
+                            {% for col in table_columns %}
+                            <td class="{{ col.css_class if col.css_class else '' }}">
+                                {% if col.prefix %}{{ col.prefix }}{% endif %}
+                                {% if stock[col.key] is not none %}
+                                {{ col.format|format(stock[col.key]) if col.format else stock[col.key] }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                                {% if col.suffix %}{{ col.suffix }}{% endif %}
+                            </td>
+                            {% endfor %}
+                            <td>{{ "%.1f"|format(stock.rsi_14) if stock.rsi_14 else 'N/A' }}</td>
+                            <td>{{ "%.1f"|format(stock.adx_14) if stock.adx_14 else 'N/A' }}</td>
+                            <td>
+                                <span class="signal-badge {{ stock.signal|lower }}">
+                                    {{ stock.signal }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div
+                    style="padding: 12px 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: #6b7280;">Showing {{ stocks|length }} stocks for {{
+                        selected_date }}</span>
+                    <button onclick="exportScreenerCSV()"
+                        style="padding: 6px 14px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #374151; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+        </section>
+        {% else %}
+        <div
+            style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
+            <div style="font-size: 48px; margin-bottom: 15px;">📊</div>
+            <div style="margin-bottom: 20px;">
+                <label
+                    style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT
+                    DATE:</label>
+                <select onchange="window.location.href='?date='+this.value;"
+                    style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                    {% for d in dates %}
+                    <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            No {{ screener_title }} found for the selected date.<br>
+            Try selecting a different date from the dropdown above.
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+
+<script>
+    function exportScreenerCSV() {
+        const table = document.querySelector('.card-table');
+        if (!table) return;
+        let csv = [];
+        const rows = table.querySelectorAll('tr');
+        rows.forEach(row => {
+            const cols = row.querySelectorAll('td, th');
+            const rowData = [];
+            cols.forEach(col => rowData.push('"' + col.textContent.trim().replace(/"/g, '""') + '"'));
+            csv.push(rowData.join(','));
+        });
+        const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '{{ screener_title|replace(" ", "_") }}_{{ selected_date }}.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

@@ -23,7 +23,10 @@ from .controllers.screener.technical_screener.controller import technical_screen
 from .controllers.screener.top_gainers_losers.controller import cache as gainers_cache
 from .controllers.screener.top_gainers_losers.controller import gainers_losers_bp
 from .controllers.stock_controller import stock_bp
+from .controllers.stock_controller import stock_bp
 from .controllers.voice_api_controller import voice_api_bp
+from .models.stock_model import cache as stock_cache
+from .utils.logger import setup_logger
 
 # from .health_check import health_bp
 
@@ -35,13 +38,19 @@ def create_app():
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
     app.secret_key = os.environ.get("APP_SECRET_KEY", "dev-secret-key-change-me")
 
+    # Configure Logging
+    setup_logger()
+    app.logger.info("Flask application initialized")
+
     # Initialize caches
     gainers_cache.init_app(app)
     signal_cache.init_app(app)
     futures_cache.init_app(app)
     tech_cache.init_app(app)
     insights_cache.init_app(app)
+    insights_cache.init_app(app)
     scanner_cache.init_app(app)
+    stock_cache.init_app(app)
 
     # Initialize authentication system (creates users table and default admin)
     from .models.auth_model import ensure_initialized

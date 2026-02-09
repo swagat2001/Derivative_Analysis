@@ -16,8 +16,29 @@ from ....models.stock_model import get_filtered_tickers
 from ....models.technical_screener_model import (
     get_death_crossover_stocks,
     get_golden_crossover_stocks,
+    get_momentum_stocks,
+    get_r1_breakout_stocks,
+    get_r2_breakout_stocks,
+    get_r3_breakout_stocks,
+    get_rsi_overbought_stocks,
+    get_rsi_oversold_stocks,
+    get_s1_breakout_stocks,
+    get_s2_breakout_stocks,
+    get_s3_breakout_stocks,
+    get_squeezing_range_stocks,
+
     get_technical_available_dates,
+    # NEW IMPORTS
+    get_week1_high_breakout_stocks,
+    get_week1_low_breakout_stocks,
+    get_week4_high_breakout_stocks,
+    get_week4_low_breakout_stocks,
+    get_week52_high_breakout_stocks,
+    get_week52_low_breakout_stocks,
+    get_potential_high_volume_stocks,
+    get_unusually_high_volume_stocks,
 )
+from ....services.signal_service import compute_signals_simple
 
 technical_screener_bp = Blueprint("technical_screener", __name__, url_prefix="/screener/technical-indicators")
 
@@ -237,3 +258,332 @@ def death_crossover():
 
         traceback.print_exc()
         return jsonify({"error": f"Death Crossover failed: {str(e)}"}), 500
+
+
+# ====== GENERIC SCREENER RENDERER ======
+def render_generic_screener(title, desc, icon, signal, signal_color, data_func,
+                            table_columns, avg_metric_func=None, avg_metric_label=None):
+    """Generic renderer for all new technical screener pages"""
+    try:
+        dates = get_technical_available_dates()
+        if not dates:
+            return render_template(
+                "screener/technical_screener/generic_screener.html",
+                dates=[], selected_date=None, stocks=[],
+                screener_title=title, screener_desc=desc,
+                screener_icon=icon, signal_color=signal_color,
+                table_columns=table_columns,
+                avg_metric=None, avg_metric_label=None,
+                indices=get_live_indices(), stock_list=get_filtered_tickers(),
+                error="No dates available",
+            )
+
+        selected_date = request.args.get("date", dates[-1])
+        stocks = data_func(selected_date, limit=100)
+
+        # Fetch signals from service
+        signals_map = compute_signals_simple(selected_date)
+
+        for stock in stocks:
+            ticker = stock.get("ticker")
+            # Use computed signal if available, otherwise fallback to hardcoded screener signal or NEUTRAL
+            if ticker and ticker in signals_map:
+                stock["signal"] = signals_map[ticker]
+            else:
+                stock["signal"] = signal
+
+        avg_metric = None
+        if avg_metric_func and stocks:
+            avg_metric = avg_metric_func(stocks)
+
+        return render_template(
+            "screener/technical_screener/generic_screener.html",
+            dates=dates, selected_date=selected_date, stocks=stocks,
+            screener_title=title, screener_desc=desc,
+            screener_icon=icon, signal_color=signal_color,
+            table_columns=table_columns,
+            avg_metric=avg_metric, avg_metric_label=avg_metric_label,
+            indices=get_live_indices(), stock_list=get_filtered_tickers(),
+        )
+    except Exception as e:
+        print(f"[ERROR] {title} route: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"{title} failed: {str(e)}"}), 500
+
+
+@technical_screener_bp.route("/rsi-overbought")
+def rsi_overbought():
+    """RSI > 75 overbought stocks screener"""
+    return render_generic_screener(
+        title="Overbought RSI Stocks",
+        desc="Detects stocks where the RSI exceeds 75, suggesting a possible upcoming price correction.",
+        icon="🔥", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_rsi_overbought_stocks,
+        table_columns=[
+            {"key": "macd", "label": "MACD", "format": "%.2f"},
+        ],
+        avg_metric_func=lambda s: "%.1f" % (sum(x.get("rsi_14", 0) or 0 for x in s) / len(s)),
+        avg_metric_label="Avg RSI",
+    )
+
+
+@technical_screener_bp.route("/rsi-oversold")
+def rsi_oversold():
+    """RSI < 25 oversold stocks screener"""
+    return render_generic_screener(
+        title="Oversold RSI Stocks",
+        desc="Finds stocks with RSI below 25, indicating a potential for price recovery.",
+        icon="❄️", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_rsi_oversold_stocks,
+        table_columns=[
+            {"key": "macd", "label": "MACD", "format": "%.2f"},
+        ],
+        avg_metric_func=lambda s: "%.1f" % (sum(x.get("rsi_14", 0) or 0 for x in s) / len(s)),
+        avg_metric_label="Avg RSI",
+    )
+
+
+@technical_screener_bp.route("/r1-breakout")
+def r1_breakout():
+    """R1 resistance breakout screener"""
+    return render_generic_screener(
+        title="R1 Resistance Breakouts",
+        desc="Stocks climbing past R1 resistance levels, potentially signaling sustained upward trends.",
+        icon="📈", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_r1_breakout_stocks,
+        table_columns=[
+            {"key": "r1", "label": "R1 Level", "format": "₹%.2f"},
+            {"key": "breakout_pct", "label": "Breakout %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/r2-breakout")
+def r2_breakout():
+    """R2 resistance breakout screener"""
+    return render_generic_screener(
+        title="R2 Resistance Breakouts",
+        desc="Stocks breaking above R2 resistance, showing strong bullish momentum.",
+        icon="📈", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_r2_breakout_stocks,
+        table_columns=[
+            {"key": "r2", "label": "R2 Level", "format": "₹%.2f"},
+            {"key": "breakout_pct", "label": "Breakout %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/r3-breakout")
+def r3_breakout():
+    """R3 resistance breakout screener"""
+    return render_generic_screener(
+        title="R3 Resistance Breakouts",
+        desc="Stocks breaking above R3 resistance — extremely strong bullish signal.",
+        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_r3_breakout_stocks,
+        table_columns=[
+            {"key": "r3", "label": "R3 Level", "format": "₹%.2f"},
+            {"key": "breakout_pct", "label": "Breakout %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/s1-breakout")
+def s1_breakout():
+    """S1 support breakout (breakdown) screener"""
+    return render_generic_screener(
+        title="S1 Support Breakouts",
+        desc="Stocks falling through S1 support lines, possibly forecasting extended declines.",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_s1_breakout_stocks,
+        table_columns=[
+            {"key": "s1", "label": "S1 Level", "format": "₹%.2f"},
+            {"key": "breakdown_pct", "label": "Breakdown %", "format": "-%.2f", "suffix": "%", "css_class": "negative"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/s2-breakout")
+def s2_breakout():
+    """S2 support breakout (breakdown) screener"""
+    return render_generic_screener(
+        title="S2 Support Breakouts",
+        desc="Stocks falling through S2 support lines, indicating significant bearish pressure.",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_s2_breakout_stocks,
+        table_columns=[
+            {"key": "s2", "label": "S2 Level", "format": "₹%.2f"},
+            {"key": "breakdown_pct", "label": "Breakdown %", "format": "-%.2f", "suffix": "%", "css_class": "negative"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/s3-breakout")
+def s3_breakout():
+    """S3 support breakout (breakdown) screener"""
+    return render_generic_screener(
+        title="S3 Support Breakouts",
+        desc="Stocks falling through S3 support — extreme bearish signal.",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_s3_breakout_stocks,
+        table_columns=[
+            {"key": "s3", "label": "S3 Level", "format": "₹%.2f"},
+            {"key": "breakdown_pct", "label": "Breakdown %", "format": "-%.2f", "suffix": "%", "css_class": "negative"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/momentum-stocks")
+def momentum_stocks():
+    """High momentum stocks screener"""
+    return render_generic_screener(
+        title="Momentum Stocks",
+        desc="Securities surging in price with strong market enthusiasm and potential for further gains.",
+        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_momentum_stocks,
+        table_columns=[
+            {"key": "momentum_score", "label": "Momentum Score", "format": "%.2f"},
+        ],
+        avg_metric_func=lambda s: "%.1f" % (sum(x.get("momentum_score", 0) or 0 for x in s) / len(s)),
+        avg_metric_label="Avg Momentum",
+    )
+
+
+@technical_screener_bp.route("/squeezing-range")
+def squeezing_range():
+    """Bollinger Band squeeze screener"""
+    return render_generic_screener(
+        title="Squeezing Range",
+        desc="Pinpoints stocks with tightening Bollinger Bands, indicating a potential breakout or breakdown.",
+        icon="🎯", signal="NEUTRAL", signal_color="#d97706",
+        data_func=get_squeezing_range_stocks,
+        table_columns=[
+            {"key": "bb_width", "label": "BB Width %", "format": "%.2f", "suffix": "%"},
+            {"key": "bb_upper", "label": "BB Upper", "format": "₹%.2f"},
+            {"key": "bb_lower", "label": "BB Lower", "format": "₹%.2f"},
+        ],
+        avg_metric_func=lambda s: "%.2f%%" % (sum(x.get("bb_width", 0) or 0 for x in s) / len(s)),
+        avg_metric_label="Avg BB Width",
+    )
+
+
+# ====== PRICE & VOLUME SCREENER ROUTES ======
+
+@technical_screener_bp.route("/week1-high-breakout")
+def week1_high_breakout():
+    """1 Week High Breakouts"""
+    return render_generic_screener(
+        title="1 Week High Breakouts",
+        desc="Securities surpassing highest price in the last week reflecting immediate bullish sentiment",
+        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_week1_high_breakout_stocks,
+        table_columns=[
+            {"key": "week1_high", "label": "1W High", "format": "₹%.2f"},
+            {"key": "breakout_pct", "label": "Breakout %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+@technical_screener_bp.route("/week1-low-breakout")
+def week1_low_breakout():
+    """1 Week Low Breakouts"""
+    return render_generic_screener(
+        title="1 Week Low Breakouts",
+        desc="Indicates immediate bearish sentiment with decline past their lowest price in the previous week",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_week1_low_breakout_stocks,
+        table_columns=[
+            {"key": "week1_low", "label": "1W Low", "format": "₹%.2f"},
+            {"key": "breakdown_pct", "label": "Breakdown %", "format": "-%.2f", "suffix": "%", "css_class": "negative"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+@technical_screener_bp.route("/week4-high-breakout")
+def week4_high_breakout():
+    """4 Week High Breakouts"""
+    return render_generic_screener(
+        title="4 Week High Breakouts",
+        desc="Securities exceeding their highest price in the last month indicating short-term bullish momentum",
+        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_week4_high_breakout_stocks,
+        table_columns=[
+            {"key": "week4_high", "label": "4W High", "format": "₹%.2f"},
+            {"key": "breakout_pct", "label": "Breakout %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+@technical_screener_bp.route("/week4-low-breakout")
+def week4_low_breakout():
+    """4 Week Low Breakouts"""
+    return render_generic_screener(
+        title="4 Week Low Breakouts",
+        desc="Pointing to short-term bearish momentum with stocks falling below their lowest price in the past month",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_week4_low_breakout_stocks,
+        table_columns=[
+            {"key": "week4_low", "label": "4W Low", "format": "₹%.2f"},
+            {"key": "breakdown_pct", "label": "Breakdown %", "format": "-%.2f", "suffix": "%", "css_class": "negative"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+@technical_screener_bp.route("/week52-high-breakout")
+def week52_high_breakout():
+    """52 Week High Breakouts"""
+    return render_generic_screener(
+        title="52 Week High Breakouts",
+        desc="Breaking past their highest price in the last year signaling strong bullish trends",
+        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_week52_high_breakout_stocks,
+        table_columns=[
+            {"key": "week52_high", "label": "52W High", "format": "₹%.2f"},
+            {"key": "breakout_pct", "label": "Breakout %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+@technical_screener_bp.route("/week52-low-breakout")
+def week52_low_breakout():
+    """52 Week Low Breakouts"""
+    return render_generic_screener(
+        title="52 Week Low Breakouts",
+        desc="Strong bearish trends suggested by dropping below their lowest price in the past year",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_week52_low_breakout_stocks,
+        table_columns=[
+            {"key": "week52_low", "label": "52W Low", "format": "₹%.2f"},
+            {"key": "breakdown_pct", "label": "Breakdown %", "format": "-%.2f", "suffix": "%", "css_class": "negative"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+@technical_screener_bp.route("/potential-high-volume")
+def potential_high_volume():
+    """Potential High Volume"""
+    return render_generic_screener(
+        title="Potential High Volume",
+        desc="Showing early signs of a spike in trading volume hinting at upcoming activity",
+        icon="📊", signal="NEUTRAL", signal_color="#d97706",
+        data_func=get_potential_high_volume_stocks,
+        table_columns=[
+            {"key": "volume", "label": "Volume"},
+            {"key": "volume_change_pct", "label": "Vol Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )
+
+@technical_screener_bp.route("/unusually-high-volume")
+def unusually_high_volume():
+    """Unusually High Volume"""
+    return render_generic_screener(
+        title="Unusually High Volume",
+        desc="Points to increased interest or activity with volume much higher than average",
+        icon="📊", signal="NEUTRAL", signal_color="#d97706",
+        data_func=get_unusually_high_volume_stocks,
+        table_columns=[
+            {"key": "volume", "label": "Volume"},
+            {"key": "volume_change_pct", "label": "Vol Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )

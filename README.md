@@ -186,6 +186,52 @@ docker-compose logs -f web
 docker-compose down
 ```
 
+### **🔐 Security Setup (CRITICAL)**
+
+**IMPORTANT**: Before running the application, you MUST configure your environment securely:
+
+#### **Step 1: Configure Environment Variables**
+```bash
+# 1. Copy the template file
+cp .env.template .env
+
+# 2. Edit .env and replace ALL placeholder values:
+#    - DB_PASSWORD: Your PostgreSQL password
+#    - APP_SECRET_KEY: Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+#    - UPSTOX_ACCESS_TOKEN: Your Upstox API token (if using live data)
+
+# 3. Verify .env is NOT tracked by git
+git status  # .env should NOT appear in the list
+```
+
+#### **Step 2: Verify Git Ignore**
+```bash
+# Ensure .env is in .gitignore
+grep -q "^\.env$" .gitignore || echo ".env" >> .gitignore
+
+# NEVER commit .env to version control
+git check-ignore .env  # Should output: .env
+```
+
+#### **Step 3: Install Pre-commit Hooks (Recommended)**
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+
+# Test hooks
+pre-commit run --all-files
+```
+
+> **⚠️ CRITICAL SECURITY WARNINGS:**
+> - `.env.template` contains PLACEHOLDER values only - never real credentials
+> - `.env` contains REAL credentials - never commit to git
+> - Always use strong, unique passwords for production
+> - Rotate credentials regularly
+> - Use environment-specific `.env` files (dev, staging, prod)
+
 ### **Manual Installation**
 ```bash
 # Create virtual environment

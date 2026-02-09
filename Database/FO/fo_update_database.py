@@ -10,37 +10,71 @@ This script performs all steps:
 """
 
 import os
+import sys
 import re
 import shutil
 import socket
 import sys
 import urllib.request
+import urllib.error
 import zipfile
-from datetime import datetime, timedelta
-from urllib.parse import quote_plus
-
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
+from Analysis_Tools.app.utils.logger import logger
+from datetime import datetime, timedelta
+from urllib.parse import quote_plus
 from py_vollib.black_scholes.greeks.analytical import delta, gamma, rho, theta, vega
 from py_vollib.black_scholes.implied_volatility import implied_volatility
 from sqlalchemy import create_engine, inspect, text
+load_dotenv()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 # ===========================================
 # 🔧 Configuration
 # ===========================================
-db_user = "postgres"
-db_password = "Gallop@3104"
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
+# Import shared database engine
 
-output_folder = "C:/data_fo"
-save_fo_eod = "C:/NSE_EOD_FO"
+from Analysis_Tools.app.models.db_config import engine
+output_folder = os.getenv("FO_TEMP_PATH", "temp_fo_data")
+save_fo_eod = os.getenv("FO_DATA_PATH", "data_fo_eod")
 
 
 # ===========================================
 # 📥 STEP 1: Download CSV Data
 # ===========================================
+# ===========================================
+# 📥 Download Helper Function
+# ===========================================
+def download_with_timeout(url, filepath, timeout=25):
+    """Download file with timeout and headers"""
+    socket.setdefaulttimeout(timeout)
+
+    try:
+        req = urllib.request.Request(url)
+        req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        req.add_header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            with open(filepath, "wb") as out_file:
+                out_file.write(response.read())
+
+        return True
+
+    except socket.timeout:
+        raise TimeoutError(f"Download timeout after {timeout}s")
+
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise FileNotFoundError("File not available (404)")
+        else:
+            raise Exception(f"HTTP Error {e.code}")
+
+    except Exception as e:
+        logger.error(f"❌ Download failed: {str(e)[:50]}")
+        raise Exception(f"Download failed: {str(e)[:50]}")
+
+
 def download_csv_data():
     print("\n" + "=" * 80)
     print("STEP 1: DOWNLOADING CSV DATA FROM NSE")
@@ -49,9 +83,6 @@ def download_csv_data():
     # -------------------------------------------
     # 1️⃣  CONNECT TO DATABASE TO GET LATEST DATE
     # -------------------------------------------
-    db_password_enc = quote_plus(db_password)
-    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
-
     inspector = inspect(engine)
     base_tables = [t for t in inspector.get_table_names() if t.startswith("TBL_") and not t.endswith("_DERIVED")]
 
@@ -96,7 +127,7 @@ def download_csv_data():
     os.makedirs(output_folder)
 
     if not os.path.exists(save_fo_eod):
-        os.makedirs(save_fo_eod)
+        os.makedirs(save_fo_eod, exist_ok=True)
 
     # -------------------------------------------
     # 4️⃣  GENERATE WEEKDAY DATES
@@ -109,15 +140,15 @@ def download_csv_data():
         date_range.append(d)
 
     if not date_range:
-        print("✅ No new weekday dates to download.")
+        logger.info("✅ No new weekday dates to download.")
         return True
 
-    print(f"📅 Downloading data for {len(date_range)} date(s)")
+    logger.info(f"📅 Downloading data for {len(date_range)} date(s)")
 
     # -------------------------------------------
     # 5️⃣  DOWNLOAD FILES
     # -------------------------------------------
-    socket.setdefaulttimeout(1)
+    socket.setdefaulttimeout(25)
     downloaded_files = []
 
     for d in date_range:
@@ -127,7 +158,7 @@ def download_csv_data():
 
         try:
             output_path = os.path.join(output_folder, filename)
-            urllib.request.urlretrieve(url, output_path)
+            download_with_timeout(url, output_path, timeout=25)
             downloaded_files.append(output_path)
             print(f"   ✅ {d} downloaded")
         except:
@@ -177,9 +208,6 @@ def upload_to_database():
     print("STEP 2: UPLOADING CSV DATA TO DATABASE")
     print("=" * 80 + "\n")
 
-    db_password_enc = quote_plus(db_password)
-    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
-
     # Expected CSV columns
     expected_columns = [
         "BizDt",
@@ -206,16 +234,43 @@ def upload_to_database():
         "NewBrdLotQty",
     ]
 
-    # Helper: sanitize table names
+    # Helper: Data Validation
+    def validate_data(df, filename):
+        """Validate DataFrame before upload."""
+        errors = []
+        missing_cols = [c for c in expected_columns if c not in df.columns]
+        if missing_cols:
+            errors.append(f"Missing columns: {missing_cols}")
+
+        if not df.empty:
+            numeric_cols = ["OpnPric", "HghPric", "LwPric", "ClsPric", "OpnIntrst"]
+            for col in numeric_cols:
+                if col in df.columns and (df[col] < 0).any():
+                    errors.append(f"Negative values found in {col}")
+
+            if "BizDt" in df.columns:
+                try:
+                    df["BizDt"] = pd.to_datetime(df["BizDt"], errors='coerce')
+                    future_dates = df[df["BizDt"] > datetime.now() + timedelta(days=1)]
+                    if not future_dates.empty:
+                        errors.append(f"Future dates found in BizDt: {future_dates['BizDt'].unique()}")
+                except Exception as e:
+                    errors.append(f"Date validation failed: {e}")
+
+        if errors:
+            logger.error(f"❌ Validation FAILED for {filename}:")
+            for e in errors:
+                logger.error(f"   - {e}")
+            return False
+        return True
+
     def sanitize_table_name(name):
         clean = re.sub(r"\W+", "_", name).strip("_").upper()
         return f"TBL_{clean}" if clean else "TBL_UNKNOWN"
 
-    # Get all ticker tables
     inspector = inspect(engine)
     existing_tables = inspector.get_table_names()
 
-    # Find latest BizDt from database
     latest_db_date = None
     base_tables = [t for t in existing_tables if t.startswith("TBL_") and not t.endswith("_DERIVED")]
 
@@ -230,7 +285,6 @@ def upload_to_database():
     else:
         print("📌 Database empty. Will upload all CSVs.")
 
-    # Load all CSV files
     csv_files = [f for f in os.listdir(save_fo_eod) if f.endswith(".csv")]
 
     if not csv_files:
@@ -246,6 +300,10 @@ def upload_to_database():
         try:
             df = pd.read_csv(file_path)
 
+            if not validate_data(df, file_name):
+                print(f"   ⚠️ Skipping invalid file: {file_name}")
+                continue
+
             if "BizDt" not in df.columns:
                 print("   ⚠ Missing BizDt column. Skipping.")
                 continue
@@ -254,7 +312,6 @@ def upload_to_database():
 
             csv_unique_dates = set(df["BizDt"].dropna().astype(str))
 
-            # Filter dates that are newer than DB
             if latest_db_date:
                 csv_unique_dates = {d for d in csv_unique_dates if d > str(latest_db_date)}
 
@@ -268,7 +325,6 @@ def upload_to_database():
 
             unique_symbols = df["TckrSymb"].dropna().unique()
 
-            # FIXED: Create tables with proper transaction management
             for symbol in unique_symbols:
                 table_name = sanitize_table_name(symbol)
                 if table_name not in existing_tables:
@@ -279,46 +335,59 @@ def upload_to_database():
                         "FinInstrmTp" VARCHAR(50),
                         "TckrSymb" VARCHAR(50),
                         "FininstrmActlXpryDt" DATE,
-                        "StrkPric" VARCHAR(50),
+                        "StrkPric" NUMERIC,
                         "OptnTp" VARCHAR(50),
-                        "FinInstrmNm" VARCHAR(50),
-                        "OpnPric" VARCHAR(50),
-                        "HghPric" VARCHAR(50),
-                        "LwPric" VARCHAR(50),
-                        "ClsPric" VARCHAR(50),
-                        "LastPric" VARCHAR(50),
-                        "PrvsClsgPric" VARCHAR(50),
-                        "UndrlygPric" VARCHAR(50),
-                        "SttlmPric" VARCHAR(50),
-                        "OpnIntrst" VARCHAR(50),
-                        "ChngInOpnIntrst" VARCHAR(50),
-                        "TtlTradgVol" VARCHAR(50),
-                        "TtlTrfVal" VARCHAR(50),
-                        "TtlNbOfTxsExctd" VARCHAR(50),
-                        "NewBrdLotQty" VARCHAR(50)
+                        "FinInstrmNm" VARCHAR(255),
+                        "OpnPric" NUMERIC,
+                        "HghPric" NUMERIC,
+                        "LwPric" NUMERIC,
+                        "ClsPric" NUMERIC,
+                        "LastPric" NUMERIC,
+                        "PrvsClsgPric" NUMERIC,
+                        "UndrlygPric" NUMERIC,
+                        "SttlmPric" NUMERIC,
+                        "OpnIntrst" BIGINT,
+                        "ChngInOpnIntrst" BIGINT,
+                        "TtlTradgVol" BIGINT,
+                        "TtlTrfVal" NUMERIC,
+                        "TtlNbOfTxsExctd" BIGINT,
+                        "NewBrdLotQty" INTEGER,
+                        UNIQUE ("BizDt", "FininstrmActlXpryDt", "StrkPric", "OptnTp")
                     );
                     """
-                    # FIXED: Use engine.begin() for proper transaction management
                     with engine.begin() as conn:
                         conn.execute(text(create_sql))
                     existing_tables.append(table_name)
-
-            # FIXED: Refresh inspector after creating new tables
             inspector = inspect(engine)
             existing_tables = inspector.get_table_names()
 
-            # Upload rows for new BizDt only
             for d in csv_unique_dates:
-                df_d = df[df["BizDt"] == datetime.strptime(d, "%Y-%m-%d").date()]
+                curr_date_obj = datetime.strptime(d, "%Y-%m-%d").date()
+                print(f"   ⏳ Starting transaction for {d}...")
 
-                for symbol in df_d["TckrSymb"].dropna().unique():
-                    table_name = sanitize_table_name(symbol)
-                    df_symbol = df_d[df_d["TckrSymb"] == symbol]
+                try:
+                    with engine.begin() as conn:
+                        df_d = df[df["BizDt"] == curr_date_obj].copy()
 
-                    cols = [col for col in expected_columns if col in df_symbol.columns]
-                    df_symbol = df_symbol[cols]
+                        df_d.drop_duplicates(subset=["TckrSymb", "FininstrmActlXpryDt", "StrkPric", "OptnTp"], keep="last", inplace=True)
 
-                    df_symbol.to_sql(table_name, con=engine, if_exists="append", index=False)
+                        for symbol in df_d["TckrSymb"].dropna().unique():
+                            table_name = sanitize_table_name(symbol)
+                            df_symbol = df_d[df_d["TckrSymb"] == symbol]
+
+                            cols = [col for col in expected_columns if col in df_symbol.columns]
+                            df_symbol = df_symbol[cols]
+
+                            delete_sql = text(f'DELETE FROM public."{table_name}" WHERE "BizDt" = :bizdt')
+                            conn.execute(delete_sql, {"bizdt": curr_date_obj})
+
+                            df_symbol.to_sql(table_name, con=conn, if_exists="append", index=False)
+
+                    print(f"   ✅ Committed data for {d}")
+
+                except Exception as e:
+                    logger.error(f"   ❌ Failed to upload date {d}. Transaction rolled back. Error: {e}")
+                    raise e
 
             upload_count += 1
             print("   ✅ Uploaded successfully.")
@@ -338,12 +407,6 @@ def calculate_greeks():
     print("STEP 3: CALCULATING GREEKS AND CREATING DERIVED TABLES")
     print("=" * 80 + "\n")
 
-    db_password_enc = quote_plus(db_password)
-    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
-
-    # ---------------------------------------------------------
-    # Get pending BizDt that are in BASE tables but not in DERIVED
-    # ---------------------------------------------------------
     def get_dates_to_process():
         try:
             inspector = inspect(engine)
@@ -354,7 +417,6 @@ def calculate_greeks():
             if not base_tables:
                 return []
 
-            # choose main index table
             sample_table = next((t for t in ["TBL_NIFTY", "TBL_BANKNIFTY"] if t in base_tables), base_tables[0])
 
             query_base = text(
@@ -471,13 +533,10 @@ def calculate_greeks():
                         print("⚠️")
                         continue
 
-                    # Ensure datetime conversion happens in main loop
                     if "FininstrmActlXpryDt" in df.columns:
                         df["FininstrmActlXpryDt"] = pd.to_datetime(df["FininstrmActlXpryDt"], errors="coerce")
                     if "BizDt" in df.columns:
                         df["BizDt"] = pd.to_datetime(df["BizDt"], errors="coerce")
-
-                    # force numeric conversion
                     numeric_cols = [
                         "UndrlygPric",
                         "StrkPric",
@@ -490,32 +549,23 @@ def calculate_greeks():
                         if col in df.columns:
                             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-                    # derived metrics
                     df["strike_diff"] = df["UndrlygPric"] - df["StrkPric"]
                     df["y_oi"] = df["OpnIntrst"] - df["ChngInOpnIntrst"]
 
-                    # Division by zero protection
                     df["chg_oi"] = df.apply(
                         lambda r: 0
-                        if (r["OpnIntrst"] + r["y_oi"]) == 0
-                        else round(
-                            100 * ((r["y_oi"] - r["OpnIntrst"]) / ((r["OpnIntrst"] + r["y_oi"]) / 2)),
-                            2,
-                        ),
+                        if r["y_oi"] == 0
+                        else round(100 * ((r["OpnIntrst"] - r["y_oi"]) / r["y_oi"]), 2),
                         axis=1,
                     )
 
                     df["chg_price"] = df.apply(
                         lambda r: 0
-                        if (r["PrvsClsgPric"] + r["LastPric"]) == 0
-                        else round(
-                            100 * ((r["PrvsClsgPric"] - r["LastPric"]) / ((r["PrvsClsgPric"] + r["LastPric"]) / 2)),
-                            2,
-                        ),
+                        if r["PrvsClsgPric"] == 0
+                        else round(100 * ((r["LastPric"] - r["PrvsClsgPric"]) / r["PrvsClsgPric"]), 2),
                         axis=1,
                     )
 
-                    # Calculate Greeks - ALL 6 INCLUDING GAMMA AND RHO
                     def safe_greeks(row):
                         try:
                             if (
@@ -550,7 +600,6 @@ def calculate_greeks():
 
                     df[["delta", "gamma", "vega", "theta", "rho", "iv"]] = df.apply(safe_greeks, axis=1)
 
-                    # Write to derived table
                     derived_table = f"{table_name}_DERIVED"
 
                     if derived_table not in inspector.get_table_names():
@@ -571,7 +620,6 @@ def calculate_greeks():
                         """
                         with engine.begin() as exe:
                             exe.execute(text(ddl))
-                        # Refresh inspector after table creation
                         inspector = inspect(engine)
 
                     df.to_sql(derived_table, engine, if_exists="append", index=False)
@@ -601,25 +649,20 @@ def main():
     print("\n" + "=" * 80)
 
     try:
-        # Step 1: Download CSV (continue even if no new data)
         download_result = download_csv_data()
-        if download_result is False:  # Only stop on actual error
+        if download_result is False:
             print("\n❌ CSV download failed!")
             return False
-
-        # Step 2: Upload to database (continue even if no new data)
         upload_result = upload_to_database()
-        if upload_result is False:  # Only stop on actual error
+        if upload_result is False:
             print("\n❌ Database upload failed!")
             return False
 
-        # Step 3: Calculate Greeks (continue even if already processed)
         greeks_result = calculate_greeks()
-        if greeks_result is False:  # Only stop on actual error
+        if greeks_result is False:
             print("\n❌ Greeks calculation failed!")
             return False
 
-        # Step 4: Pre-calculate screener cache data (OPTIONAL)
         try:
             import screener_cache
 
@@ -635,7 +678,6 @@ def main():
             print(f"\n⚠️ Screener cache error: {e}")
             print("   Continuing with pipeline...")
 
-        # Step 4b: Pre-calculate Futures OI cache (OPTIONAL)
         try:
             import futures_oi_cache
 
@@ -651,7 +693,6 @@ def main():
             print(f"\n⚠️ Futures OI cache error: {e}")
             print("   Continuing with pipeline...")
 
-        # Step 4c: Pre-calculate Technical Screener cache (OPTIONAL)
         try:
             import technical_screener_cache
 
@@ -667,7 +708,6 @@ def main():
             print(f"\n⚠️ Technical Screener cache error: {e}")
             print("   Continuing with pipeline...")
 
-        # Step 4d: Pre-calculate Signal Scanner cache (New Optimization)
         try:
             import signal_scanner_cache
 
@@ -682,19 +722,17 @@ def main():
             print(f"\n⚠️ Signal Scanner cache error: {e}")
             print("   Continuing with pipeline...")
 
-        # Step 5: Pre-calculate dashboard data (OPTIONAL)
         try:
             print("\n" + "=" * 80)
             print("STEP 5: PRE-CALCULATING DASHBOARD DATA (OPTIONAL)")
             print("=" * 80 + "\n")
 
-            # Import from same directory
             import precalculate_data
 
             create_precalculated_tables = precalculate_data.create_precalculated_tables
             precalculate_all_dates = precalculate_data.precalculate_all_dates
 
-            if True:  # Always try
+            if True:
                 create_precalculated_tables()
                 precalculate_all_dates()
                 print("✓ Dashboard data pre-calculated")
@@ -706,36 +744,35 @@ def main():
             print(f"\n⚠️ Dashboard data error: {e}")
             print("   Continuing with pipeline...")
 
-        # Step 6: Fetch Index Constituents (for instant loading in web app)
         try:
             import index_constituents_cache
 
             fetch_index_constituents = index_constituents_cache.fetch_index_constituents_cache
             print("\n" + "=" * 80)
-            print("STEP 6: FETCHING INDEX CONSTITUENTS FROM NSE")
+            logger.info("STEP 6: FETCHING INDEX CONSTITUENTS FROM NSE")
             print("=" * 80 + "\n")
             fetch_index_constituents()
-            print("✓ Index constituents cache updated")
+            logger.info("✓ Index constituents cache updated")
         except ImportError:
-            print("\n⚠️ index_constituents_cache module not found. Skipping Step 6.")
+            logger.warning("\n⚠️ index_constituents_cache module not found. Skipping Step 6.")
         except Exception as e:
-            print(f"\n⚠️ Index constituents error: {e}")
-            print("   Continuing with pipeline...")
+            logger.error(f"\n⚠️ Index constituents error: {e}")
+            logger.info("   Continuing with pipeline...")
 
         print("\n" + "=" * 80)
-        print("             ✅ PIPELINE COMPLETE!")
+        logger.info("             ✅ PIPELINE COMPLETE!")
         print("=" * 80)
-        print("\n✓ All steps completed successfully")
-        print("\nYour database is up to date!")
+        logger.info("\n✓ All steps completed successfully")
+        logger.info("\nYour database is up to date!")
         print("=" * 80 + "\n")
 
         return True
 
     except Exception as e:
-        print(f"\n❌ Fatal Error: {e}")
+        logger.error(f"\n❌ Fatal Error: {e}")
         import traceback
 
-        traceback.print_exc()
+        logger.error(traceback.format_exc())
         return False
 
 

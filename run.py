@@ -11,7 +11,7 @@
 # import csv, os, time, threading
 #
 # app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'secret!'
+# app.config['SECRET_KEY'] = 'secret!' # pragma: allowlist secret
 # socketio = SocketIO(app)
 #
 # CSV_PATH = r"C:\Users\Admin\Desktop\Derivative_Analysis\spot_data\Data\spotData.csv"
@@ -50,3 +50,4 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=5000, debug=True)
+    # app.run("113.193.111.234", port=5000, debug=False)

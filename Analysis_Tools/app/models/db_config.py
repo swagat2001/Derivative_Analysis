@@ -5,6 +5,9 @@
 # =============================================================
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 from functools import lru_cache
 from urllib.parse import quote_plus
 
@@ -16,7 +19,7 @@ from sqlalchemy import create_engine
 # =============================================================
 
 db_user = "postgres"
-db_password = "Gallop@3104"
+db_password = os.getenv("DB_PASSWORD")
 db_host = "localhost"
 db_port = "5432"
 db_name = "BhavCopy_Database"
@@ -34,6 +37,7 @@ engine = create_engine(
     echo=False,
     connect_args={"connect_timeout": 10, "application_name": "Derivatives_Analysis"},
 )
+engine_fo = engine  # Alias for clarity
 
 # Create engine for Cash/Equity database (CashStocks_Database)
 engine_cash = create_engine(
@@ -112,7 +116,7 @@ def get_stock_list_from_excel():
     global _excel_cache, _excel_cache_time
     import time
 
-    excel_path = r"C:\Users\Admin\Desktop\Derivative_Analysis\stock list.xlsx"
+    excel_path = os.getenv("EXCEL_FILTER_PATH", "stock list.xlsx")
     current_time = time.time()
 
     # Check if cache is valid

@@ -1,28 +1,16 @@
+# Pre-commit hook configuration for security checks
+# Install: pip install pre-commit && pre-commit install
+
 repos:
-  # Python formatting
-  - repo: https://github.com/psf/black
-    rev: 23.12.1
+  # Check for secrets and credentials
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
     hooks:
-      - id: black
-        language_version: python3
-        args: ['--line-length=120']
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package.lock.json
 
-  # Import sorting
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: ['--profile', 'black', '--line-length', '120']
-
-  # Linting (relaxed for legacy code)
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8
-        args: ['--max-line-length=120', '--extend-ignore=E203,W503,E501,F401,F841,E722,F811,F541,E225,E231']
-        exclude: 'Database/'
-
-  # General checks
+  # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -32,4 +20,21 @@ repos:
       - id: check-added-large-files
         args: ['--maxkb=1000']
       - id: check-merge-conflict
-      - id: debug-statements
+      - id: detect-private-key
+
+  # Prevent committing .env files
+  - repo: local
+    hooks:
+      - id: prevent-env-commit
+        name: Prevent .env file commits
+        entry: >
+          bash -c 'if git diff --cached --name-only | grep -q "^\.env$"; then echo "ERROR: Attempting to commit .env file with real credentials!"; exit 1; fi'
+        language: system
+        pass_filenames: false
+
+      - id: check-env-template
+        name: Check .env.template for real credentials
+        entry: python
+        language: python
+        files: \.env\.template$
+        args: ['-c', 'import sys, re; content = open(sys.argv[1]).read(); patterns = [r"DB_PASSWORD=(?!your-|placeholder|changeme|CHANGE)", r"APP_SECRET_KEY=(?!your-|dev-secret|changeme|CHANGE)", r"Gallop@3104"]; matches = [p for p in patterns if re.search(p, content, re.IGNORECASE)]; sys.exit(1) if matches else sys.exit(0)']

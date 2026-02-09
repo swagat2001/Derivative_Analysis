@@ -252,7 +252,7 @@
       },
       {
         title: "Golden Crossover",
-        description: "Stocks where 50-day SMA crosses above 200-day SMA",
+        description: "Stocks where 50-day SMA crosses above 200-day SMA — bullish trend reversal",
         icon: ICONS.sparkles,
         url: "{{ url_for('technical_screener.golden_crossover') }}",
         badge: null,
@@ -260,34 +260,90 @@
       },
       {
         title: "Death Crossover",
-        description: "Stocks where 50-day SMA crosses below 200-day SMA",
+        description: "Stocks where 50-day SMA crosses below 200-day SMA — bearish trend reversal",
         icon: ICONS.trendDown,
         url: "{{ url_for('technical_screener.death_crossover') }}",
         badge: null,
         inline: false
       },
       {
-        title: "RSI Overbought",
-        description: "Stocks with RSI > 70 indicating potential reversal",
+        title: "Overbought RSI Stocks",
+        description: "Stocks with RSI > 75 suggesting possible upcoming price correction",
         icon: ICONS.flame,
-        url: "{{ url_for('technical_screener.technical_screener') }}?filter=rsi_overbought",
-        badge: null,
+        url: "{{ url_for('technical_screener.rsi_overbought') }}",
+        badge: "New",
         inline: false
       },
       {
-        title: "RSI Oversold",
-        description: "Stocks with RSI < 30 indicating potential bounce",
+        title: "Oversold RSI Stocks",
+        description: "Stocks with RSI < 25 indicating potential price recovery",
         icon: ICONS.snowflake,
-        url: "{{ url_for('technical_screener.technical_screener') }}?filter=rsi_oversold",
+        url: "{{ url_for('technical_screener.rsi_oversold') }}",
+        badge: "New",
+        inline: false
+      },
+      {
+        title: "R1 Resistance Breakouts",
+        description: "Stocks climbing past R1 resistance, signaling sustained upward trends",
+        icon: ICONS.arrowUp,
+        url: "{{ url_for('technical_screener.r1_breakout') }}",
+        badge: "New",
+        inline: false
+      },
+      {
+        title: "R2 Resistance Breakouts",
+        description: "Stocks breaking above R2 resistance with strong bullish momentum",
+        icon: ICONS.arrowUp,
+        url: "{{ url_for('technical_screener.r2_breakout') }}",
         badge: null,
         inline: false
       },
       {
-        title: "Strong Trending (ADX)",
-        description: "Stocks with ADX > 25 showing strong trend momentum",
-        icon: ICONS.strength,
-        url: "{{ url_for('technical_screener.technical_screener') }}?filter=adx_strong",
+        title: "R3 Resistance Breakouts",
+        description: "Stocks breaking above R3 resistance — extremely strong bullish signal",
+        icon: ICONS.rocket,
+        url: "{{ url_for('technical_screener.r3_breakout') }}",
         badge: null,
+        inline: false
+      },
+      {
+        title: "S1 Support Breakouts",
+        description: "Stocks falling through S1 support, possibly forecasting extended declines",
+        icon: ICONS.arrowDown,
+        url: "{{ url_for('technical_screener.s1_breakout') }}",
+        badge: "New",
+        inline: false
+      },
+      {
+        title: "S2 Support Breakouts",
+        description: "Stocks falling through S2 support, indicating significant bearish pressure",
+        icon: ICONS.arrowDown,
+        url: "{{ url_for('technical_screener.s2_breakout') }}",
+        badge: null,
+        inline: false
+      },
+      {
+        title: "S3 Support Breakouts",
+        description: "Stocks falling through S3 support — extreme bearish signal",
+        icon: ICONS.arrowDown,
+        url: "{{ url_for('technical_screener.s3_breakout') }}",
+        badge: null,
+        inline: false
+      },
+      {
+        title: "Momentum Stocks",
+        description: "Securities surging in price with strong market enthusiasm and potential for further gains",
+        icon: ICONS.rocket,
+        url: "{{ url_for('technical_screener.momentum_stocks') }}",
+        badge: "New",
+        inline: false
+      },
+      {
+        title: "Squeezing Range",
+        description: "Stocks with tightening Bollinger Bands, indicating a potential breakout or breakdown",
+        icon: ICONS.target,
+        url: "{{ url_for('technical_screener.squeezing_range') }}",
+        badge: "New",
         inline: false
       }
     ],
@@ -424,6 +480,72 @@
         apiUrl: "{{ url_for('index_screener.api_iv_spike') }}",
         badge: null,
         inline: true
+      }
+    ],
+    "Price & Volume Screeners": [
+      {
+        title: "1 Week High Breakouts",
+        description: "Securities surpassing highest price in the last week reflecting immediate bullish sentiment",
+        icon: ICONS.rocket,
+        url: "{{ url_for('technical_screener.week1_high_breakout') }}",
+        badge: "New",
+        inline: false
+      },
+      {
+        title: "1 Week Low Breakouts",
+        description: "Indicates immediate bearish sentiment with decline past their lowest price in the previous week",
+        icon: ICONS.arrowDown,
+        url: "{{ url_for('technical_screener.week1_low_breakout') }}",
+        badge: "New",
+        inline: false
+      },
+      {
+        title: "4 Week High Breakouts",
+        description: "Securities exceeding their highest price in the last month indicating short-term bullish momentum",
+        icon: ICONS.rocket,
+        url: "{{ url_for('technical_screener.week4_high_breakout') }}",
+        badge: null,
+        inline: false
+      },
+      {
+        title: "4 Week Low Breakouts",
+        description: "Pointing to short-term bearish momentum with stocks falling below their lowest price in the past month",
+        icon: ICONS.arrowDown,
+        url: "{{ url_for('technical_screener.week4_low_breakout') }}",
+        badge: null,
+        inline: false
+      },
+      {
+        title: "52 Week High Breakouts",
+        description: "Breaking past their highest price in the last year signaling strong bullish trends",
+        icon: ICONS.trophy,
+        url: "{{ url_for('technical_screener.week52_high_breakout') }}",
+        badge: "Hot",
+        inline: false
+      },
+      {
+        title: "52 Week Low Breakouts",
+        description: "Strong bearish trends suggested by dropping below their lowest price in the past year",
+        icon: ICONS.snowflake,
+        url: "{{ url_for('technical_screener.week52_low_breakout') }}",
+        badge: null,
+        inline: false
+      },
+      {
+        title: "Potential High Volume",
+        description: "Showing early signs of a spike in trading volume hinting at upcoming activity",
+        icon: ICONS.volume,
+        url: "{{ url_for('technical_screener.potential_high_volume') }}",
+        badge: null,
+        inline: false
+      },
+      {
+        title: "Unusually High Volume",
+        description: "Points to increased interest or activity with volume much higher than average",
+        icon: ICONS.flame,
+        url: "{{ url_for('technical_screener.unusually_high_volume') }}",
+        badge: "Hot",
+        inline: false
       }
     ]
   };
