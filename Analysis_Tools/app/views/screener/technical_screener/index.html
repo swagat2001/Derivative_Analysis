@@ -10,536 +10,615 @@
 {% block content %}
 <div class="screener-container">
 
-  {% include 'components/screener_sidebar.html' %}
+    {% include 'components/screener_sidebar.html' %}
 
-  <main class="screener-main">
+    <main class="screener-main">
 
-    <!-- Back Button -->
-    <div class="back-button-container" style="margin-bottom: 20px;">
-      <button class="back-btn" onclick="window.location.href='{{ url_for('screener.screener_landing') }}'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-        Back to Screeners
-      </button>
-    </div>
-
-<div class="technical-container">
-
-    {% if tech_data %}
-
-    <!-- RSI Based Section -->
-    <section class="screener-section">
-        <div class="section-title" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <span>📊 RSI-Based Analysis</span>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT DATE:</label>
-                <select onchange="window.location.href='/screener/technical?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
-                    {% for d in dates %}
-                    <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <!-- Back Button -->
+        <div class="back-button-container" style="margin-bottom: 20px;">
+            {% set back_url = url_for('goldmine.goldmine_page', tab=request.args.get('tab')) if
+            request.args.get('source') == 'goldmine' else url_for('screener.screener_landing') %}
+            <button class="back-btn" onclick="window.location.href='{{ back_url }}'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back to Screeners
+            </button>
         </div>
-        <div class="cards-grid">
-            <!-- RSI Overbought -->
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">▶ RSI OVERBOUGHT (RSI > 80)</div>
+
+        <div class="technical-container">
+
+            {% if tech_data %}
+
+            <!-- RSI Based Section -->
+            <section class="screener-section">
+                <div class="section-title"
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <span>📊 RSI-Based Analysis</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label
+                            style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT
+                            DATE:</label>
+                        <select onchange="window.location.href='/screener/technical?date='+this.value;"
+                            style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                            {% for d in dates %}
+                            <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>RSI</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.rsi_overbought %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td class="positive">{{ "%.1f"|format(item.rsi_14) }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
-                        </tr>
+                <div class="cards-grid">
+                    <!-- RSI Overbought -->
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">▶ RSI OVERBOUGHT (RSI > 80)</div>
+                        </div>
+                        <table class="card-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>RSI</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tech_data.rsi_overbought %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                    </td>
+                                    <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                    <td class="positive">{{ "%.1f"|format(item.rsi_14) }}</td>
+                                    <td><span
+                                            style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{
+                                            item.signal }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No
+                                        overbought stocks found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- RSI Oversold -->
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">▶ RSI OVERSOLD (RSI < 20)</div>
+                            </div>
+                            <table class="card-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Stock</th>
+                                        <th>Price</th>
+                                        <th>RSI</th>
+                                        <th>Signal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in tech_data.rsi_oversold %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                        </td>
+                                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                        <td class="negative">{{ "%.1f"|format(item.rsi_14) }}</td>
+                                        <td><span
+                                                style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{
+                                                item.signal }}</span></td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No
+                                            oversold stocks found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+            </section>
+
+            <!-- MACD Based Section -->
+            <section class="screener-section">
+                <div class="section-title">📉 MACD-Based Analysis</div>
+                <div class="cards-grid">
+                    <!-- MACD Bullish Crossover -->
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">MACD Bullish Crossover</div>
+                        </div>
+                        <table class="card-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>MACD</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tech_data.macd_bullish %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                    </td>
+                                    <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                    <td class="positive">{{ "%.2f"|format(item.macd) }}</td>
+                                    <td><span
+                                            style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{
+                                            item.signal }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No
+                                        bullish crossovers found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MACD Bearish Crossover -->
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">MACD Bearish Crossover</div>
+                        </div>
+                        <table class="card-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>MACD</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tech_data.macd_bearish %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                    </td>
+                                    <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                    <td class="negative">{{ "%.2f"|format(item.macd) }}</td>
+                                    <td><span
+                                            style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{
+                                            item.signal }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No
+                                        bearish crossovers found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SMA Based Section -->
+            <section class="screener-section">
+                <div class="section-title">📈 SMA-Based Analysis</div>
+                <div class="cards-grid">
+                    <!-- Above Both SMA -->
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">Above 50 & 200 SMA (Bullish)</div>
+                        </div>
+                        <table class="card-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>% from 200 SMA</th>
+                                    <th>RSI</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tech_data.above_sma %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                    </td>
+                                    <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                    <td class="positive">{{ "%+.2f"|format(item.dist_from_200sma_pct) }}%</td>
+                                    <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
+                                    <td><span
+                                            style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{
+                                            item.signal }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No stocks
+                                        above both SMAs</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Below Both SMA -->
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">Below 50 & 200 SMA (Bearish)</div>
+                        </div>
+                        <table class="card-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>% from 200 SMA</th>
+                                    <th>RSI</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tech_data.below_sma %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                    </td>
+                                    <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                    <td class="negative">{{ "%+.2f"|format(item.dist_from_200sma_pct) }}%</td>
+                                    <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
+                                    <td><span
+                                            style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{
+                                            item.signal }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No stocks
+                                        below both SMAs</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ADX Based Section -->
+            <section class="screener-section">
+                <div class="section-title">💪 Strong Trending Stocks (ADX > 25)</div>
+                <div class="cards-grid">
+                    <div class="screener-card">
+                        <div class="card-header">
+                            <div class="card-title">Strong Trending Stocks</div>
+                        </div>
+                        <table class="card-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>ADX</th>
+                                    <th>RSI</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tech_data.strong_trend %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                    </td>
+                                    <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                    <td><strong>{{ "%.1f"|format(item.adx_14) }}</strong></td>
+                                    <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
+                                    <td><span
+                                            style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{
+                                            item.signal }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No strong
+                                        trending stocks found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================= -->
+            <!-- HEATMAP SECTIONS WITH COUNTS AND TOGGLE -->
+            <!-- ============================================================= -->
+
+            <!-- RSI Heatmap - 6 Categories -->
+            <div class="tech-section heatmap-section">
+                <div class="section-title">🌡️ RSI Heatmap</div>
+
+                <div class="heatmap-container" id="rsi-heatmap">
+                    <div class="heatmap-legend">
+                        <div class="legend-item active" data-filter="rsi-overbought"
+                            onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-overbought', this)">
+                            <span class="legend-color rsi-overbought"></span>
+                            <span>RSI > 80 (Overbought)</span>
+                            <span class="legend-count" id="rsi-overbought-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="rsi-strong-bullish"
+                            onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-strong-bullish', this)">
+                            <span class="legend-color rsi-strong-bullish"></span>
+                            <span>RSI 60-80 (Strong Bullish)</span>
+                            <span class="legend-count" id="rsi-strong-bullish-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="rsi-mild-bullish"
+                            onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-mild-bullish', this)">
+                            <span class="legend-color rsi-mild-bullish"></span>
+                            <span>RSI 50-60 (Mild Bullish)</span>
+                            <span class="legend-count" id="rsi-mild-bullish-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="rsi-mild-bearish"
+                            onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-mild-bearish', this)">
+                            <span class="legend-color rsi-mild-bearish"></span>
+                            <span>RSI 40-50 (Mild Bearish)</span>
+                            <span class="legend-count" id="rsi-mild-bearish-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="rsi-strong-bearish"
+                            onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-strong-bearish', this)">
+                            <span class="legend-color rsi-strong-bearish"></span>
+                            <span>RSI 20-40 (Strong Bearish)</span>
+                            <span class="legend-count" id="rsi-strong-bearish-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="rsi-oversold"
+                            onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-oversold', this)">
+                            <span class="legend-color rsi-oversold"></span>
+                            <span>RSI < 20 (Oversold)</span>
+                                    <span class="legend-count" id="rsi-oversold-count">0</span>
+                        </div>
+                    </div>
+
+                    <div class="heatmap-grid">
+                        {% for item in tech_data.heatmap %}
+                        {% if item.rsi_14 and item.rsi_14 > 80 %}
+                        {% set rsi_class = 'rsi-overbought' %}
+                        {% elif item.rsi_14 and item.rsi_14 >= 60 %}
+                        {% set rsi_class = 'rsi-strong-bullish' %}
+                        {% elif item.rsi_14 and item.rsi_14 >= 50 %}
+                        {% set rsi_class = 'rsi-mild-bullish' %}
+                        {% elif item.rsi_14 and item.rsi_14 >= 40 %}
+                        {% set rsi_class = 'rsi-mild-bearish' %}
+                        {% elif item.rsi_14 and item.rsi_14 >= 20 %}
+                        {% set rsi_class = 'rsi-strong-bearish' %}
+                        {% elif item.rsi_14 %}
+                        {% set rsi_class = 'rsi-oversold' %}
                         {% else %}
-                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No overbought stocks found</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- RSI Oversold -->
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">▶ RSI OVERSOLD (RSI < 20)</div>
-                </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>RSI</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.rsi_oversold %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td class="negative">{{ "%.1f"|format(item.rsi_14) }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{ item.signal }}</span></td>
-                        </tr>
+                        {% set rsi_class = 'rsi-mild-bearish' %}
+                        {% endif %}
+                        <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ rsi_class }}"
+                            data-category="{{ rsi_class }}"
+                            title="{{ item.ticker }}: RSI={{ '%.1f'|format(item.rsi_14) if item.rsi_14 else 'N/A' }}">
+                            <div class="ticker">{{ item.ticker }}</div>
+                            <div class="value">{{ "%.0f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</div>
+                        </a>
                         {% else %}
-                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No oversold stocks found</td></tr>
+                        <div class="no-data-message">No heatmap data available</div>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- MACD Based Section -->
-    <section class="screener-section">
-        <div class="section-title">📉 MACD-Based Analysis</div>
-        <div class="cards-grid">
-            <!-- MACD Bullish Crossover -->
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">MACD Bullish Crossover</div>
+                    </div>
                 </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>MACD</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.macd_bullish %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td class="positive">{{ "%.2f"|format(item.macd) }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
-                        </tr>
+            </div>
+
+            <!-- MACD Heatmap -->
+            <div class="tech-section heatmap-section">
+                <div class="section-title">📉 MACD Heatmap</div>
+
+                <div class="heatmap-container" id="macd-heatmap">
+                    <div class="heatmap-legend">
+                        <div class="legend-item active" data-filter="macd-bullish"
+                            onclick="toggleHeatmapFilter('macd-heatmap', 'macd-bullish', this)">
+                            <span class="legend-color macd-bullish"></span>
+                            <span>MACD > Signal (Bullish)</span>
+                            <span class="legend-count" id="macd-bullish-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="macd-neutral"
+                            onclick="toggleHeatmapFilter('macd-heatmap', 'macd-neutral', this)">
+                            <span class="legend-color macd-neutral"></span>
+                            <span>Neutral</span>
+                            <span class="legend-count" id="macd-neutral-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="macd-bearish"
+                            onclick="toggleHeatmapFilter('macd-heatmap', 'macd-bearish', this)">
+                            <span class="legend-color macd-bearish"></span>
+                            <span>MACD < Signal (Bearish)</span>
+                                    <span class="legend-count" id="macd-bearish-count">0</span>
+                        </div>
+                    </div>
+
+                    <div class="heatmap-grid">
+                        {% for item in tech_data.heatmap %}
+                        {% set macd_class = 'macd-bullish' if item.macd and item.macd_signal and item.macd >
+                        item.macd_signal else ('macd-bearish' if item.macd and item.macd_signal and item.macd <
+                            item.macd_signal else 'macd-neutral' ) %} <a href="/stock/{{ item.ticker }}"
+                            class="heatmap-cell {{ macd_class }}" data-category="{{ macd_class }}"
+                            title="{{ item.ticker }}: MACD={{ '%.2f'|format(item.macd) if item.macd else 'N/A' }}">
+                            <div class="ticker">{{ item.ticker }}</div>
+                            <div class="value">{{ "%.1f"|format(item.macd) if item.macd else 'N/A' }}</div>
+                            </a>
+                            {% else %}
+                            <div class="no-data-message">No heatmap data available</div>
+                            {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMA Heatmap -->
+            <div class="tech-section heatmap-section">
+                <div class="section-title">📈 SMA Heatmap</div>
+
+                <div class="heatmap-container" id="sma-heatmap">
+                    <div class="heatmap-legend">
+                        <div class="legend-item active" data-filter="sma-bullish"
+                            onclick="toggleHeatmapFilter('sma-heatmap', 'sma-bullish', this)">
+                            <span class="legend-color sma-bullish"></span>
+                            <span>Above 200 SMA (Bullish)</span>
+                            <span class="legend-count" id="sma-bullish-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="sma-neutral"
+                            onclick="toggleHeatmapFilter('sma-heatmap', 'sma-neutral', this)">
+                            <span class="legend-color sma-neutral"></span>
+                            <span>No Data</span>
+                            <span class="legend-count" id="sma-neutral-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="sma-bearish"
+                            onclick="toggleHeatmapFilter('sma-heatmap', 'sma-bearish', this)">
+                            <span class="legend-color sma-bearish"></span>
+                            <span>Below 200 SMA (Bearish)</span>
+                            <span class="legend-count" id="sma-bearish-count">0</span>
+                        </div>
+                    </div>
+
+                    <div class="heatmap-grid">
+                        {% for item in tech_data.heatmap %}
+                        {% set sma_class = 'sma-bullish' if item.above_200_sma else ('sma-bearish' if item.below_200_sma
+                        else 'sma-neutral') %}
+                        <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ sma_class }}"
+                            data-category="{{ sma_class }}"
+                            title="{{ item.ticker }}: {{ '%+.1f'|format(item.dist_from_200sma_pct) if item.dist_from_200sma_pct else 'N/A' }}% from 200 SMA">
+                            <div class="ticker">{{ item.ticker }}</div>
+                            <div class="value">{{ "%+.0f"|format(item.dist_from_200sma_pct) if item.dist_from_200sma_pct
+                                else 'N/A' }}%</div>
+                        </a>
                         {% else %}
-                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No bullish crossovers found</td></tr>
+                        <div class="no-data-message">No heatmap data available</div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- MACD Bearish Crossover -->
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">MACD Bearish Crossover</div>
-                </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>MACD</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.macd_bearish %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td class="negative">{{ "%.2f"|format(item.macd) }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{ item.signal }}</span></td>
-                        </tr>
+            <!-- ADX Heatmap -->
+            <div class="tech-section heatmap-section">
+                <div class="section-title">💪 ADX Heatmap (Trend Strength)</div>
+
+                <div class="heatmap-container" id="adx-heatmap">
+                    <div class="heatmap-legend">
+                        <div class="legend-item active" data-filter="adx-strong"
+                            onclick="toggleHeatmapFilter('adx-heatmap', 'adx-strong', this)">
+                            <span class="legend-color adx-strong"></span>
+                            <span>ADX > 25 (Strong Trend)</span>
+                            <span class="legend-count" id="adx-strong-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="adx-neutral"
+                            onclick="toggleHeatmapFilter('adx-heatmap', 'adx-neutral', this)">
+                            <span class="legend-color adx-neutral"></span>
+                            <span>No Data</span>
+                            <span class="legend-count" id="adx-neutral-count">0</span>
+                        </div>
+                        <div class="legend-item active" data-filter="adx-weak"
+                            onclick="toggleHeatmapFilter('adx-heatmap', 'adx-weak', this)">
+                            <span class="legend-color adx-weak"></span>
+                            <span>ADX < 25 (Weak/No Trend)</span>
+                                    <span class="legend-count" id="adx-weak-count">0</span>
+                        </div>
+                    </div>
+
+                    <div class="heatmap-grid">
+                        {% for item in tech_data.heatmap %}
+                        {% set adx_class = 'adx-strong' if item.adx_14 and item.adx_14 > 25 else ('adx-weak' if
+                        item.adx_14 else 'adx-neutral') %}
+                        <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ adx_class }}"
+                            data-category="{{ adx_class }}"
+                            title="{{ item.ticker }}: ADX={{ '%.1f'|format(item.adx_14) if item.adx_14 else 'N/A' }}">
+                            <div class="ticker">{{ item.ticker }}</div>
+                            <div class="value">{{ "%.0f"|format(item.adx_14) if item.adx_14 else 'N/A' }}</div>
+                        </a>
                         {% else %}
-                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No bearish crossovers found</td></tr>
+                        <div class="no-data-message">No heatmap data available</div>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- SMA Based Section -->
-    <section class="screener-section">
-        <div class="section-title">📈 SMA-Based Analysis</div>
-        <div class="cards-grid">
-            <!-- Above Both SMA -->
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">Above 50 & 200 SMA (Bullish)</div>
+                    </div>
                 </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>% from 200 SMA</th>
-                            <th>RSI</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.above_sma %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td class="positive">{{ "%+.2f"|format(item.dist_from_200sma_pct) }}%</td>
-                            <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No stocks above both SMAs</td></tr>
+            </div>
+
+            {% else %}
+            <div
+                style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <label
+                        style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT
+                        DATE:</label>
+                    <select onchange="window.location.href='/screener/technical?date='+this.value;"
+                        style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                        {% for d in dates %}
+                        <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Below Both SMA -->
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">Below 50 & 200 SMA (Bearish)</div>
+                    </select>
                 </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>% from 200 SMA</th>
-                            <th>RSI</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.below_sma %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td class="negative">{{ "%+.2f"|format(item.dist_from_200sma_pct) }}%</td>
-                            <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #fee2e2; color: #991b1b;">{{ item.signal }}</span></td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No stocks below both SMAs</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                No Technical Screener data available for the selected date.<br>
+                Please run the database update to generate cache data.
             </div>
+            {% endif %}
+
         </div>
-    </section>
 
-    <!-- ADX Based Section -->
-    <section class="screener-section">
-        <div class="section-title">💪 Strong Trending Stocks (ADX > 25)</div>
-        <div class="cards-grid">
-            <div class="screener-card">
-                <div class="card-header">
-                    <div class="card-title">Strong Trending Stocks</div>
-                </div>
-                <table class="card-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>ADX</th>
-                            <th>RSI</th>
-                            <th>Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in tech_data.strong_trend %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a></td>
-                            <td>{{ "%.2f"|format(item.underlying_price) }}</td>
-                            <td><strong>{{ "%.1f"|format(item.adx_14) }}</strong></td>
-                            <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
-                            <td><span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">{{ item.signal }}</span></td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No strong trending stocks found</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
+        <script>
+            // Calculate and display counts on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                updateAllCounts();
+            });
 
-    <!-- ============================================================= -->
-    <!-- HEATMAP SECTIONS WITH COUNTS AND TOGGLE -->
-    <!-- ============================================================= -->
+            function updateAllCounts() {
+                // RSI counts - 6 categories
+                updateCount('rsi-heatmap', 'rsi-overbought', 'rsi-overbought-count');
+                updateCount('rsi-heatmap', 'rsi-strong-bullish', 'rsi-strong-bullish-count');
+                updateCount('rsi-heatmap', 'rsi-mild-bullish', 'rsi-mild-bullish-count');
+                updateCount('rsi-heatmap', 'rsi-mild-bearish', 'rsi-mild-bearish-count');
+                updateCount('rsi-heatmap', 'rsi-strong-bearish', 'rsi-strong-bearish-count');
+                updateCount('rsi-heatmap', 'rsi-oversold', 'rsi-oversold-count');
 
-    <!-- RSI Heatmap - 6 Categories -->
-    <div class="tech-section heatmap-section">
-        <div class="section-title">🌡️ RSI Heatmap</div>
+                // MACD counts
+                updateCount('macd-heatmap', 'macd-bullish', 'macd-bullish-count');
+                updateCount('macd-heatmap', 'macd-neutral', 'macd-neutral-count');
+                updateCount('macd-heatmap', 'macd-bearish', 'macd-bearish-count');
 
-        <div class="heatmap-container" id="rsi-heatmap">
-            <div class="heatmap-legend">
-                <div class="legend-item active" data-filter="rsi-overbought" onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-overbought', this)">
-                    <span class="legend-color rsi-overbought"></span>
-                    <span>RSI > 80 (Overbought)</span>
-                    <span class="legend-count" id="rsi-overbought-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="rsi-strong-bullish" onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-strong-bullish', this)">
-                    <span class="legend-color rsi-strong-bullish"></span>
-                    <span>RSI 60-80 (Strong Bullish)</span>
-                    <span class="legend-count" id="rsi-strong-bullish-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="rsi-mild-bullish" onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-mild-bullish', this)">
-                    <span class="legend-color rsi-mild-bullish"></span>
-                    <span>RSI 50-60 (Mild Bullish)</span>
-                    <span class="legend-count" id="rsi-mild-bullish-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="rsi-mild-bearish" onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-mild-bearish', this)">
-                    <span class="legend-color rsi-mild-bearish"></span>
-                    <span>RSI 40-50 (Mild Bearish)</span>
-                    <span class="legend-count" id="rsi-mild-bearish-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="rsi-strong-bearish" onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-strong-bearish', this)">
-                    <span class="legend-color rsi-strong-bearish"></span>
-                    <span>RSI 20-40 (Strong Bearish)</span>
-                    <span class="legend-count" id="rsi-strong-bearish-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="rsi-oversold" onclick="toggleHeatmapFilter('rsi-heatmap', 'rsi-oversold', this)">
-                    <span class="legend-color rsi-oversold"></span>
-                    <span>RSI < 20 (Oversold)</span>
-                    <span class="legend-count" id="rsi-oversold-count">0</span>
-                </div>
-            </div>
+                // SMA counts
+                updateCount('sma-heatmap', 'sma-bullish', 'sma-bullish-count');
+                updateCount('sma-heatmap', 'sma-neutral', 'sma-neutral-count');
+                updateCount('sma-heatmap', 'sma-bearish', 'sma-bearish-count');
 
-            <div class="heatmap-grid">
-                {% for item in tech_data.heatmap %}
-                {% if item.rsi_14 and item.rsi_14 > 80 %}
-                    {% set rsi_class = 'rsi-overbought' %}
-                {% elif item.rsi_14 and item.rsi_14 >= 60 %}
-                    {% set rsi_class = 'rsi-strong-bullish' %}
-                {% elif item.rsi_14 and item.rsi_14 >= 50 %}
-                    {% set rsi_class = 'rsi-mild-bullish' %}
-                {% elif item.rsi_14 and item.rsi_14 >= 40 %}
-                    {% set rsi_class = 'rsi-mild-bearish' %}
-                {% elif item.rsi_14 and item.rsi_14 >= 20 %}
-                    {% set rsi_class = 'rsi-strong-bearish' %}
-                {% elif item.rsi_14 %}
-                    {% set rsi_class = 'rsi-oversold' %}
-                {% else %}
-                    {% set rsi_class = 'rsi-mild-bearish' %}
-                {% endif %}
-                <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ rsi_class }}" data-category="{{ rsi_class }}" title="{{ item.ticker }}: RSI={{ '%.1f'|format(item.rsi_14) if item.rsi_14 else 'N/A' }}">
-                    <div class="ticker">{{ item.ticker }}</div>
-                    <div class="value">{{ "%.0f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</div>
-                </a>
-                {% else %}
-                <div class="no-data-message">No heatmap data available</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+                // ADX counts
+                updateCount('adx-heatmap', 'adx-strong', 'adx-strong-count');
+                updateCount('adx-heatmap', 'adx-neutral', 'adx-neutral-count');
+                updateCount('adx-heatmap', 'adx-weak', 'adx-weak-count');
+            }
 
-    <!-- MACD Heatmap -->
-    <div class="tech-section heatmap-section">
-        <div class="section-title">📉 MACD Heatmap</div>
+            function updateCount(containerId, category, countId) {
+                var container = document.getElementById(containerId);
+                if (!container) return;
+                var cells = container.querySelectorAll('.heatmap-cell[data-category="' + category + '"]');
+                var countEl = document.getElementById(countId);
+                if (countEl) {
+                    countEl.textContent = cells.length;
+                }
+            }
 
-        <div class="heatmap-container" id="macd-heatmap">
-            <div class="heatmap-legend">
-                <div class="legend-item active" data-filter="macd-bullish" onclick="toggleHeatmapFilter('macd-heatmap', 'macd-bullish', this)">
-                    <span class="legend-color macd-bullish"></span>
-                    <span>MACD > Signal (Bullish)</span>
-                    <span class="legend-count" id="macd-bullish-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="macd-neutral" onclick="toggleHeatmapFilter('macd-heatmap', 'macd-neutral', this)">
-                    <span class="legend-color macd-neutral"></span>
-                    <span>Neutral</span>
-                    <span class="legend-count" id="macd-neutral-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="macd-bearish" onclick="toggleHeatmapFilter('macd-heatmap', 'macd-bearish', this)">
-                    <span class="legend-color macd-bearish"></span>
-                    <span>MACD < Signal (Bearish)</span>
-                    <span class="legend-count" id="macd-bearish-count">0</span>
-                </div>
-            </div>
+            function toggleHeatmapFilter(containerId, category, legendItem) {
+                var container = document.getElementById(containerId);
+                if (!container) return;
+                var cells = container.querySelectorAll('.heatmap-cell[data-category="' + category + '"]');
 
-            <div class="heatmap-grid">
-                {% for item in tech_data.heatmap %}
-                {% set macd_class = 'macd-bullish' if item.macd and item.macd_signal and item.macd > item.macd_signal else ('macd-bearish' if item.macd and item.macd_signal and item.macd < item.macd_signal else 'macd-neutral') %}
-                <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ macd_class }}" data-category="{{ macd_class }}" title="{{ item.ticker }}: MACD={{ '%.2f'|format(item.macd) if item.macd else 'N/A' }}">
-                    <div class="ticker">{{ item.ticker }}</div>
-                    <div class="value">{{ "%.1f"|format(item.macd) if item.macd else 'N/A' }}</div>
-                </a>
-                {% else %}
-                <div class="no-data-message">No heatmap data available</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+                // Toggle active state on legend item
+                legendItem.classList.toggle('active');
 
-    <!-- SMA Heatmap -->
-    <div class="tech-section heatmap-section">
-        <div class="section-title">📈 SMA Heatmap</div>
-
-        <div class="heatmap-container" id="sma-heatmap">
-            <div class="heatmap-legend">
-                <div class="legend-item active" data-filter="sma-bullish" onclick="toggleHeatmapFilter('sma-heatmap', 'sma-bullish', this)">
-                    <span class="legend-color sma-bullish"></span>
-                    <span>Above 200 SMA (Bullish)</span>
-                    <span class="legend-count" id="sma-bullish-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="sma-neutral" onclick="toggleHeatmapFilter('sma-heatmap', 'sma-neutral', this)">
-                    <span class="legend-color sma-neutral"></span>
-                    <span>No Data</span>
-                    <span class="legend-count" id="sma-neutral-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="sma-bearish" onclick="toggleHeatmapFilter('sma-heatmap', 'sma-bearish', this)">
-                    <span class="legend-color sma-bearish"></span>
-                    <span>Below 200 SMA (Bearish)</span>
-                    <span class="legend-count" id="sma-bearish-count">0</span>
-                </div>
-            </div>
-
-            <div class="heatmap-grid">
-                {% for item in tech_data.heatmap %}
-                {% set sma_class = 'sma-bullish' if item.above_200_sma else ('sma-bearish' if item.below_200_sma else 'sma-neutral') %}
-                <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ sma_class }}" data-category="{{ sma_class }}" title="{{ item.ticker }}: {{ '%+.1f'|format(item.dist_from_200sma_pct) if item.dist_from_200sma_pct else 'N/A' }}% from 200 SMA">
-                    <div class="ticker">{{ item.ticker }}</div>
-                    <div class="value">{{ "%+.0f"|format(item.dist_from_200sma_pct) if item.dist_from_200sma_pct else 'N/A' }}%</div>
-                </a>
-                {% else %}
-                <div class="no-data-message">No heatmap data available</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- ADX Heatmap -->
-    <div class="tech-section heatmap-section">
-        <div class="section-title">💪 ADX Heatmap (Trend Strength)</div>
-
-        <div class="heatmap-container" id="adx-heatmap">
-            <div class="heatmap-legend">
-                <div class="legend-item active" data-filter="adx-strong" onclick="toggleHeatmapFilter('adx-heatmap', 'adx-strong', this)">
-                    <span class="legend-color adx-strong"></span>
-                    <span>ADX > 25 (Strong Trend)</span>
-                    <span class="legend-count" id="adx-strong-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="adx-neutral" onclick="toggleHeatmapFilter('adx-heatmap', 'adx-neutral', this)">
-                    <span class="legend-color adx-neutral"></span>
-                    <span>No Data</span>
-                    <span class="legend-count" id="adx-neutral-count">0</span>
-                </div>
-                <div class="legend-item active" data-filter="adx-weak" onclick="toggleHeatmapFilter('adx-heatmap', 'adx-weak', this)">
-                    <span class="legend-color adx-weak"></span>
-                    <span>ADX < 25 (Weak/No Trend)</span>
-                    <span class="legend-count" id="adx-weak-count">0</span>
-                </div>
-            </div>
-
-            <div class="heatmap-grid">
-                {% for item in tech_data.heatmap %}
-                {% set adx_class = 'adx-strong' if item.adx_14 and item.adx_14 > 25 else ('adx-weak' if item.adx_14 else 'adx-neutral') %}
-                <a href="/stock/{{ item.ticker }}" class="heatmap-cell {{ adx_class }}" data-category="{{ adx_class }}" title="{{ item.ticker }}: ADX={{ '%.1f'|format(item.adx_14) if item.adx_14 else 'N/A' }}">
-                    <div class="ticker">{{ item.ticker }}</div>
-                    <div class="value">{{ "%.0f"|format(item.adx_14) if item.adx_14 else 'N/A' }}</div>
-                </a>
-                {% else %}
-                <div class="no-data-message">No heatmap data available</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    {% else %}
-    <div style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT DATE:</label>
-            <select onchange="window.location.href='/screener/technical?date='+this.value;" style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
-                {% for d in dates %}
-                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        No Technical Screener data available for the selected date.<br>
-        Please run the database update to generate cache data.
-    </div>
-    {% endif %}
+                // Show or hide cells
+                var isActive = legendItem.classList.contains('active');
+                cells.forEach(function (cell) {
+                    cell.style.display = isActive ? '' : 'none';
+                });
+            }
+        </script>
 
 </div>
-
-<script>
-// Calculate and display counts on page load
-document.addEventListener('DOMContentLoaded', function() {
-    updateAllCounts();
-});
-
-function updateAllCounts() {
-    // RSI counts - 6 categories
-    updateCount('rsi-heatmap', 'rsi-overbought', 'rsi-overbought-count');
-    updateCount('rsi-heatmap', 'rsi-strong-bullish', 'rsi-strong-bullish-count');
-    updateCount('rsi-heatmap', 'rsi-mild-bullish', 'rsi-mild-bullish-count');
-    updateCount('rsi-heatmap', 'rsi-mild-bearish', 'rsi-mild-bearish-count');
-    updateCount('rsi-heatmap', 'rsi-strong-bearish', 'rsi-strong-bearish-count');
-    updateCount('rsi-heatmap', 'rsi-oversold', 'rsi-oversold-count');
-
-    // MACD counts
-    updateCount('macd-heatmap', 'macd-bullish', 'macd-bullish-count');
-    updateCount('macd-heatmap', 'macd-neutral', 'macd-neutral-count');
-    updateCount('macd-heatmap', 'macd-bearish', 'macd-bearish-count');
-
-    // SMA counts
-    updateCount('sma-heatmap', 'sma-bullish', 'sma-bullish-count');
-    updateCount('sma-heatmap', 'sma-neutral', 'sma-neutral-count');
-    updateCount('sma-heatmap', 'sma-bearish', 'sma-bearish-count');
-
-    // ADX counts
-    updateCount('adx-heatmap', 'adx-strong', 'adx-strong-count');
-    updateCount('adx-heatmap', 'adx-neutral', 'adx-neutral-count');
-    updateCount('adx-heatmap', 'adx-weak', 'adx-weak-count');
-}
-
-function updateCount(containerId, category, countId) {
-    var container = document.getElementById(containerId);
-    if (!container) return;
-    var cells = container.querySelectorAll('.heatmap-cell[data-category="' + category + '"]');
-    var countEl = document.getElementById(countId);
-    if (countEl) {
-        countEl.textContent = cells.length;
-    }
-}
-
-function toggleHeatmapFilter(containerId, category, legendItem) {
-    var container = document.getElementById(containerId);
-    if (!container) return;
-    var cells = container.querySelectorAll('.heatmap-cell[data-category="' + category + '"]');
-
-    // Toggle active state on legend item
-    legendItem.classList.toggle('active');
-
-    // Show or hide cells
-    var isActive = legendItem.classList.contains('active');
-    cells.forEach(function(cell) {
-        cell.style.display = isActive ? '' : 'none';
-    });
-}
-</script>
-
-</div>
-  </main>
+</main>
 </div>
 {% endblock %}

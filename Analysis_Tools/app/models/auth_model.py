@@ -12,6 +12,7 @@ from sqlalchemy import create_engine, text
 
 from .db_config import engine  # Use shared engine from db_config
 
+
 # =============================================================
 # PASSWORD HASHING
 # =============================================================
@@ -46,6 +47,8 @@ def init_users_table():
                 full_name VARCHAR(100),
                 email VARCHAR(100),
                 is_active BOOLEAN DEFAULT TRUE,
+                verification_code VARCHAR(6),
+                is_verified BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_login TIMESTAMP
             )
@@ -117,7 +120,7 @@ def validate_user(username: str, password: str) -> bool:
     try:
         query = text(
             """
-            SELECT password_hash, is_active
+            SELECT password_hash, is_active, role, is_verified
             FROM users
             WHERE username = :username
         """
@@ -130,9 +133,14 @@ def validate_user(username: str, password: str) -> bool:
             if not row:
                 return False
 
-            stored_hash, is_active = row
+            stored_hash, is_active, role, is_verified = row
 
             if not is_active:
+                return False
+
+            # Check verification for non-admin users
+            if role != 'admin' and not is_verified:
+                print(f"[INFO] User {username} not verified")
                 return False
 
             if verify_password(password, stored_hash):
@@ -196,7 +204,12 @@ def get_user_display_name(username: str) -> Optional[str]:
 
 
 def create_user(
-    username: str, password: str, role: str = "user", full_name: str = None, email: str = None
+    username: str,
+    password: str,
+    role: str = "user",
+    full_name: str = None,
+    email: str = None,
+    verification_code: str = None,
 ) -> Tuple[bool, str]:
     """Create a new user. Returns (success, message)."""
     try:
@@ -210,10 +223,19 @@ def create_user(
         # Insert user
         insert_query = text(
             """
-            INSERT INTO users (username, password_hash, role, full_name, email, is_active)
-            VALUES (:username, :password_hash, :role, :full_name, :email, :is_active)
+            INSERT INTO users (
+                username, password_hash, role, full_name, email,
+                is_active, verification_code, is_verified
+            )
+            VALUES (
+                :username, :password_hash, :role, :full_name, :email,
+                :is_active, :verification_code, :is_verified
+            )
         """
         )
+
+        # Auto-verify admin or if no code provided (legacy support)
+        is_verified = role == "admin"
 
         with engine.begin() as conn:
             conn.execute(
@@ -225,6 +247,8 @@ def create_user(
                     "full_name": full_name,
                     "email": email,
                     "is_active": True,
+                    "verification_code": verification_code,
+                    "is_verified": is_verified,
                 },
             )
 
@@ -253,6 +277,49 @@ def update_user_password(username: str, new_password: str) -> bool:
     except Exception as e:
         print(f"[ERROR] Failed to update password: {e}")
         return False
+
+
+def verify_user_email(username: str, code: str) -> Tuple[bool, str]:
+    """Verify user email with code."""
+    try:
+        # Get user and update in single transaction
+        with engine.begin() as conn:
+            query = text(
+                """
+                SELECT verification_code, is_verified
+                FROM users
+                WHERE username = :username
+            """
+            )
+            result = conn.execute(query, {"username": username})
+            row = result.fetchone()
+
+            if not row:
+                return False, "User not found"
+
+            stored_code, is_verified = row
+
+            if is_verified:
+                return True, "User already verified"
+
+            if str(stored_code) != str(code):
+                return False, "Invalid verification code"
+
+            # Update status
+            update_query = text(
+                """
+                UPDATE users
+                SET is_verified = TRUE, verification_code = NULL
+                WHERE username = :username
+            """
+            )
+            conn.execute(update_query, {"username": username})
+
+            return True, "Email verified successfully"
+
+    except Exception as e:
+        print(f"[ERROR] Verification failed: {e}")
+        return False, f"Verification failed: {str(e)}"
 
 
 # =============================================================

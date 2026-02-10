@@ -13,6 +13,7 @@ from .controllers.screener import screener_bp
 from .controllers.screener.fundamental_screener.controller import fundamental_screener_bp
 from .controllers.screener.futures_oi.controller import cache as futures_cache
 from .controllers.screener.futures_oi.controller import futures_oi_bp
+from .controllers.screener.goldmine.controller import goldmine_bp
 from .controllers.screener.index_screener.controller import index_screener_bp
 from .controllers.screener.signal_analysis.controller import cache as signal_cache
 from .controllers.screener.signal_analysis.controller import signal_analysis_bp
@@ -73,6 +74,7 @@ def create_app():
     app.register_blueprint(technical_screener_bp)  # Technical at /screener/technical
     app.register_blueprint(index_screener_bp)  # Index screeners at /screener/index/
     app.register_blueprint(fundamental_screener_bp)  # Fundamental screeners
+    app.register_blueprint(goldmine_bp)  # Goldmine at /screener/goldmine
     app.register_blueprint(voice_api_bp)  # Voice API at /api/voice/
 
     # Add custom Jinja2 filter for expiry date formatting
@@ -126,6 +128,7 @@ def create_app():
         if request.endpoint in [
             "auth.login",
             "auth.signup",
+            "auth.verify",
             "auth.logout",
             "health.health_check",
             "static",

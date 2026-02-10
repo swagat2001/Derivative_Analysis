@@ -224,16 +224,22 @@ def _load_fo_data(start_date: str):
 # =============================================================
 
 
-def run_signal_scanner(start_date: str = None, days_back: int = 30):
+def run_signal_scanner(start_date: str = None, days_back: int = 7, limit: int = 10000):
     """
     Run the signal scanner and return results.
     OPTIMIZED: Reads from 'daily_signal_scanner' cache table.
+
+
+    Args:
+        start_date: Starting date (YYYY-MM-DD) or None for auto-calculate
+        days_back: Number of days to look back (default: 7, reduced from 30)
+        limit: Maximum rows to fetch from database (default: 10000)
     """
     if not start_date:
-        # Default to 30 days back
+        # Default to 7 days back (reduced from 30 for performance)
         start_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
 
-    print(f"[INFO] Fetching cached signals from {start_date}...")
+    print(f"[INFO] Fetching cached signals from {start_date} (limit: {limit:,} rows)...")
 
     # Query Cache Table - Multi-Contract
     # JSONB columns are returned as dicts by psycopg2 automatically
@@ -245,6 +251,7 @@ def run_signal_scanner(start_date: str = None, days_back: int = 30):
         FROM daily_signal_scanner
         WHERE date >= :start_date
         ORDER BY date DESC, symbol ASC, expiry ASC, strike ASC
+        LIMIT :limit
     """
     )
 
@@ -252,7 +259,7 @@ def run_signal_scanner(start_date: str = None, days_back: int = 30):
 
     try:
         with engine.connect() as conn:
-            result = conn.execute(query, {"start_date": start_date})
+            result = conn.execute(query, {"start_date": start_date, "limit": limit})
             rows = result.fetchall()
 
         if not rows:

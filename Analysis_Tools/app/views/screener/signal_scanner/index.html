@@ -659,14 +659,7 @@
                     <option value="oi">OI</option>
                 </select>
             </div>
-            <button class="scan-btn" id="scanBtn" onclick="runScanner()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.3-4.3" />
-                </svg>
-                Run Scanner
-            </button>
+            <!-- Run Scanner button removed for auto-load -->
         </div>
 
         <!-- Summary Cards -->
@@ -900,11 +893,11 @@
     }
 
     async function runScanner() {
-        const btn = document.getElementById('scanBtn');
+        // const btn = document.getElementById('scanBtn'); // Removed
         const container = document.getElementById('resultsContainer');
 
-        btn.disabled = true;
-        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Scanning...';
+        // btn.disabled = true; // Removed
+        // btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Scanning...'; // Removed
         container.innerHTML = `<div class="loading-spinner">
         <div class="spinner"></div>
         <span class="loading-text">Scanning F&O data for signals...</span>
@@ -940,8 +933,8 @@
             <p>Please check your connection and try again</p>
         </div>`;
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Run Scanner`;
+            // btn.disabled = false; // Removed
+            // btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Run Scanner`; // Removed
         }
     }
 
@@ -949,6 +942,9 @@
     document.getElementById('symbolFilter').addEventListener('input', debounce(applyFilters, 300));
     document.getElementById('optionType').addEventListener('change', applyFilters);
     document.getElementById('sortBy').addEventListener('change', applyFilters);
+
+    // Auto-run when Days Back changes (fetches new data)
+    document.getElementById('daysBack').addEventListener('change', runScanner);
 
     function debounce(func, wait) {
         let timeout;
@@ -962,7 +958,7 @@
         };
     }
 
-    // Auto-run on page load (optional - uncomment if desired)
-    // document.addEventListener('DOMContentLoaded', runScanner);
+    // Auto-run on page load
+    document.addEventListener('DOMContentLoaded', runScanner);
 </script>
 {% endblock %}

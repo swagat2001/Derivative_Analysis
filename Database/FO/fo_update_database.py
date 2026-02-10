@@ -14,21 +14,30 @@ import sys
 import re
 import shutil
 import socket
-import sys
-import urllib.request
+
+# Reconfigure stdout for UTF-8 support (Windows console workaround)
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 import urllib.error
 import zipfile
 import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
+
+# Add project root to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from Analysis_Tools.app.utils.logger import logger
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 from py_vollib.black_scholes.greeks.analytical import delta, gamma, rho, theta, vega
 from py_vollib.black_scholes.implied_volatility import implied_volatility
 from sqlalchemy import create_engine, inspect, text
+
 load_dotenv()
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 # ===========================================
 # 🔧 Configuration

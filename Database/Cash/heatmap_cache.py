@@ -170,12 +170,18 @@ def classify_industry(industry: str) -> str:
     return "Diversified / Others"
 
 
+_sector_load_attempted = False
+
+
 def load_sector_master():
     """Load sector data from nse_sector_master.csv file."""
     global _sector_cache
+    global _sector_load_attempted
 
-    if _sector_cache:
+    if _sector_cache or _sector_load_attempted:
         return
+
+    _sector_load_attempted = True
 
     csv_path = None
     for path in SECTOR_MASTER_PATHS:
@@ -184,7 +190,7 @@ def load_sector_master():
             break
 
     if not csv_path:
-        print("[WARN] nse_sector_master.csv not found in any known location.")
+        print("[WARN] nse_sector_master.csv not found in any known location. Sectors will default to 'Others'.")
         return
 
     try:

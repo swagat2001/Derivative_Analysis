@@ -16,14 +16,16 @@
 
   {% include 'components/screener_sidebar.html' %}
 
-    <!-- MAIN CONTENT -->
+  <!-- MAIN CONTENT -->
   <main class="screener-main">
 
     <!-- Back Button -->
     <div class="back-button-container" style="margin-bottom: 20px;">
-      <button class="back-btn" onclick="window.location.href='{{ url_for('screener.screener_landing') }}'">
+      {% set back_url = url_for('goldmine.goldmine_page', tab=request.args.get('tab')) if request.args.get('source') ==
+      'goldmine' else url_for('screener.screener_landing') %}
+      <button class="back-btn" onclick="window.location.href='{{ back_url }}'">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
+          <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
         Back to Screeners
       </button>
@@ -31,17 +33,17 @@
 
 
 
-  <div class="top-filters" id="topMenuFilter">
-    <div class="filter-box"><a href="#openIntrest">Open Intrest</a></div>
-    <div class="filter-box active"> <a href="#Moneyness">Moneyness</a></div>
-    <div class="filter-box"><a href="#ImpliedVolatility">Implied Volatility</a></div>
-    <div class="filter-box"><a href="#FuturesAnalysis">Futures Analysis</a></div>
-    <div class="filter-box"><a href="#BullishBearish">BULLISH / BEARISH</a></div>
-  </div>
+    <div class="top-filters" id="topMenuFilter">
+      <div class="filter-box"><a href="#openIntrest">Open Intrest</a></div>
+      <div class="filter-box active"> <a href="#Moneyness">Moneyness</a></div>
+      <div class="filter-box"><a href="#ImpliedVolatility">Implied Volatility</a></div>
+      <div class="filter-box"><a href="#FuturesAnalysis">Futures Analysis</a></div>
+      <div class="filter-box"><a href="#BullishBearish">BULLISH / BEARISH</a></div>
+    </div>
 
-  {% include 'screener/top_gainers_losers/screener_header.html' %}
+    {% include 'screener/top_gainers_losers/screener_header.html' %}
 
-  {% if selected_date and screener_data %}
+    {% if selected_date and screener_data %}
 
     {% include 'screener/top_gainers_losers/screener_oi_section.html' %}
     {% include 'screener/top_gainers_losers/screener_moneyness_section.html' %}
@@ -53,11 +55,11 @@
          =============================== -->
     {% include 'screener/top_gainers_losers/final_signal_section.html' %}
 
-  {% else %}
+    {% else %}
     <div class="no-data">
       <p>Please select a date to view screener data.</p>
     </div>
-  {% endif %}
+    {% endif %}
 
 </div>
 </div>

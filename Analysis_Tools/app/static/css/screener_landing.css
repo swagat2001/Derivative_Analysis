@@ -184,9 +184,9 @@
     border-radius: 12px;
     padding: 18px 20px;
     margin-bottom: 12px;
-    /* display: flex;
+    display: flex;
     justify-content: space-between;
-    align-items: center; */
+    align-items: center;
     cursor: pointer;
     transition: all 0.25s ease;
     text-decoration: none;

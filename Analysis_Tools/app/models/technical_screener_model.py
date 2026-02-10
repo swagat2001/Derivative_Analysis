@@ -617,6 +617,7 @@ def get_potential_high_volume_stocks(date, limit=100):
         print(f"Error getting potential high volume: {e}")
         return []
 
+
 def get_unusually_high_volume_stocks(date, limit=100):
     """Stocks with unusually high volume (>2.5x avg)"""
     try:
@@ -631,4 +632,55 @@ def get_unusually_high_volume_stocks(date, limit=100):
         return df.to_dict("records")
     except Exception as e:
         print(f"Error getting unusually high volume: {e}")
+        return []
+
+
+def get_price_gainers_stocks(date, limit=100):
+    """Get top price gainers"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, price_change_pct, volume, rsi_14, adx_14
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND price_change_pct > 0
+            ORDER BY price_change_pct DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting price gainers: {e}")
+        return []
+
+
+def get_price_losers_stocks(date, limit=100):
+    """Get top price losers"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, price_change_pct, volume, rsi_14, adx_14
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date AND price_change_pct < 0
+            ORDER BY price_change_pct ASC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting price losers: {e}")
+        return []
+
+
+def get_high_volume_stocks(date, limit=100):
+    """Get high volume stocks"""
+    try:
+        q = text("""
+            SELECT ticker, underlying_price, volume, volume_change_pct, rsi_14, adx_14
+            FROM public.technical_screener_cache
+            WHERE cache_date = :date
+            ORDER BY volume DESC
+            LIMIT :limit
+        """)
+        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        return df.to_dict("records")
+    except Exception as e:
+        print(f"Error getting high volume stocks: {e}")
         return []

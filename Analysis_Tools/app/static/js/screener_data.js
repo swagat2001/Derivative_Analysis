@@ -1,0 +1,438 @@
+/* ===== SVG ICON DEFINITIONS ===== */
+const ICONS = {
+  chart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>',
+  target: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  package: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+  trendUp: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  sparkles: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M5 19l.5 1.5L7 21l-1.5.5L5 23l-.5-1.5L3 21l1.5-.5L5 19z"/><path d="M19 5l.5 1.5L21 7l-1.5.5L19 9l-.5-1.5L17 7l1.5-.5L19 5z"/></svg>',
+  trendDown: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>',
+  flame: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+  snowflake: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m4.93 19.07 4.24-4.24"/><path d="m14.83 9.17 4.24-4.24"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+  strength: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>',
+  trophy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+  bank: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>',
+  download: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  zap: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  arrowUp: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>',
+  arrowDown: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',
+  volume: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
+  rocket: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>'
+};
+
+/* ===== SCREENER DATA WITH ROUTES ===== */
+const SCREENER_DATA = {
+  "Derivative Screeners": [
+    {
+      title: "F&O Signal Scanner",
+      description: "Comprehensive F&O scanner with RSI, Pivot Levels, Volume Profile, OI Spike & Divergence signals",
+      icon: ICONS.target,
+      url: "/screener/signal-scanner/",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "Top Gainers & Losers",
+      description: "Top 10 gainers/losers across 40 categories - OI, IV, Moneyness for Calls, Puts & Futures",
+      icon: ICONS.chart,
+      url: "/screener/top-gainers-losers/",
+      badge: "Popular",
+      inline: false
+    },
+    {
+      title: "Signal Analysis",
+      description: "Advanced bullish/bearish signal classification with multi-factor analysis",
+      icon: ICONS.sparkles,
+      url: "/screener/signal-analysis/",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Futures OI Analysis",
+      description: "Expiry-wise Open Interest analysis - Current, Next & Far Month",
+      icon: ICONS.package,
+      url: "/screener/futures-oi/",
+      badge: null,
+      inline: false
+    }
+  ],
+  "Technical Screeners": [
+    {
+      title: "Technical Screener",
+      description: "RSI, MACD, SMA, ADX based screening with interactive heatmaps",
+      icon: ICONS.trendUp,
+      url: "/screener/technical-indicators/",
+      badge: "Premium",
+      inline: false
+    },
+    {
+      title: "Golden Crossover",
+      description: "Stocks where 50-day SMA crosses above 200-day SMA — bullish trend reversal",
+      icon: ICONS.sparkles,
+      url: "/screener/technical-indicators/golden-crossover",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Death Crossover",
+      description: "Stocks where 50-day SMA crosses below 200-day SMA — bearish trend reversal",
+      icon: ICONS.trendDown,
+      url: "/screener/technical-indicators/death-crossover",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Overbought RSI Stocks",
+      description: "Stocks with RSI > 75 suggesting possible upcoming price correction",
+      icon: ICONS.flame,
+      url: "/screener/technical-indicators/rsi-overbought",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "Oversold RSI Stocks",
+      description: "Stocks with RSI < 25 indicating potential price recovery",
+      icon: ICONS.snowflake,
+      url: "/screener/technical-indicators/rsi-oversold",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "R1 Resistance Breakouts",
+      description: "Stocks climbing past R1 resistance, signaling sustained upward trends",
+      icon: ICONS.arrowUp,
+      url: "/screener/technical-indicators/r1-breakout",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "R2 Resistance Breakouts",
+      description: "Stocks breaking above R2 resistance with strong bullish momentum",
+      icon: ICONS.arrowUp,
+      url: "/screener/technical-indicators/r2-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "R3 Resistance Breakouts",
+      description: "Stocks breaking above R3 resistance — extremely strong bullish signal",
+      icon: ICONS.rocket,
+      url: "/screener/technical-indicators/r3-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "S1 Support Breakouts",
+      description: "Stocks falling through S1 support, possibly forecasting extended declines",
+      icon: ICONS.arrowDown,
+      url: "/screener/technical-indicators/s1-breakout",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "S2 Support Breakouts",
+      description: "Stocks falling through S2 support, indicating significant bearish pressure",
+      icon: ICONS.arrowDown,
+      url: "/screener/technical-indicators/s2-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "S3 Support Breakouts",
+      description: "Stocks falling through S3 support — extreme bearish signal",
+      icon: ICONS.arrowDown,
+      url: "/screener/technical-indicators/s3-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Momentum Stocks",
+      description: "Securities surging in price with strong market enthusiasm and potential for further gains",
+      icon: ICONS.rocket,
+      url: "/screener/technical-indicators/momentum-stocks",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "Squeezing Range",
+      description: "Stocks with tightening Bollinger Bands, indicating a potential breakout or breakdown",
+      icon: ICONS.target,
+      url: "/screener/technical-indicators/squeezing-range",
+      badge: "New",
+      inline: false
+    }
+  ],
+  "Fundamental Screeners": [
+    {
+      title: "Best Annual Results",
+      description: "Companies with consistent sales & profit growth",
+      icon: ICONS.chart,
+      dataKey: "scanx-growth",
+      apiUrl: "/screener/fundamental/api/scan/best_results",
+      badge: "Hot",
+      inline: true
+    },
+    {
+      title: "CapEx Boost",
+      description: "Businesses ramping up capital expenditures",
+      icon: ICONS.rocket,
+      dataKey: "scanx-capex",
+      apiUrl: "/screener/fundamental/api/scan/capex_boost",
+      badge: "New",
+      inline: true
+    },
+    {
+      title: "Mighty Midcap Stocks",
+      description: "Mid-caps with robust fundamentals and growth",
+      icon: ICONS.strength,
+      dataKey: "scanx-midcap",
+      apiUrl: "/screener/fundamental/api/scan/mighty_midcap",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "Titan Largecap Stocks",
+      description: "Stable market leaders with strong positions",
+      icon: ICONS.trophy,
+      dataKey: "scanx-largecap",
+      apiUrl: "/screener/fundamental/api/scan/titan_largecap",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "Stellar Smallcap Stocks",
+      description: "High-performing small-caps with upside",
+      icon: ICONS.sparkles,
+      dataKey: "scanx-smallcap",
+      apiUrl: "/screener/fundamental/api/scan/stellar_smallcap",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "Negative Working Capital",
+      description: "Efficient liquidity management",
+      icon: ICONS.zap,
+      dataKey: "scanx-nwc",
+      apiUrl: "/screener/fundamental/api/scan/negative_working_capital",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "Potential Multibagger",
+      description: "High growth metrics with upside potential",
+      icon: ICONS.target,
+      dataKey: "scanx-multi",
+      apiUrl: "/screener/fundamental/api/scan/potential_multibagger",
+      badge: "Pop",
+      inline: true
+    }
+  ],
+  "Intraday Screeners": [
+    {
+      title: "Price Gainers Today",
+      description: "Top price gainers in today's trading session",
+      icon: ICONS.arrowUp,
+      url: "/screener/technical-indicators/price-gainers",
+      badge: "Live",
+      inline: false
+    },
+    {
+      title: "Price Losers Today",
+      description: "Top price losers in today's trading session",
+      icon: ICONS.arrowDown,
+      url: "/screener/technical-indicators/price-losers",
+      badge: "Live",
+      inline: false
+    },
+    {
+      title: "High Volume Alert",
+      description: "Stocks trading above average volume",
+      icon: ICONS.volume,
+      url: "/screener/technical-indicators/potential-high-volume",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Breakout Scanner",
+      description: "Stocks breaking key resistance levels",
+      icon: ICONS.rocket,
+      url: "/screener/technical-indicators/?filter=breakout",
+      badge: "Beta",
+      inline: false
+    },
+    {
+      title: "Nifty 50 Analysis",
+      description: "Comprehensive derivative analysis for Nifty 50 stocks",
+      icon: ICONS.trophy,
+      dataKey: "nifty50",
+      apiUrl: "/screener/api/nifty50",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "Bank Nifty Analysis",
+      description: "Derivative analysis for Bank Nifty constituents",
+      icon: ICONS.bank,
+      dataKey: "banknifty",
+      apiUrl: "/screener/api/banknifty",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "High OI Buildup",
+      description: "Stocks showing significant Open Interest accumulation",
+      icon: ICONS.download,
+      dataKey: "high-oi",
+      apiUrl: "/screener/api/high-oi",
+      badge: null,
+      inline: true
+    },
+    {
+      title: "IV Spike Alert",
+      description: "Stocks with unusual Implied Volatility movement",
+      icon: ICONS.zap,
+      dataKey: "iv-spike",
+      apiUrl: "/screener/api/iv-spike",
+      badge: null,
+      inline: true
+    }
+  ],
+  "Price & Volume Screeners": [
+    {
+      title: "1 Week High Breakouts",
+      description: "Securities surpassing highest price in the last week reflecting immediate bullish sentiment",
+      icon: ICONS.rocket,
+      url: "/screener/technical-indicators/week1-high-breakout",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "1 Week Low Breakouts",
+      description: "Indicates immediate bearish sentiment with decline past their lowest price in the previous week",
+      icon: ICONS.arrowDown,
+      url: "/screener/technical-indicators/week1-low-breakout",
+      badge: "New",
+      inline: false
+    },
+    {
+      title: "4 Week High Breakouts",
+      description: "Securities exceeding their highest price in the last month indicating short-term bullish momentum",
+      icon: ICONS.rocket,
+      url: "/screener/technical-indicators/week4-high-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "4 Week Low Breakouts",
+      description: "Pointing to short-term bearish momentum with stocks falling below their lowest price in the past month",
+      icon: ICONS.arrowDown,
+      url: "/screener/technical-indicators/week4-low-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "52 Week High Breakouts",
+      description: "Breaking past their highest price in the last year signaling strong bullish trends",
+      icon: ICONS.trophy,
+      url: "/screener/technical-indicators/week52-high-breakout",
+      badge: "Hot",
+      inline: false
+    },
+    {
+      title: "52 Week Low Breakouts",
+      description: "Strong bearish trends suggested by dropping below their lowest price in the past year",
+      icon: ICONS.snowflake,
+      url: "/screener/technical-indicators/week52-low-breakout",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Potential High Volume",
+      description: "Showing early signs of a spike in trading volume hinting at upcoming activity",
+      icon: ICONS.volume,
+      url: "/screener/technical-indicators/potential-high-volume",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Unusually High Volume",
+      description: "Points to increased interest or activity with volume much higher than average",
+      icon: ICONS.flame,
+      url: "/screener/technical-indicators/unusually-high-volume",
+      badge: "Hot",
+      inline: false
+    }
+  ]
+};
+
+/* ===== DUMMY STOCK DATA (Client-side fallback) ===== */
+const STOCK_DATA = {
+  "nifty50": {
+    title: "Nifty 50",
+    tag: "Nifty 50",
+    description: "The Nifty 50 is a benchmark index in the Indian stock market. It includes the top 50 large-cap companies listed on the National Stock Exchange (NSE) based on market capitalization and liquidity.",
+    stocks: [
+      { ticker: "RELIANCE", price: 1473.20, change: -31.00, change_pct: -2.06, volume: 7154042, oi: 12500000, iv: 24.5, signal: "BEARISH" },
+      { ticker: "HDFCBANK", price: 1746.40, change: -2.65, change_pct: -0.28, volume: 12666323, oi: 8900000, iv: 18.2, signal: "NEUTRAL" },
+      { ticker: "ICICIBANK", price: 1434.50, change: 6.80, change_pct: 0.48, volume: 9566450, oi: 7600000, iv: 21.3, signal: "BULLISH" },
+      { ticker: "INFY", price: 1617.30, change: -21.70, change_pct: -1.32, volume: 1989675, oi: 5400000, iv: 22.8, signal: "BEARISH" },
+      { ticker: "TCS", price: 3845.60, change: 45.30, change_pct: 1.19, volume: 1245890, oi: 3200000, iv: 19.4, signal: "BULLISH" },
+      { ticker: "BHARTIARTL", price: 1678.90, change: 12.40, change_pct: 0.74, volume: 3456789, oi: 4500000, iv: 23.1, signal: "BULLISH" },
+      { ticker: "SBIN", price: 845.30, change: -8.90, change_pct: -1.04, volume: 8765432, oi: 9800000, iv: 26.7, signal: "BEARISH" },
+      { ticker: "HDFC", price: 2890.50, change: 34.20, change_pct: 1.20, volume: 2345678, oi: 4100000, iv: 20.5, signal: "BULLISH" },
+      { ticker: "KOTAKBANK", price: 1823.40, change: -15.60, change_pct: -0.85, volume: 1567890, oi: 3400000, iv: 19.8, signal: "NEUTRAL" },
+      { ticker: "LT", price: 3567.80, change: 28.90, change_pct: 0.82, volume: 987654, oi: 2800000, iv: 21.2, signal: "BULLISH" },
+      { ticker: "WIPRO", price: 456.70, change: -5.40, change_pct: -1.17, volume: 4567890, oi: 6700000, iv: 25.3, signal: "BEARISH" },
+      { ticker: "AXISBANK", price: 1234.50, change: 8.90, change_pct: 0.73, volume: 5678901, oi: 5200000, iv: 22.4, signal: "BULLISH" },
+      { ticker: "MARUTI", price: 12456.30, change: -156.70, change_pct: -1.24, volume: 345678, oi: 890000, iv: 24.6, signal: "BEARISH" },
+      { ticker: "SUNPHARMA", price: 1567.80, change: 23.40, change_pct: 1.51, volume: 2345678, oi: 3100000, iv: 27.8, signal: "BULLISH" },
+      { ticker: "TATAMOTORS", price: 987.60, change: -12.30, change_pct: -1.23, volume: 6789012, oi: 8200000, iv: 32.1, signal: "BEARISH" },
+      { ticker: "ASIANPAINT", price: 2890.40, change: 18.60, change_pct: 0.65, volume: 567890, oi: 1200000, iv: 18.9, signal: "NEUTRAL" },
+      { ticker: "BAJFINANCE", price: 7234.50, change: 89.30, change_pct: 1.25, volume: 1234567, oi: 2400000, iv: 28.4, signal: "BULLISH" },
+      { ticker: "HCLTECH", price: 1678.90, change: -18.40, change_pct: -1.08, volume: 1890123, oi: 3800000, iv: 23.6, signal: "BEARISH" },
+      { ticker: "TITAN", price: 3456.70, change: 42.10, change_pct: 1.23, volume: 890123, oi: 1600000, iv: 25.2, signal: "BULLISH" },
+      { ticker: "ULTRACEMCO", price: 11234.50, change: -78.90, change_pct: -0.70, volume: 234567, oi: 450000, iv: 20.1, signal: "NEUTRAL" },
+      { ticker: "TECHM", price: 1567.80, change: 12.30, change_pct: 0.79, volume: 2345678, oi: 4100000, iv: 24.8, signal: "BULLISH" },
+      { ticker: "POWERGRID", price: 312.40, change: 4.50, change_pct: 1.46, volume: 5678901, oi: 7800000, iv: 19.3, signal: "BULLISH" },
+      { ticker: "NTPC", price: 378.90, change: -2.30, change_pct: -0.60, volume: 4567890, oi: 6500000, iv: 18.7, signal: "NEUTRAL" },
+      { ticker: "M&M", price: 2678.40, change: 34.50, change_pct: 1.31, volume: 1890123, oi: 2900000, iv: 26.4, signal: "BULLISH" },
+      { ticker: "HINDALCO", price: 678.90, change: -8.70, change_pct: -1.27, volume: 3456789, oi: 5100000, iv: 29.8, signal: "BEARISH" }
+    ]
+  },
+  "banknifty": {
+    title: "Bank Nifty",
+    tag: "Bank Nifty",
+    description: "Bank Nifty is a sectoral index comprising the most liquid and large capitalized banking stocks. It provides investors and market intermediaries a benchmark that captures the capital market performance of Indian banking sector.",
+    stocks: [
+      { ticker: "HDFCBANK", price: 1746.40, change: -2.65, change_pct: -0.28, volume: 12666323, oi: 8900000, iv: 18.2, signal: "NEUTRAL" },
+      { ticker: "ICICIBANK", price: 1434.50, change: 6.80, change_pct: 0.48, volume: 9566450, oi: 7600000, iv: 21.3, signal: "BULLISH" },
+      { ticker: "SBIN", price: 845.30, change: -8.90, change_pct: -1.04, volume: 8765432, oi: 9800000, iv: 26.7, signal: "BEARISH" },
+      { ticker: "KOTAKBANK", price: 1823.40, change: -15.60, change_pct: -0.85, volume: 1567890, oi: 3400000, iv: 19.8, signal: "NEUTRAL" },
+      { ticker: "AXISBANK", price: 1234.50, change: 8.90, change_pct: 0.73, volume: 5678901, oi: 5200000, iv: 22.4, signal: "BULLISH" },
+      { ticker: "INDUSINDBK", price: 1456.70, change: 18.90, change_pct: 1.31, volume: 2345678, oi: 3100000, iv: 28.5, signal: "BULLISH" },
+      { ticker: "BANDHANBNK", price: 234.50, change: -3.40, change_pct: -1.43, volume: 4567890, oi: 4200000, iv: 35.2, signal: "BEARISH" },
+      { ticker: "FEDERALBNK", price: 178.90, change: 2.10, change_pct: 1.19, volume: 3456789, oi: 5600000, iv: 24.8, signal: "BULLISH" },
+      { ticker: "IDFCFIRSTB", price: 87.60, change: -1.20, change_pct: -1.35, volume: 6789012, oi: 8100000, iv: 31.4, signal: "BEARISH" },
+      { ticker: "PNB", price: 112.30, change: 1.80, change_pct: 1.63, volume: 7890123, oi: 9200000, iv: 29.6, signal: "BULLISH" },
+      { ticker: "AUBANK", price: 678.40, change: -5.60, change_pct: -0.82, volume: 1234567, oi: 2100000, iv: 26.3, signal: "NEUTRAL" },
+      { ticker: "BANKBARODA", price: 267.80, change: 3.40, change_pct: 1.29, volume: 5678901, oi: 6800000, iv: 27.1, signal: "BULLISH" }
+    ]
+  },
+  "high-oi": {
+    title: "High OI Buildup",
+    tag: "High OI",
+    description: "Stocks showing significant Open Interest accumulation. High OI buildup often indicates strong market interest and potential directional moves.",
+    stocks: [] // Will be populated from nifty50
+  },
+  "iv-spike": {
+    title: "IV Spike Alert",
+    tag: "IV Spike",
+    description: "Stocks with unusual Implied Volatility movement. IV spikes often precede significant price movements and can indicate upcoming events or market uncertainty.",
+    stocks: [] // Will be populated from nifty50
+  }
+};
+
+// Populate high-oi and iv-spike from nifty50 data
+STOCK_DATA["high-oi"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.oi - a.oi).slice(0, 15);
+STOCK_DATA["iv-spike"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.iv - a.iv).slice(0, 15);
+
+console.log('✅ screener_data.js loaded -', Object.keys(SCREENER_DATA).length, 'categories');

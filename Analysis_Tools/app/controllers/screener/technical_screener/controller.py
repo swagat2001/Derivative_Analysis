@@ -37,6 +37,10 @@ from ....models.technical_screener_model import (
     get_week52_low_breakout_stocks,
     get_potential_high_volume_stocks,
     get_unusually_high_volume_stocks,
+    # NEW IMPORTS
+    get_price_gainers_stocks,
+    get_price_losers_stocks,
+    get_high_volume_stocks,
 )
 from ....services.signal_service import compute_signals_simple
 
@@ -582,6 +586,51 @@ def unusually_high_volume():
         desc="Points to increased interest or activity with volume much higher than average",
         icon="📊", signal="NEUTRAL", signal_color="#d97706",
         data_func=get_unusually_high_volume_stocks,
+        table_columns=[
+            {"key": "volume", "label": "Volume"},
+            {"key": "volume_change_pct", "label": "Vol Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/price-gainers")
+def price_gainers():
+    """Top Price Gainers Screener"""
+    return render_generic_screener(
+        title="Top Price Gainers",
+        desc="Stocks with the highest percentage price increase in the current session.",
+        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_price_gainers_stocks,
+        table_columns=[
+            {"key": "price_change_pct", "label": "Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/price-losers")
+def price_losers():
+    """Top Price Losers Screener"""
+    return render_generic_screener(
+        title="Top Price Losers",
+        desc="Stocks with the highest percentage price decrease in the current session.",
+        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_price_losers_stocks,
+        table_columns=[
+            {"key": "price_change_pct", "label": "Change %", "format": "%.2f", "suffix": "%", "css_class": "negative"},
+            {"key": "volume", "label": "Volume"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/high-volume")
+def high_volume():
+    """Top High Volume Screener"""
+    return render_generic_screener(
+        title="High Volume Stocks",
+        desc="Stocks with the highest trading volume in the current session.",
+        icon="📊", signal="NEUTRAL", signal_color="#d97706",
+        data_func=get_high_volume_stocks,
         table_columns=[
             {"key": "volume", "label": "Volume"},
             {"key": "volume_change_pct", "label": "Vol Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},

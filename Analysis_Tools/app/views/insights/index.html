@@ -731,6 +731,19 @@
         border-top-color: rgba(15, 23, 42, 0.98);
     }
 
+    /* FIX: Tooltip positioning for top row items */
+    .treemap-tooltip.bottom {
+        bottom: auto;
+        top: calc(100% + 8px);
+    }
+
+    .treemap-tooltip.bottom::after {
+        top: auto;
+        bottom: 100%;
+        border-top-color: transparent;
+        border-bottom-color: rgba(15, 23, 42, 0.98);
+    }
+
     .treemap-cell:hover .treemap-tooltip,
     .treemap-cell-abs:hover .treemap-tooltip {
         opacity: 1;
@@ -2406,6 +2419,9 @@
         const logoSize = Math.min(40, Math.max(18, Math.sqrt(area) / 4));
 
         const logoHtml = showLogo ? `<div class="stock-logo" style="width:${logoSize}px;height:${logoSize}px;font-size:${logoSize / 3}px;">${initials}</div>` : '';
+
+        // Check if cell is in the top row (y < 100px) and apply bottom tooltip
+        const layoutClass = y < 100 ? 'bottom' : '';
         const symbolHtml = showSymbol ? `<span class="symbol" style="font-size:${symbolSize}px;">${stock.symbol}</span>` : '';
         const priceHtml = showPrice ? `<span class="price" style="font-size:${priceSize}px;">${formatPrice(stock.close)}</span>` : '';
         const changeHtml = showChange ? `<span class="change" style="font-size:${changeSize}px;">${changeSign}${stock.change_pct.toFixed(2)}%</span>` : '';
@@ -2417,7 +2433,7 @@
             ${symbolHtml}
             ${priceHtml}
             ${changeHtml}
-            <div class="treemap-tooltip">
+            <div class="treemap-tooltip ${layoutClass}">
                 <div class="tt-header">
                     <span class="tt-symbol">${stock.symbol}</span>
                     <span class="tt-change ${changeClass}">${changeSign}${stock.change_pct.toFixed(2)}%</span>

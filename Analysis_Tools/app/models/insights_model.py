@@ -366,6 +366,7 @@ def get_insights_dates():
 def clear_insights_cache():
     """Clear all insights caches."""
     _get_insights_dates_cached.cache_clear()
+    _get_fo_symbols_cached.cache_clear()
     _get_heatmap_data_cached.cache_clear()
     _get_fii_dii_data_cached.cache_clear()
     _get_fii_derivatives_data_cached.cache_clear()
@@ -379,8 +380,39 @@ def clear_insights_cache():
 # =============================================================
 # 2️⃣ HEATMAP DATA - FROM CASH DATABASE (REAL OHLCV DATA)
 #    Like ScanX - Uses actual Cash market prices
-#    Shows ALL stocks available in CashStocks_Database
+#    FILTERED: Shows ONLY F&O stocks (stocks with derivatives)
 # =============================================================
+
+
+@lru_cache(maxsize=1)
+def _get_fo_symbols_cached():
+    """
+    Get list of symbols that have F&O derivatives.
+    Returns set of symbols that exist in BhavCopy_Database (F&O database).
+    """
+    try:
+        query = text("""
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_name LIKE 'TBL_%'
+            AND table_name NOT LIKE '%_DERIVED'
+            ORDER BY table_name;
+        """)
+
+        with engine.connect() as conn:
+            result = conn.execute(query)
+            tables = [row[0] for row in result]
+
+        # Extract symbol names from table names (TBL_NIFTY -> NIFTY)
+        fo_symbols = set(table.replace('TBL_', '') for table in tables if table.startswith('TBL_'))
+
+        print(f"[INFO] Found {len(fo_symbols)} F&O symbols in BhavCopy_Database")
+        return frozenset(fo_symbols)  # frozenset is hashable for caching
+
+    except Exception as e:
+        print(f"[ERROR] _get_fo_symbols_cached(): {e}")
+        return frozenset()
 
 
 @lru_cache(maxsize=32)
@@ -407,6 +439,16 @@ def _get_heatmap_data_cached(selected_date: str):
             cached_df = pd.read_sql(query_cache, con=conn, params={"result_date": selected_date})
 
         if not cached_df.empty:
+            # FILTER: Only F&O stocks
+            fo_symbols = _get_fo_symbols_cached()
+            if fo_symbols:
+                cached_df = cached_df[cached_df["symbol"].isin(fo_symbols)]
+                print(f"[INFO] Filtered to {len(cached_df)} F&O stocks (from {len(cached_df) + len(set(cached_df['symbol']) - fo_symbols)} total)")
+
+            if cached_df.empty:
+                print(f"[WARN] No F&O stocks found for {selected_date} after filtering")
+                return tuple()
+
             # OPTIMIZATION: Vectorized type conversion (100x faster than iterrows)
             cached_df["symbol"] = cached_df["symbol"].astype(str)
             cached_df["close"] = cached_df["close"].astype(float)
@@ -943,156 +985,84 @@ def get_nifty50_data(start_date: str, end_date: str):
 
 @lru_cache(maxsize=32)
 def _get_delivery_data_cached(selected_date: str):
-    """Get delivery percentage data for stocks."""
+    """
+    Get delivery percentage data from cache table.
+    OPTIMIZED: Reads from daily_delivery_data table (single query).
+    """
     try:
-        print(f"[DEBUG] Getting delivery data for date: {selected_date}")
+        print(f"[INFO] Fetching delivery data for {selected_date} from cache...")
 
-        # Get all per-symbol tables from cash database
-        query = text(
-            """
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = 'public'
-            AND table_name LIKE 'TBL_%'
-            AND table_name != 'TBL_NIFTY_DERIVED'
-            ORDER BY table_name;
-        """
-        )
+        query = text("""
+            SELECT symbol, close, volume, delivery_qty, delivery_pct
+            FROM daily_delivery_data
+            WHERE date = :selected_date
+            ORDER BY delivery_pct DESC
+        """)
+
         with engine_cash.connect() as conn:
-            result = conn.execute(query)
-            tables = [row[0] for row in result]
-
-        print(f"[DEBUG] Found {len(tables)} tables in cash database")
-
-        if not tables:
-            print("[WARN] No tables found in cash database")
-            return tuple()
-
-        # Debug: Check what dates exist in a sample table
-        if tables:
-            sample_table = tables[0]
-            try:
-                date_check_query = (
-                    f'SELECT DISTINCT "BizDt"::date as date FROM public."{sample_table}" ORDER BY date DESC LIMIT 5'
-                )
-                date_df = pd.read_sql(date_check_query, con=engine_cash)
-                if not date_df.empty:
-                    available_dates = date_df["date"].tolist()
-                    print(f"[DEBUG] Available dates in {sample_table}: {available_dates}")
-                    print(f"[DEBUG] Looking for date: {selected_date}")
-                else:
-                    print(f"[DEBUG] No dates found in {sample_table}")
-            except Exception as e:
-                print(f"[DEBUG] Could not check dates: {str(e)[:100]}")
-
-        # Query each table INDIVIDUALLY to avoid UNION errors
-        all_data = []
-        successful_queries = 0
-        failed_queries = 0
-
-        for table in tables:
-            symbol_name = table.replace("TBL_", "")
-
-            # Skip empty symbol names
-            if not symbol_name:
-                continue
-
-            # Build query - embed date directly since parameterization is causing issues
-            query_str = (
-                "SELECT '" + symbol_name + "' as symbol, "
-                'CAST("ClsPric" AS NUMERIC) as close, '
-                'CAST("TtlTradgVol" AS NUMERIC) as volume, '
-                'CAST(COALESCE("DlvryQty", 0) AS NUMERIC) as delivery_qty, '
-                'CASE WHEN CAST("TtlTradgVol" AS NUMERIC) > 0 '
-                'THEN ROUND((CAST(COALESCE("DlvryQty", 0) AS NUMERIC) / CAST("TtlTradgVol" AS NUMERIC)) * 100, 2) '
-                "ELSE 0 END as delivery_pct "
-                'FROM public."' + table + '" '
-                'WHERE CAST("BizDt" AS DATE) = CAST(\'' + selected_date + "' AS DATE) "
-                'AND "TtlTradgVol" IS NOT NULL '
-                'AND CAST("TtlTradgVol" AS NUMERIC) > 0 '
-                'ORDER BY "BizDt" DESC '
-                "LIMIT 1"
-            )
-
-            # Debug: Print first query to see the actual SQL
-            if successful_queries == 0 and failed_queries == 0:
-                print(f"[DEBUG] Example query for {table}:")
-                print(f"[DEBUG] {query_str[:200]}...")
-
-            try:
-                df_row = pd.read_sql(query_str, con=engine_cash)
-
-                if not df_row.empty:
-                    all_data.append(df_row)
-                    successful_queries += 1
-            except Exception as e:
-                failed_queries += 1
-                # Only log first 5 errors to avoid console spam
-                if failed_queries <= 5:
-                    error_str = str(e)[:100]
-                    print(f"[DEBUG] Skip {table}: {error_str}")
-
-        print(f"[DEBUG] Successfully queried {successful_queries} tables, {failed_queries} failed")
-
-        if not all_data:
-            print(f"[WARN] No delivery data found for {selected_date}")
-            return tuple()
-
-        df = pd.concat(all_data, ignore_index=True)
+            df = pd.read_sql(query, conn, params={"selected_date": selected_date})
 
         if df.empty:
-            print(f"[WARN] Combined dataframe is empty for {selected_date}")
+            print(f"[WARN] No delivery data in cache for {selected_date}")
+            print("[INFO] Run: python build_delivery_cache.py")
             return tuple()
 
-        print(f"[DEBUG] Found {len(df)} stocks with delivery data")
-        df = df.sort_values("delivery_pct", ascending=False)
+        print(f"[INFO] Loaded {len(df)} stocks with delivery data in < 0.1s")
 
         result = []
         for _, row in df.iterrows():
-            result.append(
-                (
-                    str(row["symbol"]),
-                    float(row["close"]) if pd.notna(row["close"]) else 0,
-                    int(float(row["volume"])) if pd.notna(row["volume"]) else 0,
-                    int(float(row["delivery_qty"])) if pd.notna(row["delivery_qty"]) else 0,
-                    float(row["delivery_pct"]) if pd.notna(row["delivery_pct"]) else 0,
-                )
-            )
+            result.append((
+                str(row["symbol"]),
+                float(row["close"]) if pd.notna(row["close"]) else 0,
+                int(row["volume"]) if pd.notna(row["volume"]) else 0,
+                int(row["delivery_qty"]) if pd.notna(row["delivery_qty"]) else 0,
+                float(row["delivery_pct"]) if pd.notna(row["delivery_pct"]) else 0,
+            ))
 
-        print(f"[INFO] Returning {len(result)} stocks with delivery data")
         return tuple(result)
 
     except Exception as e:
         print(f"[ERROR] _get_delivery_data_cached(): {e}")
         import traceback
-
         traceback.print_exc()
         return tuple()
 
 
 def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
-    """Get stocks with high delivery percentage."""
+    """Get stocks with high delivery percentage (F&O stocks only)."""
     cached_data = _get_delivery_data_cached(selected_date)
 
     if not cached_data:
         print(f"[WARN] No cached delivery data for {selected_date}, returning empty list")
         return []
 
+    # Get F&O symbols for filtering
+    fo_symbols = _get_fo_symbols_cached()
+
     result = []
     for row in cached_data:
+        symbol = row[0]
+
+        # Filter: Only F&O stocks
+        if fo_symbols and symbol not in fo_symbols:
+            continue
+
         if row[4] >= min_delivery_pct:
             result.append(
                 {
-                    "symbol": row[0],
+                    "symbol": symbol,
                     "close": row[1],
                     "volume": row[2],
                     "delivery_qty": row[3],
                     "delivery_pct": row[4],
-                    "sector": get_sector(row[0]),
+                    "sector": get_sector(symbol),
                 }
             )
 
-    print(f"[INFO] Filtered to {len(result)} stocks with delivery_pct >= {min_delivery_pct}")
+    if fo_symbols:
+        print(f"[INFO] Filtered to {len(result)} F&O stocks with delivery_pct >= {min_delivery_pct}")
+    else:
+        print(f"[INFO] Filtered to {len(result)} stocks with delivery_pct >= {min_delivery_pct}")
     return result
 
 

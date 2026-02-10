@@ -22,6 +22,13 @@ load_dotenv()
 import re
 import socket
 import sys
+
+# Reconfigure stdout for UTF-8 support (Windows console workaround)
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 import time
 import urllib.error
 import urllib.request
@@ -563,6 +570,24 @@ def main():
             logger.info("\n✅ Heatmap Cache Update Triggered")
         except Exception as e:
             logger.error(f"⚠️ Failed to run heatmap cache update: {e}")
+
+        # ===========================================
+        # 🚀 STEP 4: UPDATE DELIVERY CACHE
+        # ===========================================
+        print("\n" + "=" * 80)
+        logger.info("🚀 STEP 4: UPDATING DELIVERY CACHE (For Insights)")
+        print("=" * 80 + "\n")
+        try:
+            import subprocess
+
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            delivery_script = os.path.join(script_dir, "delivery_cache.py")
+
+            logger.info(f"▶ Running: {delivery_script}")
+            subprocess.run([sys.executable, delivery_script], check=False)
+            logger.info("\n✅ Delivery Cache Update Triggered")
+        except Exception as e:
+            logger.error(f"⚠️ Failed to run delivery cache update: {e}")
 
         print("=" * 80 + "\n")
 

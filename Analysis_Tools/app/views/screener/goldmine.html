@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}By Goldmine – Premium Screeners{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
+<style>
+  .goldmine-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .goldmine-tab {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    position: relative;
+    bottom: -2px;
+  }
+
+  .goldmine-tab:hover {
+    color: #1a1a1a;
+    background: #f9fafb;
+  }
+
+  .goldmine-tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+  }
+
+  .goldmine-tab-content {
+    display: none;
+  }
+
+  .goldmine-tab-content.active {
+    display: block;
+  }
+
+  .goldmine-tab[data-tab="derivative"].active {
+    color: #f59e0b;
+    border-bottom-color: #f59e0b;
+  }
+
+  .goldmine-tab[data-tab="technical"].active {
+    color: #10b981;
+    border-bottom-color: #10b981;
+  }
+
+  .goldmine-tab[data-tab="fundamental"].active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+  }
+
+  .goldmine-tab[data-tab="intraday"].active {
+    color: #ef4444;
+    border-bottom-color: #ef4444;
+  }
+
+  .goldmine-tab[data-tab="price-volume"].active {
+    color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  @media (max-width: 768px) {
+    .goldmine-tabs {
+      gap: 4px;
+    }
+
+    .goldmine-tab {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="screener-container">
+
+  {% include 'components/screener_sidebar.html' %}
+
+  <main class="screener-main">
+
+    <!-- SCREENER LIST VIEW -->
+    <div id="screenerListView" class="screener-list">
+      <div class="goldmine-tabs">
+        <button class="goldmine-tab active" data-tab="derivative" onclick="switchTab('derivative')">
+          Derivative Screeners
+        </button>
+        <button class="goldmine-tab" data-tab="technical" onclick="switchTab('technical')">
+          Technical Screeners
+        </button>
+        <button class="goldmine-tab" data-tab="fundamental" onclick="switchTab('fundamental')">
+          Fundamental Screeners
+        </button>
+        <button class="goldmine-tab" data-tab="intraday" onclick="switchTab('intraday')">
+          Intraday Screeners
+        </button>
+        <button class="goldmine-tab" data-tab="price-volume" onclick="switchTab('price-volume')">
+          Price & Volume Screeners
+        </button>
+      </div>
+
+      <div id="tab-derivative" class="goldmine-tab-content active">
+        <div id="screenerList-derivative"></div>
+      </div>
+
+      <div id="tab-technical" class="goldmine-tab-content">
+        <div id="screenerList-technical"></div>
+      </div>
+
+      <div id="tab-fundamental" class="goldmine-tab-content">
+        <div id="screenerList-fundamental"></div>
+      </div>
+
+      <div id="tab-intraday" class="goldmine-tab-content">
+        <div id="screenerList-intraday"></div>
+      </div>
+
+      <div id="tab-price-volume" class="goldmine-tab-content">
+        <div id="screenerList-price-volume"></div>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW (Hidden by default) -->
+    <div id="detailView" class="detail-view" style="display: none;">
+      <button class="back-btn" onclick="showScreenerList()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Back to Screeners
+      </button>
+
+      <div class="detail-header">
+        <div class="detail-header-left">
+          <div class="detail-title">
+            <span id="detailTitle">Screener Title</span>
+            <span class="author">by @goldmine</span>
+          </div>
+          <div class="detail-desc" id="detailDesc">
+            Screener description goes here.
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn" onclick="exportToCSV()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="detail-table" id="stocksTable">
+          <thead>
+            <tr id="tableHeaderRow">
+              <!-- Dynamically populated headers -->
+            </tr>
+          </thead>
+          <tbody id="stocksTableBody">
+            <!-- Rows will be inserted here -->
+          </tbody>
+        </table>
+
+        <div class="table-footer">
+          <div class="footer-left">
+            Showing <strong id="showingCount">0</strong> of <strong id="totalCount">0</strong> results
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+{% endblock %}
+
+{% block page_js %}
+<script src="{{ url_for('static', filename='js/screener_data.js') }}"></script>
+<script src="{{ url_for('static', filename='js/goldmine.js') }}"></script>
+{% endblock %}
