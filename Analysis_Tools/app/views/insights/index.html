@@ -1247,6 +1247,87 @@
         color: #1e293b;
         margin-bottom: 12px;
     }
+
+    /* ============================================
+     DELIVERY TABLE STYLES (ScanX Copy)
+    ============================================ */
+    .delivery-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 12px;
+        font-size: 13px;
+    }
+
+    .delivery-table th {
+        text-align: left;
+        padding: 12px 16px;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 12px;
+        border-bottom: 1px solid #e2e8f0;
+        background: white;
+        white-space: nowrap;
+    }
+
+    .delivery-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        background: white;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .delivery-table tr:hover td {
+        background: #f8fafc;
+    }
+
+    .delivery-table .stock-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: #1f2937;
+        text-decoration: none;
+    }
+
+    .delivery-table .stock-logo {
+        width: 28px;
+        height: 28px;
+        background: #f1f5f9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        font-weight: 800;
+        color: #64748b;
+    }
+
+    .delivery-table .stock-name {
+        color: #0f172a;
+    }
+
+    .progress-bar-bg {
+        width: 100px;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: #8b5cf6;
+        /* Purple like ScanX */
+    }
+
+    .delivery-table .text-right {
+        text-align: right !important;
+    }
 </style>
 {% endblock %}
 
@@ -2527,32 +2608,82 @@
         const container = document.getElementById('delivery-container');
         const minPct = document.getElementById('minDelivery').value;
         const sort = document.getElementById('deliverySort').value;
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        const index = currentIndex || 'all';
+
+        if (container.innerHTML.trim() === '') {
+            container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        }
+
         try {
-            const response = await fetch(`/insights/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${currentIndex}`);
+            const response = await fetch(`/insights/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}`);
             const data = await response.json();
 
-            if (!data.success) {
-                container.innerHTML = '<div class="empty-state"><h3>❌ Error Loading Delivery Data</h3><p>Unable to load delivery data. Please try again.</p></div>';
-                return;
-            }
-
-            if (!data.data || data.data.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
+            if (!data.success || !data.data || data.data.length === 0) {
+                container.innerHTML = `<div class="empty-state">
                         <h3>📦 No Delivery Data Available</h3>
                         <p>Delivery percentage data is not available for ${currentDate}.</p>
-                        <p style="color: #6b7280; margin-top: 12px; font-size: 14px;">This data comes from the cash market database and may not be available for all dates.</p>
-                        <p style="color: #6b7280; font-size: 14px;">Try selecting a different date or check if the cash database has been updated.</p>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
 
-            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat"><span class="stat-value">${data.summary.total_stocks}</span><span class="stat-label">Total</span></div><div class="summary-stat"><span class="stat-value">${data.summary.avg_delivery_pct}%</span><span class="stat-label">Avg Delivery</span></div><div class="summary-stat advances"><span class="stat-value">${data.summary.high_delivery_count}</span><span class="stat-label">High Delivery</span></div></div><div class="delivery-grid">${data.data.map(s => `<div class="delivery-card"><div class="delivery-info"><a href="/stock/${s.symbol}" target="_blank" class="delivery-symbol">${s.symbol}</a><span class="delivery-sector">${s.sector}</span><span class="delivery-price">₹${s.close.toLocaleString()}</span></div><div class="delivery-pct"><span class="pct-value">${s.delivery_pct.toFixed(1)}%</span><span class="pct-label">Delivery</span></div></div>`).join('')}</div>`;
+            // HEADER SUMMARY
+            // HEADER SUMMARY removed as per request
+            let html = '';
+
+            // TABLE START
+            html += `
+            <div class="screener-card" style="padding:0; overflow:hidden;">
+            <div style="overflow-x:auto;">
+            <table class="delivery-table">
+                <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th class="text-right">LTP (₹)</th>
+                        <th class="text-right">Change</th>
+                        <th class="text-right">Change %</th>
+                        <th class="text-right">Traded Vol</th>
+                        <th class="text-right">Delivered Vol</th>
+                        <th class="text-right">Delivered %</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            // TABLE ROWS
+            data.data.forEach(s => {
+                const changeClass = s.change_pct >= 0 ? 'positive' : 'negative';
+                const changeSign = s.change_pct >= 0 ? '+' : '';
+                const logoInitials = s.symbol.substring(0, 2);
+
+                html += `
+                <tr>
+                    <td>
+                        <a href="/stock/${s.symbol}" target="_blank" class="stock-cell">
+                            <div class="stock-logo">${logoInitials}</div>
+                            <span class="stock-name">${s.symbol}</span>
+                        </a>
+                    </td>
+                    <td class="text-right" style="font-weight:600">₹${s.close.toLocaleString()}</td>
+                    <td class="text-right ${changeClass}">${changeSign}${s.change ? s.change.toFixed(2) : '-'}</td>
+                    <td class="text-right ${changeClass}" style="font-weight:700">${changeSign}${s.change_pct ? s.change_pct.toFixed(2) : '0.00'}%</td>
+                    <td class="text-right">${formatNumber(s.volume)}</td>
+                    <td class="text-right">${formatNumber(s.delivery_qty)}</td>
+                    <td class="text-right">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                            <span style="font-weight:800; color:#8b5cf6;">${s.delivery_pct.toFixed(2)}%</span>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:${Math.min(s.delivery_pct, 100)}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            html += `</tbody></table></div></div>`;
+            container.innerHTML = html;
+
         } catch (e) {
             console.error('Error loading delivery data:', e);
-            container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load delivery data. Please check the console for details.</p></div>';
+            container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load delivery data.</p></div>';
         }
     }
 

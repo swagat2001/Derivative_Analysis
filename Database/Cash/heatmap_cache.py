@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 
 from dotenv import load_dotenv
 
-load_dotenv()
+import json
 import time
 from datetime import datetime
 from urllib.parse import quote_plus
@@ -174,7 +174,7 @@ _sector_load_attempted = False
 
 
 def load_sector_master():
-    """Load sector data from nse_sector_master.csv file."""
+    """Load sector data from CSV or fallback to JSON."""
     global _sector_cache
     global _sector_load_attempted
 
@@ -183,53 +183,98 @@ def load_sector_master():
 
     _sector_load_attempted = True
 
+    # 1. Try CSV First
     csv_path = None
     for path in SECTOR_MASTER_PATHS:
         if path and os.path.exists(path):
             csv_path = path
             break
 
-    if not csv_path:
-        print("[WARN] nse_sector_master.csv not found in any known location. Sectors will default to 'Others'.")
-        return
+    if csv_path:
+        try:
+            df = pd.read_csv(csv_path)
+            # Normalize columns
+            df.columns = [c.strip().upper() for c in df.columns]
 
-    try:
-        df = pd.read_csv(csv_path)
-        # Normalize columns
-        df.columns = [c.strip().upper() for c in df.columns]
+            # We need SYMBOL and MACRO-SECTOR or SECTOR
+            # Use first column as symbol (usually SYMBOL)
+            symbol_col = df.columns[0]
 
-        # We need SYMBOL and MACRO-SECTOR or SECTOR
-        # Use first column as symbol (usually SYMBOL)
-        symbol_col = df.columns[0]
+            # Look for Industry column
+            industry_col = next((c for c in df.columns if "INDUSTRY" in c), None)
 
-        # Look for Industry column
-        industry_col = next((c for c in df.columns if "INDUSTRY" in c), None)
+            if not industry_col:
+                # Maybe it has SECTOR directly?
+                sector_col = next((c for c in df.columns if "SECTOR" in c), None)
+            else:
+                sector_col = industry_col
 
-        if not industry_col:
-            # Maybe it has SECTOR directly?
-            sector_col = next((c for c in df.columns if "SECTOR" in c), None)
-        else:
-            sector_col = industry_col
+            if symbol_col and sector_col:
+                for _, row in df.iterrows():
+                    sym = str(row[symbol_col]).strip().upper()
+                    raw_sector = str(row[sector_col]).strip()
 
-        if symbol_col and sector_col:
-            for _, row in df.iterrows():
-                sym = str(row[symbol_col]).strip().upper()
-                raw_sector = str(row[sector_col]).strip()
+                    # If using Industry column, map it
+                    if industry_col:
+                        final_sector = classify_industry(raw_sector)
+                    else:
+                        final_sector = raw_sector
 
-                # If using Industry column, map it
-                if industry_col:
-                    final_sector = classify_industry(raw_sector)
-                else:
-                    final_sector = raw_sector
+                    _sector_cache[sym] = final_sector
 
-                _sector_cache[sym] = final_sector
+            print(
+                f"[INFO] Loaded sector mapping for {len(_sector_cache)} stocks from CSV"
+            )
+            return
 
-        print(
-            f"[INFO] Loaded {_sector_cache.get('NIFTY 50', 'Unknown')} sector mapping for {len(_sector_cache)} stocks"
-        )
+        except Exception as e:
+            print(f"[ERROR] Failed to load sector master CSV: {e}")
 
-    except Exception as e:
-        print(f"[ERROR] Failed to load sector master: {e}")
+    # 2. Fallback to JSON from Data_scraper
+    print("[WARN] nse_sector_master.csv not found or failed. Attempting to load from index_constituents.json...")
+
+    json_path = r"C:\Users\Admin\Desktop\Derivative_Analysis\Data_scraper\index_constituents.json"
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+
+            indices = data.get("indices", {})
+
+            # Mapping from JSON index keys to Display Sector
+            INDEX_TO_SECTOR = {
+                "niftyit": "Information Technology",
+                "niftybank": "Financials",
+                "niftypsubank": "Financials",
+                "niftyfinancial": "Financials",
+                "niftypharma": "Healthcare & Pharma",
+                "niftyauto": "Automobile",
+                "niftymetal": "Metals & Mining",
+                "niftyfmcg": "FMCG",
+                "niftyenergy": "Energy",
+                "niftyrealty": "Real Estate & Construction",
+                "niftymedia": "Media & Entertainment",
+                "niftyinfra": "Infrastructure & Construction",
+            }
+
+            count = 0
+            for idx_key, idx_symbols in indices.items():
+                sector_name = INDEX_TO_SECTOR.get(idx_key.lower())
+                if sector_name:
+                    for sym in idx_symbols:
+                        sym_clean = str(sym).strip().upper()
+                        # Only set if not already set
+                        if sym_clean not in _sector_cache:
+                            _sector_cache[sym_clean] = sector_name
+                            count += 1
+
+            print(f"[INFO] Loaded sector data for {count} stocks from index_constituents.json")
+            return
+
+        except Exception as e:
+            print(f"[WARNING] Could not load from index_constituents.json: {e}")
+
+    print("[WARNING] No sector data found. Sectors will default to 'Others'.")
 
 
 def get_sector(symbol: str) -> str:

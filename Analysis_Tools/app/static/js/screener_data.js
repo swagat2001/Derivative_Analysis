@@ -181,7 +181,7 @@ const SCREENER_DATA = {
       inline: true
     },
     {
-      title: "Mighty Midcap Stocks",
+      title: "Midcap Stocks",
       description: "Mid-caps with robust fundamentals and growth",
       icon: ICONS.strength,
       dataKey: "scanx-midcap",
@@ -190,7 +190,7 @@ const SCREENER_DATA = {
       inline: true
     },
     {
-      title: "Titan Largecap Stocks",
+      title: "Largecap Stocks",
       description: "Stable market leaders with strong positions",
       icon: ICONS.trophy,
       dataKey: "scanx-largecap",
@@ -199,7 +199,7 @@ const SCREENER_DATA = {
       inline: true
     },
     {
-      title: "Stellar Smallcap Stocks",
+      title: "Smallcap Stocks",
       description: "High-performing small-caps with upside",
       icon: ICONS.sparkles,
       dataKey: "scanx-smallcap",
@@ -217,7 +217,7 @@ const SCREENER_DATA = {
       inline: true
     },
     {
-      title: "Potential Multibagger",
+      title: "Multibagger",
       description: "High growth metrics with upside potential",
       icon: ICONS.target,
       dataKey: "scanx-multi",

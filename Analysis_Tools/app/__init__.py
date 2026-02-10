@@ -120,26 +120,26 @@ def create_app():
     app.jinja_env.filters["format_number"] = format_number
 
     # =============================================================
-    # AUTHENTICATION MIDDLEWARE
+    # AUTHENTICATION MIDDLEWARE (DISABLED: LOGIN OPTIONAL)
     # =============================================================
-    @app.before_request
-    def require_login():
-        # Allow access to login, signup, logout, health check, and static files
-        if request.endpoint in [
-            "auth.login",
-            "auth.signup",
-            "auth.verify",
-            "auth.logout",
-            "health.health_check",
-            "static",
-        ]:
-            return None
-
-        # Check if user is logged in
-        if "user" not in session:
-            return redirect(url_for("auth.login"))
-
-        return None
+    # @app.before_request
+    # def require_login():
+    #     # Allow access to login, signup, logout, health check, and static files
+    #     if request.endpoint in [
+    #         "auth.login",
+    #         "auth.signup",
+    #         "auth.verify",
+    #         "auth.logout",
+    #         "health.health_check",
+    #         "static",
+    #     ]:
+    #         return None
+    #
+    #     # Check if user is logged in
+    #     if "user" not in session:
+    #         return redirect(url_for("auth.login"))
+    #
+    #     return None
 
     # Make user info available to all templates
     @app.context_processor

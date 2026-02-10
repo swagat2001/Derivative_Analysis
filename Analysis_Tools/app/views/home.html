@@ -42,59 +42,6 @@
             Go to Dashboard
           </a>
         </div>
-
-        <!-- Market Statistics Section -->
-        <div class="market-statistics">
-          <div class="stats-header">
-            <h3>Market Statistics</h3>
-            <span class="stats-timestamp">As on {{ market_stats.date }}</span>
-          </div>
-
-          <div class="stats-grid-top">
-            <div class="stat-card purple">
-              <div class="stat-label">Stock Traded</div>
-              <div class="stat-value">{{ "{:,}".format(market_stats.stock_traded) }}</div>
-            </div>
-            <div class="stat-card green">
-              <div class="stat-label">Advances</div>
-              <div class="stat-value">{{ "{:,}".format(market_stats.advances) }}</div>
-            </div>
-            <div class="stat-card red">
-              <div class="stat-label">Declines</div>
-              <div class="stat-value">{{ "{:,}".format(market_stats.declines) }}</div>
-            </div>
-            <div class="stat-card orange">
-              <div class="stat-label">Unchanged</div>
-              <div class="stat-value">{{ "{:,}".format(market_stats.unchanged) }}</div>
-            </div>
-          </div>
-
-          <div class="stats-grid-bottom">
-            <div class="stat-item">
-              <div class="stat-item-label">No. of Stocks at</div>
-              <div class="stat-item-title">52 Week High</div>
-              <div class="stat-item-value up">▲ {{ market_stats.week52_high }}</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-item-label">No. of Stocks at</div>
-              <div class="stat-item-title">52 Week Low</div>
-              <div class="stat-item-value down">{{ market_stats.week52_low }} ▼</div>
-            </div>
-            <div class="stat-center-icon">
-              <img src="../static/image/favicon.png" alt="" />
-            </div>
-            <div class="stat-item">
-              <div class="stat-item-label">No. of Stocks in</div>
-              <div class="stat-item-title">Upper Circuit</div>
-              <div class="stat-item-value up">{{ market_stats.upper_circuits }}</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-item-label">No. of Stocks in</div>
-              <div class="stat-item-title">Lower Circuit</div>
-              <div class="stat-item-value down">{{ market_stats.lower_circuits }}</div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="hero-visual">
         <div class="hero-cards-grid">
@@ -154,17 +101,6 @@
               <div class="card-info">
                 <div class="card-value down" id="niftynext50Value">68,499.30</div>
                 <div class="card-change down" id="niftynext50Change">▼ -1.01%</div>
-              </div>
-            </div>
-          </div>
-          <div class="hero-card red">
-            <div class="card-header">
-              <span class="card-title">NIFTY 100</span>
-            </div>
-            <div class="card-content">
-              <div class="card-info">
-                <div class="card-value down" id="nifty100Value">26,260.30</div>
-                <div class="card-change down" id="nifty100Change">▼ -0.76%</div>
               </div>
             </div>
           </div>

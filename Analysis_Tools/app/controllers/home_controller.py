@@ -55,30 +55,95 @@ def home():
     fii_dii_data = get_live_fii_dii()
 
     # Get Market Statistics
+    # Get Market Statistics
     try:
-        # Get latest available date from insights
-        dates = get_insights_dates()
-        if dates:
-            latest_date = dates[0]
-        else:
-            latest_date = datetime.now().strftime("%Y-%m-%d")
+        # 1. Try Live JSON Data first
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        stats_file = os.path.join(base_dir, "spot_data", "Data", "MarketStats.json")
 
-        market_stats = get_market_stats(latest_date) or {}
+        market_stats = {}
+        used_live_data = False
 
-        # Get 52 Week High/Low counts
-        week52_data = get_52_week_analysis(latest_date) or {}
+        if os.path.exists(stats_file):
+            try:
+                with open(stats_file, 'r') as f:
+                    live_stats = json.load(f)
+
+                    # Parse timestamp - Handle multiple formats
+                    timestamp_str = live_stats['last_updated']
+                    last_updated = None
+                    for fmt in ("%Y-%m-%d %H:%M:%S", "%d-%b-%Y %H:%M", "%d-%b-%Y %H:%M:%S"):
+                        try:
+                            last_updated = datetime.strptime(timestamp_str, fmt)
+                            break
+                        except ValueError:
+                            continue
+
+                    if not last_updated:
+                        # Fallback if parsing fails but assume recent for now if file mod time is recent?
+                        # Or just log error and fail gracefully
+                        print(f"Error parsing date: {timestamp_str}")
+                        raise ValueError("Unknown date format")
+
+                    # Check if data is recent (e.g., within 10 minutes)
+                    if (datetime.now() - last_updated).total_seconds() < 600:
+                         market_stats = {
+                             "total": live_stats.get('stock_traded', 0),
+                             "advances": live_stats.get('advances', 0),
+                             "declines": live_stats.get('declines', 0),
+                             "unchanged": live_stats.get('unchanged', 0),
+                             "upper_circuits": live_stats.get('upper_circuits', 0),
+                             "lower_circuits": live_stats.get('lower_circuits', 0),
+                             "week52_high": live_stats.get('week52_high', 0),
+                             "week52_low": live_stats.get('week52_low', 0),
+                         }
+                         used_live_data = True
+                         # Format for display (e.g., matching database format or nice UI format)
+                         latest_date = last_updated.strftime("%Y-%m-%d")
+
+            except Exception as e:
+                print(f"Error reading MarketStats.json: {e}")
+
+        # 2. Fallback to DB if live data not available
+        if not used_live_data:
+            dates = get_insights_dates()
+            if dates:
+                latest_date = dates[0]
+            else:
+                latest_date = datetime.now().strftime("%Y-%m-%d")
+
+            db_stats = get_market_statistics(latest_date) or {} # Using correct function name from your prompt, assuming it matches imported
+            # Wait, the import was get_market_stats, but previous code called get_market_stats(latest_date)
+            # Let's double check the previous code block.
+            # Previous code: market_stats = get_market_stats(latest_date) or {}
+            # Yes.
+            market_stats = get_market_stats(latest_date) or {}
+
+            # The DB function returns specific structure, ensure mapping.
+            # Previous code mapped it:
+            # "total": market_stats.get("total", 0) -> stock_traded
+
+        # 3. 52 Week Logic - If using live data, we already have it. If fallback, need DB.
+        week52_high_val = market_stats.get("week52_high", 0)
+        week52_low_val = market_stats.get("week52_low", 0)
+
+        if not used_live_data:
+             week52_data = get_52_week_analysis(latest_date) or {}
+             week52_high_val = len(week52_data.get("at_high", []))
+             week52_low_val = len(week52_data.get("at_low", []))
 
         # Combine into a single stats object for the template
         final_stats = {
             "date": latest_date,
-            "stock_traded": market_stats.get("total", 0),
+            "stock_traded": market_stats.get("total", 0) if not used_live_data else market_stats.get("total", 0), # mapped correctly above
             "advances": market_stats.get("advances", 0),
             "declines": market_stats.get("declines", 0),
             "unchanged": market_stats.get("unchanged", 0),
             "upper_circuits": market_stats.get("upper_circuits", 0),
             "lower_circuits": market_stats.get("lower_circuits", 0),
-            "week52_high": len(week52_data.get("at_high", [])), # Using 'at_high' as strict 52w high
-            "week52_low": len(week52_data.get("at_low", [])),    # Using 'at_low' as strict 52w low
+            "week52_high": week52_high_val,
+            "week52_low": week52_low_val,
+            "is_live": used_live_data
         }
 
         # Calculate percentages for breadth bar
@@ -98,7 +163,8 @@ def home():
             "stock_traded": 0, "advances": 0, "declines": 0, "unchanged": 0,
             "upper_circuits": 0, "lower_circuits": 0, "week52_high": 0, "week52_low": 0,
             "adv_pct": 50, "dec_pct": 50,
-            "adv_width": "50.0%", "dec_width": "50.0%"
+            "adv_width": "50.0%", "dec_width": "50.0%",
+            "is_live": False
         }
 
     # Get Nifty PE

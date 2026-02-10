@@ -1039,6 +1039,10 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
     # Get F&O symbols for filtering
     fo_symbols = _get_fo_symbols_cached()
 
+    # Get heatmap data for price change info
+    heatmap_data = get_heatmap_data(selected_date)
+    heatmap_map = {item['symbol']: item for item in heatmap_data}
+
     result = []
     for row in cached_data:
         symbol = row[0]
@@ -1048,6 +1052,18 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
             continue
 
         if row[4] >= min_delivery_pct:
+            # Get change data from heatmap
+            stock_data = heatmap_map.get(symbol, {})
+            change_pct = stock_data.get('change_pct', 0)
+
+            # Calculate absolute change
+            close = row[1]
+            try:
+                prev_close = close / (1 + (change_pct / 100))
+                change = close - prev_close
+            except:
+                change = 0
+
             result.append(
                 {
                     "symbol": symbol,
@@ -1056,6 +1072,8 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
                     "delivery_qty": row[3],
                     "delivery_pct": row[4],
                     "sector": get_sector(symbol),
+                    "change_pct": change_pct,
+                    "change": round(change, 2)
                 }
             )
 

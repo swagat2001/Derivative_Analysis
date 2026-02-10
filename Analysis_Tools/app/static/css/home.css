@@ -10,7 +10,7 @@
 
 /* ===== HERO SECTION ===== */
 .hero-section {
-  padding:50px 0;
+  padding: 50px 0;
   position: relative;
   overflow: hidden;
 }
@@ -20,25 +20,37 @@
   gap: 60px;
   max-width: 1400px;
   margin: 0 auto;
-  padding:0 40px;
+  padding: 0 40px;
+  flex-direction: column;
+  align-items: center;
 }
 
-.hero-visual, .hero-content {max-width: 50%; width: 100%;}
+.hero-visual {
+  max-width: 100%;
+  order: 1
+}
+
+.hero-content {
+  max-width: 50%;
+  width: 100%;
+  order: 2;
+  align-items: center;
+}
 
 .visual-illustration {
-    position: absolute;
-    top: -60px;
-    right: -1130px;
-    opacity: 0.05;
-    transform: scale(1.8);
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+  position: absolute;
+  top: -60px;
+  right: -1130px;
+  opacity: 0.05;
+  transform: scale(1.8);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .hero-content {
   flex: 1;
-  text-align: left;
+  text-align: center;
 }
 
 .hero-title {
@@ -50,7 +62,7 @@
 }
 
 .hero-title .highlight {
-  color:var(--goldmine-maroon);
+  color: var(--goldmine-maroon);
   background: linear-gradient(135deg, var(--goldmine-maroon) 0%, var(--goldmine-maroon-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -68,11 +80,12 @@
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* Market Statistics Section */
 .market-statistics {
-  margin-top:30px;
+  margin-top: 30px;
   background: #f8f9fa;
   border-radius: 16px;
   padding: 24px;
@@ -215,7 +228,8 @@
 /* Hero Visual */
 
 .hero-cards-grid {
-  display: block; /* Changed from grid for Slick slider */
+  display: block;
+  /* Changed from grid for Slick slider */
 }
 
 /* Slick slider overrides */
@@ -296,8 +310,8 @@
 }
 
 #container {
-    height: 400px;
-    min-width: 310px;
+  height: 400px;
+  min-width: 310px;
 }
 
 .up {
@@ -307,14 +321,16 @@
 .down {
   color: #ff6b6b;
 }
+
 .hero-visual {
   flex-shrink: 0;
-  padding-bottom: 50px; /* Space for slider dots */
+  padding-bottom: 50px;
+  /* Space for slider dots */
 }
 
 /* Index Detail Section */
 .index-detail-section {
-  margin-top:15px;
+  margin-top: 15px;
 }
 
 .index-detail-header {
@@ -328,7 +344,7 @@
   font-size: 13px;
   font-weight: 600;
   color: #312e81;
-  margin:0;
+  margin: 0;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -376,7 +392,7 @@
   flex-wrap: wrap;
   flex-direction: row;
   gap: 4px;
-  align-items:center;
+  align-items: center;
 }
 
 .stat-item span {
@@ -479,26 +495,30 @@
 .hero-card {
   /* background: #ffffff; */
   border: 1px solid #e5e7eb;
-  padding:0;
+  padding: 0;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
 .card-header {
-  padding-bottom:0;
+  padding-bottom: 0;
   padding-top: 0;
   border-bottom: 1px solid #f3f4f6;
   padding-left: 10px;
   margin-bottom: 5px;
 }
+
 .card-content {
   display: block;
-  padding:0 10px 10px;
+  padding: 0 10px 10px;
 }
+
 .card-info {
-  max-width: 100px; width: 100%;
+  max-width: 100px;
+  width: 100%;
 }
+
 .card-chart {
   max-width: 150px;
   width: 100%;
@@ -512,13 +532,13 @@
 }
 
 .hero-chart {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-    height: 250px;
-    margin-top: 20px;
-    position: relative;
-    z-index: 1;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  height: 250px;
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .index-grid {
@@ -553,8 +573,15 @@
   font-weight: 600;
 }
 
-.index-change.up, .up { color: #16a34a; }
-.index-change.down, .down { color: #dc2626; }
+.index-change.up,
+.up {
+  color: #16a34a;
+}
+
+.index-change.down,
+.down {
+  color: #dc2626;
+}
 
 /* ===== FEATURES SECTION ===== */
 .features-section {
@@ -714,8 +741,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tab-description {
@@ -870,8 +904,13 @@
   font-weight: 700;
 }
 
-.ticker-item.up .ticker-change { color: #16a34a; }
-.ticker-item.down .ticker-change { color: #dc2626; }
+.ticker-item.up .ticker-change {
+  color: #16a34a;
+}
+
+.ticker-item.down .ticker-change {
+  color: #dc2626;
+}
 
 /* OI Bars */
 .oi-bars {
@@ -907,9 +946,17 @@
   transition: width 0.5s ease;
 }
 
-.bar.call { background: linear-gradient(90deg, #16a34a, #22c55e); }
-.bar.put { background: linear-gradient(90deg, #dc2626, #ef4444); }
-.bar.pcr { background: linear-gradient(90deg, var(--goldmine-maroon), #6366f1); }
+.bar.call {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+}
+
+.bar.put {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.bar.pcr {
+  background: linear-gradient(90deg, var(--goldmine-maroon), #6366f1);
+}
 
 .oi-value {
   width: 50px;
@@ -994,8 +1041,13 @@
   font-weight: 700;
 }
 
-.activity-value.up { color: #16a34a; }
-.activity-value.down { color: #dc2626; }
+.activity-value.up {
+  color: #16a34a;
+}
+
+.activity-value.down {
+  color: #dc2626;
+}
 
 .insight-note {
   font-size: 12px;
@@ -1026,8 +1078,13 @@
   color: #ffffff;
 }
 
-.breadth-bar .advance { background: #16a34a; }
-.breadth-bar .decline { background: #dc2626; }
+.breadth-bar .advance {
+  background: #16a34a;
+}
+
+.breadth-bar .decline {
+  background: #dc2626;
+}
 
 .breadth-labels {
   display: flex;
@@ -1061,9 +1118,17 @@
   border-radius: 50%;
 }
 
-.status-dot.green { background: #16a34a; }
-.status-dot.yellow { background: #eab308; }
-.status-dot.red { background: #dc2626; }
+.status-dot.green {
+  background: #16a34a;
+}
+
+.status-dot.yellow {
+  background: #eab308;
+}
+
+.status-dot.red {
+  background: #dc2626;
+}
 
 .pe-range {
   display: flex;
@@ -1090,7 +1155,7 @@
   background: #1a1a1a;
   border-radius: 50%;
   border: 3px solid #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transform: translateX(-50%);
 }
 
@@ -1174,7 +1239,7 @@
   max-width: 100%;
   width: 100%;
   margin-top: 30px;
-  padding:30px 100px;
+  padding: 30px 100px;
   border-top: 1px solid #323232;
   font-size: 13px;
   color: #6b7280;
@@ -1185,10 +1250,12 @@
 .footer-brand {
   max-width: 330px;
 }
+
 .footer-logo {
   height: 40px;
   margin-bottom: 16px;
 }
+
 .footer-brand h4 {
   color: #9ca3af;
   margin-bottom: 15px;
@@ -1203,6 +1270,7 @@
   flex-shrink: 0;
   stroke: currentColor;
 }
+
 .footer-brand p {
   font-size: 14px;
   color: #9ca3af;

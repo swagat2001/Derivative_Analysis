@@ -44,23 +44,25 @@
 /* ===== TOP FILTERS (PILLS) ===== */
 .top-filters {
     position: sticky;
-    top: 66px; /* Account for header height */
+    top: 66px;
+    /* Account for header height */
     z-index: 1000;
     display: flex;
     gap: 10px;
     margin-bottom: 24px;
     flex-wrap: wrap;
-    padding:9px;
+    padding: 9px;
     background: #ffffff;
     border-bottom: 1px solid #e5e7eb;
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Mobile responsive adjustments for sticky filters */
 @media (max-width: 768px) {
     .top-filters {
-        top: 60px; /* Smaller header on mobile */
+        top: 60px;
+        /* Smaller header on mobile */
         padding: 12px 0;
         gap: 8px;
     }
@@ -100,7 +102,7 @@
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 16px;
-    padding-bottom:12px;
+    padding-bottom: 12px;
     border-bottom: 2px solid #e5e7eb;
 }
 
@@ -123,7 +125,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 0;
 }
 
@@ -131,7 +133,7 @@
     background: #f9fafb;
     border-color: #8B2432;
     color: #8B2432;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
 }
 
@@ -184,7 +186,7 @@
     border-radius: 12px;
     padding: 18px 20px;
     margin-bottom: 12px;
-    display: flex;
+    /* display: flex; */
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
@@ -299,8 +301,15 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
 }
 
 /* ===== COMING SOON ===== */

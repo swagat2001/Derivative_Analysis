@@ -37,14 +37,14 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .back-btn:hover {
   background: #f9fafb;
   border-color: #8B2432;
   color: #8B2432;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
@@ -63,12 +63,12 @@
     font-size: 13px;
     gap: 6px;
   }
-  
+
   .back-btn svg {
     width: 14px;
     height: 14px;
   }
-  
+
   .back-button-container {
     margin-bottom: 16px;
   }
@@ -92,7 +92,7 @@
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 }
 
@@ -166,6 +166,7 @@
   padding: 14px 16px;
   border-bottom: 1px solid #e5e7eb;
   background: #fafafa;
+  width: 100%;
 }
 
 .card-title {
@@ -242,4 +243,22 @@
   .cards-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Fix for horizontal layout regression */
+.screener-section .screener-card {
+  display: block !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+.screener-section .screener-card .card-header {
+  width: 100% !important;
+  margin-bottom: 15px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.screener-section .screener-card .card-table {
+  width: 100%;
 }
