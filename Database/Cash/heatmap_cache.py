@@ -175,7 +175,6 @@ _sector_load_attempted = False
 
 def load_sector_master():
     """Load sector data from CSV or fallback to JSON."""
-    global _sector_cache
     global _sector_load_attempted
 
     if _sector_cache or _sector_load_attempted:
