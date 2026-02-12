@@ -225,3 +225,88 @@ def api_market_breadth():
             "unchanged": 0,
             "total": 0
         }), 200
+
+
+@home_bp.route("/api/advance-decline")
+def advance_decline():
+    """API endpoint for live NSE advance-decline data"""
+    import requests
+
+    base_url = "https://www.nseindia.com"
+    api_url = "https://www.nseindia.com/api/live-analysis-advance"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.nseindia.com/market-data/advance-decline",
+        "Connection": "keep-alive"
+    }
+
+    try:
+        session = requests.Session()
+        session.headers.update(headers)
+
+        # Step 1 - Get cookies
+        session.get(base_url, timeout=10)
+
+        # Step 2 - Call API
+        response = session.get(api_url, timeout=10)
+
+        if response.status_code != 200:
+            return jsonify({
+                "success": False,
+                "error": f"NSE blocked request",
+                "status": response.status_code,
+                "advances": 0,
+                "declines": 0
+            }), 200
+
+        data = response.json()
+
+        # Extract advances, declines, and timestamp from actual NSE structure
+        # NSE Structure: {"timestamp": "12-Feb-2026 12:18:36", "advance": {"count": {"Advances": 964, "Declines": 2015}}}
+
+        # Timestamp is at ROOT level
+        timestamp = data.get("timestamp", "")
+
+        # Advances/Declines are in nested structure
+        advance_data = data.get("advance", {})
+        count_data = advance_data.get("count", {})
+
+        advances = count_data.get("Advances", 0)
+        declines = count_data.get("Declines", 0)
+
+        # Debug logging
+        print(f"[NSE API] ✅ Advances: {advances}, Declines: {declines}, Timestamp: '{timestamp}'")
+        print(f"[NSE API] Response keys: {list(data.keys())}")
+
+        return jsonify({
+            "success": True,
+            "advances": advances,
+            "declines": declines,
+            "total": advances + declines,
+            "timestamp": timestamp
+        }), 200
+
+    except requests.exceptions.Timeout:
+        return jsonify({
+            "success": False,
+            "error": "Request timeout",
+            "advances": 0,
+            "declines": 0
+        }), 200
+    except KeyError:
+        return jsonify({
+            "success": False,
+            "error": "Unexpected JSON structure",
+            "advances": 0,
+            "declines": 0
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "advances": 0,
+            "declines": 0
+        }), 200

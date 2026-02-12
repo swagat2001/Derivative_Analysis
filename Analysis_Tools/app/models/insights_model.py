@@ -1597,90 +1597,19 @@ def _get_nifty_pe_cached(date_key):
 
 
 def get_nifty_pe():
-    """Get current Nifty 50 PE ratio (Live Adjusted)."""
+    """Get Nifty 50 PE ratio (EOD only - No live adjustments)."""
     try:
-        # 1. Get Base PE (Calculated from Fundamentals ~ Yesterday/Today EOD)
-        # Use simple caching (daily)
+        # Get EOD PE (Calculated from Fundamentals)
+        # Use simple caching (daily refresh)
         date_key = datetime.now().strftime("%Y-%m-%d")
-        base_data = _get_nifty_pe_cached(date_key)
+        pe_data = _get_nifty_pe_cached(date_key)
 
-        if not base_data:
+        if not pe_data:
             return None
 
-        base_pe = base_data["pe"]
-
-        # 2. Get Live Nifty Spot Price
-        live_price = None
-        try:
-            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            spot_file = os.path.join(base_dir, "spot_data", "Data", "Nifty50Spot.txt")
-            if os.path.exists(spot_file):
-                with open(spot_file, "r") as f:
-                    content = f.read().strip()
-                    if content:
-                        live_price = float(content)
-        except Exception as e:
-            print(f"[WARNING] Read Nifty50Spot.txt failed: {e}")
-
-        # 3. Get Base Nifty Price (used for scaling)
-        # We need the index price that corresponds to the 'base_pe' calculation time.
-        # Since _get_nifty_pe_cached uses latest available fundamental data (usually TTM earnings are constant),
-        # but Market Cap depends on Price.
-        # Actually, _get_nifty_pe_cached sums Market Cap.
-        # Market Cap = Price * Shares.
-        # So PE is linear with Price.
-        # We need the 'Price' that was used to calculate that Base PE.
-        # _get_nifty_pe_cached retrieves `fundamental_service.get_stock_fundamentals`.
-        # fundamental_service reads from `futures_oi_cache` or `dashboard_data` (Last Close).
-        # So base_pe is based on "Last Close".
-
-        # Let's get "Last Close" of Nifty 50 to compute Implied EPS.
-        # Index Model has fallback data or we can query DB.
-        # Quicker: Live PE = Base PE * (Live Index / Prev Index Close) ??
-        # No, better involves EPS.
-        # Implied Index Price (sum of market caps?) NO.
-        # Nifty Index Value != Sum of Market Caps. It's Divisor based.
-
-        # Better approach:
-        # PE = Price / EPS.
-        # EPS is constant intraday.
-        # EPS = Prev_Close / Prev_PE.
-        # Live_PE = Live_Price / EPS.
-
-        # We need 'Prev_Close' of Nifty 50.
-        from ..models.live_indices_model import LiveIndicesReader
-
-        # live_indices_model has fallback/history logic.
-        nifty_data = LiveIndicesReader.get_index_data("nifty50")
-        prev_close = 24600 # Default fallback
-        if nifty_data:
-            prev_close = nifty_data.get("previousClose", 24600)
-
-        if live_price and prev_close > 0 and base_pe > 0:
-            # EPS = Prev_Close / Base_PE (Approx)
-            # Actually, base_pe comes from `get_stock_fundamentals` which uses `closing_price` (Yesterday).
-            # So yes, base_pe corresponds to prev_close.
-            implied_eps = prev_close / base_pe
-            live_pe = live_price / implied_eps
-
-            # Update values
-            base_data["pe"] = round(live_pe, 2)
-
-            # Update status color/label if changed
-            pe = live_pe
-            if pe < 20:
-                base_data["status"] = "Undervalued"
-                base_data["color"] = "green"
-            elif 20 <= pe <= 25:
-                base_data["status"] = "Fairly Valued"
-                base_data["color"] = "yellow"
-            else:
-                base_data["status"] = "Overvalued"
-                base_data["color"] = "red"
-
-            print(f"[INFO] Live PE Adjustment: {base_pe} -> {live_pe:.2f} (Price: {prev_close} -> {live_price})")
-
-        return base_data
+        # Return EOD data without any live adjustments
+        print(f"[INFO] Nifty PE (EOD): {pe_data['pe']}")
+        return pe_data
 
     except Exception as e:
         print(f"[ERROR] get_nifty_pe: {e}")
