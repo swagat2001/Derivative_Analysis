@@ -9,31 +9,29 @@
     <!-- LEFT: Logo -->
     <div class="header-logo">
       <a href="{{ url_for('home.home') }}" class="logo-link" title="Goldmine Derivatives">
-        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}"
-             alt="Goldmine" class="logo-img">
+        <img src="{{ url_for('static', filename='image/Goldmine-logo.png') }}" alt="Goldmine" class="logo-img">
       </a>
     </div>
 
     <!-- CENTER: Navigation -->
     <nav class="header-nav">
-      <a href="{{ url_for('home.home') }}"
-         class="nav-link {% if request.endpoint == 'home.home' %}active{% endif %}">
+      <a href="{{ url_for('home.home') }}" class="nav-link {% if request.endpoint == 'home.home' %}active{% endif %}">
         Home
       </a>
       <a href="{{ url_for('news.news_page') }}"
-         class="nav-link {% if request.endpoint and 'news' in request.endpoint %}active{% endif %}">
+        class="nav-link {% if request.endpoint and 'news' in request.endpoint %}active{% endif %}">
         News
       </a>
       <a href="{{ url_for('screener.screener_landing') }}"
-         class="nav-link {% if request.endpoint and 'screener' in request.endpoint %}active{% endif %}">
-        Screeners
+        class="nav-link {% if request.endpoint and 'screener' in request.endpoint %}active{% endif %}">
+        Scanners
       </a>
       <a href="{{ url_for('insights.insights_page') }}"
-         class="nav-link {% if request.endpoint and 'insights' in request.endpoint %}active{% endif %}">
-        Insights
+        class="nav-link {% if request.endpoint and 'insights' in request.endpoint %}active{% endif %}">
+        Neev
       </a>
       <a href="{{ url_for('dashboard.dashboard') }}"
-         class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">
+        class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">
         Dashboard
       </a>
     </nav>
@@ -41,51 +39,38 @@
     <!-- CENTER-RIGHT: Search Box -->
     <div class="header-search">
       <div class="search-wrapper">
-        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
-        <input type="text"
-               id="stockSearchInput"
-               class="search-input"
-               placeholder="Search for stocks"
-               autocomplete="off"
-               list="stockList"
-               onkeypress="handleSearchKeypress(event)">
+        <input type="text" id="stockSearchInput" class="search-input" placeholder="Search for stocks" autocomplete="off"
+          list="stockList" onkeypress="handleSearchKeypress(event)">
         <datalist id="stockList">
           {% if stock_list %}
-            {% for symbol in stock_list %}
-              <option value="{{ symbol }}">
+          {% for symbol in stock_list %}
+          <option value="{{ symbol }}">
             {% endfor %}
-          {% endif %}
+            {% endif %}
         </datalist>
       </div>
     </div>
 
-    <!-- RIGHT: Auth Buttons -->
+    <!-- RIGHT: Empty Actions Section (Auth removed) -->
     <div class="header-actions">
-      {% if current_user %}
-        <div class="user-info">
-          <span class="user-greeting">Welcome,</span>
-          <span class="user-name">{{ user_display_name or current_user }}</span>
-        </div>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
-      {% else %}
-        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
-        <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Open Account</a>
-      {% endif %}
+      <!-- Authentication removed - public access -->
     </div>
 
   </div>
 </header>
 
 <script>
-function handleSearchKeypress(event) {
-  if (event.key === 'Enter') {
-    const ticker = document.getElementById('stockSearchInput').value.trim().toUpperCase();
-    if (ticker) {
-      window.location.href = '/stock/' + ticker;
+  function handleSearchKeypress(event) {
+    if (event.key === 'Enter') {
+      const ticker = document.getElementById('stockSearchInput').value.trim().toUpperCase();
+      if (ticker) {
+        window.location.href = '/stock/' + ticker;
+      }
     }
   }
-}
 </script>

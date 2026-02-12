@@ -69,7 +69,7 @@
         </table>
     </div>
     {% else %}
-    <p class="fund-no-data">📊 No data available for this section</p>
+    <p class="fund-no-data">No data available for this section</p>
     {% endif %}
 </div>
 {% endmacro %}
@@ -88,14 +88,14 @@
     <nav class="fund-nav-tabs">
         <div class="fund-nav-tabs-inner">
             <div class="fund-company-tab">{{ symbol }}</div>
-            <a href="#summary" class="fund-nav-tab active">📈 Summary</a>
-            <a href="#chart" class="fund-nav-tab">📊 Chart</a>
-            <a href="#quarters" class="fund-nav-tab">📅 Quarters</a>
-            <a href="#profit-loss" class="fund-nav-tab">💰 Profit & Loss</a>
-            <a href="#balance-sheet" class="fund-nav-tab">📋 Balance Sheet</a>
-            <a href="#cash-flow" class="fund-nav-tab">💵 Cash Flow</a>
-            <a href="#ratios" class="fund-nav-tab">📐 Ratios</a>
-            <a href="#shareholding" class="fund-nav-tab">👥 Shareholding</a>
+            <a href="#summary" class="fund-nav-tab active">Summary</a>
+            <a href="#chart" class="fund-nav-tab">Chart</a>
+            <a href="#quarters" class="fund-nav-tab">Quarters</a>
+            <a href="#profit-loss" class="fund-nav-tab">Profit & Loss</a>
+            <a href="#balance-sheet" class="fund-nav-tab">Balance Sheet</a>
+            <a href="#cash-flow" class="fund-nav-tab">Cash Flow</a>
+            <a href="#ratios" class="fund-nav-tab">Ratios</a>
+            <a href="#shareholding" class="fund-nav-tab">Shareholding</a>
         </div>
     </nav>
 
@@ -120,7 +120,7 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
             <div>
-                <strong>⚠️ No Fundamental Data Available for {{ symbol }}</strong>
+                <strong>No Fundamental Data Available for {{ symbol }}</strong>
                 <p>Fundamental data is currently available for: {{ available_stocks|join(', ') }}</p>
             </div>
         </div>
@@ -148,7 +148,7 @@
                             </div>
 
                             <div class="fund-company-meta">
-                                <span>🏛️ BSE: {{ symbol }}</span>
+                                <span>BSE: {{ symbol }}</span>
                             </div>
                         </div>
 
@@ -156,14 +156,14 @@
                             <!-- Metric Cards -->
                             {% if metrics.market_cap and metrics.market_cap > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">💼 Market Cap</span>
+                                <span class="fund-metric-label">Market Cap</span>
                                 <span class="fund-metric-value">₹{{ "{:,.0f}".format(metrics.market_cap) }} Cr</span>
                             </div>
                             {% endif %}
 
                             {% if metrics.current_price and metrics.current_price > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">💰 Current Price</span>
+                                <span class="fund-metric-label">Current Price</span>
                                 <span class="fund-metric-value large">₹{{ "{:,.2f}".format(metrics.current_price)
                                     }}</span>
                             </div>
@@ -172,7 +172,7 @@
                             {% if (metrics.high_52w and metrics.high_52w > 0) or (metrics.low_52w and metrics.low_52w >
                             0) %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">📊 52W High / Low</span>
+                                <span class="fund-metric-label">52W High / Low</span>
                                 <span class="fund-metric-value">₹{{ "%.0f"|format(metrics.high_52w if metrics.high_52w
                                     else 0) }} / {{ "%.0f"|format(metrics.low_52w if metrics.low_52w else 0) }}</span>
                             </div>
@@ -180,42 +180,42 @@
 
                             {% if metrics.stock_pe and metrics.stock_pe > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">📈 Stock P/E</span>
+                                <span class="fund-metric-label">Stock P/E</span>
                                 <span class="fund-metric-value">{{ "%.1f"|format(metrics.stock_pe) }}</span>
                             </div>
                             {% endif %}
 
                             {% if metrics.book_value and metrics.book_value > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">📖 Book Value</span>
+                                <span class="fund-metric-label">Book Value</span>
                                 <span class="fund-metric-value">₹{{ "%.0f"|format(metrics.book_value) }}</span>
                             </div>
                             {% endif %}
 
                             {% if metrics.dividend_yield and metrics.dividend_yield > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">💸 Dividend Yield</span>
+                                <span class="fund-metric-label">Dividend Yield</span>
                                 <span class="fund-metric-value">{{ "%.2f"|format(metrics.dividend_yield) }}%</span>
                             </div>
                             {% endif %}
 
                             {% if metrics.roce and metrics.roce > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">🎯 ROCE</span>
+                                <span class="fund-metric-label">ROCE</span>
                                 <span class="fund-metric-value">{{ "%.2f"|format(metrics.roce * 100) }}%</span>
                             </div>
                             {% endif %}
 
                             {% if metrics.roe and metrics.roe > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">📊 ROE</span>
+                                <span class="fund-metric-label">ROE</span>
                                 <span class="fund-metric-value">{{ "%.2f"|format(metrics.roe * 100) }}%</span>
                             </div>
                             {% endif %}
 
                             {% if metrics.face_value and metrics.face_value > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">🎫 Face Value</span>
+                                <span class="fund-metric-label">Face Value</span>
                                 <span class="fund-metric-value">₹{{ "%.1f"|format(metrics.face_value) }}</span>
                             </div>
                             {% endif %}
@@ -224,14 +224,14 @@
 
                     <!-- About Sidebar -->
                     <aside class="fund-about-section">
-                        <h3>ℹ️ ABOUT</h3>
+                        <h3>ABOUT</h3>
                         <p>
                             {{ symbol }} is a publicly listed company on the Bombay Stock Exchange (BSE).
                             This comprehensive fundamental analysis provides detailed financial data, key metrics,
                             and historical performance to help you make informed investment decisions.
                         </p>
                         <div class="fund-key-points">
-                            <h3>🎯 KEY HIGHLIGHTS</h3>
+                            <h3>KEY HIGHLIGHTS</h3>
                             <ul>
                                 {% if metrics.current_price and metrics.current_price > 0 %}
                                 <li><strong>Current Price:</strong> ₹{{ "{:,.2f}".format(metrics.current_price) }}</li>
@@ -258,7 +258,7 @@
         <!-- Price Chart Section -->
         <section id="chart" class="fund-content-section">
             <div class="fund-section">
-                <h2 class="fund-section-title">📊 Price Chart</h2>
+                <h2 class="fund-section-title">Price Chart</h2>
 
                 <div class="fund-chart-header">
                     <div class="fund-chart-controls">
@@ -282,11 +282,11 @@
                 <div class="fund-chart-footer">
                     <label class="fund-chart-checkbox">
                         <input type="checkbox" checked>
-                        <span>📈 Price</span>
+                        <span>Price</span>
                     </label>
                     <label class="fund-chart-checkbox">
                         <input type="checkbox" checked>
-                        <span>📊 Volume</span>
+                        <span>Volume</span>
                     </label>
                 </div>
             </div>
@@ -294,27 +294,27 @@
 
         <!-- Financial Data Sections -->
         <section id="quarters" class="fund-content-section">
-            {{ render_financial_table(quarterly, "📅 Quarterly Results", 13) }}
+            {{ render_financial_table(quarterly, "Quarterly Results", 13) }}
         </section>
 
         <section id="profit-loss" class="fund-content-section">
-            {{ render_financial_table(pnl, "💰 Profit & Loss Statement", 13) }}
+            {{ render_financial_table(pnl, "Profit & Loss Statement", 13) }}
         </section>
 
         <section id="balance-sheet" class="fund-content-section">
-            {{ render_financial_table(balance_sheet, "📋 Balance Sheet", 13) }}
+            {{ render_financial_table(balance_sheet, "Balance Sheet", 13) }}
         </section>
 
         <section id="cash-flow" class="fund-content-section">
-            {{ render_financial_table(cashflow, "💵 Cash Flow Statement", 13) }}
+            {{ render_financial_table(cashflow, "Cash Flow Statement", 13) }}
         </section>
 
         <section id="ratios" class="fund-content-section">
-            {{ render_financial_table(ratios, "📐 Financial Ratios", 13) }}
+            {{ render_financial_table(ratios, "Financial Ratios", 13) }}
         </section>
 
         <section id="shareholding" class="fund-content-section">
-            {{ render_financial_table(shareholding, "👥 Shareholding Pattern", 13) }}
+            {{ render_financial_table(shareholding, "Shareholding Pattern", 13) }}
         </section>
 
     </main>

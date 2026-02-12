@@ -81,7 +81,9 @@ def flask_test_client():
         sys.path.insert(0, project_root)
 
     # Import app
-    from Analysis_Tools import app as flask_app
+    # Import app
+    from Analysis_Tools.app import create_app
+    flask_app = create_app()
 
     # Configure for testing
     flask_app.config['TESTING'] = True

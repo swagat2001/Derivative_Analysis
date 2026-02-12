@@ -1,0 +1,242 @@
+{
+  "2014-03-01": [
+    {
+      "DebtorDays": 96.0
+    },
+    {
+      "InventoryDays": 125.0
+    },
+    {
+      "DaysPayable": 222.0
+    },
+    {
+      "CashConversionCycle": -2.0
+    },
+    {
+      "WorkingCapitalDays": -9.0
+    },
+    {
+      "ROCE%": 0.14
+    }
+  ],
+  "2015-03-01": [
+    {
+      "DebtorDays": 82.0
+    },
+    {
+      "InventoryDays": 79.0
+    },
+    {
+      "DaysPayable": 146.0
+    },
+    {
+      "CashConversionCycle": 15.0
+    },
+    {
+      "WorkingCapitalDays": -12.0
+    },
+    {
+      "ROCE%": 0.15
+    }
+  ],
+  "2016-03-01": [
+    {
+      "DebtorDays": 76.0
+    },
+    {
+      "InventoryDays": 104.0
+    },
+    {
+      "DaysPayable": 211.0
+    },
+    {
+      "CashConversionCycle": -31.0
+    },
+    {
+      "WorkingCapitalDays": -17.0
+    },
+    {
+      "ROCE%": 0.2
+    }
+  ],
+  "2017-03-01": [
+    {
+      "DebtorDays": 78.0
+    },
+    {
+      "InventoryDays": 97.0
+    },
+    {
+      "DaysPayable": 191.0
+    },
+    {
+      "CashConversionCycle": -16.0
+    },
+    {
+      "WorkingCapitalDays": 6.0
+    },
+    {
+      "ROCE%": 0.2
+    }
+  ],
+  "2018-03-01": [
+    {
+      "DebtorDays": 75.0
+    },
+    {
+      "InventoryDays": 152.0
+    },
+    {
+      "DaysPayable": 228.0
+    },
+    {
+      "CashConversionCycle": -2.0
+    },
+    {
+      "WorkingCapitalDays": 8.0
+    },
+    {
+      "ROCE%": 0.2
+    }
+  ],
+  "2019-03-01": [
+    {
+      "DebtorDays": 78.0
+    },
+    {
+      "InventoryDays": 119.0
+    },
+    {
+      "DaysPayable": 211.0
+    },
+    {
+      "CashConversionCycle": -14.0
+    },
+    {
+      "WorkingCapitalDays": 8.0
+    },
+    {
+      "ROCE%": 0.25
+    }
+  ],
+  "2020-03-01": [
+    {
+      "DebtorDays": 57.0
+    },
+    {
+      "InventoryDays": 116.0
+    },
+    {
+      "DaysPayable": 211.0
+    },
+    {
+      "CashConversionCycle": -38.0
+    },
+    {
+      "WorkingCapitalDays": -13.0
+    },
+    {
+      "ROCE%": 0.19
+    }
+  ],
+  "2021-03-01": [
+    {
+      "DebtorDays": 69.0
+    },
+    {
+      "InventoryDays": 143.0
+    },
+    {
+      "DaysPayable": 260.0
+    },
+    {
+      "CashConversionCycle": -48.0
+    },
+    {
+      "WorkingCapitalDays": -1.0
+    },
+    {
+      "ROCE%": 0.13
+    }
+  ],
+  "2022-03-01": [
+    {
+      "DebtorDays": 72.0
+    },
+    {
+      "InventoryDays": 125.0
+    },
+    {
+      "DaysPayable": 223.0
+    },
+    {
+      "CashConversionCycle": -26.0
+    },
+    {
+      "WorkingCapitalDays": 6.0
+    },
+    {
+      "ROCE%": 0.2
+    }
+  ],
+  "2023-03-01": [
+    {
+      "DebtorDays": 71.0
+    },
+    {
+      "InventoryDays": 127.0
+    },
+    {
+      "DaysPayable": 223.0
+    },
+    {
+      "CashConversionCycle": -25.0
+    },
+    {
+      "WorkingCapitalDays": 2.0
+    },
+    {
+      "ROCE%": 0.25
+    }
+  ],
+  "2024-03-01": [
+    {
+      "DebtorDays": 74.0
+    },
+    {
+      "InventoryDays": 106.0
+    },
+    {
+      "DaysPayable": 198.0
+    },
+    {
+      "CashConversionCycle": -18.0
+    },
+    {
+      "WorkingCapitalDays": 20.0
+    },
+    {
+      "ROCE%": 0.26
+    }
+  ],
+  "2025-03-01": [
+    {
+      "DebtorDays": 60.0
+    },
+    {
+      "InventoryDays": 131.0
+    },
+    {
+      "DaysPayable": 209.0
+    },
+    {
+      "CashConversionCycle": -18.0
+    },
+    {
+      "WorkingCapitalDays": 16.0
+    },
+    {
+      "ROCE%": 0.26
+    }
+  ]
+}

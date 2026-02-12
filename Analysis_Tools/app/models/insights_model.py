@@ -19,7 +19,11 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import text
+
+# Load environment variables from .env file
+load_dotenv()
 
 from .db_config import engine, engine_cash
 
@@ -27,11 +31,35 @@ from .db_config import engine, engine_cash
 # SECTOR MAPPING FOR STOCKS
 # =============================================================
 
-SECTOR_MASTER_PATHS = [
-    "C:/NSE_EOD_CASH_WITH_INDICATORS/nse_sector_master.csv",
-    "C:/Users/Admin/Desktop/Derivative_Analysis/SMA/nse_sector_master.csv",
-    os.path.join(os.path.dirname(__file__), "nse_sector_master.csv"),
-]
+# Build sector master paths from environment variables
+def _get_sector_master_paths():
+    """Get sector master CSV paths from environment variables with fallbacks."""
+    paths = []
+
+    # Primary path from environment
+    primary_path = os.getenv("SECTOR_MASTER_PATH")
+    if primary_path:
+        paths.append(primary_path)
+
+    # Fallback paths from environment (comma-separated)
+    fallback_paths = os.getenv("SECTOR_MASTER_FALLBACK_PATHS", "")
+    if fallback_paths:
+        paths.extend([p.strip() for p in fallback_paths.split(",") if p.strip()])
+
+    # Default fallback if no env vars set
+    if not paths:
+        paths = [
+            "C:/Users/Admin/Desktop/Derivative_Analysis/nse_sector_master.csv",
+            "C:/NSE_EOD_CASH_WITH_INDICATORS/nse_sector_master.csv",
+            "C:/Users/Admin/Desktop/Derivative_Analysis/SMA/nse_sector_master.csv",
+        ]
+
+    # Always add local path as final fallback
+    paths.append(os.path.join(os.path.dirname(__file__), "nse_sector_master.csv"))
+
+    return paths
+
+SECTOR_MASTER_PATHS = _get_sector_master_paths()
 
 _sector_cache = {}
 _sector_cache_loaded = False
@@ -227,14 +255,17 @@ def _load_sector_master():
                     sector = row.get("SECTOR", row.get("NSE_INDUSTRY", ""))
 
                     if symbol and sector:
-                        _sector_cache[symbol] = classify_industry(str(sector))
+                        # Use the sector directly from CSV instead of mapping it
+                        _sector_cache[symbol] = str(sector).strip()
 
                 print(f"[INFO] Loaded sector data for {len(_sector_cache)} stocks from {path}")
                 _sector_cache_loaded = True
+                # CSV loaded successfully - do NOT use JSON fallback
                 return
             except Exception as e:
                 print(f"[WARNING] Could not load sector master from {path}: {e}")
 
+    # Only reach here if NO CSV file was found
     print("[WARNING] No sector master file found. Attempting to load from index_constituents.json...")
 
     # Fallback to JSON from Data_scraper
@@ -582,27 +613,45 @@ def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: st
 
 def get_sector_performance(selected_date: str, comparison_date: str = None):
     """Get sector-wise performance aggregated from stock data."""
+    # Load sector master to get all sectors
+    if not _sector_cache_loaded:
+        _load_sector_master()
+
+    # Get all unique sectors from the CSV
+    all_sectors = set(_sector_cache.values()) if _sector_cache else set()
+
+    # Initialize sector_data with all sectors
+    sector_data = {}
+    for sector in all_sectors:
+        sector_data[sector] = {
+            "sector": sector,
+            "stocks": [],
+            "total_change": 0,
+            "total_turnover": 0,
+            "count": 0,
+        }
+
+    # Get heatmap data
     heatmap_data = get_heatmap_data(selected_date, comparison_date)
 
-    if not heatmap_data:
-        return []
+    # Populate with actual stock data
+    if heatmap_data:
+        for stock in heatmap_data:
+            sector = stock["sector"]
+            # Add sector if it wasn't in the CSV (fallback)
+            if sector not in sector_data:
+                sector_data[sector] = {
+                    "sector": sector,
+                    "stocks": [],
+                    "total_change": 0,
+                    "total_turnover": 0,
+                    "count": 0,
+                }
 
-    sector_data = {}
-    for stock in heatmap_data:
-        sector = stock["sector"]
-        if sector not in sector_data:
-            sector_data[sector] = {
-                "sector": sector,
-                "stocks": [],
-                "total_change": 0,
-                "total_turnover": 0,
-                "count": 0,
-            }
-
-        sector_data[sector]["stocks"].append(stock["symbol"])
-        sector_data[sector]["total_change"] += stock["change_pct"]
-        sector_data[sector]["total_turnover"] += stock["turnover"]
-        sector_data[sector]["count"] += 1
+            sector_data[sector]["stocks"].append(stock["symbol"])
+            sector_data[sector]["total_change"] += stock["change_pct"]
+            sector_data[sector]["total_turnover"] += stock["turnover"]
+            sector_data[sector]["count"] += 1
 
     result = []
     for sector, data in sector_data.items():
@@ -612,7 +661,7 @@ def get_sector_performance(selected_date: str, comparison_date: str = None):
                 "avg_change": round(data["total_change"] / data["count"], 2) if data["count"] > 0 else 0,
                 "total_turnover": data["total_turnover"],
                 "stock_count": data["count"],
-                "stocks": data["stocks"][:5],
+                "stocks": data["stocks"][:5],  # Top 5 stocks
             }
         )
 

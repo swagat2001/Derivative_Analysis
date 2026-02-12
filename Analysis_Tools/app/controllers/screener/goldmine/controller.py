@@ -9,7 +9,7 @@ from flask import Blueprint, render_template
 goldmine_bp = Blueprint(
     'goldmine',
     __name__,
-    url_prefix='/screener/goldmine'
+    url_prefix='/scanner/goldmine'
 )
 
 

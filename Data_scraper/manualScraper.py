@@ -4,6 +4,7 @@ Manual Company Scraper - For companies that failed in batch scraper
 Saves data in same format as batchScraper.py for Flask UI compatibility
 """
 
+import copy
 import datetime
 import json
 import os
@@ -18,10 +19,11 @@ from screenerScraper import ScreenerScrape
 # ============================================================================
 COMPANIES = [
     # Already scraped - commented out to avoid re-scraping
-    # "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK",
-    # "HINDUNILVR", "SBIN", "BHARTIARTL", "ITC", "KOTAKBANK",
-    # "LT", "AXISBANK", "ASIANPAINT", "MARUTI", "WIPRO",
-    # "FEDERALBNK", "BOSCHLTD",
+    "RELIANCE",
+    "TCS", "HDFCBANK", "INFY", "ICICIBANK",
+    "HINDUNILVR", "SBIN", "BHARTIARTL", "ITC", "KOTAKBANK",
+    "LT", "AXISBANK", "ASIANPAINT", "MARUTI", "WIPRO",
+    "FEDERALBNK", "BOSCHLTD",
     # New stocks to scrape - Popular F&O stocks
     "ABB",
     "ADANIENT",
@@ -84,6 +86,7 @@ def create_directories():
         f"{OUTPUT_DIR}/ratios",
         f"{OUTPUT_DIR}/shareholding",
         f"{OUTPUT_DIR}/price",
+        f"{OUTPUT_DIR}/company_info",
         f"{OUTPUT_DIR}/annual_reports",
         f"{OUTPUT_DIR}/corporate_announcements",
         f"{OUTPUT_DIR}/market_announcements",
@@ -91,6 +94,73 @@ def create_directories():
     ]
     for d in dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
+
+
+def load_existing_data(symbol, data_type):
+    """Load existing JSON data for a symbol if it exists"""
+    path = f"{OUTPUT_DIR}/{data_type}/{symbol}.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            # print(f"    [WARN] Failed to load existing {data_type}: {e}")
+            pass
+    return None
+
+
+def merge_data(old_data, new_data, data_type):
+    """
+    Merge new_data into old_data.
+    Returns the merged data structure.
+    """
+    if not old_data:
+        return new_data
+
+    merged = copy.deepcopy(old_data)
+
+    if data_type == "price":
+        # Handle Price Data (Datasets structure)
+        if "datasets" not in merged or "datasets" not in new_data:
+            return new_data  # Cannot merge structure mismatch
+
+        for new_ds in new_data["datasets"]:
+            found = False
+            for old_ds in merged["datasets"]:
+                if old_ds.get("metric") == new_ds.get("metric") and old_ds.get("label") == new_ds.get("label"):
+                    found = True
+                    # Merge values
+                    old_values = old_ds.get("values", [])
+                    new_values = new_ds.get("values", [])
+
+                    # Create a set for O(1) lookup of existing dates
+                    existing_dates = {val[0] for val in old_values}
+
+                    for val in new_values:
+                        date = val[0]
+                        if date not in existing_dates:
+                            old_values.append(val)
+
+                    # Sort by date
+                    try:
+                        old_values.sort(key=lambda x: x[0])
+                    except:
+                        pass  # robust sort
+
+                    old_ds["values"] = old_values
+                    break
+
+            if not found:
+                merged["datasets"].append(new_ds)
+
+    else:
+        # Handle Dictionary Data (Quarterly, P&L, etc.)
+        # Structure: { "date": [ ...data... ] }
+        if isinstance(merged, dict) and isinstance(new_data, dict):
+            # Update overwrites keys. This adds new dates and updates existing ones.
+            merged.update(new_data)
+
+    return merged
 
 
 def flatten_data(data_dict):
@@ -222,6 +292,7 @@ def scrape_company(sc, symbol):
         ("ratios", lambda: sc.ratios(), "ratios"),
         ("shareholding", lambda: sc.shareHolding(quarterly=False, withAddon=False), "shareholding"),
         ("price", lambda: sc.closePrice(), "price"),
+        ("company_info", lambda: sc.companyInfo(), "company_info"),
         ("annual_reports", lambda: sc.annualReports(), "annual_reports"),
         (
             "corporate_announcements",
@@ -233,11 +304,16 @@ def scrape_company(sc, symbol):
     for name, fetch_func, data_type in data_tasks:
         try:
             log_message(f"Fetching {name}...")
-            data = fetch_func()
+            new_data = fetch_func()
 
-            if data:
-                if save_data(data, symbol, data_type, SAVE_FORMAT):
-                    log_message(f"    [OK] {name} saved")
+            if new_data:
+                # MERGE LOGIC START
+                old_data = load_existing_data(symbol, data_type)
+                merged_data = merge_data(old_data, new_data, data_type)
+                # MERGE LOGIC END
+
+                if save_data(merged_data, symbol, data_type, SAVE_FORMAT):
+                    log_message(f"    [OK] {name} saved (merged)")
                     results["success"].append(name)
                 else:
                     log_message(f"    [WARN] {name} save failed")

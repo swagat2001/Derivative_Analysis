@@ -570,5 +570,49 @@
     {
       "RawPDF": "/company/source/quarter/372/9/2025/"
     }
+  ],
+  "2025-12-01": [
+    {
+      "Revenue ": 21214.0
+    },
+    {
+      "Interest": 7339.0
+    },
+    {
+      "Expenses ": 7938.0
+    },
+    {
+      "FinancingProfit": 5937.0
+    },
+    {
+      "FinancingMargin%": 0.28
+    },
+    {
+      "OtherIncome ": -262.0
+    },
+    {
+      "Depreciation": 244.0
+    },
+    {
+      "Profitbeforetax": 5431.0
+    },
+    {
+      "Tax%": 0.25
+    },
+    {
+      "NetProfit ": 4066.0
+    },
+    {
+      "EPSinRs": 6.39
+    },
+    {
+      "GrossNPA%": 0.0121
+    },
+    {
+      "NetNPA%": 0.004699999999999999
+    },
+    {
+      "RawPDF": "/company/source/quarter/372/12/2025/"
+    }
   ]
 }

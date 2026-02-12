@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Death Crossover - Technical Screener{% endblock %}
+{% block title %}Death Crossover - Technical Scanner{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
@@ -20,7 +20,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-                Back to Screeners
+                Back to Scanners
             </button>
         </div>
 
@@ -35,7 +35,7 @@
                                 style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT
                                 DATE:</label>
                             <select
-                                onchange="window.location.href='/screener/technical-indicators/death-crossover?date='+this.value;"
+                                onchange="window.location.href='/scanner/technical-indicators/death-crossover?date='+this.value;"
                                 style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
                                 {% for d in dates %}
                                 <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
@@ -112,7 +112,7 @@
                     style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase; margin-right: 10px;">SELECT
                     DATE:</label>
                 <select
-                    onchange="window.location.href='/screener/technical-indicators/death-crossover?date='+this.value;"
+                    onchange="window.location.href='/scanner/technical-indicators/death-crossover?date='+this.value;"
                     style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
                     {% for d in dates %}
                     <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>

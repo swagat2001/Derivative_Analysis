@@ -5,77 +5,106 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
 <style>
-/* Stats as clickable filters on right */
-.stats-filters {
+  /* Stats as clickable filters on right */
+  .stats-filters {
     display: flex;
     align-items: center;
     gap: 20px;
-}
+  }
 
-.stat-filter {
+  .stat-filter {
     text-align: center;
     cursor: pointer;
     padding: 6px 12px;
     border-radius: 6px;
     transition: all 0.15s;
     border: 2px solid transparent;
-}
+  }
 
-.stat-filter:hover {
+  .stat-filter:hover {
     background: #f9fafb;
-}
+  }
 
-.stat-filter.active {
+  .stat-filter.active {
     background: #fef2f2;
     border-color: #8B2432;
-}
+  }
 
-.stat-filter .value {
+  .stat-filter .value {
     font-size: 24px;
     font-weight: 700;
-}
+  }
 
-.stat-filter .label {
+  .stat-filter .label {
     font-size: 10px;
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
+  }
 
-.stat-filter.total .value { color: #374151; }
-.stat-filter.bullish .value { color: #16a34a; }
-.stat-filter.bearish .value { color: #dc2626; }
-.stat-filter.neutral .value { color: #d97706; }
+  .stat-filter.total .value {
+    color: #374151;
+  }
 
-.stat-filter.total.active .value { color: #8B2432; }
+  .stat-filter.bullish .value {
+    color: #16a34a;
+  }
 
-/* Signal Badge */
-.signal-badge {
+  .stat-filter.bearish .value {
+    color: #dc2626;
+  }
+
+  .stat-filter.neutral .value {
+    color: #d97706;
+  }
+
+  .stat-filter.total.active .value {
+    color: #8B2432;
+  }
+
+  /* Signal Badge */
+  .signal-badge {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 12px;
     font-weight: 600;
     font-size: 11px;
     text-transform: uppercase;
-}
+  }
 
-.signal-badge.bullish { background: #dcfce7; color: #166534; }
-.signal-badge.bearish { background: #fee2e2; color: #991b1b; }
-.signal-badge.neutral { background: #fef3c7; color: #92400e; }
+  .signal-badge.bullish {
+    background: #dcfce7;
+    color: #166534;
+  }
 
-/* Signal Score */
-.signal-score {
+  .signal-badge.bearish {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .signal-badge.neutral {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  /* Signal Score */
+  .signal-score {
     display: flex;
     gap: 10px;
     font-size: 12px;
     font-weight: 600;
-}
+  }
 
-.signal-score .bull { color: #16a34a; }
-.signal-score .bear { color: #dc2626; }
+  .signal-score .bull {
+    color: #16a34a;
+  }
 
-/* Expand Button */
-.expand-btn {
+  .signal-score .bear {
+    color: #dc2626;
+  }
+
+  /* Expand Button */
+  .expand-btn {
     background: none;
     border: 1px solid #e5e7eb;
     color: #6b7280;
@@ -84,117 +113,130 @@
     padding: 4px 10px;
     border-radius: 4px;
     transition: all 0.15s;
-}
+  }
 
-.expand-btn:hover {
+  .expand-btn:hover {
     border-color: #8B2432;
     color: #8B2432;
     background: #fef2f2;
-}
+  }
 
-/* Details Row */
-.details-row {
+  /* Details Row */
+  .details-row {
     display: none;
     background: #f9fafb;
-}
+  }
 
-.details-row.show {
+  .details-row.show {
     display: table-row;
-}
+  }
 
-.details-content {
+  .details-content {
     padding: 14px 16px;
-}
+  }
 
-.category-section {
+  .category-section {
     margin-bottom: 10px;
-}
+  }
 
-.category-section:last-child {
+  .category-section:last-child {
     margin-bottom: 0;
-}
+  }
 
-.category-section strong {
+  .category-section strong {
     display: block;
     margin-bottom: 6px;
     font-size: 11px;
-}
+  }
 
-.category-list {
+  .category-list {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-}
+  }
 
-.category-item {
+  .category-item {
     padding: 3px 8px;
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
     font-size: 10px;
     color: #4b5563;
-}
+  }
 
-/* Sort indicator */
-.sortable { cursor: pointer; user-select: none; }
-.sortable:hover { background: #f3f4f6; }
-.sort-icon { font-size: 10px; margin-left: 3px; opacity: 0.6; }
+  /* Sort indicator */
+  .sortable {
+    cursor: pointer;
+    user-select: none;
+  }
 
-/* Loading overlay */
-.loading-overlay {
+  .sortable:hover {
+    background: #f3f4f6;
+  }
+
+  .sort-icon {
+    font-size: 10px;
+    margin-left: 3px;
+    opacity: 0.6;
+  }
+
+  /* Loading overlay */
+  .loading-overlay {
     display: none;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.8);
     justify-content: center;
     align-items: center;
     z-index: 10;
-}
+  }
 
-.loading-overlay.show {
+  .loading-overlay.show {
     display: flex;
-}
+  }
 
-.loading-spinner {
+  .loading-spinner {
     width: 28px;
     height: 28px;
     border: 3px solid #f3f4f6;
     border-top-color: #8B2432;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-}
+  }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
-.table-container {
+  .table-container {
     position: relative;
-}
+  }
 
-/* Responsive */
-@media (max-width: 900px) {
+  /* Responsive */
+  @media (max-width: 900px) {
     .card-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 14px !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 14px !important;
     }
 
     .stats-filters {
-        gap: 12px;
+      gap: 12px;
     }
 
     .stat-filter {
-        padding: 4px 8px;
+      padding: 4px 8px;
     }
 
     .stat-filter .value {
-        font-size: 18px;
+      font-size: 18px;
     }
-}
+  }
 </style>
 {% endblock %}
 
@@ -206,18 +248,19 @@
 
     <!-- Back Button -->
     <div class="back-button-container" style="margin-bottom: 20px;">
-      <button class="back-btn" onclick="window.location.href='{{ url_for('screener.screener_landing') }}'">
+      <button class="back-btn" onclick="goToScanners()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
+          <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        Back to Screeners
+        Back to Scanners
       </button>
     </div>
 
     <section class="screener-section">
       <div class="screener-card">
         <!-- Single Row Header: Title + Date on left, Stats/Filters on right -->
-        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div class="card-header"
+          style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
 
           <!-- Left: Title + Date -->
           <div style="display: flex; align-items: center; gap: 16px;">
@@ -225,9 +268,10 @@
 
             <div style="display: flex; align-items: center; gap: 8px;">
               <label style="font-size: 11px; font-weight: 600; color: #8B2432; text-transform: uppercase;">Date:</label>
-              <select id="dateSelect" onchange="handleDateChange(this.value)" style="font-size: 12px; padding: 5px 10px; border: 1px solid #e5e7eb; border-radius: 4px; background: white; cursor: pointer;">
+              <select id="dateSelect" onchange="handleDateChange(this.value)"
+                style="font-size: 12px; padding: 5px 10px; border: 1px solid #e5e7eb; border-radius: 4px; background: white; cursor: pointer;">
                 {% for d in dates %}
-                <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+                <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -265,11 +309,13 @@
               <tr>
                 <th style="width: 45px;">#</th>
                 <th class="sortable" data-sort="symbol">
-                  Symbol <span class="sort-icon" id="sortSymbol">{% if sort_by == 'symbol' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</span>
+                  Symbol <span class="sort-icon" id="sortSymbol">{% if sort_by == 'symbol' %}{% if sort_order == 'asc'
+                    %}▲{% else %}▼{% endif %}{% endif %}</span>
                 </th>
                 <th style="width: 90px;">Signal</th>
                 <th class="sortable" data-sort="strength" style="width: 120px;">
-                  Strength <span class="sort-icon" id="sortStrength">{% if sort_by == 'strength' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</span>
+                  Strength <span class="sort-icon" id="sortStrength">{% if sort_by == 'strength' %}{% if sort_order ==
+                    'asc' %}▲{% else %}▼{% endif %}{% endif %}</span>
                 </th>
                 <th style="width: 80px;">Details</th>
               </tr>
@@ -327,52 +373,58 @@
 </div>
 
 <script>
-// State management
-let currentFilter = '{{ signal_filter }}';
-let currentSortBy = '{{ sort_by }}';
-let currentSortOrder = '{{ sort_order }}';
-let currentDate = '{{ selected_date }}';
+  // State management
+  let currentFilter = '{{ signal_filter }}';
+  let currentSortBy = '{{ sort_by }}';
+  let currentSortOrder = '{{ sort_order }}';
+  let currentDate = '{{ selected_date }}';
 
-// Toggle details row
-function toggleDetails(id) {
+  // Navigation function
+  function goToScanners() {
+    window.location.href = '{{ url_for("screener.screener_landing") }}';
+  }
+
+
+  // Toggle details row
+  function toggleDetails(id) {
     const row = document.getElementById(id);
     if (row) {
-        row.classList.toggle('show');
+      row.classList.toggle('show');
     }
-}
+  }
 
-// Show/hide loading
-function showLoading() {
+  // Show/hide loading
+  function showLoading() {
     document.getElementById('loadingOverlay').classList.add('show');
-}
+  }
 
-function hideLoading() {
+  function hideLoading() {
     document.getElementById('loadingOverlay').classList.remove('show');
-}
+  }
 
-// Update stats display
-function updateStats(stats) {
+  // Update stats display
+  function updateStats(stats) {
     document.getElementById('statTotal').textContent = stats.total;
     document.getElementById('statBullish').textContent = stats.bullish;
     document.getElementById('statBearish').textContent = stats.bearish;
     document.getElementById('statNeutral').textContent = stats.neutral;
-}
+  }
 
-// Render table rows
-function renderTable(signals) {
+  // Render table rows
+  function renderTable(signals) {
     const tbody = document.getElementById('signalsTableBody');
 
     if (!signals || signals.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">No signals found</td></tr>';
-        return;
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">No signals found</td></tr>';
+      return;
     }
 
     let html = '';
     signals.forEach((item, index) => {
-        const signalClass = item.signal.toLowerCase();
-        const rowId = 'details-' + (index + 1);
+      const signalClass = item.signal.toLowerCase();
+      const rowId = 'details-' + (index + 1);
 
-        html += `
+      html += `
             <tr class="signal-row">
                 <td>${index + 1}</td>
                 <td><a href="/stock/${item.ticker}" class="symbol-link">${item.ticker}</a></td>
@@ -392,16 +444,16 @@ function renderTable(signals) {
                             <strong style="color:#16a34a;">Bullish Categories (${item.bullish_count})</strong>
                             <div class="category-list">
                                 ${item.bullish_categories && item.bullish_categories.length > 0
-                                    ? item.bullish_categories.map(c => `<div class="category-item">${c}</div>`).join('')
-                                    : '<div class="category-item" style="color:#999;">None</div>'}
+          ? item.bullish_categories.map(c => `<div class="category-item">${c}</div>`).join('')
+          : '<div class="category-item" style="color:#999;">None</div>'}
                             </div>
                         </div>
                         <div class="category-section">
                             <strong style="color:#dc2626;">Bearish Categories (${item.bearish_count})</strong>
                             <div class="category-list">
                                 ${item.bearish_categories && item.bearish_categories.length > 0
-                                    ? item.bearish_categories.map(c => `<div class="category-item">${c}</div>`).join('')
-                                    : '<div class="category-item" style="color:#999;">None</div>'}
+          ? item.bearish_categories.map(c => `<div class="category-item">${c}</div>`).join('')
+          : '<div class="category-item" style="color:#999;">None</div>'}
                             </div>
                         </div>
                     </div>
@@ -411,67 +463,67 @@ function renderTable(signals) {
     });
 
     tbody.innerHTML = html;
-}
+  }
 
-// Fetch signals via AJAX
-async function fetchSignals() {
+  // Fetch signals via AJAX
+  async function fetchSignals() {
     showLoading();
 
     try {
-        const url = `/screener/signal-analysis/api/signals?date=${currentDate}&filter=${currentFilter}&sort=${currentSortBy}&order=${currentSortOrder}`;
-        const response = await fetch(url);
-        const data = await response.json();
+      const url = `/scanner/signal-analysis/api/signals?date=${currentDate}&filter=${currentFilter}&sort=${currentSortBy}&order=${currentSortOrder}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-        if (data.success) {
-            renderTable(data.signals);
-            updateStats(data.stats);
-            updateSortIndicators();
-        } else {
-            console.error('Error fetching signals:', data.error);
-        }
+      if (data.success) {
+        renderTable(data.signals);
+        updateStats(data.stats);
+        updateSortIndicators();
+      } else {
+        console.error('Error fetching signals:', data.error);
+      }
     } catch (error) {
-        console.error('Fetch error:', error);
+      console.error('Fetch error:', error);
     } finally {
-        hideLoading();
+      hideLoading();
     }
-}
+  }
 
-// Update sort indicators
-function updateSortIndicators() {
+  // Update sort indicators
+  function updateSortIndicators() {
     document.getElementById('sortSymbol').textContent = currentSortBy === 'symbol' ? (currentSortOrder === 'asc' ? '▲' : '▼') : '';
     document.getElementById('sortStrength').textContent = currentSortBy === 'strength' ? (currentSortOrder === 'asc' ? '▲' : '▼') : '';
-}
+  }
 
-// Handle stat-filter click (stats on right side work as filters)
-document.querySelectorAll('.stat-filter').forEach(stat => {
-    stat.addEventListener('click', function() {
-        document.querySelectorAll('.stat-filter').forEach(s => s.classList.remove('active'));
-        this.classList.add('active');
-        currentFilter = this.dataset.filter;
-        fetchSignals();
+  // Handle stat-filter click (stats on right side work as filters)
+  document.querySelectorAll('.stat-filter').forEach(stat => {
+    stat.addEventListener('click', function () {
+      document.querySelectorAll('.stat-filter').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+      currentFilter = this.dataset.filter;
+      fetchSignals();
     });
-});
+  });
 
-// Handle sort header click
-document.querySelectorAll('th.sortable').forEach(th => {
-    th.addEventListener('click', function() {
-        const sortField = this.dataset.sort;
+  // Handle sort header click
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', function () {
+      const sortField = this.dataset.sort;
 
-        if (currentSortBy === sortField) {
-            currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
-        } else {
-            currentSortBy = sortField;
-            currentSortOrder = sortField === 'symbol' ? 'asc' : 'desc';
-        }
+      if (currentSortBy === sortField) {
+        currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSortBy = sortField;
+        currentSortOrder = sortField === 'symbol' ? 'asc' : 'desc';
+      }
 
-        fetchSignals();
+      fetchSignals();
     });
-});
+  });
 
-// Handle date change
-function handleDateChange(newDate) {
+  // Handle date change
+  function handleDateChange(newDate) {
     currentDate = newDate;
     fetchSignals();
-}
+  }
 </script>
 {% endblock %}

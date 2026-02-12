@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}By Goldmine – Premium Screeners{% endblock %}
+{% block title %}By Goldmine – Premium Scanners{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener_landing.css') }}">
@@ -96,19 +96,19 @@
     <div id="screenerListView" class="screener-list">
       <div class="goldmine-tabs">
         <button class="goldmine-tab active" data-tab="derivative" onclick="switchTab('derivative')">
-          Derivative Screeners
+          Derivative Scanners
         </button>
         <button class="goldmine-tab" data-tab="technical" onclick="switchTab('technical')">
-          Technical Screeners
+          Technical Scanners
         </button>
         <button class="goldmine-tab" data-tab="fundamental" onclick="switchTab('fundamental')">
-          Fundamental Screeners
+          Fundamental Scanners
         </button>
         <button class="goldmine-tab" data-tab="intraday" onclick="switchTab('intraday')">
-          Intraday Screeners
+          Intraday Scanners
         </button>
         <button class="goldmine-tab" data-tab="price-volume" onclick="switchTab('price-volume')">
-          Price & Volume Screeners
+          Price & Volume Scanners
         </button>
       </div>
 
@@ -139,17 +139,17 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        Back to Screeners
+        Back to Scanners
       </button>
 
       <div class="detail-header">
         <div class="detail-header-left">
           <div class="detail-title">
-            <span id="detailTitle">Screener Title</span>
+            <span id="detailTitle">Scanner Title</span>
             <span class="author">by @goldmine</span>
           </div>
           <div class="detail-desc" id="detailDesc">
-            Screener description goes here.
+            Scanner description goes here.
           </div>
         </div>
         <div class="detail-actions">

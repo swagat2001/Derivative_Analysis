@@ -44,7 +44,7 @@ from ....models.technical_screener_model import (
 )
 from ....services.signal_service import compute_signals_simple
 
-technical_screener_bp = Blueprint("technical_screener", __name__, url_prefix="/screener/technical-indicators")
+technical_screener_bp = Blueprint("technical_screener", __name__, url_prefix="/scanner/technical-indicators")
 
 # Initialize cache
 cache = Cache(config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 3600})

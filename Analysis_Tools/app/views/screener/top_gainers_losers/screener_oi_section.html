@@ -6,7 +6,7 @@
   <h2 class="section-title">📊 Open Interest Changes</h2>
 
   <div class="section-right-control">
-    <select id="dateSelect" name="date" onchange="window.location.href='/screener/top-gainers-losers?date='+this.value;">
+    <select id="dateSelect" name="date" onchange="window.location.href='/scanner/top-gainers-losers?date='+this.value;">
       {% for d in dates %}
       <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
       {% endfor %}

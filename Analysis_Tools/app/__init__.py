@@ -63,18 +63,18 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(home_bp)  # Home page at /
     app.register_blueprint(news_bp)  # News at /news
-    app.register_blueprint(insights_bp)  # Insights at /insights
+    app.register_blueprint(insights_bp)  # Neev at /neev
     app.register_blueprint(dashboard_bp)  # Dashboard at /dashboard
     app.register_blueprint(stock_bp)
-    app.register_blueprint(screener_bp)  # Landing page at /screener
-    app.register_blueprint(gainers_losers_bp)  # Tables at /screener/top-gainers-losers
-    app.register_blueprint(signal_analysis_bp)  # Signals at /screener/signal-analysis
-    app.register_blueprint(signal_scanner_bp)  # Signal Scanner at /screener/signal-scanner
-    app.register_blueprint(futures_oi_bp)  # Futures OI at /screener/futures-oi
-    app.register_blueprint(technical_screener_bp)  # Technical at /screener/technical
-    app.register_blueprint(index_screener_bp)  # Index screeners at /screener/index/
+    app.register_blueprint(screener_bp)  # Landing page at /scanner
+    app.register_blueprint(gainers_losers_bp)  # Tables at /scanner/top-gainers-losers
+    app.register_blueprint(signal_analysis_bp)  # Signals at /scanner/signal-analysis
+    app.register_blueprint(signal_scanner_bp)  # Signal Scanner at /scanner/signal-scanner
+    app.register_blueprint(futures_oi_bp)  # Futures OI at /scanner/futures-oi
+    app.register_blueprint(technical_screener_bp)  # Technical at /scanner/technical
+    app.register_blueprint(index_screener_bp)  # Index screeners at /scanner/index/
     app.register_blueprint(fundamental_screener_bp)  # Fundamental screeners
-    app.register_blueprint(goldmine_bp)  # Goldmine at /screener/goldmine
+    app.register_blueprint(goldmine_bp)  # Goldmine at /scanner/goldmine
     app.register_blueprint(voice_api_bp)  # Voice API at /api/voice/
 
     # Add custom Jinja2 filter for expiry date formatting
@@ -141,15 +141,13 @@ def create_app():
     #
     #     return None
 
-    # Make user info available to all templates
+    # User context removed - public access mode
+    # Authentication is disabled for this application
     @app.context_processor
     def inject_user():
-        from .models.auth_model import get_user_display_name
-
-        username = session.get("user")
         return {
-            "current_user": username,
-            "user_display_name": get_user_display_name(username) if username else None,
+            "current_user": None,
+            "user_display_name": None,
         }
 
     return app

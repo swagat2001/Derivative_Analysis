@@ -21,12 +21,12 @@ const ICONS = {
 
 /* ===== SCREENER DATA WITH ROUTES ===== */
 const SCREENER_DATA = {
-  "Derivative Screeners": [
+  "Derivative Scanners": [
     {
       title: "F&O Signal Scanner",
       description: "Comprehensive F&O scanner with RSI, Pivot Levels, Volume Profile, OI Spike & Divergence signals",
       icon: ICONS.target,
-      url: "/screener/signal-scanner/",
+      url: "/scanner/signal-scanner/",
       badge: "New",
       inline: false
     },
@@ -34,7 +34,7 @@ const SCREENER_DATA = {
       title: "Top Gainers & Losers",
       description: "Top 10 gainers/losers across 40 categories - OI, IV, Moneyness for Calls, Puts & Futures",
       icon: ICONS.chart,
-      url: "/screener/top-gainers-losers/",
+      url: "/scanner/top-gainers-losers/",
       badge: "Popular",
       inline: false
     },
@@ -42,7 +42,7 @@ const SCREENER_DATA = {
       title: "Signal Analysis",
       description: "Advanced bullish/bearish signal classification with multi-factor analysis",
       icon: ICONS.sparkles,
-      url: "/screener/signal-analysis/",
+      url: "/scanner/signal-analysis/",
       badge: null,
       inline: false
     },
@@ -50,17 +50,17 @@ const SCREENER_DATA = {
       title: "Futures OI Analysis",
       description: "Expiry-wise Open Interest analysis - Current, Next & Far Month",
       icon: ICONS.package,
-      url: "/screener/futures-oi/",
+      url: "/scanner/futures-oi/",
       badge: null,
       inline: false
     }
   ],
-  "Technical Screeners": [
+  "Technical Scanners": [
     {
-      title: "Technical Screener",
+      title: "Technical Scanner",
       description: "RSI, MACD, SMA, ADX based screening with interactive heatmaps",
       icon: ICONS.trendUp,
-      url: "/screener/technical-indicators/",
+      url: "/scanner/technical-indicators/",
       badge: "Premium",
       inline: false
     },
@@ -68,7 +68,7 @@ const SCREENER_DATA = {
       title: "Golden Crossover",
       description: "Stocks where 50-day SMA crosses above 200-day SMA — bullish trend reversal",
       icon: ICONS.sparkles,
-      url: "/screener/technical-indicators/golden-crossover",
+      url: "/scanner/technical-indicators/golden-crossover",
       badge: null,
       inline: false
     },
@@ -76,7 +76,7 @@ const SCREENER_DATA = {
       title: "Death Crossover",
       description: "Stocks where 50-day SMA crosses below 200-day SMA — bearish trend reversal",
       icon: ICONS.trendDown,
-      url: "/screener/technical-indicators/death-crossover",
+      url: "/scanner/technical-indicators/death-crossover",
       badge: null,
       inline: false
     },
@@ -84,7 +84,7 @@ const SCREENER_DATA = {
       title: "Overbought RSI Stocks",
       description: "Stocks with RSI > 75 suggesting possible upcoming price correction",
       icon: ICONS.flame,
-      url: "/screener/technical-indicators/rsi-overbought",
+      url: "/scanner/technical-indicators/rsi-overbought",
       badge: "New",
       inline: false
     },
@@ -92,7 +92,7 @@ const SCREENER_DATA = {
       title: "Oversold RSI Stocks",
       description: "Stocks with RSI < 25 indicating potential price recovery",
       icon: ICONS.snowflake,
-      url: "/screener/technical-indicators/rsi-oversold",
+      url: "/scanner/technical-indicators/rsi-oversold",
       badge: "New",
       inline: false
     },
@@ -100,7 +100,7 @@ const SCREENER_DATA = {
       title: "R1 Resistance Breakouts",
       description: "Stocks climbing past R1 resistance, signaling sustained upward trends",
       icon: ICONS.arrowUp,
-      url: "/screener/technical-indicators/r1-breakout",
+      url: "/scanner/technical-indicators/r1-breakout",
       badge: "New",
       inline: false
     },
@@ -108,7 +108,7 @@ const SCREENER_DATA = {
       title: "R2 Resistance Breakouts",
       description: "Stocks breaking above R2 resistance with strong bullish momentum",
       icon: ICONS.arrowUp,
-      url: "/screener/technical-indicators/r2-breakout",
+      url: "/scanner/technical-indicators/r2-breakout",
       badge: null,
       inline: false
     },
@@ -116,7 +116,7 @@ const SCREENER_DATA = {
       title: "R3 Resistance Breakouts",
       description: "Stocks breaking above R3 resistance — extremely strong bullish signal",
       icon: ICONS.rocket,
-      url: "/screener/technical-indicators/r3-breakout",
+      url: "/scanner/technical-indicators/r3-breakout",
       badge: null,
       inline: false
     },
@@ -124,7 +124,7 @@ const SCREENER_DATA = {
       title: "S1 Support Breakouts",
       description: "Stocks falling through S1 support, possibly forecasting extended declines",
       icon: ICONS.arrowDown,
-      url: "/screener/technical-indicators/s1-breakout",
+      url: "/scanner/technical-indicators/s1-breakout",
       badge: "New",
       inline: false
     },
@@ -132,7 +132,7 @@ const SCREENER_DATA = {
       title: "S2 Support Breakouts",
       description: "Stocks falling through S2 support, indicating significant bearish pressure",
       icon: ICONS.arrowDown,
-      url: "/screener/technical-indicators/s2-breakout",
+      url: "/scanner/technical-indicators/s2-breakout",
       badge: null,
       inline: false
     },
@@ -140,7 +140,7 @@ const SCREENER_DATA = {
       title: "S3 Support Breakouts",
       description: "Stocks falling through S3 support — extreme bearish signal",
       icon: ICONS.arrowDown,
-      url: "/screener/technical-indicators/s3-breakout",
+      url: "/scanner/technical-indicators/s3-breakout",
       badge: null,
       inline: false
     },
@@ -148,7 +148,7 @@ const SCREENER_DATA = {
       title: "Momentum Stocks",
       description: "Securities surging in price with strong market enthusiasm and potential for further gains",
       icon: ICONS.rocket,
-      url: "/screener/technical-indicators/momentum-stocks",
+      url: "/scanner/technical-indicators/momentum-stocks",
       badge: "New",
       inline: false
     },
@@ -156,18 +156,18 @@ const SCREENER_DATA = {
       title: "Squeezing Range",
       description: "Stocks with tightening Bollinger Bands, indicating a potential breakout or breakdown",
       icon: ICONS.target,
-      url: "/screener/technical-indicators/squeezing-range",
+      url: "/scanner/technical-indicators/squeezing-range",
       badge: "New",
       inline: false
     }
   ],
-  "Fundamental Screeners": [
+  "Fundamental Scanners": [
     {
       title: "Best Annual Results",
       description: "Companies with consistent sales & profit growth",
       icon: ICONS.chart,
       dataKey: "scanx-growth",
-      apiUrl: "/screener/fundamental/api/scan/best_results",
+      apiUrl: "/scanner/fundamental/api/scan/best_results",
       badge: "Hot",
       inline: true
     },
@@ -176,7 +176,7 @@ const SCREENER_DATA = {
       description: "Businesses ramping up capital expenditures",
       icon: ICONS.rocket,
       dataKey: "scanx-capex",
-      apiUrl: "/screener/fundamental/api/scan/capex_boost",
+      apiUrl: "/scanner/fundamental/api/scan/capex_boost",
       badge: "New",
       inline: true
     },
@@ -185,7 +185,7 @@ const SCREENER_DATA = {
       description: "Mid-caps with robust fundamentals and growth",
       icon: ICONS.strength,
       dataKey: "scanx-midcap",
-      apiUrl: "/screener/fundamental/api/scan/mighty_midcap",
+      apiUrl: "/scanner/fundamental/api/scan/mighty_midcap",
       badge: null,
       inline: true
     },
@@ -194,7 +194,7 @@ const SCREENER_DATA = {
       description: "Stable market leaders with strong positions",
       icon: ICONS.trophy,
       dataKey: "scanx-largecap",
-      apiUrl: "/screener/fundamental/api/scan/titan_largecap",
+      apiUrl: "/scanner/fundamental/api/scan/titan_largecap",
       badge: null,
       inline: true
     },
@@ -203,7 +203,7 @@ const SCREENER_DATA = {
       description: "High-performing small-caps with upside",
       icon: ICONS.sparkles,
       dataKey: "scanx-smallcap",
-      apiUrl: "/screener/fundamental/api/scan/stellar_smallcap",
+      apiUrl: "/scanner/fundamental/api/scan/stellar_smallcap",
       badge: null,
       inline: true
     },
@@ -212,7 +212,7 @@ const SCREENER_DATA = {
       description: "Efficient liquidity management",
       icon: ICONS.zap,
       dataKey: "scanx-nwc",
-      apiUrl: "/screener/fundamental/api/scan/negative_working_capital",
+      apiUrl: "/scanner/fundamental/api/scan/negative_working_capital",
       badge: null,
       inline: true
     },
@@ -221,17 +221,17 @@ const SCREENER_DATA = {
       description: "High growth metrics with upside potential",
       icon: ICONS.target,
       dataKey: "scanx-multi",
-      apiUrl: "/screener/fundamental/api/scan/potential_multibagger",
+      apiUrl: "/scanner/fundamental/api/scan/potential_multibagger",
       badge: "Pop",
       inline: true
     }
   ],
-  "Intraday Screeners": [
+  "Intraday Scanners": [
     {
       title: "Price Gainers Today",
       description: "Top price gainers in today's trading session",
       icon: ICONS.arrowUp,
-      url: "/screener/technical-indicators/price-gainers",
+      url: "/scanner/technical-indicators/price-gainers",
       badge: "Live",
       inline: false
     },
@@ -239,7 +239,7 @@ const SCREENER_DATA = {
       title: "Price Losers Today",
       description: "Top price losers in today's trading session",
       icon: ICONS.arrowDown,
-      url: "/screener/technical-indicators/price-losers",
+      url: "/scanner/technical-indicators/price-losers",
       badge: "Live",
       inline: false
     },
@@ -247,7 +247,7 @@ const SCREENER_DATA = {
       title: "High Volume Alert",
       description: "Stocks trading above average volume",
       icon: ICONS.volume,
-      url: "/screener/technical-indicators/potential-high-volume",
+      url: "/scanner/technical-indicators/potential-high-volume",
       badge: null,
       inline: false
     },
@@ -255,7 +255,7 @@ const SCREENER_DATA = {
       title: "Breakout Scanner",
       description: "Stocks breaking key resistance levels",
       icon: ICONS.rocket,
-      url: "/screener/technical-indicators/?filter=breakout",
+      url: "/scanner/technical-indicators/?filter=breakout",
       badge: "Beta",
       inline: false
     },
@@ -264,7 +264,7 @@ const SCREENER_DATA = {
       description: "Comprehensive derivative analysis for Nifty 50 stocks",
       icon: ICONS.trophy,
       dataKey: "nifty50",
-      apiUrl: "/screener/api/nifty50",
+      apiUrl: "/scanner/api/nifty50",
       badge: null,
       inline: true
     },
@@ -273,7 +273,7 @@ const SCREENER_DATA = {
       description: "Derivative analysis for Bank Nifty constituents",
       icon: ICONS.bank,
       dataKey: "banknifty",
-      apiUrl: "/screener/api/banknifty",
+      apiUrl: "/scanner/api/banknifty",
       badge: null,
       inline: true
     },
@@ -282,7 +282,7 @@ const SCREENER_DATA = {
       description: "Stocks showing significant Open Interest accumulation",
       icon: ICONS.download,
       dataKey: "high-oi",
-      apiUrl: "/screener/api/high-oi",
+      apiUrl: "/scanner/api/high-oi",
       badge: null,
       inline: true
     },
@@ -291,17 +291,17 @@ const SCREENER_DATA = {
       description: "Stocks with unusual Implied Volatility movement",
       icon: ICONS.zap,
       dataKey: "iv-spike",
-      apiUrl: "/screener/api/iv-spike",
+      apiUrl: "/scanner/api/iv-spike",
       badge: null,
       inline: true
     }
   ],
-  "Price & Volume Screeners": [
+  "Price & Volume Scanners": [
     {
       title: "1 Week High Breakouts",
       description: "Securities surpassing highest price in the last week reflecting immediate bullish sentiment",
       icon: ICONS.rocket,
-      url: "/screener/technical-indicators/week1-high-breakout",
+      url: "/scanner/technical-indicators/week1-high-breakout",
       badge: "New",
       inline: false
     },
@@ -309,7 +309,7 @@ const SCREENER_DATA = {
       title: "1 Week Low Breakouts",
       description: "Indicates immediate bearish sentiment with decline past their lowest price in the previous week",
       icon: ICONS.arrowDown,
-      url: "/screener/technical-indicators/week1-low-breakout",
+      url: "/scanner/technical-indicators/week1-low-breakout",
       badge: "New",
       inline: false
     },
@@ -317,7 +317,7 @@ const SCREENER_DATA = {
       title: "4 Week High Breakouts",
       description: "Securities exceeding their highest price in the last month indicating short-term bullish momentum",
       icon: ICONS.rocket,
-      url: "/screener/technical-indicators/week4-high-breakout",
+      url: "/scanner/technical-indicators/week4-high-breakout",
       badge: null,
       inline: false
     },
@@ -325,7 +325,7 @@ const SCREENER_DATA = {
       title: "4 Week Low Breakouts",
       description: "Pointing to short-term bearish momentum with stocks falling below their lowest price in the past month",
       icon: ICONS.arrowDown,
-      url: "/screener/technical-indicators/week4-low-breakout",
+      url: "/scanner/technical-indicators/week4-low-breakout",
       badge: null,
       inline: false
     },
@@ -333,7 +333,7 @@ const SCREENER_DATA = {
       title: "52 Week High Breakouts",
       description: "Breaking past their highest price in the last year signaling strong bullish trends",
       icon: ICONS.trophy,
-      url: "/screener/technical-indicators/week52-high-breakout",
+      url: "/scanner/technical-indicators/week52-high-breakout",
       badge: "Hot",
       inline: false
     },
@@ -341,7 +341,7 @@ const SCREENER_DATA = {
       title: "52 Week Low Breakouts",
       description: "Strong bearish trends suggested by dropping below their lowest price in the past year",
       icon: ICONS.snowflake,
-      url: "/screener/technical-indicators/week52-low-breakout",
+      url: "/scanner/technical-indicators/week52-low-breakout",
       badge: null,
       inline: false
     },
@@ -349,7 +349,7 @@ const SCREENER_DATA = {
       title: "Potential High Volume",
       description: "Showing early signs of a spike in trading volume hinting at upcoming activity",
       icon: ICONS.volume,
-      url: "/screener/technical-indicators/potential-high-volume",
+      url: "/scanner/technical-indicators/potential-high-volume",
       badge: null,
       inline: false
     },
@@ -357,7 +357,7 @@ const SCREENER_DATA = {
       title: "Unusually High Volume",
       description: "Points to increased interest or activity with volume much higher than average",
       icon: ICONS.flame,
-      url: "/screener/technical-indicators/unusually-high-volume",
+      url: "/scanner/technical-indicators/unusually-high-volume",
       badge: "Hot",
       inline: false
     }

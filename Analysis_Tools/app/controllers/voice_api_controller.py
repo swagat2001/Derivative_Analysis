@@ -222,9 +222,9 @@ def get_page_context(page):
         if page == "home":
             context["commands"] = [
                 {"phrase": "go to dashboard", "action": "navigate", "target": "/dashboard"},
-                {"phrase": "open screeners", "action": "navigate", "target": "/screener/"},
+                {"phrase": "open screeners", "action": "navigate", "target": "/scanner/"},
                 {"phrase": "search [stock]", "action": "search", "dynamic": True},
-                {"phrase": "show top gainers", "action": "navigate", "target": "/screener/top-gainers-losers"},
+                {"phrase": "show top gainers", "action": "navigate", "target": "/scanner/top-gainers-losers"},
             ]
             context["hints"] = [
                 "Go to dashboard",
@@ -265,8 +265,8 @@ def get_page_context(page):
                 {"phrase": "show all", "action": "click", "selector": "[data-filter='all']"},
                 {"phrase": "derivative screeners", "action": "click", "selector": "[data-category='derivative']"},
                 {"phrase": "technical screeners", "action": "click", "selector": "[data-category='technical']"},
-                {"phrase": "nifty 50", "action": "navigate", "target": "/screener/index"},
-                {"phrase": "bank nifty", "action": "navigate", "target": "/screener/banknifty"},
+                {"phrase": "nifty 50", "action": "navigate", "target": "/scanner/index"},
+                {"phrase": "bank nifty", "action": "navigate", "target": "/scanner/banknifty"},
             ]
             context["hints"] = ["Filter bullish", "Filter bearish", "Nifty 50", "Bank Nifty", "Back to list"]
 
@@ -305,12 +305,12 @@ def get_page_context(page):
                 {
                     "phrase": "golden crossover",
                     "action": "navigate",
-                    "target": "/screener/technical-indicators/golden-crossover",
+                    "target": "/scanner/technical-indicators/golden-crossover",
                 },
                 {
                     "phrase": "death crossover",
                     "action": "navigate",
-                    "target": "/screener/technical-indicators/death-crossover",
+                    "target": "/scanner/technical-indicators/death-crossover",
                 },
                 {"phrase": "rsi overbought", "action": "click", "selector": "[data-indicator='rsi-overbought']"},
                 {"phrase": "rsi oversold", "action": "click", "selector": "[data-indicator='rsi-oversold']"},

@@ -73,8 +73,48 @@ def calculate_fundamental_metrics(symbol):
             prev_price = price_df.iloc[-2]["value"] if len(price_df) > 1 else latest_price
             metrics["current_price"] = latest_price
             metrics["price_change"] = ((latest_price - prev_price) / prev_price * 100) if prev_price else 0
+
+            # Default to all-time or last year if company_info is missing
             metrics["high_52w"] = price_df["value"].max()
             metrics["low_52w"] = price_df["value"].min()
+
+    # Load Company Info (Scraped Header) - PRIORITY FOR MARKET CAP & HIGH/LOW
+    company_info = load_fundamental_json(symbol, "company_info")
+    if company_info:
+        # Helper to clean and parse float
+        def parse_float(val):
+            if isinstance(val, (int, float)):
+                return float(val)
+            if isinstance(val, str):
+                return float(val.replace(",", "").replace("%", ""))
+            return 0
+
+        if "Market Cap" in company_info:
+            metrics["market_cap"] = parse_float(company_info["Market Cap"])
+
+        if "High / Low" in company_info:
+            hl = company_info["High / Low"].split("/")
+            if len(hl) == 2:
+                metrics["high_52w"] = parse_float(hl[0])
+                metrics["low_52w"] = parse_float(hl[1])
+
+        if "Stock P/E" in company_info:
+            metrics["stock_pe"] = parse_float(company_info["Stock P/E"])
+
+        if "Book Value" in company_info:
+            metrics["book_value"] = parse_float(company_info["Book Value"])
+
+        if "ROCE" in company_info:
+            metrics["roce"] = parse_float(company_info["ROCE"]) / 100
+
+        if "ROE" in company_info:
+            metrics["roe"] = parse_float(company_info["ROE"]) / 100
+
+        if "Dividend Yield" in company_info:
+            metrics["dividend_yield"] = parse_float(company_info["Dividend Yield"])
+
+        if "Face Value" in company_info:
+            metrics["face_value"] = parse_float(company_info["Face Value"])
 
     # Load P&L data
     pnl_data = load_fundamental_json(symbol, "pnl")
@@ -89,55 +129,9 @@ def calculate_fundamental_metrics(symbol):
                         metrics["sales"] = value
                     elif "netprofit" in key_lower.replace(" ", "") or "net profit" in key_lower:
                         metrics["net_profit"] = value
-                    elif key == "EPS" or "eps" in key_lower:
+                    elif (key == "EPS" or "eps" in key_lower) and metrics["eps"] == 0:
+                         # Only set if not already set (though company_info doesn't have eps usually)
                         metrics["eps"] = value
-
-    # Load ratios
-    ratios_data = load_fundamental_json(symbol, "ratios")
-    if ratios_data:
-        dates = sorted(ratios_data.keys(), reverse=True)
-        if dates:
-            latest_ratios = ratios_data[dates[0]]
-            for item in latest_ratios:
-                for key, value in item.items():
-                    key_lower = key.lower()
-                    if "roce" in key_lower:
-                        if isinstance(value, (int, float)):
-                            metrics["roce"] = value / 100 if value > 1 else value
-                    elif "roe" in key_lower:
-                        if isinstance(value, (int, float)):
-                            metrics["roe"] = value / 100 if value > 1 else value
-
-    # Load balance sheet for book value and market cap
-    bs_data = load_fundamental_json(symbol, "balance_sheet")
-    if bs_data:
-        dates = sorted(bs_data.keys(), reverse=True)
-        if dates and len(dates) > 0:
-            latest_bs = bs_data[dates[0]]
-            equity = None
-            reserves = None
-
-            for item in latest_bs:
-                for key, value in item.items():
-                    key_lower = key.lower()
-                    if "equity" in key_lower and "capital" in key_lower:
-                        equity = value
-                    elif "reserve" in key_lower:
-                        reserves = value
-
-            if equity and isinstance(equity, (int, float)) and equity > 0:
-                shares_crores = equity / 10
-                metrics["shares_outstanding"] = shares_crores
-
-                if metrics["current_price"] and metrics["current_price"] > 0:
-                    metrics["market_cap"] = shares_crores * metrics["current_price"]
-
-                if reserves and isinstance(reserves, (int, float)):
-                    book_value = (equity + reserves) / shares_crores
-                    metrics["book_value"] = book_value
-
-            if metrics["current_price"] and metrics["current_price"] > 0 and metrics["eps"] and metrics["eps"] > 0:
-                metrics["stock_pe"] = metrics["current_price"] / metrics["eps"]
 
     return metrics
 

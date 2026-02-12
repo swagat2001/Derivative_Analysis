@@ -107,6 +107,7 @@
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
+    display: none;
   }
 
   .screener-sidebar .menu-badge {
@@ -148,7 +149,7 @@
 </style>
 
 <aside class="screener-sidebar">
-  <h3>Screeners</h3>
+  <h3>Scanners</h3>
   <a href="{{ url_for('screener.screener_landing') }}"
     class="menu-item {% if request.endpoint == 'screener.screener_landing' %}active{% endif %}">
     <span class="menu-icon icon-explore">
@@ -218,6 +219,6 @@
         <polyline points="7 3 7 8 15 8" />
       </svg>
     </span>
-    My Saved Screeners
+    My Saved Scanners
   </div>
 </aside>

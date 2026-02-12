@@ -492,5 +492,43 @@
     {
       "RawPDF": "/company/source/quarter/1198/9/2025/"
     }
+  ],
+  "2025-12-01": [
+    {
+      "Sales ": 44312.0
+    },
+    {
+      "Expenses ": 35442.0
+    },
+    {
+      "OperatingProfit": 8870.0
+    },
+    {
+      "OPM%": 0.2
+    },
+    {
+      "OtherIncome ": 65.0
+    },
+    {
+      "Interest": 3909.0
+    },
+    {
+      "Depreciation": 1975.0
+    },
+    {
+      "Profitbeforetax": 3051.0
+    },
+    {
+      "Tax%": 0.27
+    },
+    {
+      "NetProfit ": 2233.0
+    },
+    {
+      "EPSinRs": 15.23
+    },
+    {
+      "RawPDF": "/company/source/quarter/1198/12/2025/"
+    }
   ]
 }

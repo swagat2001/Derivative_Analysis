@@ -34,7 +34,8 @@ class LiveIndicesUpdater {
             'sensex': { valueId: 'sensexValue', changeId: 'sensexChange' },
             'niftyfin': { valueId: 'niftyfinValue', changeId: 'niftyfinChange' },
             'niftynext50': { valueId: 'niftynext50Value', changeId: 'niftynext50Change' },
-            'nifty100': { valueId: 'nifty100Value', changeId: 'nifty100Change' }
+            'nifty100': { valueId: 'nifty100Value', changeId: 'nifty100Change' },
+            'indiavix': { valueId: 'indiavixValue', changeId: 'indiavixChange' }
         };
 
         const mapping = cardMap[indexKey];
@@ -92,7 +93,8 @@ class LiveIndicesUpdater {
             'sensex': 'SENSEX',
             'niftyfin': 'NIFTY FIN',
             'niftynext50': 'NIFTY NEXT 50',
-            'nifty100': 'NIFTY 100'
+            'nifty100': 'NIFTY 100',
+            'indiavix': 'INDIA VIX'
         };
 
         const indexNameEl = document.getElementById('selectedIndexName');
@@ -212,29 +214,65 @@ class LiveIndicesUpdater {
             'sensexValue': 'sensex',
             'niftyfinValue': 'niftyfin',
             'niftynext50Value': 'niftynext50',
-            'nifty100Value': 'nifty100'
+            'nifty100Value': 'nifty100',
+            'indiavixValue': 'indiavix'
         };
 
         Object.keys(cardMap).forEach(valueId => {
             const element = document.getElementById(valueId);
-            if (!element) return;
+            if (!element) {
+                console.warn(`Element not found: ${valueId}`);
+                return;
+            }
 
             const card = element.closest('.hero-card');
-            if (!card) return;
+            if (!card) {
+                console.warn(`Card not found for: ${valueId}`);
+                return;
+            }
 
             card.style.cursor = 'pointer';
 
             card.addEventListener('click', () => {
                 const indexKey = cardMap[valueId];
+                console.log(`Card clicked: ${indexKey}`);
                 this.selectedIndex = indexKey;
+
+                // Remove active state from all cards
+                document.querySelectorAll('.hero-card').forEach(c => c.classList.remove('active'));
+                // Add active state to clicked card
+                card.classList.add('active');
 
                 // Update detail and chart with latest data
                 if (this.latestData && this.latestData[indexKey]) {
+                    console.log(`Updating with live data for ${indexKey}`);
                     this.updateIndexDetail(indexKey, this.latestData[indexKey]);
                     this.updateChart(indexKey, this.latestData[indexKey]);
+                } else {
+                    console.log(`No live data yet for ${indexKey}, using fallback`);
+                    // Use fallback data from the page
+                    const fallbackData = this.getFallbackData(indexKey);
+                    if (fallbackData) {
+                        this.updateIndexDetail(indexKey, fallbackData);
+                        this.updateChart(indexKey, fallbackData);
+                    }
                 }
             });
         });
+    }
+
+    getFallbackData(indexKey) {
+        // Fallback data when live data isn't available yet
+        const fallbacks = {
+            'nifty50': { value: 24677.80, change: 103.45, percentChange: 0.42, open: 24600.00, high: 24700.00, low: 24550.00, history: [] },
+            'banknifty': { value: 51234.50, change: -92.15, percentChange: -0.18, open: 51450.00, high: 51550.30, low: 51100.20, history: [] },
+            'sensex': { value: 83758.43, change: 1018.23, percentChange: 1.23, open: 83200.00, high: 83900.50, low: 83150.00, history: [] },
+            'niftyfin': { value: 23890.40, change: 158.92, percentChange: 0.67, open: 23750.00, high: 23950.00, low: 23700.00, history: [] },
+            'niftynext50': { value: 68499.30, change: -698.45, percentChange: -1.01, open: 69200.00, high: 69350.00, low: 68400.00, history: [] },
+            'nifty100': { value: 26260.30, change: -202.15, percentChange: -0.76, open: 26450.00, high: 26500.00, low: 26200.00, history: [] },
+            'indiavix': { value: 13.50, change: 0.00, percentChange: 0.00, open: 13.20, high: 13.80, low: 13.10, history: [] }
+        };
+        return fallbacks[indexKey] || null;
     }
 
     async update() {

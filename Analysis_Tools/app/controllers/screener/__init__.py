@@ -8,7 +8,7 @@ from ...controllers.dashboard_controller import get_live_indices
 from ...models.dashboard_model import get_available_dates
 from ...models.stock_model import get_filtered_tickers
 
-screener_bp = Blueprint("screener", __name__, url_prefix="/screener")
+screener_bp = Blueprint("screener", __name__, url_prefix="/scanner")
 
 
 @screener_bp.route("/")

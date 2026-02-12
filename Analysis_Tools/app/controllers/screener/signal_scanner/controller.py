@@ -22,7 +22,7 @@ from ....models.stock_model import get_filtered_tickers
 signal_scanner_bp = Blueprint(
     "signal_scanner",
     __name__,
-    url_prefix="/screener/signal-scanner",
+    url_prefix="/scanner/signal-scanner",
     template_folder="../../../views/screener/signal_scanner",
 )
 

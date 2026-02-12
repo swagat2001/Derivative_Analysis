@@ -17,7 +17,7 @@ from ....models.stock_model import get_filtered_tickers
 # Import from centralized signal service (SINGLE SOURCE OF TRUTH)
 from ....services.signal_service import compute_signals_simple
 
-index_screener_bp = Blueprint("index_screener", __name__, url_prefix="/screener")
+index_screener_bp = Blueprint("index_screener", __name__, url_prefix="/scanner")
 
 # Initialize cache
 cache = Cache(config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 3600})
@@ -39,7 +39,7 @@ def calculate_signal_counts(stocks):
 @index_screener_bp.route("/index")
 def nifty50_screener():
     """
-    Nifty 50 screener page at /screener/index
+    Nifty 50 screener page at /scanner/index
     Fetches real-time constituents from NSE and data from database
     """
     # Get date parameter or use latest
@@ -87,7 +87,7 @@ def nifty50_screener():
 @index_screener_bp.route("/banknifty")
 def banknifty_screener():
     """
-    Bank Nifty screener page at /screener/banknifty
+    Bank Nifty screener page at /scanner/banknifty
     Fetches real-time constituents from NSE and data from database
     """
     # Get date parameter or use latest
@@ -135,7 +135,7 @@ def banknifty_screener():
 @index_screener_bp.route("/high-oi")
 def high_oi_screener():
     """
-    High OI Buildup screener page at /screener/high-oi
+    High OI Buildup screener page at /scanner/high-oi
     Shows Nifty 50 stocks sorted by highest OI
     """
     selected_date = request.args.get("date", None)
@@ -167,7 +167,7 @@ def high_oi_screener():
 @index_screener_bp.route("/iv-spike")
 def iv_spike_screener():
     """
-    IV Spike Alert screener page at /screener/iv-spike
+    IV Spike Alert screener page at /scanner/iv-spike
     Shows Nifty 50 stocks with highest IV
     """
     selected_date = request.args.get("date", None)

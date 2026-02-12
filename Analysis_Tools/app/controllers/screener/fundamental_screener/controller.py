@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, render_template
 from ....services.fundamental_service import fundamental_service
 
 # Define Blueprint
-fundamental_screener_bp = Blueprint("fundamental_screener", __name__, url_prefix="/screener/fundamental")
+fundamental_screener_bp = Blueprint("fundamental_screener", __name__, url_prefix="/scanner/fundamental")
 
 
 @fundamental_screener_bp.route("/api/scan/<category>")

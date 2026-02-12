@@ -313,21 +313,43 @@ class stockScreener:
             data[dta] = transcript_link["href"]
         return data
 
+    def getCompanyInfo(self):
+        """Scrape company info header (Market Cap, High/Low, etc.)"""
+        ratios_div = self.soup.find('ul', id='top-ratios')
+        if not ratios_div:
+            return {}
+
+        data = {}
+        for li in ratios_div.find_all('li'):
+            name = li.find('span', class_='name').text.strip()
+            # Handle multiple numbers (like High / Low)
+            numbers = li.find_all('span', class_='number')
+            if len(numbers) > 1:
+                # Join with ' / ' to match the key format or just clean strings
+                val = " / ".join([n.text.strip().replace(',', '') for n in numbers])
+            else:
+                val = li.find('span', class_='number').text.strip().replace(',', '')
+            data[name] = val
+        return data
+
 
 class ScreenerScrape(stockScreener):
-    files = os.listdir(".")
-    if "tokens" not in files:
-        os.mkdir("tokens")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    TOKENS_DIR = os.path.join(BASE_DIR, "tokens")
+
+    if not os.path.exists(TOKENS_DIR):
+        os.makedirs(TOKENS_DIR)
 
     def __init__(self):
         try:
             self.tokendf = pd.read_csv(
-                r"./tokens/tokens_{dt}.csv".format(dt=datetime.datetime.now().strftime("%Y%m%d"))
+                os.path.join(self.TOKENS_DIR, "tokens_{dt}.csv".format(dt=datetime.datetime.now().strftime("%Y%m%d")))
             )
         except:
-            files = os.listdir("./tokens")
-            for file in files:
-                os.remove(f"./tokens/{file}")
+            if os.path.exists(self.TOKENS_DIR):
+                files = os.listdir(self.TOKENS_DIR)
+                for file in files:
+                    os.remove(os.path.join(self.TOKENS_DIR, file))
             self.getTokendf()
 
     def getTokendf(self):
@@ -335,7 +357,7 @@ class ScreenerScrape(stockScreener):
         r = requests.get(url, timeout=60)
         df = pd.DataFrame(r.json())
         self.tokendf = df[df["exch_seg"] == "BSE"][["token", "name", "symbol"]]
-        self.tokendf.to_csv(r"./tokens/tokens_{dt}.csv".format(dt=datetime.datetime.now().strftime("%Y%m%d")))
+        self.tokendf.to_csv(os.path.join(self.TOKENS_DIR, "tokens_{dt}.csv".format(dt=datetime.datetime.now().strftime("%Y%m%d"))))
 
     def getBSEToken(self, symbol):
         data = self.tokendf[self.tokendf["symbol"] == symbol]
@@ -357,6 +379,9 @@ class ScreenerScrape(stockScreener):
     def upcomingResults(self):
         sc = stockScreener()
         return sc.upcomingResults()
+
+    def companyInfo(self):
+        return self.getCompanyInfo()
 
 
 # quarterly DF

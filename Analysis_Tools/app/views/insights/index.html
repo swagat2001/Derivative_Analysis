@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Market Insights - Derivative Analysis{% endblock %}
+{% block title %}Market Neev - Derivative Analysis{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/screener.css') }}">
@@ -1352,12 +1352,36 @@
             </div>
         </div>
 
+        <!-- EOD Data Disclaimer -->
+        <div
+            style="background-color: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                style="width: 16px; height: 16px;">
+                <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span>Note: All analysis and insights are based on End-of-Day (EOD) data of <strong>{{ selected_date
+                    }}</strong>.</span>
+        </div>
+
         <!-- Controls Bar (ScanX Style) -->
         <div class="controls-bar scanx-controls" id="heatmapControls" {% if active_tab !='heatmap'
             %}style="display:none;" {% endif %}>
+
+            <!-- Filter Type Toggle -->
             <div class="control-group">
-                <label>Index :</label>
-                <select id="indexSelect" onchange="changeIndex(this.value)">
+                <label>Filter By :</label>
+                <select id="filterTypeSelect" onchange="changeFilterType(this.value)">
+                    <option value="index" selected>Index</option>
+                    <option value="sector">Sector</option>
+                </select>
+            </div>
+
+            <!-- Dynamic Filter Dropdown -->
+            <div class="control-group">
+                <label id="filterLabel">Index :</label>
+                <select id="filterSelect" onchange="changeFilter(this.value)">
                     {% for idx in index_list %}
                     <option value="{{ idx.key }}" {% if idx.key==selected_index %}selected{% endif %}>{{ idx.name }}
                     </option>
@@ -1582,7 +1606,7 @@
                 if (!globalFiiData) container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>'; // Only spinner on first load
                 try {
                     const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
-                    const response = await fetch(`/insights/api/fii-dii?end_date=${dateParam}&days=${days}`);
+                    const response = await fetch(`/neev/api/fii-dii?end_date=${dateParam}&days=${days}`);
                     const data = await response.json();
 
                     if ((!data.data || !data.data.length) && (!data.derivatives || !Object.keys(data.derivatives).length)) {
@@ -2202,7 +2226,7 @@
                 'volume': 'Volume Breakout Scanner',
                 'sectors': 'Sector Performance'
             };
-            titleText.textContent = titles[tab] || 'Market Insights';
+            titleText.textContent = titles[tab] || 'Market Neev';
         }
 
         const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDii, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors };
@@ -2210,6 +2234,81 @@
     }
 
     let currentPerformance = 'D';
+
+    // ============================================
+    // FILTER TYPE: INDEX vs SECTOR TOGGLE
+    // ============================================
+
+    let currentFilterType = 'index';  // 'index' or 'sector'
+    let currentFilterValue = 'all';
+
+    // Sectors list (will be populated from API data)
+    let availableSectors = [];
+
+    function changeFilterType(filterType) {
+        currentFilterType = filterType;
+        const filterLabel = document.getElementById('filterLabel');
+        const filterSelect = document.getElementById('filterSelect');
+
+        if (filterType === 'sector') {
+            // Switch to sector filtering
+            filterLabel.textContent = 'Sector :';
+
+            // Get unique sectors from current data
+            if (availableSectors.length === 0) {
+                // Extract sectors from last loaded heatmap data
+                const cacheKeys = Array.from(heatmapDataCache.keys());
+                if (cacheKeys.length > 0) {
+                    const lastData = heatmapDataCache.get(cacheKeys[0]);
+                    if (lastData && lastData.stocks) {
+                        const sectorSet = new Set();
+                        lastData.stocks.forEach(stock => {
+                            if (stock.sector) sectorSet.add(stock.sector);
+                        });
+                        availableSectors = Array.from(sectorSet).sort();
+                    }
+                }
+            }
+
+            // Populate sector dropdown
+            filterSelect.innerHTML = '<option value="all">All Sectors</option>';
+            availableSectors.forEach(sector => {
+                filterSelect.innerHTML += `<option value="${sector}">${sector}</option>`;
+            });
+
+            currentFilterValue = 'all';
+
+        } else {
+            // Switch to index filtering
+            filterLabel.textContent = 'Index :';
+
+            // Populate index dropdown (restore original)
+            filterSelect.innerHTML = `
+                {% for idx in index_list %}
+                <option value="{{ idx.key }}">{{ idx.name }}</option>
+                {% endfor %}
+            `;
+
+            // Set to current index value
+            filterSelect.value = currentIndex || 'all';
+            currentFilterValue = currentIndex || 'all';
+        }
+
+        // Reload heatmap with new filter
+        loadHeatmap();
+    }
+
+    function changeFilter(value) {
+        currentFilterValue = value;
+
+        if (currentFilterType === 'index') {
+            currentIndex = value;
+            changeIndex(value);
+        } else {
+            // Sector filtering
+            loadHeatmap();
+        }
+    }
 
     function changeIndex(index) {
         currentIndex = index;
@@ -2399,9 +2498,9 @@
         const view = document.getElementById('heatmapView').value;
         const sort = document.getElementById('heatmapSort').value;
 
-        // Construct cache key
+        // Construct cache key (include filter type and value)
         const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
-        const cacheKey = `${dateParam}_${sort}_${currentIndex}_${currentPerformance}_${view}`;
+        const cacheKey = `${dateParam}_${sort}_${currentIndex}_${currentPerformance}_${view}_${currentFilterType}_${currentFilterValue}`;
 
         // Check Cache First
         if (heatmapDataCache.has(cacheKey)) {
@@ -2414,7 +2513,10 @@
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
         try {
-            const response = await fetch(`/insights/api/heatmap?date=${dateParam}&sort=${sort}&index=${currentIndex}&period=${currentPerformance}`);
+            // Use index or sector filtering based on current filter type
+            let filterParam = currentFilterType === 'index' ? `index=${currentIndex}` : `index=all`;
+
+            const response = await fetch(`/neev/api/heatmap?date=${dateParam}&sort=${sort}&${filterParam}&period=${currentPerformance}`);
             const data = await response.json();
 
             if (!data.success || !data.stocks.length) {
@@ -2435,30 +2537,72 @@
 
     function renderHeatmapWithData(data, view, sort) {
         if (data.indices) updateIndexDropdown(data.indices);
+
+        // Extract and store available sectors
+        if (data.stocks) {
+            const sectorSet = new Set();
+            data.stocks.forEach(stock => {
+                if (stock.sector) sectorSet.add(stock.sector);
+            });
+            availableSectors = Array.from(sectorSet).sort();
+        }
+
+        // Apply sector filtering if needed
+        let filteredStocks = data.stocks;
+        if (currentFilterType === 'sector' && currentFilterValue !== 'all') {
+            filteredStocks = data.stocks.filter(stock => stock.sector === currentFilterValue);
+
+            // Recalculate stats for filtered stocks
+            if (filteredStocks.length > 0) {
+                const advances = filteredStocks.filter(s => s.change_pct > 0).length;
+                const declines = filteredStocks.filter(s => s.change_pct < 0).length;
+                const unchanged = filteredStocks.filter(s => s.change_pct === 0).length;
+
+                data.stats = {
+                    advances,
+                    declines,
+                    unchanged,
+                    total: filteredStocks.length
+                };
+            }
+        }
+
         updateMarketSummary(data.stats);
 
-        if (view === 'sector') renderSectorHeatmap(data.stocks);
-        else renderTreemapHeatmap(data.stocks, sort);
+        if (view === 'sector') renderSectorHeatmap(filteredStocks);
+        else renderTreemapHeatmap(filteredStocks, sort);
     }
 
     function updateIndexDropdown(indices) {
-        const select = document.getElementById('indexSelect');
-        // Use global currentIndex if available, else fallback
-        const selectedVal = currentIndex || select.value || 'all';
-        select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === selectedVal ? 'selected' : ''}>${idx.name}</option>`).join('');
+        const select = document.getElementById('filterSelect');
+
+        // Only update if we're in index mode
+        if (currentFilterType === 'index') {
+            // Use global currentIndex if available, else fallback
+            const selectedVal = currentIndex || select.value || 'all';
+            select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === selectedVal ? 'selected' : ''}>${idx.name}</option>`).join('');
+        }
     }
 
     function updateMarketSummary(stats) {
         if (!stats) return;
 
-        // Get selected index name
-        const selectedIndex = document.getElementById('indexSelect');
-        const indexName = selectedIndex ? selectedIndex.options[selectedIndex.selectedIndex].text.split(' (')[0] : 'All F&O';
+        // Get selected filter name (index or sector)
+        const filterSelect = document.getElementById('filterSelect');
+        let filterName = 'All F&O';
 
-        // Update title to reflect selected index
+        if (filterSelect) {
+            if (currentFilterType === 'sector') {
+                filterName = currentFilterValue === 'all' ? 'All Sectors' : currentFilterValue;
+            } else {
+                filterName = filterSelect.options[filterSelect.selectedIndex].text.split(' (')[0];
+            }
+        }
+
+        // Update title to reflect selected filter
         const titleText = document.getElementById('heatmapTitleText');
         if (titleText) {
-            titleText.textContent = indexName + ' Heatmap';
+            titleText.textContent = filterName + ' Heatmap';
         }
 
         // Update right side index info (using stats for now since we don't have live price)
@@ -2466,7 +2610,7 @@
         const indexChange = document.getElementById('indexChange');
         const indexArrow = document.getElementById('indexArrow');
 
-        if (indexLabel) indexLabel.textContent = indexName;
+        if (indexLabel) indexLabel.textContent = filterName;
 
         if (indexChange) {
             const changeText = `${stats.advances} ↑ ${stats.declines} ↓`;
@@ -2615,7 +2759,7 @@
         }
 
         try {
-            const response = await fetch(`/insights/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}`);
+            const response = await fetch(`/neev/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}`);
             const data = await response.json();
 
             if (!data.success || !data.data || data.data.length === 0) {
@@ -2691,30 +2835,101 @@
         const container = document.getElementById('week52-container');
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
         try {
-            const response = await fetch(`/insights/api/52-week?date=${currentDate}&index=${currentIndex}`);
+            const response = await fetch(`/neev/api/52-week?date=${currentDate}&index=${currentIndex}`);
             const data = await response.json();
             if (!data.success) { container.innerHTML = '<div class="empty-state"><p>No 52-week data</p></div>'; return; }
-            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">🔥 At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">📈 Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">⚠️ At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">📉 Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
+            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
         } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
     }
 
     async function loadVolume() {
         const container = document.getElementById('volume-container');
         const multiplier = document.getElementById('volumeMultiplier').value;
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        const index = currentIndex || 'all';
+
+        if (container.innerHTML.trim() === '') {
+            container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        }
+
         try {
-            const response = await fetch(`/insights/api/volume-breakouts?date=${currentDate}&multiplier=${multiplier}&index=${currentIndex}`);
+            const response = await fetch(`/neev/api/volume-breakouts?date=${currentDate}&multiplier=${multiplier}&index=${index}`);
             const data = await response.json();
-            if (!data.success || !data.data.length) { container.innerHTML = '<div class="empty-state"><p>No volume breakouts</p></div>'; return; }
-            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat"><span class="stat-value">${data.count}</span><span class="stat-label">Breakout Stocks</span></div></div><div class="volume-grid">${data.data.map(s => `<div class="volume-card"><div class="volume-header"><a href="/stock/${s.symbol}" target="_blank" class="volume-symbol">${s.symbol}</a><span class="volume-ratio">${s.volume_ratio}x</span></div><div class="volume-stats"><div class="volume-stat"><span class="value">${formatNumber(s.volume)}</span><span class="label">Volume</span></div><div class="volume-stat"><span class="value">${formatNumber(s.avg_volume)}</span><span class="label">Avg Vol</span></div><div class="volume-stat"><span class="value">₹${s.close.toLocaleString()}</span><span class="label">Price</span></div><div class="volume-stat"><span class="value">${s.sector}</span><span class="label">Sector</span></div></div></div>`).join('')}</div>`;
-        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+
+            if (!data.success || !data.data || data.data.length === 0) {
+                container.innerHTML = `<div class="empty-state">
+                        <h3>📊 No Volume Breakout Data</h3>
+                        <p>No stocks found with volume ≥ ${multiplier}x average for ${currentDate}.</p>
+                    </div>`;
+                return;
+            }
+
+            // TABLE START
+            let html = `
+            <div class="screener-card" style="padding:0; overflow:hidden;">
+            <div style="overflow-x:auto;">
+            <table class="delivery-table">
+                <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th class="text-right">LTP (₹)</th>
+                        <th class="text-right">Change %</th>
+                        <th class="text-right">Today Vol</th>
+                        <th class="text-right">Avg Vol (20D)</th>
+                        <th class="text-right">Volume Ratio</th>
+                        <th>Sector</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            // TABLE ROWS
+            data.data.forEach(s => {
+                const changeClass = s.change_pct >= 0 ? 'positive' : 'negative';
+                const changeSign = s.change_pct >= 0 ? '+' : '';
+                const logoInitials = s.symbol.substring(0, 2);
+
+                // Color code the ratio - higher = more significant
+                let ratioColor = '#8b5cf6'; // purple default
+                if (s.volume_ratio >= 5) ratioColor = '#dc2626'; // red for extreme
+                else if (s.volume_ratio >= 3) ratioColor = '#f59e0b'; // orange for high
+
+                html += `
+                <tr>
+                    <td>
+                        <a href="/stock/${s.symbol}" target="_blank" class="stock-cell">
+                            <div class="stock-logo">${logoInitials}</div>
+                            <span class="stock-name">${s.symbol}</span>
+                        </a>
+                    </td>
+                    <td class="text-right" style="font-weight:600">₹${s.close.toLocaleString()}</td>
+                    <td class="text-right ${changeClass}" style="font-weight:700">${changeSign}${s.change_pct ? s.change_pct.toFixed(2) : '0.00'}%</td>
+                    <td class="text-right" style="font-weight:600">${formatNumber(s.volume)}</td>
+                    <td class="text-right">${formatNumber(s.avg_volume)}</td>
+                    <td class="text-right">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                            <span style="font-weight:800; color:${ratioColor};">${s.volume_ratio}x</span>
+                            <div class="progress-bar-bg" style="width:120px;">
+                                <div class="progress-bar-fill" style="width:${Math.min(s.volume_ratio * 20, 100)}%; background:${ratioColor}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:11px; color:#64748b;">${s.sector || '-'}</td>
+                </tr>`;
+            });
+
+            html += `</tbody></table></div></div>`;
+            container.innerHTML = html;
+
+        } catch (e) {
+            console.error('Error loading volume data:', e);
+            container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load volume breakout data.</p></div>';
+        }
     }
 
     async function loadSectors() {
         const container = document.getElementById('sectors-container');
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
         try {
-            const response = await fetch(`/insights/api/sector-performance?date=${currentDate}`);
+            const response = await fetch(`/neev/api/sector-performance?date=${currentDate}`);
             const data = await response.json();
             if (!data.success || !data.sectors.length) { container.innerHTML = '<div class="empty-state"><p>No sector data</p></div>'; return; }
             container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Sector Performance</span></div><table class="card-table"><thead><tr><th>#</th><th>Sector</th><th>Avg Change</th><th>Turnover</th><th>Stocks</th><th>Top Movers</th></tr></thead><tbody>${data.sectors.map((s, i) => `<tr><td>${i + 1}</td><td><strong>${s.sector}</strong></td><td class="${s.avg_change >= 0 ? 'positive' : 'negative'}">${s.avg_change >= 0 ? '+' : ''}${s.avg_change}%</td><td>${formatNumber(s.total_turnover)}</td><td>${s.stock_count}</td><td>${s.stocks.slice(0, 3).map(sym => `<a href="/stock/${sym}" class="symbol-link">${sym}</a>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;

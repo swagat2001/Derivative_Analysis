@@ -562,13 +562,57 @@
       "EPSinRs": 22.9
     },
     {
-      "GrossNPA%": 0.0173
+      "GrossNPA%": 0.0
     },
     {
-      "NetNPA%": 0.0042
+      "NetNPA%": 0.0
     },
     {
       "RawPDF": "/company/source/quarter/3188/9/2025/"
+    }
+  ],
+  "2025-12-01": [
+    {
+      "Revenue ": 130590.0
+    },
+    {
+      "Interest": 78783.0
+    },
+    {
+      "Expenses ": 76799.0
+    },
+    {
+      "FinancingProfit": -24992.0
+    },
+    {
+      "FinancingMargin%": -0.19
+    },
+    {
+      "OtherIncome ": 55059.0
+    },
+    {
+      "Depreciation": 0.0
+    },
+    {
+      "Profitbeforetax": 30067.0
+    },
+    {
+      "Tax%": 0.27
+    },
+    {
+      "NetProfit ": 22176.0
+    },
+    {
+      "EPSinRs": 23.09
+    },
+    {
+      "GrossNPA%": 0.0
+    },
+    {
+      "NetNPA%": 0.0
+    },
+    {
+      "RawPDF": "/company/source/quarter/3188/12/2025/"
     }
   ]
 }

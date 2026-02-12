@@ -39,7 +39,7 @@ from ...models.insights_model import (
 from ...models.stock_model import get_filtered_tickers
 
 # Blueprint setup
-insights_bp = Blueprint("insights", __name__, url_prefix="/insights", template_folder="../../views/insights")
+insights_bp = Blueprint("insights", __name__, url_prefix="/neev", template_folder="../../views/insights")
 
 # Cache setup
 cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})

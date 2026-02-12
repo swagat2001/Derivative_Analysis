@@ -45,7 +45,7 @@ async function loadFiiDiiEnhanced() {
     try {
         // Get currentDate from global scope or use empty string
         const dateParam = (typeof currentDate !== 'undefined' && currentDate && currentDate !== 'None') ? currentDate : '';
-        const url = `/insights/api/fii-dii?end_date=${dateParam}&days=${days}`;
+        const url = `/neev/api/fii-dii?end_date=${dateParam}&days=${days}`;
 
         console.log('[FII/DII Enhanced] Fetching from URL:', url);
 

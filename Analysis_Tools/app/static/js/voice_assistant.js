@@ -145,13 +145,13 @@ class GoldmineVoiceAssistant {
     if (path === '/' || path === '') return 'home';
     if (path === '/dashboard' || path === '/dashboard/') return 'dashboard';
     if (path.startsWith('/stock/')) return 'stock_detail';
-    if (path === '/screener/' || path === '/screener') return 'screener_landing';
+    if (path === '/scanner/' || path === '/screener') return 'screener_landing';
     if (path.includes('top-gainers-losers')) return 'top_gainers_losers';
     if (path.includes('signal-analysis')) return 'signal_analysis';
     if (path.includes('futures-oi')) return 'futures_oi';
     if (path.includes('technical')) return 'technical_screener';
-    if (path.includes('/screener/index') || path.includes('/screener/banknifty') ||
-        path.includes('/screener/high-oi') || path.includes('/screener/iv-spike')) return 'index_screener';
+    if (path.includes('/scanner/index') || path.includes('/scanner/banknifty') ||
+      path.includes('/scanner/high-oi') || path.includes('/scanner/iv-spike')) return 'index_screener';
     if (path === '/login') return 'login';
     if (path === '/signup') return 'signup';
 
@@ -291,12 +291,12 @@ class GoldmineVoiceAssistant {
       'home': 'Home',
       'dashboard': 'Dashboard',
       'stock_detail': `Stock: ${this.getCurrentTicker() || 'Detail'}`,
-      'screener_landing': 'Screeners',
+      'screener_landing': 'Scanners',
       'top_gainers_losers': 'Top Gainers & Losers',
       'signal_analysis': 'Signal Analysis',
       'futures_oi': 'Futures OI',
-      'technical_screener': 'Technical Screener',
-      'index_screener': 'Index Screener',
+      'technical_screener': 'Technical Scanner',
+      'index_screener': 'Index Scanner',
       'login': 'Login',
       'signup': 'Sign Up',
       'unknown': 'Page'
@@ -412,7 +412,7 @@ class GoldmineVoiceAssistant {
   }
 
   stop() {
-    try { this.recognition.stop(); } catch (e) {}
+    try { this.recognition.stop(); } catch (e) { }
     this.updateUI('idle');
   }
 
@@ -568,40 +568,40 @@ class GoldmineVoiceAssistant {
       return this.navigate('/dashboard', 'dashboard');
     }
 
-    if (this.match(cmd, ['go to screeners', 'screeners', 'open screeners', 'screener hub'])) {
-      return this.navigate('/screener/', 'screeners');
+    if (this.match(cmd, ['go to screeners', 'screeners', 'open screeners', 'screener hub', 'go to scanners', 'scanners', 'open scanners', 'scanner hub'])) {
+      return this.navigate('/scanner/', 'scanners');
     }
 
     if (this.match(cmd, ['top gainers', 'gainers losers', 'top losers'])) {
-      return this.navigate('/screener/top-gainers-losers', 'top gainers');
+      return this.navigate('/scanner/top-gainers-losers', 'top gainers');
     }
 
     if (this.match(cmd, ['signal analysis', 'signals', 'trading signals'])) {
-      return this.navigate('/screener/signal-analysis', 'signal analysis');
+      return this.navigate('/scanner/signal-analysis', 'signal analysis');
     }
 
     if (this.match(cmd, ['futures oi', 'futures', 'open interest'])) {
-      return this.navigate('/screener/futures-oi', 'futures OI');
+      return this.navigate('/scanner/futures-oi', 'futures OI');
     }
 
-    if (this.match(cmd, ['technical screener', 'technical', 'technical analysis'])) {
-      return this.navigate('/screener/technical-indicators', 'technical screener');
+    if (this.match(cmd, ['technical screener', 'technical', 'technical analysis', 'technical scanner'])) {
+      return this.navigate('/scanner/technical-indicators', 'technical scanner');
     }
 
     if (this.match(cmd, ['nifty 50', 'nifty fifty', 'nifty'])) {
-      return this.navigate('/screener/index', 'Nifty 50');
+      return this.navigate('/scanner/index', 'Nifty 50');
     }
 
     if (this.match(cmd, ['bank nifty', 'banknifty'])) {
-      return this.navigate('/screener/banknifty', 'Bank Nifty');
+      return this.navigate('/scanner/banknifty', 'Bank Nifty');
     }
 
     if (this.match(cmd, ['high oi', 'high open interest', 'oi buildup'])) {
-      return this.navigate('/screener/high-oi', 'high OI');
+      return this.navigate('/scanner/high-oi', 'high OI');
     }
 
     if (this.match(cmd, ['iv spike', 'volatility spike'])) {
-      return this.navigate('/screener/iv-spike', 'IV spike');
+      return this.navigate('/scanner/iv-spike', 'IV spike');
     }
 
     // Dynamic stock search - check against database
@@ -911,10 +911,10 @@ class GoldmineVoiceAssistant {
 
   parseTechnicalCommands(cmd) {
     if (this.match(cmd, ['golden crossover', 'golden cross'])) {
-      return this.navigate('/screener/technical-indicators/golden-crossover', 'golden crossover');
+      return this.navigate('/scanner/technical-indicators/golden-crossover', 'golden crossover');
     }
     if (this.match(cmd, ['death crossover', 'death cross'])) {
-      return this.navigate('/screener/technical-indicators/death-crossover', 'death crossover');
+      return this.navigate('/scanner/technical-indicators/death-crossover', 'death crossover');
     }
     if (this.match(cmd, ['rsi overbought', 'overbought'])) {
       return this.clickElement('[data-indicator="rsi-overbought"]', 'RSI overbought');

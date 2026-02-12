@@ -1,10 +1,53 @@
 <!-- ==============================
      STOCK DETAIL CHART COMPONENT
-     Multi-Panel: Price, OI, Volume, IV, PCR
+     Professional Candlestick Chart with Multiple Indicators
      ============================== -->
 <div class="chart-section">
-    <h3 class="section-title">Price History (Last 40 Days)</h3>
-    <div class="price-chart-container" id="priceChart">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="section-title" style="margin: 0;">Price History (Last 90 Days)</h3>
+
+        <!-- Chart Type Selector -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="chart-toggle-btn active" onclick="toggleIndicator('price')" id="btn-price">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M2 14V2h2v12H2zm4-6v6h2V8H6zm4-4v10h2V4h-2z"/>
+                </svg>
+                Price
+            </button>
+            <button class="chart-toggle-btn active" onclick="toggleIndicator('volume')" id="btn-volume">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M1 14h14v2H1z M3 10h2v4H3z M6 6h2v8H6z M9 8h2v6H9z M12 4h2v10h-2z"/>
+                </svg>
+                Volume
+            </button>
+            <button class="chart-toggle-btn" onclick="toggleIndicator('oi')" id="btn-oi">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M1 2v12h14V2H1zm13 11H2V3h12v10z"/>
+                </svg>
+                OI
+            </button>
+            <button class="chart-toggle-btn" onclick="toggleIndicator('iv')" id="btn-iv">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 1l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z"/>
+                </svg>
+                IV
+            </button>
+            <button class="chart-toggle-btn" onclick="toggleIndicator('pcr')" id="btn-pcr">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 2a6 6 0 100 12A6 6 0 008 2zM4 8h8"/>
+                </svg>
+                PCR
+            </button>
+            <button class="chart-toggle-btn" onclick="toggleIndicator('moneyness')" id="btn-moneyness">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M2 8l4-4v3h8v2H6v3z"/>
+                </svg>
+                Moneyness
+            </button>
+        </div>
+    </div>
+
+    <div class="price-chart-container" id="priceChart" style="height: 500px;">
         <div class="chart-loading">
             <div class="loading-spinner"></div>
             <span>Loading chart...</span>
@@ -12,10 +55,47 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+.chart-toggle-btn {
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-toggle-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.chart-toggle-btn.active {
+    background: linear-gradient(135deg, #8B2432 0%, #c14858 100%);
+    color: white;
+    border-color: #8B2432;
+    box-shadow: 0 2px 8px rgba(139, 36, 50, 0.25);
+}
+
+.chart-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+}
+</style>
 
 <script>
-// Load comprehensive chart data
+// Global chart data and active indicators
+let globalChartData = null;
+let activeIndicators = new Set(['price', 'volume']); // Default active
+let currentChart = null;
+
+// Load comprehensive chart data using Highcharts
 document.addEventListener('DOMContentLoaded', function() {
     const ticker = '{{ ticker }}';
     const chartContainer = document.getElementById('priceChart');
@@ -25,7 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(result => {
             if (result.success && result.data.length > 0) {
-                renderComprehensiveChart(result.data);
+                globalChartData = result.data;
+                renderMultiIndicatorChart();
             } else {
                 chartContainer.innerHTML = '<div class="no-data-message">No price data available</div>';
             }
@@ -36,200 +117,365 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });
 
-function renderComprehensiveChart(data) {
-    const container = document.getElementById('priceChart');
-    container.innerHTML = '<canvas id="mainChart"></canvas>';
+function toggleIndicator(indicator) {
+    if (!globalChartData) return;
 
-    const ctx = document.getElementById('mainChart').getContext('2d');
+    // Toggle indicator in set
+    if (activeIndicators.has(indicator)) {
+        activeIndicators.delete(indicator);
+    } else {
+        activeIndicators.add(indicator);
+    }
 
-    // Sort data by date
-    const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    // Ensure at least one indicator is active
+    if (activeIndicators.size === 0) {
+        activeIndicators.add('price');
+    }
 
-    // Extract data
-    const labels = sortedData.map(d => d.date);
-    const prices = sortedData.map(d => d.close);
-    const oi = sortedData.map(d => d.oi || 0);
-    const volume = sortedData.map(d => d.volume || 0);
-    const iv = sortedData.map(d => d.iv || 0);
-    const pcr = sortedData.map(d => d.pcr || 0);
-    const moneynessChange = sortedData.map(d => d.moneyness_change || 0);
+    // Update button states
+    document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+        const btnId = btn.id.replace('btn-', '');
+        if (activeIndicators.has(btnId)) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Price',
-                    data: prices,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    yAxisID: 'y',
-                    tension: 0.1,
-                    borderWidth: 2,
-                },
-                {
-                    label: 'Open Interest',
-                    data: oi,
-                    borderColor: '#059669',
-                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
-                    yAxisID: 'y1',
-                    tension: 0.1,
-                    borderWidth: 2,
-                    hidden: true,
-                },
-                {
-                    label: 'Volume',
-                    data: volume,
-                    borderColor: '#d97706',
-                    backgroundColor: 'rgba(217, 119, 6, 0.1)',
-                    yAxisID: 'y2',
-                    tension: 0.1,
-                    borderWidth: 2,
-                    hidden: true,
-                },
-                {
-                    label: 'IV',
-                    data: iv,
-                    borderColor: '#7c3aed',
-                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
-                    yAxisID: 'y3',
-                    tension: 0.1,
-                    borderWidth: 2,
-                    hidden: true,
-                },
-                {
-                    label: 'PCR',
-                    data: pcr,
-                    borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                    yAxisID: 'y4',
-                    tension: 0.1,
-                    borderWidth: 2,
-                    hidden: true,
-                },
-                {
-                    label: 'Moneyness Change',
-                    data: moneynessChange,
-                    borderColor: '#ec4899',
-                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                    yAxisID: 'y5',
-                    tension: 0.1,
-                    borderWidth: 2,
-                    hidden: true,
-                }
-            ]
+    // Re-render chart
+    renderMultiIndicatorChart();
+}
+
+function renderMultiIndicatorChart() {
+    if (!globalChartData) return;
+
+    // Destroy existing chart
+    if (currentChart) {
+        currentChart.destroy();
+    }
+
+    const sortedData = globalChartData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Prepare all data series
+    const dataMap = {
+        price: [],
+        volume: [],
+        oi: [],
+        iv: [],
+        pcr: [],
+        moneyness: []
+    };
+
+    sortedData.forEach(d => {
+        const timestamp = new Date(d.date).getTime();
+
+        // OHLC for candlestick
+        dataMap.price.push([
+            timestamp,
+            d.open || d.close,
+            d.high || d.close,
+            d.low || d.close,
+            d.close
+        ]);
+
+        dataMap.volume.push([timestamp, d.volume || 0]);
+        dataMap.oi.push([timestamp, d.oi || 0]);
+        dataMap.iv.push([timestamp, d.iv || 0]);
+        dataMap.pcr.push([timestamp, d.pcr || 0]);
+        dataMap.moneyness.push([timestamp, d.moneyness_change || 0]);
+    });
+
+    // Build yAxis configuration - UNIFIED OVERLAY APPROACH
+    const yAxisConfig = [];
+    const seriesConfig = [];
+    let axisIndex = 0;
+
+    // Determine if we need volume panel (separate bottom panel)
+    const hasVolume = activeIndicators.has('volume');
+    const mainPanelHeight = hasVolume ? 75 : 100;
+    const volumePanelHeight = hasVolume ? 25 : 0;
+
+    // === MAIN CHART PANEL (Price + overlays) ===
+
+    // Price Y-Axis (Left side - always primary)
+    if (activeIndicators.has('price')) {
+        yAxisConfig.push({
+            labels: {
+                align: 'left',
+                x: 5,
+                style: { color: '#2563eb', fontWeight: '600', fontSize: '11px' },
+                formatter: function() { return '₹' + Highcharts.numberFormat(this.value, 0, '.', ','); }
+            },
+            title: { text: 'Price', style: { color: '#2563eb', fontWeight: '700', fontSize: '12px' }},
+            height: mainPanelHeight + '%',
+            lineWidth: 2,
+            gridLineColor: '#f1f5f9',
+            opposite: false
+        });
+
+        seriesConfig.push({
+            type: 'candlestick',
+            name: '{{ ticker }}',
+            data: dataMap.price,
+            yAxis: axisIndex,
+            color: '#ef4444',
+            upColor: '#22c55e',
+            lineColor: '#ef4444',
+            upLineColor: '#22c55e',
+            tooltip: { valueDecimals: 2, valuePrefix: '₹' },
+            zIndex: 2
+        });
+
+        axisIndex++;
+    }
+
+    // OI Y-Axis (Right side - overlay)
+    if (activeIndicators.has('oi')) {
+        yAxisConfig.push({
+            labels: {
+                align: 'right',
+                x: -5,
+                style: { color: '#059669', fontWeight: '600', fontSize: '11px' },
+                formatter: function() { return Highcharts.numberFormat(this.value / 1000000, 1) + 'M'; }
+            },
+            title: { text: 'OI', style: { color: '#059669', fontWeight: '700', fontSize: '12px' }},
+            height: mainPanelHeight + '%',
+            lineWidth: 2,
+            gridLineColor: 'transparent',
+            opposite: true,
+            offset: 0
+        });
+
+        seriesConfig.push({
+            type: 'line',
+            name: 'OI',
+            data: dataMap.oi,
+            yAxis: axisIndex,
+            color: '#059669',
+            lineWidth: 2,
+            tooltip: { valueDecimals: 0 },
+            zIndex: 1
+        });
+
+        axisIndex++;
+    }
+
+    // IV Y-Axis (Right side - overlay)
+    if (activeIndicators.has('iv')) {
+        const offset = activeIndicators.has('oi') ? 60 : 0;
+        yAxisConfig.push({
+            labels: {
+                align: 'right',
+                x: -5,
+                style: { color: '#7c3aed', fontWeight: '600', fontSize: '11px' },
+                formatter: function() { return this.value.toFixed(1) + '%'; }
+            },
+            title: { text: 'IV', style: { color: '#7c3aed', fontWeight: '700', fontSize: '12px' }},
+            height: mainPanelHeight + '%',
+            lineWidth: 2,
+            gridLineColor: 'transparent',
+            opposite: true,
+            offset: offset
+        });
+
+        seriesConfig.push({
+            type: 'spline',
+            name: 'IV',
+            data: dataMap.iv,
+            yAxis: axisIndex,
+            color: '#7c3aed',
+            lineWidth: 2,
+            dashStyle: 'Dash',
+            tooltip: { valueSuffix: '%', valueDecimals: 2 },
+            zIndex: 1
+        });
+
+        axisIndex++;
+    }
+
+    // PCR Y-Axis (Right side - overlay)
+    if (activeIndicators.has('pcr')) {
+        let offset = 0;
+        if (activeIndicators.has('oi')) offset += 60;
+        if (activeIndicators.has('iv')) offset += 60;
+
+        yAxisConfig.push({
+            labels: {
+                align: 'right',
+                x: -5,
+                style: { color: '#dc2626', fontWeight: '600', fontSize: '11px' },
+                formatter: function() { return this.value.toFixed(2); }
+            },
+            title: { text: 'PCR', style: { color: '#dc2626', fontWeight: '700', fontSize: '12px' }},
+            height: mainPanelHeight + '%',
+            lineWidth: 2,
+            gridLineColor: 'transparent',
+            opposite: true,
+            offset: offset,
+            plotLines: [{
+                value: 1.0, color: '#94a3b8', dashStyle: 'dot', width: 1,
+                label: { text: '1.0', align: 'right', style: { color: '#64748b', fontSize: '9px' }}
+            }]
+        });
+
+        seriesConfig.push({
+            type: 'spline',
+            name: 'PCR',
+            data: dataMap.pcr,
+            yAxis: axisIndex,
+            color: '#dc2626',
+            lineWidth: 2,
+            dashStyle: 'ShortDot',
+            tooltip: { valueDecimals: 3 },
+            zIndex: 1
+        });
+
+        axisIndex++;
+    }
+
+    // Moneyness Y-Axis (Left side - overlay)
+    if (activeIndicators.has('moneyness')) {
+        const offset = activeIndicators.has('price') ? 60 : 0;
+        yAxisConfig.push({
+            labels: {
+                align: 'left',
+                x: 5,
+                style: { color: '#ec4899', fontWeight: '600', fontSize: '11px' },
+                formatter: function() { return this.value.toFixed(4); }
+            },
+            title: { text: 'Moneyness', style: { color: '#ec4899', fontWeight: '700', fontSize: '12px' }},
+            height: mainPanelHeight + '%',
+            lineWidth: 2,
+            gridLineColor: 'transparent',
+            opposite: false,
+            offset: offset,
+            plotLines: [{
+                value: 0, color: '#94a3b8', dashStyle: 'dot', width: 1
+            }]
+        });
+
+        seriesConfig.push({
+            type: 'line',
+            name: 'Moneyness',
+            data: dataMap.moneyness,
+            yAxis: axisIndex,
+            color: '#ec4899',
+            lineWidth: 2,
+            tooltip: { valueDecimals: 4 },
+            zIndex: 1
+        });
+
+        axisIndex++;
+    }
+
+    // === VOLUME PANEL (Separate bottom panel) ===
+    if (activeIndicators.has('volume')) {
+        yAxisConfig.push({
+            labels: {
+                align: 'right',
+                x: -5,
+                style: { color: '#d97706', fontWeight: '600', fontSize: '11px' },
+                formatter: function() { return Highcharts.numberFormat(this.value / 1000000, 1) + 'M'; }
+            },
+            title: { text: 'Volume', style: { color: '#d97706', fontWeight: '700', fontSize: '12px' }},
+            top: (mainPanelHeight + 2) + '%',
+            height: (volumePanelHeight - 2) + '%',
+            lineWidth: 2,
+            gridLineColor: '#f1f5f9',
+            opposite: false
+        });
+
+        seriesConfig.push({
+            type: 'column',
+            name: 'Volume',
+            data: dataMap.volume,
+            yAxis: axisIndex,
+            color: 'rgba(217, 119, 6, 0.5)',
+            borderWidth: 0,
+            tooltip: { valueDecimals: 0 }
+        });
+
+        axisIndex++;
+    }
+
+    // Create the unified overlay chart
+    currentChart = Highcharts.stockChart('priceChart', {
+        chart: {
+            backgroundColor: '#ffffff',
+            style: { fontFamily: 'Inter, system-ui, sans-serif' },
+            height: 500
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    onClick: function(e, legendItem, legend) {
-                        const index = legendItem.datasetIndex;
-                        const chart = legend.chart;
-                        const meta = chart.getDatasetMeta(index);
-                        meta.hidden = !meta.hidden;
-                        chart.update();
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed.y !== null) {
-                                if (context.dataset.label === 'Moneyness Change') {
-                                    label += context.parsed.y.toFixed(4);
-                                } else {
-                                    label += new Intl.NumberFormat('en-IN').format(context.parsed.y);
-                                }
-                            }
-                            return label;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Price',
-                        color: '#2563eb'
-                    },
-                    ticks: {
-                        color: '#2563eb'
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: false,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'OI'
-                    }
-                },
-                y2: {
-                    type: 'linear',
-                    display: false,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Volume'
-                    }
-                },
-                y3: {
-                    type: 'linear',
-                    display: false,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'IV'
-                    }
-                },
-                y4: {
-                    type: 'linear',
-                    display: false,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'PCR'
-                    }
-                },
-                y5: {
-                    type: 'linear',
-                    display: false,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Moneyness Change',
-                        color: '#ec4899'
-                    },
-                    ticks: {
-                        color: '#ec4899'
+        rangeSelector: {
+            selected: 1,
+            buttons: [
+                { type: 'week', count: 1, text: '1w' },
+                { type: 'month', count: 1, text: '1m' },
+                { type: 'month', count: 3, text: '3m' },
+                { type: 'all', text: 'All' }
+            ],
+            buttonTheme: {
+                fill: '#f8fafc',
+                stroke: '#e2e8f0',
+                style: { color: '#475569', fontWeight: '500' },
+                states: {
+                    hover: { fill: '#e2e8f0' },
+                    select: {
+                        fill: '#8B2432',
+                        style: { color: 'white', fontWeight: '600' }
                     }
                 }
             }
+        },
+        title: {
+            text: '{{ ticker }} - Multi-Indicator Chart',
+            style: { color: '#1f2937', fontWeight: '700', fontSize: '16px' }
+        },
+        navigator: {
+            enabled: true,
+            series: {
+                color: '#8B2432',
+                lineColor: '#8B2432'
+            }
+        },
+        scrollbar: {
+            enabled: true,
+            barBackgroundColor: '#f1f5f9',
+            barBorderColor: '#e2e8f0',
+            buttonBackgroundColor: '#f8fafc',
+            buttonBorderColor: '#cbd5e1',
+            rifleColor: '#64748b',
+            trackBackgroundColor: '#f8fafc',
+            trackBorderColor: '#e2e8f0'
+        },
+        yAxis: yAxisConfig,
+        xAxis: {
+            type: 'datetime',
+            labels: {
+                style: { color: '#64748b', fontWeight: '500' }
+            },
+            gridLineColor: '#f1f5f9',
+            lineColor: '#e2e8f0'
+        },
+        tooltip: {
+            split: true,
+            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+            borderColor: '#e2e8f0',
+            borderRadius: 8,
+            shadow: true,
+            style: { color: '#1f2937', fontSize: '12px', fontWeight: '500' }
+        },
+        series: seriesConfig,
+        credits: { enabled: false },
+        responsive: {
+            rules: [{
+                condition: { maxWidth: 800 },
+                chartOptions: {
+                    rangeSelector: { inputEnabled: false }
+                }
+            }]
         }
     });
 }
+
+
 </script>

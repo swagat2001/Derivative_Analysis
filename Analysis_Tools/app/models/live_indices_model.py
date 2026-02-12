@@ -26,6 +26,7 @@ class LiveIndicesReader:
         "niftyfin": {"spot": "NiftyFinSpot.txt", "history": "NiftyFinHistory.txt"},
         "niftynext50": {"spot": "NiftyNext50Spot.txt", "history": "NiftyNext50History.txt"},
         "nifty100": {"spot": "Nifty100Spot.txt", "history": "Nifty100History.txt"},
+        "indiavix": {"spot": "IndiaVIXSpot.txt", "history": "IndiaVIXHistory.txt"},
     }
 
     # Static fallback data when files don't exist (market closed)
@@ -48,6 +49,7 @@ class LiveIndicesReader:
             "previousClose": 69200.00,
         },
         "nifty100": {"value": 26260.30, "open": 26450.00, "high": 26500.00, "low": 26200.00, "previousClose": 26450.00},
+        "indiavix": {"value": 13.50, "open": 13.20, "high": 13.80, "low": 13.10, "previousClose": 13.20},
     }
 
     @staticmethod

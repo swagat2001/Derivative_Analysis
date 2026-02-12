@@ -62,6 +62,11 @@ INSTRUMENTS = {
         "spot_file": "Nifty100Spot.txt",
         "history_file": "Nifty100History.txt",
     },
+    "NSE_INDEX|India VIX": {
+        "name": "INDIA VIX",
+        "spot_file": "IndiaVIXSpot.txt",
+        "history_file": "IndiaVIXHistory.txt",
+    },
 }
 
 # === Time Limits ===
@@ -124,7 +129,7 @@ async def fetch_market_data():
 
     os.system("cls" if os.name == "nt" else "clear")
     print(f"{Fore.CYAN}===== GOLDMINE LIVE INDICES STREAMER ====={Style.RESET_ALL}\n")
-    print(f"{Fore.CYAN}Streaming: NIFTY 50, BANK NIFTY, SENSEX, NIFTY FIN, NIFTY NEXT 50, NIFTY 100{Style.RESET_ALL}\n")
+    print(f"{Fore.CYAN}Streaming: NIFTY 50, BANK NIFTY, SENSEX, NIFTY FIN, NIFTY NEXT 50, NIFTY 100, INDIA VIX{Style.RESET_ALL}\n")
     print(f"{Fore.YELLOW}Data Path: {DATA_PATH}{Style.RESET_ALL}\n")
 
     previous_values = {}

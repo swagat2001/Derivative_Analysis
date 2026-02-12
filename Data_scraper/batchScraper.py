@@ -4,6 +4,7 @@ Batch Scraper - Fetches data for all stocks and saves to files
 Created: 2026-01-24
 """
 
+import copy
 import datetime
 import json
 import os
@@ -16,7 +17,7 @@ from screenerScraper import ScreenerScrape
 # ============================================
 # CONFIGURATION
 # ============================================
-OUTPUT_DIR = "./data"  # Base output directory
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")  # Base output directory
 DELAY_BETWEEN_STOCKS = 2  # Seconds to wait between stocks (avoid rate limiting)
 DELAY_BETWEEN_REQUESTS = 0.5  # Seconds between API calls for same stock
 MAX_STOCKS = None  # Set to a number to limit (e.g., 10 for testing), None for all
@@ -33,6 +34,7 @@ FETCH_SHAREHOLDING = True
 FETCH_PRICE = True
 FETCH_ANNUAL_REPORTS = True  # Links to annual report PDFs
 FETCH_CORPORATE_ANNOUNCEMENTS = True  # Company announcements from BSE
+FETCH_COMPANY_INFO = True  # Market Cap, High/Low, PE, etc.
 
 # Corporate announcements date range
 ANNOUNCEMENTS_START_DATE = datetime.date(2020, 1, 1)  # Start date for announcements
@@ -56,11 +58,79 @@ def create_directories():
         f"{OUTPUT_DIR}/annual_reports",
         f"{OUTPUT_DIR}/corporate_announcements",
         f"{OUTPUT_DIR}/market_announcements",
+        f"{OUTPUT_DIR}/company_info",
         f"{OUTPUT_DIR}/logs",
     ]
     for d in dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
     print(f"[OK] Created output directories in: {OUTPUT_DIR}")
+
+
+def load_existing_data(symbol, data_type):
+    """Load existing JSON data for a symbol if it exists"""
+    path = f"{OUTPUT_DIR}/{data_type}/{symbol}.json"
+    print(path)
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            pass
+    return None
+
+
+def merge_data(old_data, new_data, data_type):
+    """
+    Merge new_data into old_data.
+    Returns the merged data structure.
+    """
+    if not old_data:
+        return new_data
+
+    merged = copy.deepcopy(old_data)
+
+    if data_type == "price":
+        # Handle Price Data (Datasets structure)
+        if "datasets" not in merged or "datasets" not in new_data:
+            return new_data  # Cannot merge structure mismatch
+
+        for new_ds in new_data["datasets"]:
+            found = False
+            for old_ds in merged["datasets"]:
+                if old_ds.get("metric") == new_ds.get("metric") and old_ds.get("label") == new_ds.get("label"):
+                    found = True
+                    # Merge values
+                    old_values = old_ds.get("values", [])
+                    new_values = new_ds.get("values", [])
+
+                    # Create a set for O(1) lookup of existing dates
+                    existing_dates = {val[0] for val in old_values}
+
+                    for val in new_values:
+                        date = val[0]
+                        if date not in existing_dates:
+                            old_values.append(val)
+
+                    # Sort by date
+                    try:
+                        old_values.sort(key=lambda x: x[0])
+                    except:
+                        pass  # robust sort
+
+                    old_ds["values"] = old_values
+                    break
+
+            if not found:
+                merged["datasets"].append(new_ds)
+
+    else:
+        # Handle Dictionary Data (Quarterly, P&L, etc.)
+        # Structure: { "date": [ ...data... ] }
+        if isinstance(merged, dict) and isinstance(new_data, dict):
+            # Update overwrites keys. This adds new dates and updates existing ones.
+            merged.update(new_data)
+
+    return merged
 
 
 def flatten_data(data_dict):
@@ -129,7 +199,7 @@ def flatten_price_data(data):
 
 
 def save_data(data, symbol, data_type, save_format="both"):
-    """Save data to file(s)"""
+    """Save data to file(s) - Same as batchScraper.py"""
     if data is None or (isinstance(data, dict) and len(data) == 0):
         return False
 
@@ -178,136 +248,189 @@ def log_progress(message, log_file):
 # ============================================
 
 
+def load_progress():
+    """Load last processed index from file"""
+    progress_file = f"{OUTPUT_DIR}/logs/scrape_progress.json"
+    if os.path.exists(progress_file):
+        try:
+            with open(progress_file, "r") as f:
+                return json.load(f)
+        except:
+            pass
+    return {"last_index": -1, "processed_count": 0}
+
+
+def save_progress(index, count):
+    """Save current progress"""
+    progress_file = f"{OUTPUT_DIR}/logs/scrape_progress.json"
+    try:
+        with open(progress_file, "w") as f:
+            json.dump({"last_index": index, "processed_count": count}, f)
+    except Exception as e:
+        print(f"Warning: Could not save progress: {e}")
+
+
 def run_batch_scraper():
-    """Main function to scrape all stocks"""
+    """Main function to scrape all stocks with resume capability and rate limit handling"""
 
     # Initialize
     create_directories()
-    log_file = f"{OUTPUT_DIR}/logs/scrape_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_file = f"{OUTPUT_DIR}/logs/scrape_{start_time}.log"
 
     # Load scraper and tokens
     sc = ScreenerScrape()
     tokens_df = sc.tokendf.copy()
 
-    # Filter out index symbols (tokens starting with 999 are BSE indices, not stocks)
+    # Filter out index symbols
     tokens_df = tokens_df[~tokens_df["token"].astype(str).str.startswith("999")]
     log_progress(f"Filtered out index symbols. {len(tokens_df)} actual stocks remaining.", log_file)
+
+    # Resume Logic
+    progress = load_progress()
+    last_index = progress["last_index"]
+
+    # If starting fresh (last_index == -1), fetching market announcements
+    if last_index == -1:
+        log_progress(f"Starting fresh batch scrape", log_file)
+
+        # Fetch market-wide announcements (once)
+        log_progress("Fetching market-wide announcements...", log_file)
+        try:
+            latest_announcements = sc.latestAnnouncements()
+            if save_data(latest_announcements, "latest_announcements", "market_announcements", SAVE_FORMAT):
+                log_progress("[OK] Latest announcements saved", log_file)
+        except Exception as e:
+            log_progress(f"[WARN] Could not fetch latest announcements: {e}", log_file)
+
+        try:
+            upcoming_results = sc.upcomingResults()
+            if save_data(upcoming_results, "upcoming_results", "market_announcements", SAVE_FORMAT):
+                log_progress("[OK] Upcoming results saved", log_file)
+        except Exception as e:
+            log_progress(f"[WARN] Could not fetch upcoming results: {e}", log_file)
+    else:
+        log_progress(f"RESUMING scrape from index {last_index + 1}", log_file)
 
     total_stocks = len(tokens_df)
     if MAX_STOCKS:
         tokens_df = tokens_df.head(MAX_STOCKS)
         total_stocks = MAX_STOCKS
 
-    log_progress(f"Starting batch scrape for {total_stocks} stocks", log_file)
+    log_progress(f"Targeting {total_stocks} stocks", log_file)
     log_progress(f"Output directory: {os.path.abspath(OUTPUT_DIR)}", log_file)
-
-    # Fetch market-wide announcements (once, not per stock)
-    log_progress("Fetching market-wide announcements...", log_file)
-    try:
-        latest_announcements = sc.latestAnnouncements()
-        if save_data(latest_announcements, "latest_announcements", "market_announcements", SAVE_FORMAT):
-            log_progress("[OK] Latest announcements saved", log_file)
-    except Exception as e:
-        log_progress(f"[WARN] Could not fetch latest announcements: {e}", log_file)
-
-    try:
-        upcoming_results = sc.upcomingResults()
-        if save_data(upcoming_results, "upcoming_results", "market_announcements", SAVE_FORMAT):
-            log_progress("[OK] Upcoming results saved", log_file)
-    except Exception as e:
-        log_progress(f"[WARN] Could not fetch upcoming results: {e}", log_file)
 
     # Track progress
     success_count = 0
     error_count = 0
     skipped_count = 0
+    consecutive_errors = 0
 
     # Process each stock
     for idx, row in tokens_df.iterrows():
+        # SKIP LOGIC: If we are resuming, skip rows until we reach last_index + 1
+        if idx <= last_index:
+            continue
+
         token = str(row["token"])
         symbol = row["symbol"]
         name = row["name"]
 
-        progress = f"[{idx+1}/{total_stocks}]"
-        log_progress(f"{progress} Processing: {symbol} ({name})", log_file)
+        progress_str = f"[{idx+1}/{total_stocks}]"
+        log_progress(f"{progress_str} Processing: {symbol} ({name})", log_file)
 
-        try:
-            # Load the stock
-            sc.loadScraper(token, consolidated=CONSOLIDATED)
-            time.sleep(DELAY_BETWEEN_REQUESTS)
+        retry_count = 0
+        max_retries = 3
+        stock_processed = False
 
-            # Fetch and save each data type
-            if FETCH_QUARTERLY:
-                data = sc.quarterlyReport(withAddon=False)
-                if save_data(data, symbol, "quarterly", SAVE_FORMAT):
-                    log_progress(f"    [OK] Quarterly report saved", log_file)
+        while retry_count < max_retries:
+            try:
+                # Load the stock
+                sc.loadScraper(token, consolidated=CONSOLIDATED)
                 time.sleep(DELAY_BETWEEN_REQUESTS)
 
-            if FETCH_PNL:
-                data = sc.pnlReport(withAddon=False)
-                if save_data(data, symbol, "pnl", SAVE_FORMAT):
-                    log_progress(f"    [OK] P&L report saved", log_file)
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                # Define tasks based on flags
+                data_tasks = []
+                if FETCH_QUARTERLY:
+                    data_tasks.append(("Quarterly", lambda: sc.quarterlyReport(withAddon=False), "quarterly"))
+                if FETCH_PNL:
+                    data_tasks.append(("P&L", lambda: sc.pnlReport(withAddon=False), "pnl"))
+                if FETCH_BALANCE_SHEET:
+                    data_tasks.append(("Balance Sheet", lambda: sc.balanceSheet(withAddon=False), "balance_sheet"))
+                if FETCH_CASHFLOW:
+                    data_tasks.append(("Cash Flow", lambda: sc.cashFLow(withAddon=False), "cashflow"))
+                if FETCH_RATIOS:
+                    data_tasks.append(("Ratios", lambda: sc.ratios(), "ratios"))
+                if FETCH_SHAREHOLDING:
+                    data_tasks.append(("Shareholding", lambda: sc.shareHolding(quarterly=False, withAddon=False), "shareholding"))
+                if FETCH_PRICE:
+                    data_tasks.append(("Price", lambda: sc.closePrice(), "price"))
+                if FETCH_COMPANY_INFO:
+                    data_tasks.append(("Company Info", lambda: sc.companyInfo(), "company_info"))
+                if FETCH_ANNUAL_REPORTS:
+                    data_tasks.append(("Annual Reports", lambda: sc.annualReports(), "annual_reports"))
+                if FETCH_CORPORATE_ANNOUNCEMENTS:
+                    data_tasks.append(("Corp Announcements", lambda: sc.corporateAnnouncements(ANNOUNCEMENTS_START_DATE, ANNOUNCEMENTS_END_DATE), "corporate_announcements"))
 
-            if FETCH_BALANCE_SHEET:
-                data = sc.balanceSheet(withAddon=False)
-                if save_data(data, symbol, "balance_sheet", SAVE_FORMAT):
-                    log_progress(f"    [OK] Balance sheet saved", log_file)
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                # Process tasks
+                stock_success = False
+                for task_name, fetch_func, data_type in data_tasks:
+                    try:
+                        new_data = fetch_func()
+                        if new_data:
+                            # MERGE LOGIC
+                            old_data = load_existing_data(symbol, data_type)
+                            merged_data = merge_data(old_data, new_data, data_type)
 
-            if FETCH_CASHFLOW:
-                data = sc.cashFLow(withAddon=False)
-                if save_data(data, symbol, "cashflow", SAVE_FORMAT):
-                    log_progress(f"    [OK] Cash flow saved", log_file)
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                            if save_data(merged_data, symbol, data_type, SAVE_FORMAT):
+                                log_progress(f"    [OK] {task_name} saved", log_file)
+                                stock_success = True
+                        time.sleep(DELAY_BETWEEN_REQUESTS)
+                    except Exception as task_e:
+                        log_progress(f"    [WARN] {task_name}: {str(task_e)[:100]}", log_file)
 
-            if FETCH_RATIOS:
-                data = sc.ratios()
-                if save_data(data, symbol, "ratios", SAVE_FORMAT):
-                    log_progress(f"    [OK] Ratios saved", log_file)
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                # Consider it a success if we processed the stock without exception
+                # even if no new data was saved (e.g. all disabled)
+                success_count += 1
+                consecutive_errors = 0 # Reset error counter on success
 
-            if FETCH_SHAREHOLDING:
-                data = sc.shareHolding(quarterly=False, withAddon=False)
-                if save_data(data, symbol, "shareholding", SAVE_FORMAT):
-                    log_progress(f"    [OK] Shareholding saved", log_file)
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                stock_processed = True
+                break # Success, exit retry loop
 
-            if FETCH_PRICE:
-                data = sc.closePrice()
-                if save_data(data, symbol, "price", SAVE_FORMAT):
-                    log_progress(f"    [OK] Price data saved", log_file)
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+            except Exception as e:
+                error_msg = str(e)
 
-            if FETCH_ANNUAL_REPORTS:
-                try:
-                    data = sc.annualReports()
-                    if save_data(data, symbol, "annual_reports", SAVE_FORMAT):
-                        log_progress(f"    [OK] Annual reports saved", log_file)
-                except:
-                    pass
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                # Check for Rate Limiting (429) via message if identifiable
+                if "429" in error_msg or "Too Many Requests" in error_msg:
+                    sleep_time = 60 * (retry_count + 1)
+                    log_progress(f"    [RATE LIMIT] 429 Detected. Sleeping for {sleep_time}s...", log_file)
+                    time.sleep(sleep_time)
+                    retry_count += 1
+                    consecutive_errors += 1
+                elif "Unable to find screener ID" in error_msg:
+                    log_progress(f"    [SKIP] Not available on Screener.in", log_file)
+                    skipped_count += 1
+                    stock_processed = True # Identified as skip, don't retry
+                    break
+                else:
+                    log_progress(f"    [ERROR] Attempt {retry_count+1}/{max_retries}: {error_msg}", log_file)
+                    retry_count += 1
+                    consecutive_errors += 1
+                    time.sleep(5) # Short sleep for other errors
 
-            if FETCH_CORPORATE_ANNOUNCEMENTS:
-                try:
-                    data = sc.corporateAnnouncements(ANNOUNCEMENTS_START_DATE, ANNOUNCEMENTS_END_DATE)
-                    if save_data(data, symbol, "corporate_announcements", SAVE_FORMAT):
-                        log_progress(f"    [OK] Corporate announcements saved", log_file)
-                except Exception as ann_err:
-                    log_progress(f"    [WARN] Corporate announcements: {ann_err}", log_file)
+        if not stock_processed:
+            log_progress(f"    [FAILED] Could not process {symbol} after retries.", log_file)
+            error_count += 1
 
-            success_count += 1
+        # Save check point
+        save_progress(idx, success_count)
 
-        except Exception as e:
-            error_msg = str(e)
-            if "Unable to find screener ID" in error_msg:
-                log_progress(f"    [SKIP] Not available on Screener.in", log_file)
-                skipped_count += 1
-            else:
-                log_progress(f"    [ERROR] {error_msg}", log_file)
-                error_count += 1
+        # Safety valve for too many consecutive errors (ip ban protection)
+        if consecutive_errors >= 10:
+            log_progress(f"[CRITICAL] Too many consecutive errors (10). Stopping to protect IP.", log_file)
+            break
 
-        # Delay between stocks to avoid rate limiting
+        # Normal delay between stocks
         time.sleep(DELAY_BETWEEN_STOCKS)
 
     # Final summary
@@ -315,7 +438,7 @@ def run_batch_scraper():
     log_progress("BATCH SCRAPE COMPLETED", log_file)
     log_progress(f"  Total stocks: {total_stocks}", log_file)
     log_progress(f"  Successful: {success_count}", log_file)
-    log_progress(f"  Skipped (not on Screener): {skipped_count}", log_file)
+    log_progress(f"  Skipped: {skipped_count}", log_file)
     log_progress(f"  Errors: {error_count}", log_file)
     log_progress(f"  Data saved to: {os.path.abspath(OUTPUT_DIR)}", log_file)
     log_progress("=" * 50, log_file)

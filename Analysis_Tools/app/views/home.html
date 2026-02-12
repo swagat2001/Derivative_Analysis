@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Goldmine – Stock Screener & Derivatives Analysis Platform{% endblock %}
+{% block title %}Goldmine – Stock Scanner & Derivatives Analysis Platform{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
@@ -21,7 +21,7 @@
           execution & management of trades.
         </h1>
         <p class="hero-subtitle">
-          We're providing Technical screeners to help you express your trading & investing ideas,
+          We're providing Technical scanners to help you express your trading & investing ideas,
           to help you analyse the markets better. Stock Markets are the true indicator
           of the growth of any country's economy.
         </p>
@@ -31,7 +31,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.35-4.35"></path>
             </svg>
-            Explore Screeners
+            Explore Scanners
           </a>
           <a href="{{ url_for('dashboard.dashboard') }}" class="btn-secondary">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -104,6 +104,18 @@
               </div>
             </div>
           </div>
+
+          <div class="hero-card">
+            <div class="card-header">
+              <span class="card-title">INDIA VIX</span>
+            </div>
+            <div class="card-content">
+              <div class="card-info">
+                <div class="card-value" id="indiavixValue">13.50</div>
+                <div class="card-change" id="indiavixChange">▲ +0.00%</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Detailed Index Info Section -->
@@ -159,10 +171,10 @@
             <path d="m21 21-4.35-4.35" />
           </svg>
         </div>
-        <h3>50+ Readymade Screeners</h3>
-        <p>Fundamental, Technical, Intraday & Derivative screeners built by experts. Filter stocks with razor-sharp
+        <h3>50+ Readymade Scanners</h3>
+        <p>Fundamental, Technical, Intraday & Derivative scanners built by experts. Filter stocks with razor-sharp
           efficiency.</p>
-        <span class="feature-link">Explore Screeners →</span>
+        <span class="feature-link">Explore Scanners →</span>
       </a>
 
       <a href="{{ url_for('dashboard.dashboard') }}" class="feature-card">
@@ -185,9 +197,9 @@
             <polyline points="2 12 12 17 22 12" />
           </svg>
         </div>
-        <h3>Market Insights</h3>
+        <h3>Market Neev</h3>
         <p>Heatmaps, FII/DII activity, delivery data, 52-week analysis & volume breakouts in one place.</p>
-        <span class="feature-link">View Insights →</span>
+        <span class="feature-link">View Neev →</span>
       </a>
 
       <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="feature-card">
@@ -232,7 +244,7 @@
   <!-- ===== SCREENER TYPES SECTION ===== -->
   <section class="screener-types-section">
     <div class="section-header">
-      <h2>Screeners for every trading style</h2>
+      <h2>Scanners for every trading style</h2>
       <p>Whether you're a day trader or long-term investor</p>
     </div>
 
@@ -246,7 +258,7 @@
 
       <div class="tab-content active" id="fundamental">
         <div class="tab-description">
-          <h3>Fundamental Screeners</h3>
+          <h3>Fundamental Scanners</h3>
           <p>For traders and investors who want to look at cold hard facts about a company's financial health. Screen
             stocks based on EPS, P/E, Working Capital, and more for better stock picking.</p>
           <ul class="screener-list">
@@ -283,7 +295,7 @@
               IV Spike Alerts
             </li>
           </ul>
-          <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View All Screeners</a>
+          <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View All Scanners</a>
         </div>
         <div class="tab-visual">
           <div class="mini-table">
@@ -318,7 +330,7 @@
 
       <div class="tab-content" id="technical">
         <div class="tab-description">
-          <h3>Technical Screeners</h3>
+          <h3>Technical Scanners</h3>
           <p>Built to help you capture stocks when they trend towards specific price points and zones. Ideal for traders
             who want to identify Crossovers, Breakouts, and momentum shifts.</p>
           <ul class="screener-list">
@@ -356,7 +368,7 @@
             </li>
           </ul>
           <a href="{{ url_for('technical_screener.technical_screener') }}" class="btn-outline">View Technical
-            Screeners</a>
+            Scanners</a>
         </div>
         <div class="tab-visual">
           <div class="indicator-cards">
@@ -381,8 +393,8 @@
 
       <div class="tab-content" id="intraday">
         <div class="tab-description">
-          <h3>Intraday Screeners</h3>
-          <p>Move quickly between 9:15 to 3:30 with day trading screeners. Choose from High Volume Stocks, Intraday
+          <h3>Intraday Scanners</h3>
+          <p>Move quickly between 9:15 to 3:30 with day trading scanners. Choose from High Volume Stocks, Intraday
             Recovery, Gap Up/Down, and more.</p>
           <ul class="screener-list">
             <li>
@@ -418,7 +430,7 @@
               Breakout Scanner
             </li>
           </ul>
-          <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View Intraday Screeners</a>
+          <a href="{{ url_for('screener.screener_landing') }}" class="btn-outline">View Intraday Scanners</a>
         </div>
         <div class="tab-visual">
           <div class="live-ticker">
@@ -444,7 +456,7 @@
 
       <div class="tab-content" id="derivative">
         <div class="tab-description">
-          <h3>Derivative Screeners</h3>
+          <h3>Derivative Scanners</h3>
           <p>Advanced F&O analysis with OI buildup, IV tracking, and options flow. Perfect for options traders looking
             for edge in the market.</p>
           <ul class="screener-list">
@@ -481,7 +493,7 @@
               Options Chain Insights
             </li>
           </ul>
-          <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="btn-outline">View Derivative Screeners</a>
+          <a href="{{ url_for('gainers_losers.top_gainers_losers') }}" class="btn-outline">View Derivative Scanners</a>
         </div>
         <div class="tab-visual">
           <div class="oi-bars">
@@ -589,14 +601,14 @@
     <div class="cta-content">
       <div class="cta-info">
         <h2>Start analyzing the market today</h2>
-        <p>Join thousands of traders using Goldmine for smarter investment decisions</p>
+        <p>Access powerful scanners and tools for smarter investment decisions</p>
       </div>
       <div class="cta-actions">
-        <a href="{{ url_for('auth.signup') }}" class="btn-primary large">
-          Create Free Account
+        <a href="{{ url_for('screener.screener_landing') }}" class="btn-primary large">
+          Explore Scanners
         </a>
-        <a href="{{ url_for('screener.screener_landing') }}" class="btn-secondary large">
-          Explore Screeners
+        <a href="{{ url_for('dashboard.dashboard') }}" class="btn-secondary large">
+          Open Dashboard
         </a>
       </div>
     </div>
@@ -625,10 +637,10 @@
       <div class="footer-links">
         <div class="footer-col">
           <h4>Products</h4>
-          <a href="{{ url_for('screener.screener_landing') }}">Screeners</a>
+          <a href="{{ url_for('screener.screener_landing') }}">Scanners</a>
           <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
           <a href="{{ url_for('insights.insights_page') }}">Heatmaps</a>
-          <a href="{{ url_for('insights.insights_page') }}">Insights</a>
+          <a href="{{ url_for('insights.insights_page') }}">Neev</a>
         </div>
         <div class="footer-col">
           <h4>Resources</h4>

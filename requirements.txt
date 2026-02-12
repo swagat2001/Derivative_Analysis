@@ -46,3 +46,8 @@ protobuf>=4.25.0
 
 # Testing
 pytest>=7.4.0
+
+# Web Scraping (for Market Breadth NSE scraper)
+selenium>=4.16.0
+webdriver-manager>=4.0.1
+selenium-stealth>=1.0.6

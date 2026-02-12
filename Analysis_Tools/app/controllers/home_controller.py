@@ -3,6 +3,8 @@ HOME CONTROLLER
 Landing page for Goldmine - ScanX style
 
 Updated: 2026-02-02 - Added FII/DII API endpoint
+Updated: 2026-02-11 - Added Market Breadth API endpoint
+Updated: 2026-02-11 - Added dynamic sample stocks display
 """
 
 from datetime import datetime, timedelta
@@ -15,6 +17,7 @@ import json
 from ..models.insights_model import get_fii_dii_summary, get_market_stats, get_52_week_analysis, get_insights_dates, get_nifty_pe
 from ..models.live_indices_model import get_live_indices
 from ..models.stock_model import get_filtered_tickers
+from ..models.homepage_model import get_homepage_sample_stocks
 # from .dashboard_controller import get_live_indices # Removed to avoid conflict
 
 home_bp = Blueprint("home", __name__)
@@ -55,7 +58,6 @@ def home():
     fii_dii_data = get_live_fii_dii()
 
     # Get Market Statistics
-    # Get Market Statistics
     try:
         # 1. Try Live JSON Data first
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -80,8 +82,6 @@ def home():
                             continue
 
                     if not last_updated:
-                        # Fallback if parsing fails but assume recent for now if file mod time is recent?
-                        # Or just log error and fail gracefully
                         print(f"Error parsing date: {timestamp_str}")
                         raise ValueError("Unknown date format")
 
@@ -98,7 +98,6 @@ def home():
                              "week52_low": live_stats.get('week52_low', 0),
                          }
                          used_live_data = True
-                         # Format for display (e.g., matching database format or nice UI format)
                          latest_date = last_updated.strftime("%Y-%m-%d")
 
             except Exception as e:
@@ -112,18 +111,9 @@ def home():
             else:
                 latest_date = datetime.now().strftime("%Y-%m-%d")
 
-            db_stats = get_market_statistics(latest_date) or {} # Using correct function name from your prompt, assuming it matches imported
-            # Wait, the import was get_market_stats, but previous code called get_market_stats(latest_date)
-            # Let's double check the previous code block.
-            # Previous code: market_stats = get_market_stats(latest_date) or {}
-            # Yes.
             market_stats = get_market_stats(latest_date) or {}
 
-            # The DB function returns specific structure, ensure mapping.
-            # Previous code mapped it:
-            # "total": market_stats.get("total", 0) -> stock_traded
-
-        # 3. 52 Week Logic - If using live data, we already have it. If fallback, need DB.
+        # 3. 52 Week Logic
         week52_high_val = market_stats.get("week52_high", 0)
         week52_low_val = market_stats.get("week52_low", 0)
 
@@ -135,7 +125,7 @@ def home():
         # Combine into a single stats object for the template
         final_stats = {
             "date": latest_date,
-            "stock_traded": market_stats.get("total", 0) if not used_live_data else market_stats.get("total", 0), # mapped correctly above
+            "stock_traded": market_stats.get("total", 0) if not used_live_data else market_stats.get("total", 0),
             "advances": market_stats.get("advances", 0),
             "declines": market_stats.get("declines", 0),
             "unchanged": market_stats.get("unchanged", 0),
@@ -151,10 +141,9 @@ def home():
         final_stats["adv_pct"] = (final_stats["advances"] / total_breadth * 100) if total_breadth > 0 else 50
         final_stats["dec_pct"] = (final_stats["declines"] / total_breadth * 100) if total_breadth > 0 else 50
 
-        # Add formatted width strings to avoid template linter errors
+        # Add formatted width strings
         final_stats["adv_width"] = f"{final_stats['adv_pct']:.1f}%"
         final_stats["dec_width"] = f"{final_stats['dec_pct']:.1f}%"
-
 
     except Exception as e:
         print(f"Error fetching market stats: {e}")
@@ -178,6 +167,9 @@ def home():
     nifty_pe["pe_pos"] = ((pe_clamped - pe_min) / (pe_max - pe_min)) * 100
     nifty_pe["pe_left_style"] = f"{nifty_pe['pe_pos']:.1f}%"
 
+    # Get sample stocks for homepage display
+    sample_stocks = get_homepage_sample_stocks()
+
     return render_template(
         "home.html",
         indices=get_live_indices(),
@@ -186,6 +178,7 @@ def home():
         fii_dii=fii_dii_data,
         market_stats=final_stats,
         nifty_pe=nifty_pe,
+        sample_stocks=sample_stocks,
     )
 
 
@@ -195,9 +188,7 @@ def api_live_indices():
     try:
         data = get_live_indices()
         return jsonify(data), 200
-
     except Exception as e:
-        # Return fallback data structure
         return jsonify({"success": True, "message": "Using fallback data", "indices": {}}), 200
 
 
@@ -207,18 +198,29 @@ def api_live_fii_dii():
     try:
         data = get_live_fii_dii()
         return jsonify(data), 200
-
     except Exception as e:
-        # Return fallback data structure
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "message": str(e),
-                    "fii_net": 0,
-                    "dii_net": 0,
-                    "total_net": 0,
-                }
-            ),
-            200,
-        )
+        return jsonify({
+            "success": False,
+            "message": str(e),
+            "fii_net": 0,
+            "dii_net": 0,
+            "total_net": 0,
+        }), 200
+
+
+@home_bp.route("/api/market-breadth")
+def api_market_breadth():
+    """API endpoint for market breadth data (Advances/Declines/Unchanged)"""
+    try:
+        from ..models.market_breadth_model import get_latest_market_breadth
+        data = get_latest_market_breadth()
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e),
+            "advances": 0,
+            "declines": 0,
+            "unchanged": 0,
+            "total": 0
+        }), 200

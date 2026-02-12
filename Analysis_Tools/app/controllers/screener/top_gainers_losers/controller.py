@@ -32,7 +32,7 @@ from ....models.technical_screener_model import get_heatmap_data
 # Import from centralized signal service (SINGLE SOURCE OF TRUTH)
 from ....services.signal_service import compute_signals_from_screener_data
 
-gainers_losers_bp = Blueprint("gainers_losers", __name__, url_prefix="/screener/top-gainers-losers")
+gainers_losers_bp = Blueprint("gainers_losers", __name__, url_prefix="/scanner/top-gainers-losers")
 
 # Initialize cache
 cache = Cache(config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 3600})

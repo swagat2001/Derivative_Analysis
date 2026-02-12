@@ -10,7 +10,7 @@ from ....controllers.dashboard_controller import get_live_indices
 from ....models.screener_model import get_available_dates_for_new_screeners, get_futures_oi_screeners
 from ....models.stock_model import get_filtered_tickers
 
-futures_oi_bp = Blueprint("futures_oi", __name__, url_prefix="/screener/futures-oi")
+futures_oi_bp = Blueprint("futures_oi", __name__, url_prefix="/scanner/futures-oi")
 
 # Initialize cache
 cache = Cache(config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 3600})

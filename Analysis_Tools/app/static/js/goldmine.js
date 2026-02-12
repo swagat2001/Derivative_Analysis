@@ -48,11 +48,11 @@ function renderCategoryScreeners(tabName) {
   }
 
   const categoryMap = {
-    'derivative': 'Derivative Screeners',
-    'technical': 'Technical Screeners',
-    'fundamental': 'Fundamental Screeners',
-    'intraday': 'Intraday Screeners',
-    'price-volume': 'Price & Volume Screeners'
+    'derivative': 'Derivative Scanners',
+    'technical': 'Technical Scanners',
+    'fundamental': 'Fundamental Scanners',
+    'intraday': 'Intraday Scanners',
+    'price-volume': 'Price & Volume Scanners'
   };
 
   const category = categoryMap[tabName];
@@ -67,8 +67,8 @@ function renderCategoryScreeners(tabName) {
   }
 
   if (!screeners) {
-    console.error(`No screeners found for category: ${category}`);
-    listEl.innerHTML = `<div class="no-data" style="text-align:center; padding:30px; color:#6b7280;">No screeners available for ${category}</div>`;
+    console.warn(`Category "${category}" not found in SCREENER_DATA. Available:`, Object.keys(SCREENER_DATA));
+    listEl.innerHTML = `<div class="no-data" style="text-align:center; padding:30px; color:#6b7280;">Category "${category}" not found. Available: ${Object.keys(SCREENER_DATA).join(', ')}</div>`;
     return;
   }
 
@@ -158,7 +158,7 @@ function fetchAndShowDetailView(dataKey, apiUrl) {
         <tr><td colspan="8" style="text-align:center; padding: 40px;">
           <p style="color: #e74c3c;">Failed to load data</p>
           <p style="color: #666; font-size: 14px;">${error.message}</p>
-          <button class="btn primary" onclick="showScreenerList()" style="margin-top: 20px;">Back to Screeners</button>
+          <button class="btn primary" onclick="showScreenerList()" style="margin-top: 20px;">Back to Scanners</button>
         </td></tr>
       `;
     });

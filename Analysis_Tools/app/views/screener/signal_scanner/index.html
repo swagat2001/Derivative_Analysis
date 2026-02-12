@@ -877,7 +877,7 @@
         const optionType = document.getElementById('optionType').value;
         const sortBy = document.getElementById('sortBy').value;
 
-        const url = `/screener/signal-scanner/api/filter?signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
+        const url = `/scanner/signal-scanner/api/filter?signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
 
         try {
             const response = await fetch(url);
@@ -909,7 +909,7 @@
         const sortBy = document.getElementById('sortBy').value;
 
         try {
-            const url = `/screener/signal-scanner/api/scan?days_back=${daysBack}&signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
+            const url = `/scanner/signal-scanner/api/scan?days_back=${daysBack}&signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
             const response = await fetch(url);
             const data = await response.json();
 

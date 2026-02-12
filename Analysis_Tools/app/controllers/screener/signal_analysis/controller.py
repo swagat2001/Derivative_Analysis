@@ -16,7 +16,7 @@ from ....models.stock_model import get_filtered_tickers
 # Import from centralized signal service (SINGLE SOURCE OF TRUTH)
 from ....services.signal_service import compute_signals_with_breakdown
 
-signal_analysis_bp = Blueprint("signal_analysis", __name__, url_prefix="/screener/signal-analysis")
+signal_analysis_bp = Blueprint("signal_analysis", __name__, url_prefix="/scanner/signal-analysis")
 
 # Initialize cache
 cache = Cache(config={"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 3600})
