@@ -655,15 +655,16 @@ def get_sector_performance(selected_date: str, comparison_date: str = None):
 
     result = []
     for sector, data in sector_data.items():
-        result.append(
-            {
-                "sector": sector,
-                "avg_change": round(data["total_change"] / data["count"], 2) if data["count"] > 0 else 0,
-                "total_turnover": data["total_turnover"],
-                "stock_count": data["count"],
-                "stocks": data["stocks"][:5],  # Top 5 stocks
-            }
-        )
+        if data["count"] > 0:
+            result.append(
+                {
+                    "sector": sector,
+                    "avg_change": round(data["total_change"] / data["count"], 2),
+                    "total_turnover": data["total_turnover"],
+                    "stock_count": data["count"],
+                    "stocks": data["stocks"][:5],  # Top 5 stocks
+                }
+            )
 
     result.sort(key=lambda x: x["avg_change"], reverse=True)
     return result
