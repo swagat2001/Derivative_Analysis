@@ -179,6 +179,7 @@ def home():
         market_stats=final_stats,
         nifty_pe=nifty_pe,
         sample_stocks=sample_stocks,
+        fii_dii_date=latest_date
     )
 
 

@@ -530,7 +530,7 @@
       <div class="insight-card fii-dii">
         <div class="insight-header">
           <h3>FII/DII Activity</h3>
-          <span class="insight-badge">Live</span>
+          <span class="insight-badge">As of {{ fii_dii_date }}</span>
         </div>
         <div class="insight-content">
           <div class="activity-row">
@@ -575,7 +575,7 @@
       <div class="insight-card pe-ratio">
         <div class="insight-header">
           <h3>Nifty PE Ratio</h3>
-          <span class="insight-badge">Valuation</span>
+          <span class="insight-badge">As of {{ fii_dii_date }}</span>
         </div>
         <div class="insight-content">
           <div class="pe-value">{{ nifty_pe.pe }}</div>
@@ -642,19 +642,19 @@
           <a href="{{ url_for('insights.insights_page') }}">Heatmaps</a>
           <a href="{{ url_for('insights.insights_page') }}">Neev</a>
         </div>
-        <div class="footer-col">
+        <!-- <div class="footer-col">
           <h4>Resources</h4>
           <a href="#">Documentation</a>
           <a href="#">API</a>
           <a href="#">Blog</a>
           <a href="#">Support</a>
-        </div>
+        </div> -->
         <div class="footer-col">
           <h4>Company</h4>
-          <a href="#">About Us</a>
-          <a href="#">Contact</a>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
+          <a href="https://goldmine.co.in/about-us/">About Us</a>
+          <a href="https://goldmine.co.in/contact-us/">Contact</a>
+          <!-- <a href="">Privacy Policy</a> -->
+          <a href="https://goldmine.co.in/services/">Services</a>
         </div>
       </div>
       <div class="footer-certified">
