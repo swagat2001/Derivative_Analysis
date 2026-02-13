@@ -987,28 +987,25 @@ def get_fii_derivatives_data(start_date: str, end_date: str):
     if not cached_data:
         return {}
 
-    # Category normalization map (handle singular/plural variations)
+    # Category normalization map (ensure consistent keys for frontend)
     CATEGORY_MAP = {
-        'index_future': 'index_futures',
         'index_futures': 'index_futures',
-        'stock_future': 'stock_futures',
-        'stock_futures': 'stock_futures',
-        'index_option': 'index_options',
+        'idx_fut': 'index_futures',
         'index_options': 'index_options',
-        'stock_option': 'stock_options',
+        'idx_opt': 'index_options',
+        'stock_futures': 'stock_futures',
+        'stk_fut': 'stock_futures',
         'stock_options': 'stock_options',
+        'stk_opt': 'stock_options',
     }
 
     # Group by date
     grouped = {}
     for row in cached_data:
         date = row[0]
-        # Normalize category to snake_case (e.g. "Index Futures" -> "index_futures")
-        raw_cat = row[1] if row[1] else ""
-        category_lower = raw_cat.lower().replace(" ", "_")
-
-        # Apply normalization map
-        category = CATEGORY_MAP.get(category_lower, category_lower)
+        # Normalize category
+        raw_cat = (row[1] or "").lower().replace(" ", "_")
+        category = CATEGORY_MAP.get(raw_cat, raw_cat)
 
         buy_val = row[2]
         sell_val = row[3]

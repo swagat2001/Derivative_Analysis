@@ -422,12 +422,12 @@ function renderDerivativeView(container, category) {
         `;
         tableRows = renderOptionsTableRows(derivativesData, mappedCategory, participant);
     } else if (isFutures) {
-        // Futures: Only 4 columns
+        // Futures: Specific headers for contracts
         tableHeaders = `
             <th>Date</th>
-            <th>Buy OI (Cr)</th>
-            <th>Sell OI (Cr)</th>
-            <th>Net OI (Cr)</th>
+            <th>Buy OI (Contracts)</th>
+            <th>Sell OI (Contracts)</th>
+            <th>Net OI (Contracts)</th>
         `;
         tableRows = renderDerivativeTableRows(derivativesData, mappedCategory, participant);
     } else {
@@ -647,17 +647,25 @@ function renderDerivativeTableRows(derivData, category, participant) {
         const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
         items.forEach(item => {
             if (isFutures) {
-                // Futures: Only 4 columns
+                // Futures: Contracts and Position
+                const long_oi = item.oi_long || 0;
+                const short_oi = item.oi_short || 0;
+                const net_oi = long_oi - short_oi;
+                const position = net_oi > 0 ? 'Bullish' : net_oi < 0 ? 'Bearish' : 'Neutral';
+                const posClass = net_oi > 0 ? 'positive' : net_oi < 0 ? 'negative' : '';
+
                 rows += `
                     <tr>
                         <td>${date}</td>
-                        <td>${formatNumber(item.buy_value)}</td>
-                        <td>${formatNumber(item.sell_value)}</td>
-                        <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
+                        <td>${formatNumber(long_oi)}</td>
+                        <td>${formatNumber(short_oi)}</td>
+                        <td class="${posClass}" style="font-weight:700">
+                            ${net_oi >= 0 ? '+' : ''}${formatNumber(net_oi)}
+                        </td>
                     </tr>
                 `;
             } else {
-                // Options: Full 7 columns
+                // Options list: Full 7 columns
                 rows += `
                     <tr>
                         <td>${date}</td>

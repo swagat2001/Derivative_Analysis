@@ -1573,10 +1573,15 @@
             let selectedParticipant = 'both';
             let globalFiiData = null;
 
-            function switchFiiSubTab(tab) {
-                // Map frontend ID to backend category key if needed
+            function switchFiiTab(tab) {
+                // Map frontend ID to backend category key
                 const map = {
                     'equity': 'equity',
+                    'index_futures': 'index_futures',
+                    'index_options': 'index_options',
+                    'stock_futures': 'stock_futures',
+                    'stock_options': 'stock_options',
+                    // legacy support
                     'idxFut': 'index_futures',
                     'idxOpt': 'index_options',
                     'stkFut': 'stock_futures',
@@ -1587,12 +1592,244 @@
 
                 document.querySelectorAll('.fii-tab-btn').forEach(b => b.classList.remove('active'));
 
-                // Highlight button - handle mapped IDs
+                // Highlight button - handle mapped IDs and original IDs
                 const btnId = 'btn-' + tab;
                 const btn = document.getElementById(btnId);
-                if (btn) btn.classList.add('active');
+                if (btn) {
+                    btn.classList.add('active');
+                } else {
+                    // Try highlighting by the mapped value if direct match fails
+                    const alternateBtnId = 'btn-' + activeFiiSubTab;
+                    const altBtn = document.getElementById(alternateBtnId);
+                    if (altBtn) altBtn.classList.add('active');
+                }
 
                 renderFiiDiiData();
+            }
+
+
+            // FIXED: Detect Futures vs Options and render appropriately
+            function renderDerivative(container, data, category) {
+                if (!data.derivatives || !Object.keys(data.derivatives).length) {
+                    container.innerHTML = '<div class="empty-state"><p>No Derivative Data Available</p></div>';
+                    return;
+                }
+
+                // Check if Futures
+                const isFutures = (category === 'index_futures' || category === 'stock_futures');
+
+                if (isFutures) {
+                    renderFuturesTab(container, data, category);
+                } else {
+                    renderOptionsTab(container, data, category);
+                }
+            }
+
+            // NEW: Futures rendering with Long/Short OI
+            function renderFuturesTab(container, data, category) {
+                const title = category === 'index_futures' ? 'Index Futures' : 'Stock Futures';
+                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII';
+
+                container.innerHTML = `
+                <div style="margin-bottom:12px;">
+                    <span class="chart-title" style="margin:0">📊 ${title} - ${participant} Position Analysis</span>
+                </div>
+
+                <div class="charts-grid-2">
+                     <div class="chart-card">
+                        <div class="chart-title">Long vs Short Positions</div>
+                        <div id="futuresPositionChart" style="height: 300px;"></div>
+                    </div>
+                     <div class="chart-card">
+                        <div class="chart-title">Net Position Trend</div>
+                        <div id="futuresNetChart" style="height: 300px;"></div>
+                    </div>
+                </div>
+
+                <div class="screener-card" style="margin-top:16px">
+                    <div class="card-header"><span class="card-title">Daily Breakdown (${participant})</span></div>
+                    <table class="card-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Buy OI (Contracts)</th>
+                                <th>Sell OI (Contracts)</th>
+                                <th>Net OI (Contracts)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${getFuturesTableRows(data.derivatives, category, participant)}
+                        </tbody>
+                    </table>
+                </div>`;
+
+                setTimeout(() => initFuturesCharts(data.derivatives, category, participant), 0);
+            }
+
+            // NEW: Options rendering (keeps buy/sell value)
+            function renderOptionsTab(container, data, category) {
+                const title = category === 'index_options' ? 'Index Options' : 'Stock Options';
+                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII';
+
+                container.innerHTML = `
+                <div style="margin-bottom:12px;">
+                    <span class="chart-title" style="margin:0">📊 ${title} Analysis (${participant})</span>
+                </div>
+
+                <div class="charts-grid-2">
+                     <div class="chart-card">
+                        <div class="chart-title">Net Value (Cr)</div>
+                        <div id="derivNetChart" style="height: 300px;"></div>
+                    </div>
+                     <div class="chart-card">
+                        <div class="chart-title">Open Interest (Contracts)</div>
+                        <div id="derivOiChart" style="height: 300px;"></div>
+                    </div>
+                </div>
+
+                <div class="screener-card" style="margin-top:16px">
+                    <div class="card-header"><span class="card-title">Detailed Logs</span></div>
+                    <table class="card-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Buy Value (Cr)</th>
+                                <th>Sell Value (Cr)</th>
+                                <th>Net Value (Cr)</th>
+                                <th>OI Contracts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${getOptionsTableRows(data.derivatives, category, participant)}
+                        </tbody>
+                    </table>
+                </div>`;
+
+                setTimeout(() => initDerivativeCharts(data.derivatives, category, participant), 0);
+            }
+
+            // NEW: Futures table - shows Long/Short contracts
+            function getFuturesTableRows(derivData, category, participant) {
+                const dates = Object.keys(derivData).sort().reverse();
+                let rows = '';
+
+                console.log('[DEBUG] getFuturesTableRows called:', { category, participant });
+                console.log('[DEBUG] Available data:', derivData);
+
+                dates.forEach(date => {
+                    // LOG what's in this date
+                    console.log(`[DEBUG] Date ${date} data:`, derivData[date]);
+
+                    // Try FLEXIBLE matching (case-insensitive, handle spaces)
+                    const item = derivData[date].find(x => {
+                        const catMatch = x.category && x.category.toLowerCase().replace(/[_\s]/g, '') === category.toLowerCase().replace(/[_\s]/g, '');
+                        const partMatch = x.participant_type === participant;
+                        console.log(`[DEBUG] Checking:`, x.category, '===', category, '?', catMatch, '&& part:', partMatch);
+                        return catMatch && partMatch;
+                    });
+
+                    if (item) {
+                        console.log('[DEBUG] MATCHED ITEM:', item);
+                    } else {
+                        console.log('[DEBUG] NO MATCH for', category, participant, 'in date', date);
+                    }
+
+                    if (item) {
+                        const long_oi = item.oi_long || 0;
+                        const short_oi = item.oi_short || 0;
+                        const net_oi = long_oi - short_oi;
+                        const position = net_oi > 0 ? 'Bullish' : net_oi < 0 ? 'Bearish' : 'Neutral';
+                        const posClass = net_oi > 0 ? 'positive' : net_oi < 0 ? 'negative' : '';
+
+                        rows += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${formatNumber(long_oi)}</td>
+                            <td>${formatNumber(short_oi)}</td>
+                            <td class="${posClass}" style="font-weight:700">
+                                ${net_oi >= 0 ? '+' : ''}${formatNumber(net_oi)}
+                            </td>
+                        </tr>`;
+                    }
+                });
+
+                if (!rows) return '<tr><td colspan="5" style="text-align:center;">No data matching ' + category + ' for ' + participant + '</td></tr>';
+                return rows;
+            }
+
+            // Options table - shows Buy/Sell value
+            function getOptionsTableRows(derivData, category, participant) {
+                const dates = Object.keys(derivData).sort().reverse();
+                let rows = '';
+
+                dates.forEach(date => {
+                    const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
+                    items.forEach(item => {
+                        rows += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${formatNumber(item.buy_value)}</td>
+                            <td>${formatNumber(item.sell_value)}</td>
+                            <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
+                            <td>${formatNumber(item.oi_contracts)}</td>
+                        </tr>`;
+                    });
+                });
+                if (!rows) return '<tr><td colspan="5" style="text-align:center;">No data</td></tr>';
+                return rows;
+            }
+
+            // NEW: Futures charts
+            function initFuturesCharts(derivData, category, participant) {
+                const dates = Object.keys(derivData).sort().slice(-30);
+                const labels = dates.map(d => d.split('-').slice(1).reverse().join('/'));
+
+                const longData = [];
+                const shortData = [];
+
+                dates.forEach(d => {
+                    const item = derivData[d].find(x =>
+                        x.category === category && x.participant_type === participant
+                    );
+                    longData.push(item ? (item.oi_long || 0) : 0);
+                    shortData.push(item ? (item.oi_short || 0) : 0);
+                });
+
+                const netData = longData.map((long, i) => long - shortData[i]);
+
+                const commonOptions = {
+                    chart: { backgroundColor: 'transparent' },
+                    title: { text: null },
+                    xAxis: { categories: labels },
+                    yAxis: { title: { text: 'Contracts' } },
+                    credits: { enabled: false }
+                };
+
+                // Chart 1: Stacked Area
+                Highcharts.chart('futuresPositionChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'area' },
+                    plotOptions: { area: { stacking: 'normal' } },
+                    series: [{
+                        name: 'Long OI',
+                        data: longData,
+                        color: '#22c55e'
+                    }, {
+                        name: 'Short OI',
+                        data: shortData,
+                        color: '#ef4444'
+                    }]
+                });
+
+                // Chart 2: Net Column
+                Highcharts.chart('futuresNetChart', {
+                    ...commonOptions,
+                    chart: { ...commonOptions.chart, type: 'column' },
+                    series: [{
+                        name: 'Net OI',
+                        data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' }))
+                    }]
+                });
             }
 
             function updateFiiParticipant() {
@@ -1757,169 +1994,9 @@
                 initCashCharts(data.data, showFii, showDii);
             }
 
-            // Implement missing renderDerivative function
-            function renderDerivative(container, data, category) {
-                // Ensure we have derivative data
-                if (!data.derivatives || !Object.keys(data.derivatives).length) {
-                    container.innerHTML = '<div class="empty-state"><p>No Derivative Data Available</p></div>';
-                    return;
-                }
 
-                const subCategories = {
-                    'index_futures': 'Index Futures',
-                    'index_options': 'Index Options',
-                    'stock_futures': 'Stock Futures',
-                    'stock_options': 'Stock Options'
-                };
 
-                const title = subCategories[category] || 'Derivatives';
-                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII'; // Default to FII as DIIs rarely do derivatives aggressively
 
-                container.innerHTML = `
-                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <span class="chart-title" style="margin:0">📊 ${title} Analysis (${participant})</span>
-                </div>
-
-                <div class="charts-grid-2">
-                     <div class="chart-card">
-                        <div class="chart-title">Net Value (Cr)</div>
-                        <div id="derivNetChart" style="height: 300px; width: 100%;"></div>
-                    </div>
-                     <div class="chart-card">
-                        <div class="chart-title">Open Interest (Contracts)</div>
-                        <div id="derivOiChart" style="height: 300px; width: 100%;"></div>
-                    </div>
-                </div>
-
-                <div class="screener-card" style="margin-top:16px">
-                    <div class="card-header"><span class="card-title">Detailed Logs</span></div>
-                    <table class="card-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Buy Value</th>
-                                <th>Sell Value</th>
-                                <th>Net Value</th>
-                                <th>OI Contracts</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${getDerivativeRows(data.derivatives, category, participant)}
-                        </tbody>
-                    </table>
-                </div>`;
-
-                // Initialize charts
-                // Use a default timeout to ensure DOM is ready
-                setTimeout(() => {
-                    initDerivativeCharts(data.derivatives, category, participant);
-                }, 0);
-            }
-
-            function getDerivativeRows(derivData, category, participant) {
-                const dates = Object.keys(derivData).sort().reverse();
-                let rows = '';
-
-                dates.forEach(date => {
-                    const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
-                    items.forEach(item => {
-                        rows += `
-                        <tr>
-                            <td>${date}</td>
-                            <td>${item.participant_type}</td>
-                            <td>${formatNumber(item.buy_value)}</td>
-                            <td>${formatNumber(item.sell_value)}</td>
-                            <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
-                            <td>${formatNumber(item.oi_contracts)}</td>
-                        </tr>`;
-                    });
-                });
-                if (!rows) return `<tr><td colspan="6" style="text-align:center;">No data for ${participant} in ${category}</td></tr>`;
-                return rows;
-            }
-
-            // Implement missing renderDerivative function
-            function renderDerivative(container, data, category) {
-                // Ensure we have derivative data
-                if (!data.derivatives || !Object.keys(data.derivatives).length) {
-                    container.innerHTML = '<div class="empty-state"><p>No Derivative Data Available</p></div>';
-                    return;
-                }
-
-                const subCategories = {
-                    'index_futures': 'Index Futures',
-                    'index_options': 'Index Options',
-                    'stock_futures': 'Stock Futures',
-                    'stock_options': 'Stock Options'
-                };
-
-                const title = subCategories[category] || 'Derivatives';
-                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII'; // Default to FII as DIIs rarely do derivatives aggressively
-
-                container.innerHTML = `
-                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <span class="chart-title" style="margin:0">📊 ${title} Analysis (${participant})</span>
-                </div>
-
-                <div class="charts-grid-2">
-                     <div class="chart-card">
-                        <div class="chart-title">Net Value (Cr)</div>
-                        <div id="derivNetChart" style="height: 300px; width: 100%;"></div>
-                    </div>
-                     <div class="chart-card">
-                        <div class="chart-title">Open Interest (Contracts)</div>
-                        <div id="derivOiChart" style="height: 300px; width: 100%;"></div>
-                    </div>
-                </div>
-
-                <div class="screener-card" style="margin-top:16px">
-                    <div class="card-header"><span class="card-title">Detailed Logs</span></div>
-                    <table class="card-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Buy Value</th>
-                                <th>Sell Value</th>
-                                <th>Net Value</th>
-                                <th>OI Contracts</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${getDerivativeRows(data.derivatives, category, participant)}
-                        </tbody>
-                    </table>
-                </div>`;
-
-                // Initialize charts
-                // Use a default timeout to ensure DOM is ready
-                setTimeout(() => {
-                    initDerivativeCharts(data.derivatives, category, participant);
-                }, 0);
-            }
-
-            function getDerivativeRows(derivData, category, participant) {
-                const dates = Object.keys(derivData).sort().reverse();
-                let rows = '';
-
-                dates.forEach(date => {
-                    const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
-                    items.forEach(item => {
-                        rows += `
-                        <tr>
-                            <td>${date}</td>
-                            <td>${item.participant_type}</td>
-                            <td>${formatNumber(item.buy_value)}</td>
-                            <td>${formatNumber(item.sell_value)}</td>
-                            <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
-                            <td>${formatNumber(item.oi_contracts)}</td>
-                        </tr>`;
-                    });
-                });
-                if (!rows) return '<tr><td colspan="6" style="text-align:center;">No data for ${participant} in ${category}</td></tr>';
-                return rows;
-            }
 
             // Updated init signature
             function initDerivativeCharts(derivData, category, participant) {

@@ -827,14 +827,14 @@ def save_fo_stats_to_db(records):
         :oi_long, :oi_short
     )
     ON CONFLICT (trade_date, category, participant_type) DO UPDATE SET
-        buy_contracts = CASE WHEN EXCLUDED.participant_type = 'FII' THEN EXCLUDED.buy_contracts ELSE fii_derivatives_activity.buy_contracts END,
-        buy_value = CASE WHEN EXCLUDED.participant_type = 'FII' THEN EXCLUDED.buy_value ELSE fii_derivatives_activity.buy_value END,
-        sell_contracts = CASE WHEN EXCLUDED.participant_type = 'FII' THEN EXCLUDED.sell_contracts ELSE fii_derivatives_activity.sell_contracts END,
-        sell_value = CASE WHEN EXCLUDED.participant_type = 'FII' THEN EXCLUDED.sell_value ELSE fii_derivatives_activity.sell_value END,
-        oi_contracts = EXCLUDED.oi_contracts,
-        oi_long = EXCLUDED.oi_long,
-        oi_short = EXCLUDED.oi_short,
-        oi_value = CASE WHEN EXCLUDED.participant_type = 'FII' THEN EXCLUDED.oi_value ELSE fii_derivatives_activity.oi_value END;
+        buy_contracts = GREATEST(fii_derivatives_activity.buy_contracts, EXCLUDED.buy_contracts),
+        buy_value = GREATEST(fii_derivatives_activity.buy_value, EXCLUDED.buy_value),
+        sell_contracts = GREATEST(fii_derivatives_activity.sell_contracts, EXCLUDED.sell_contracts),
+        sell_value = GREATEST(fii_derivatives_activity.sell_value, EXCLUDED.sell_value),
+        oi_contracts = GREATEST(fii_derivatives_activity.oi_contracts, EXCLUDED.oi_contracts),
+        oi_long = GREATEST(fii_derivatives_activity.oi_long, EXCLUDED.oi_long),
+        oi_short = GREATEST(fii_derivatives_activity.oi_short, EXCLUDED.oi_short),
+        oi_value = GREATEST(fii_derivatives_activity.oi_value, EXCLUDED.oi_value);
     """
 
     count = 0
