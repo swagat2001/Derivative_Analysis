@@ -91,7 +91,7 @@ def classify_industry(industry: str) -> str:
 
 def load_sector_master(force_reload=False):
     """Load sector data from CSV or fallback to JSON."""
-    global _sector_cache, _sector_cache_loaded
+    global _sector_cache_loaded
 
     if _sector_cache_loaded and not force_reload:
         return
