@@ -268,7 +268,7 @@ def get_golden_crossover_stocks(date, limit=50):
                 AND above_50_sma = TRUE
                 AND above_200_sma = TRUE
                 AND sma_50 > sma_200
-            ORDER BY sma_diff_pct DESC
+            ORDER BY sma_diff_pct ASC
             LIMIT :limit
         """
         )
@@ -484,7 +484,7 @@ def get_death_crossover_stocks(date, limit=50):
                 AND below_50_sma = TRUE
                 AND below_200_sma = TRUE
                 AND sma_50 < sma_200
-            ORDER BY sma_diff_pct ASC
+            ORDER BY sma_diff_pct DESC
             LIMIT :limit
         """
         )

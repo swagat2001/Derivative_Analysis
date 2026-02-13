@@ -563,3 +563,36 @@
         display: none;
     }
 }
+
+/* Sentiment Badge Styles */
+.sentiment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.sentiment-bullish {
+    background-color: #f0fff4;
+    color: #15803d;
+    /* Dark Green */
+    border: 1px solid #bbf7d0;
+}
+
+.sentiment-bearish {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    /* Dark Red */
+    border: 1px solid #fecaca;
+}
+
+.sentiment-neutral {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    /* Grey */
+    border: 1px solid #e5e7eb;
+}

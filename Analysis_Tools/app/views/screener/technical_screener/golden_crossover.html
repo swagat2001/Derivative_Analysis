@@ -9,14 +9,14 @@
 {% block content %}
 <div class="screener-container">
 
+
     {% include 'components/screener_sidebar.html' %}
 
     <main class="screener-main">
 
         <!-- Back Button -->
         <div class="back-button-container" style="margin-bottom: 20px;">
-            <button class="back-btn"
-                onclick="window.location.href='{{ url_for('technical_screener.technical_screener', source=request.args.get('source'), tab=request.args.get('tab')) }}'">
+            <button class="back-btn" onclick="window.location.href='{{ url_for('screener.screener_landing') }}'">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>

@@ -112,6 +112,24 @@ def api_heatmap():
     # Pass period to the model
     all_heatmap_data = get_heatmap_data(selected_date, period=period, comparison_date=comparison_date)
 
+    # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
+    if not all_heatmap_data and not comparison_date:
+        # Check if we have data for a previous date
+        from ...models.db_config import engine_cash
+        from sqlalchemy import text
+        try:
+            with engine_cash.connect() as conn:
+                # Find max date <= selected_date in daily_market_heatmap
+                fallback_query = text("SELECT MAX(date) FROM daily_market_heatmap WHERE date <= :date")
+                fallback_date = conn.execute(fallback_query, {"date": selected_date}).scalar()
+
+                if fallback_date and str(fallback_date) != str(selected_date):
+                    print(f"[INFO] Fallback: No heatmap data for {selected_date}, using {fallback_date}")
+                    selected_date = str(fallback_date)
+                    all_heatmap_data = get_heatmap_data(selected_date, period=period)
+        except Exception as e:
+            print(f"[ERROR] Heatmap fallback failed: {e}")
+
     # Build dynamic index list
     available_symbols = [s["symbol"] for s in all_heatmap_data]
     dynamic_indices = get_dynamic_indices(available_symbols)
@@ -498,6 +516,24 @@ def api_delivery():
 
     delivery_data = get_delivery_data(selected_date, min_pct)
 
+    # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
+    if not delivery_data:
+        # Check if we have data for a previous date
+        from ...models.db_config import engine_cash
+        from sqlalchemy import text
+        try:
+            with engine_cash.connect() as conn:
+                # Find max date <= selected_date in daily_delivery_data
+                fallback_query = text("SELECT MAX(date) FROM daily_delivery_data WHERE date <= :date")
+                fallback_date = conn.execute(fallback_query, {"date": selected_date}).scalar()
+
+                if fallback_date and str(fallback_date) != str(selected_date):
+                    print(f"[INFO] Fallback: No delivery data for {selected_date}, using {fallback_date}")
+                    selected_date = str(fallback_date)
+                    delivery_data = get_delivery_data(selected_date, min_pct)
+        except Exception as e:
+            print(f"[ERROR] Delivery data fallback failed: {e}")
+
     if not delivery_data:
         print(f"[API] No delivery data returned for {selected_date}")
         return jsonify(
@@ -585,6 +621,25 @@ def api_52_week():
 
     analysis = get_52_week_analysis(selected_date)
 
+    # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
+    has_data = any(len(v) > 0 for v in analysis.values())
+    if not has_data:
+        # Check if we have data for a previous date
+        from ...models.db_config import engine_cash
+        from sqlalchemy import text
+        try:
+            with engine_cash.connect() as conn:
+                # Find max date <= selected_date in daily_market_heatmap (source for 52-week too)
+                fallback_query = text("SELECT MAX(date) FROM daily_market_heatmap WHERE date <= :date")
+                fallback_date = conn.execute(fallback_query, {"date": selected_date}).scalar()
+
+                if fallback_date and str(fallback_date) != str(selected_date):
+                    print(f"[INFO] Fallback (52-week): No data for {selected_date}, using {fallback_date}")
+                    selected_date = str(fallback_date)
+                    analysis = get_52_week_analysis(selected_date)
+        except Exception as e:
+            print(f"[ERROR] 52-week fallback failed: {e}")
+
     # Filter by index if needed
     if selected_index != "all":
         index_stocks = get_index_stocks(selected_index)
@@ -625,6 +680,24 @@ def api_volume_breakouts():
 
     breakouts = get_volume_breakouts(selected_date, multiplier)
 
+    # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
+    if not breakouts:
+        # Check if we have data for a previous date
+        from ...models.db_config import engine_cash
+        from sqlalchemy import text
+        try:
+            with engine_cash.connect() as conn:
+                # Find max date <= selected_date in daily_market_heatmap (source for volume breakouts)
+                fallback_query = text("SELECT MAX(date) FROM daily_market_heatmap WHERE date <= :date")
+                fallback_date = conn.execute(fallback_query, {"date": selected_date}).scalar()
+
+                if fallback_date and str(fallback_date) != str(selected_date):
+                    print(f"[INFO] Fallback (Volume): No data for {selected_date}, using {fallback_date}")
+                    selected_date = str(fallback_date)
+                    breakouts = get_volume_breakouts(selected_date, multiplier)
+        except Exception as e:
+            print(f"[ERROR] Volume breakout fallback failed: {e}")
+
     # Filter by index
     breakouts = filter_stocks_by_index(breakouts, selected_index)
 
@@ -652,6 +725,24 @@ def api_sector_performance():
         return jsonify({"error": "No data available"}), 404
 
     sector_data = get_sector_performance(selected_date)
+
+    # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
+    if not sector_data:
+        # Check if we have data for a previous date
+        from ...models.db_config import engine_cash
+        from sqlalchemy import text
+        try:
+            with engine_cash.connect() as conn:
+                # Find max date <= selected_date in daily_market_heatmap (source for sector perf)
+                fallback_query = text("SELECT MAX(date) FROM daily_market_heatmap WHERE date <= :date")
+                fallback_date = conn.execute(fallback_query, {"date": selected_date}).scalar()
+
+                if fallback_date and str(fallback_date) != str(selected_date):
+                    print(f"[INFO] Fallback (Sector): No data for {selected_date}, using {fallback_date}")
+                    selected_date = str(fallback_date)
+                    sector_data = get_sector_performance(selected_date)
+        except Exception as e:
+            print(f"[ERROR] Sector performance fallback failed: {e}")
 
     return jsonify(
         {

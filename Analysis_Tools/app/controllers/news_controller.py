@@ -12,7 +12,11 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from html import unescape
 from urllib.parse import quote_plus, urlparse
-from transformers import pipeline
+try:
+    from transformers import pipeline
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
 
 import requests
 from flask import Blueprint, jsonify, render_template, request
@@ -261,19 +265,35 @@ def get_relative_time(dt: datetime) -> str:
         return "Recently"
 
 # Load AI once at startup. This will use about 1.2GB of your 24GB RAM.
-print("Initializing FinBERT Sentiment AI...")
-sentiment_pipe = pipeline("sentiment-analysis", model="ProsusAI/finbert", device=-1)
+if TRANSFORMERS_AVAILABLE:
+    print("Initializing FinBERT Sentiment AI...")
+    try:
+        sentiment_pipe = pipeline("sentiment-analysis", model="ProsusAI/finbert", device=-1)
+    except Exception as e:
+        print(f"[WARN] Failed to load sentiment pipeline: {e}")
+        sentiment_pipe = None
+else:
+    print("[WARN] Transformers library not found. Sentiment analysis disabled.")
+    sentiment_pipe = None
 
 def apply_sentiment_to_news(news_list):
     """Helper function to process headlines in batch for speed."""
     if not news_list:
         return news_list
 
+    # Check if pipeline is available
+    if not sentiment_pipe:
+        return news_list
+
     # Extract just titles
     titles = [item['title'] for item in news_list]
 
     # Run AI batch analysis
-    results = sentiment_pipe(titles, padding=True, truncation=True)
+    try:
+        results = sentiment_pipe(titles, padding=True, truncation=True)
+    except Exception as e:
+        print(f"[ERROR] Sentiment analysis failed: {e}")
+        return news_list
 
     # Map labels and merge back
     mapping = {"positive": "Bullish", "negative": "Bearish", "neutral": "Neutral"}
