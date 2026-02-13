@@ -2,7 +2,7 @@
 
 {% block title %}{{ symbol }} - Fundamental Analysis{% endblock %}
 
-{% macro render_financial_table(data, title, limit=13) %}
+{% macro render_financial_table(data, title, limit=13, chart_flag=False) %}
 <div class="fund-section">
     <h2 class="fund-section-title">{{ title }}</h2>
     {% if data %}
@@ -11,6 +11,9 @@
             <thead>
                 <tr>
                     <th>Metric</th>
+                    {% if chart_flag %}
+                    <th class="fund-trend-col">Trend</th>
+                    {% endif %}
                     {% set dates = data.keys()|sort(reverse=True)|list %}
                     {% for date in dates %}
                     {% if loop.index <= limit %} <th>{{ date }}</th>
@@ -21,8 +24,8 @@
             <tbody>
                 {% set all_metrics = {} %}
                 {% for date, items in data.items() %}
-                {% for item in items %}
-                {% for key, value in item.items() %}
+                {% for items_list in items %}
+                {% for key, value in items_list.items() %}
                 {% if not (value is string and ('/' in value or value.startswith('http'))) %}
                 {% if key not in all_metrics %}
                 {% set _ = all_metrics.update({key: True}) %}
@@ -35,6 +38,42 @@
                 {% for metric in all_metrics.keys() %}
                 <tr>
                     <td>{{ metric }}</td>
+
+                    {% if chart_flag %}
+                    <td class="fund-trend-cell">
+                        {% set series_data = [] %}
+                        {% set sorted_dates = data.keys()|sort %}
+                        {% for d in sorted_dates %}
+                        {% set val_found = namespace(value=None) %}
+                        {% for item in data[d] %}
+                        {% if metric in item %}
+                        {% set v = item[metric] %}
+                        {% if v is number %}
+                        {% set val_found.value = v %}
+                        {% elif v is string and v|replace(',','')|replace('%','')|float %}
+                        {% set val_found.value = v|replace(',','')|replace('%','')|float %}
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if val_found.value is not none %}
+                        {% set _ = series_data.append({'date': d, 'value': val_found.value}) %}
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if series_data|length > 1 %}
+                        <div class="fund-trend-icon" data-metric="{{ metric }}"
+                            data-series='{{ series_data|tojson|safe }}'>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <span class="fund-no-trend">-</span>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+
                     {% set dates = data.keys()|sort(reverse=True)|list %}
                     {% for date in dates %}
                     {% if loop.index <= limit %} <td>
@@ -52,7 +91,11 @@
                         {% if '%' in metric %}
                         {{ "%.2f"|format(value.found * 100) }}%
                         {% else %}
+                        {% if value.found % 1 == 0 %}
+                        {{ "%.0f"|format(value.found) }}
+                        {% else %}
                         {{ "%.2f"|format(value.found) }}
+                        {% endif %}
                         {% endif %}
                         {% else %}
                         {{ value.found }}
@@ -79,6 +122,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Trend Chart Styles */
+    .fund-trend-col {
+        width: 50px;
+        text-align: center;
+    }
+
+    .fund-trend-cell {
+        text-align: center;
+        padding: 4px !important;
+    }
+
+    .fund-trend-icon {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #6366f1;
+        transition: transform 0.2s, color 0.2s;
+    }
+
+    .fund-trend-icon:hover {
+        transform: scale(1.2);
+        color: #4f46e5;
+    }
+
+    .fund-no-trend {
+        color: #9ca3af;
+        font-size: 0.8rem;
+    }
+
+    /* Chart Popup */
+    #chart-popup {
+        position: absolute;
+        z-index: 1000;
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        display: none;
+        width: 850px;
+        height: 550px;
+        /* pointer-events: none; REMOVED to allow interaction */
+        /* Prevent flickering on cursor overlap */
+        padding: 12px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -294,28 +384,31 @@
 
         <!-- Financial Data Sections -->
         <section id="quarters" class="fund-content-section">
-            {{ render_financial_table(quarterly, "Quarterly Results", 13) }}
+            {{ render_financial_table(quarterly, "Quarterly Results", 13, True) }}
         </section>
 
         <section id="profit-loss" class="fund-content-section">
-            {{ render_financial_table(pnl, "Profit & Loss Statement", 13) }}
+            {{ render_financial_table(pnl, "Profit & Loss Statement", 13, True) }}
         </section>
 
         <section id="balance-sheet" class="fund-content-section">
-            {{ render_financial_table(balance_sheet, "Balance Sheet", 13) }}
+            {{ render_financial_table(balance_sheet, "Balance Sheet", 13, True) }}
         </section>
 
         <section id="cash-flow" class="fund-content-section">
-            {{ render_financial_table(cashflow, "Cash Flow Statement", 13) }}
+            {{ render_financial_table(cashflow, "Cash Flow Statement", 13, True) }}
         </section>
 
         <section id="ratios" class="fund-content-section">
-            {{ render_financial_table(ratios, "Financial Ratios", 13) }}
+            {{ render_financial_table(ratios, "Financial Ratios", 13, True) }}
         </section>
 
         <section id="shareholding" class="fund-content-section">
-            {{ render_financial_table(shareholding, "Shareholding Pattern", 13) }}
+            {{ render_financial_table(shareholding, "Shareholding Pattern", 13, True) }}
         </section>
+
+        <!-- Hidden Chart Popup Container -->
+        <div id="chart-popup"></div>
 
     </main>
 </div>
@@ -324,9 +417,10 @@
 
 {% block page_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
 <script id="chart-data-json" type="application/json">{{ chart_data | tojson }}</script>
 <script>
-    // Price chart data
+    // Price chart data (Chart.js implementation kept as is)
     const chartDataBlock = document.getElementById('chart-data-json');
     const chartData = chartDataBlock ? JSON.parse(chartDataBlock.textContent) : [];
     let chartInstance = null;
@@ -492,7 +586,7 @@
         }
     });
 
-    // Tab navigation
+    // Tab navigation logic kept as is
     document.addEventListener('DOMContentLoaded', function () {
         const tabs = document.querySelectorAll('.fund-nav-tab');
         const sections = document.querySelectorAll('.fund-content-section[id]');
@@ -550,6 +644,156 @@
         window.addEventListener('scroll', () => {
             if (scrollTimeout) clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(updateActiveTab, 50);
+        });
+    });
+
+    // ============================================
+    // Highcharts Trend Popup Logic
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function () {
+        const popup = document.getElementById('chart-popup');
+        let chart = null;
+        let hideTimeout;
+
+        function hidePopup() {
+            hideTimeout = setTimeout(() => {
+                popup.style.display = 'none';
+                if (chart) {
+                    chart.destroy();
+                    chart = null;
+                }
+            }, 300); // 300ms delay to allow moving options
+        }
+
+        popup.addEventListener('mouseenter', function () {
+            if (hideTimeout) clearTimeout(hideTimeout);
+        });
+
+        popup.addEventListener('mouseleave', function () {
+            hidePopup();
+        });
+
+        document.querySelectorAll('.fund-trend-icon').forEach(icon => {
+            icon.addEventListener('mouseenter', function (e) {
+                if (hideTimeout) clearTimeout(hideTimeout);
+
+                const metricName = this.getAttribute('data-metric');
+                const rawData = JSON.parse(this.getAttribute('data-series'));
+
+                // Parse series data for Highcharts
+                // Expecting data: [{date: 'YYYY-MM', value: 123}, ...]
+                // Sort by date just in case
+                rawData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                const categories = rawData.map(d => d.date);
+                const values = rawData.map(d => d.value);
+
+                // Show popup near cursor
+                const rect = this.getBoundingClientRect();
+                const POPUP_HEIGHT = 500;
+
+                popup.style.display = 'block';
+                popup.style.left = (window.scrollX + rect.left + 30) + 'px'; // 30px offset
+
+                // Check if popup fits below
+                // Available space from icon bottom to viewport bottom
+                const spaceBelow = window.innerHeight - rect.bottom;
+
+                if (spaceBelow < POPUP_HEIGHT) {
+                    // Not enough space below, position above
+                    // Align bottom of popup with bottom of icon (approx)
+                    popup.style.top = (window.scrollY + rect.top - POPUP_HEIGHT + 20) + 'px';
+                } else {
+                    // Default: Position below/centered
+                    popup.style.top = (window.scrollY + rect.top - 50) + 'px';
+                }
+
+                // Render Highchart
+                if (chart) {
+                    chart.destroy();
+                }
+
+                chart = Highcharts.chart('chart-popup', {
+                    chart: {
+                        type: 'area', // or 'line'
+                        backgroundColor: '#1f2937',
+                        margin: [50, 30, 70, 80], // Much larger margins for labels
+                        height: 500 // Match new popup height
+                    },
+                    title: {
+                        text: metricName,
+                        align: 'left',
+                        style: { color: '#e5e7eb', fontSize: '16px', fontWeight: 'bold' },
+                        margin: 20
+                    },
+                    xAxis: {
+                        categories: categories,
+                        labels: {
+                            enabled: true,
+                            style: { color: '#9ca3af', fontSize: '11px' },
+                            step: 1,
+                            rotation: -45 // Angle labels for better fit
+                        },
+                        lineColor: '#4b5563',
+                        tickColor: '#4b5563',
+                        title: {
+                            text: 'Quarter',
+                            style: { color: '#9ca3af', fontSize: '12px' },
+                            margin: 20
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Value',
+                            style: { color: '#9ca3af', fontSize: '12px' },
+                            margin: 20
+                        },
+                        gridLineColor: '#374151',
+                        gridLineWidth: 1,
+                        labels: {
+                            enabled: true,
+                            style: { color: '#9ca3af', fontSize: '11px' },
+                            formatter: function () {
+                                if (Math.abs(this.value) >= 10000000) return (this.value / 10000000).toFixed(1) + 'Cr';
+                                if (Math.abs(this.value) >= 100000) return (this.value / 100000).toFixed(1) + 'L';
+                                if (Math.abs(this.value) >= 1000) return (this.value / 1000).toFixed(0) + 'k';
+                                return this.value;
+                            }
+                        }
+                    },
+                    legend: { enabled: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                        style: { color: '#fff' },
+                        borderColor: '#4b5563',
+                        borderRadius: 4,
+                        headerFormat: '<span style="font-size: 11px; color: #9ca3af">{point.key}</span><br/>',
+                        pointFormat: '<span style="color:#6366f1">\u25CF</span> <b>{point.y:,.2f}</b>'
+                    },
+                    plotOptions: {
+                        area: {
+                            fillOpacity: 0.3,
+                            lineWidth: 2,
+                            marker: {
+                                enabled: true,
+                                radius: 3,
+                                fillColor: '#6366f1',
+                                states: { hover: { radius: 5 } }
+                            },
+                            color: '#6366f1' // Indigo
+                        }
+                    },
+                    credits: { enabled: false },
+                    series: [{
+                        name: metricName,
+                        data: values
+                    }]
+                });
+            });
+
+            icon.addEventListener('mouseleave', function () {
+                hidePopup();
+            });
         });
     });
 </script>

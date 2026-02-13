@@ -1,42 +1,4 @@
 {
-  "2022-09-01": [
-    {
-      "Sales ": 168656.0
-    },
-    {
-      "Expenses ": 155311.0
-    },
-    {
-      "OperatingProfit": 13346.0
-    },
-    {
-      "OPM%": 0.08
-    },
-    {
-      "OtherIncome ": 2315.0
-    },
-    {
-      "Interest": 1993.0
-    },
-    {
-      "Depreciation": 4443.0
-    },
-    {
-      "Profitbeforetax": 9224.0
-    },
-    {
-      "Tax%": 0.26
-    },
-    {
-      "NetProfit ": 6830.0
-    },
-    {
-      "EPSinRs": 6.6
-    },
-    {
-      "RawPDF": "/company/source/quarter/2320/9/2022/"
-    }
-  ],
   "2022-12-01": [
     {
       "Sales ": 169213.0
@@ -343,37 +305,37 @@
   ],
   "2024-12-01": [
     {
-      "Sales ": 166097.0
+      "Sales ": 167213.0
     },
     {
-      "Expenses ": 141819.0
+      "Expenses ": 142858.0
     },
     {
-      "OperatingProfit": 24278.0
+      "OperatingProfit": 24354.0
     },
     {
       "OPM%": 0.15
     },
     {
-      "OtherIncome ": 2411.0
+      "OtherIncome ": 2415.0
     },
     {
-      "Interest": 3670.0
+      "Interest": 3750.0
     },
     {
-      "Depreciation": 9497.0
+      "Depreciation": 9539.0
     },
     {
-      "Profitbeforetax": 13522.0
+      "Profitbeforetax": 13480.0
     },
     {
       "Tax%": 0.28
     },
     {
-      "NetProfit ": 9784.0
+      "NetProfit ": 9747.0
     },
     {
-      "EPSinRs": 6.85
+      "EPSinRs": 6.82
     },
     {
       "RawPDF": "/company/source/quarter/2320/12/2024/"
@@ -491,6 +453,44 @@
     },
     {
       "RawPDF": "/company/source/quarter/2320/9/2025/"
+    }
+  ],
+  "2025-12-01": [
+    {
+      "Sales ": 167423.0
+    },
+    {
+      "Expenses ": 142088.0
+    },
+    {
+      "OperatingProfit": 25335.0
+    },
+    {
+      "OPM%": 0.15
+    },
+    {
+      "OtherIncome ": 3450.0
+    },
+    {
+      "Interest": 3207.0
+    },
+    {
+      "Depreciation": 9388.0
+    },
+    {
+      "Profitbeforetax": 16190.0
+    },
+    {
+      "Tax%": 0.26
+    },
+    {
+      "NetProfit ": 11946.0
+    },
+    {
+      "EPSinRs": 7.96
+    },
+    {
+      "RawPDF": "/company/source/quarter/2320/12/2025/"
     }
   ]
 }

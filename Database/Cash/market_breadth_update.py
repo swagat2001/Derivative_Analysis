@@ -90,37 +90,50 @@ def scrape_nse_count(driver, url, category):
 
 def get_market_breadth():
     """
-    Scrape market breadth data from NSE
+    Fetch market breadth data from NSE API
     Returns: dict with advances, declines, unchanged counts
     """
-    driver = None
+    import requests
+    base_url = "https://www.nseindia.com"
+    api_url = "https://www.nseindia.com/api/live-analysis-advance"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.nseindia.com/market-data/advance-decline",
+    }
 
     try:
-        driver = get_headless_driver()
+        session = requests.Session()
+        session.headers.update(headers)
 
-        # Access NSE homepage first to establish session
-        logger.info("Accessing NSE Homepage...")
-        driver.get("https://www.nseindia.com")
-        time.sleep(3)
+        # Establishing session cookies
+        session.get(base_url, timeout=10)
 
-        # Scrape each category
-        advances = scrape_nse_count(driver, "https://www.nseindia.com/market-data/advance", "Advances")
-        declines = scrape_nse_count(driver, "https://www.nseindia.com/market-data/decline", "Declines")
-        unchanged = scrape_nse_count(driver, "https://www.nseindia.com/market-data/unchanged", "Unchanged")
+        response = session.get(api_url, timeout=10)
+        if response.status_code != 200:
+            raise Exception(f"NSE API returned status {response.status_code}")
+
+        data = response.json()
+
+        # NSE Structure: {"timestamp": "...", "advance": {"count": {"Advances": 964, "Declines": 2015, "Unchange": 180, "Total": 3159}}}
+        advance_data = data.get("advance", {})
+        count_data = advance_data.get("count", {})
 
         result = {
-            "advances": advances,
-            "declines": declines,
-            "unchanged": unchanged,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "advances": count_data.get("Advances", 0),
+            "declines": count_data.get("Declines", 0),
+            "unchanged": count_data.get("Unchange", 0),
+            "timestamp": data.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             "date": datetime.now().strftime("%Y-%m-%d")
         }
 
-        logger.info(f"Market Breadth: {result}")
+        logger.info(f"✅ Market Breadth via API: {result}")
         return result
 
     except Exception as e:
-        logger.error(f"Error in get_market_breadth: {str(e)}")
+        logger.error(f"Error in get_market_breadth API: {str(e)}")
         return {
             "advances": 0,
             "declines": 0,
@@ -129,10 +142,6 @@ def get_market_breadth():
             "date": datetime.now().strftime("%Y-%m-%d"),
             "error": str(e)
         }
-
-    finally:
-        if driver:
-            driver.quit()
 
 
 # ===========================================

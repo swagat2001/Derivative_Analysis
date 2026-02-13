@@ -7,6 +7,7 @@ pandas>=2.1.0
 numpy>=1.26.0
 sqlalchemy>=2.0.0
 psycopg2-binary>=2.9.9
+requests>=2.31.0
 
 # Technical Analysis (for RSI calculation)
 pandas-ta>=0.3.14b
@@ -51,3 +52,7 @@ pytest>=7.4.0
 selenium>=4.16.0
 webdriver-manager>=4.0.1
 selenium-stealth>=1.0.6
+
+
+# pip install torch --index-url https://download.pytorch.org/whl/cpu
+# pip install transformers

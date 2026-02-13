@@ -1,42 +1,4 @@
 {
-  "2022-09-01": [
-    {
-      "Sales ": 56176.0
-    },
-    {
-      "Expenses ": 50814.0
-    },
-    {
-      "OperatingProfit": 5362.0
-    },
-    {
-      "OPM%": 0.1
-    },
-    {
-      "OtherIncome ": 330.0
-    },
-    {
-      "Interest": 879.0
-    },
-    {
-      "Depreciation": 1713.0
-    },
-    {
-      "Profitbeforetax": 3100.0
-    },
-    {
-      "Tax%": 0.29
-    },
-    {
-      "NetProfit ": 2205.0
-    },
-    {
-      "EPSinRs": 9.81
-    },
-    {
-      "RawPDF": "/company/source/quarter/1328/9/2022/"
-    }
-  ],
   "2022-12-01": [
     {
       "Sales ": 53151.0
@@ -491,6 +453,44 @@
     },
     {
       "RawPDF": "/company/source/quarter/1328/9/2025/"
+    }
+  ],
+  "2025-12-01": [
+    {
+      "Sales ": 66521.0
+    },
+    {
+      "Expenses ": 58530.0
+    },
+    {
+      "OperatingProfit": 7991.0
+    },
+    {
+      "OPM%": 0.12
+    },
+    {
+      "OtherIncome ": -2061.0
+    },
+    {
+      "Interest": 881.0
+    },
+    {
+      "Depreciation": 2220.0
+    },
+    {
+      "Profitbeforetax": 2829.0
+    },
+    {
+      "Tax%": 0.28
+    },
+    {
+      "NetProfit ": 2049.0
+    },
+    {
+      "EPSinRs": 9.12
+    },
+    {
+      "RawPDF": "/company/source/quarter/1328/12/2025/"
     }
   ]
 }

@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from html import unescape
 from urllib.parse import quote_plus, urlparse
+from transformers import pipeline
 
 import requests
 from flask import Blueprint, jsonify, render_template, request
@@ -259,6 +260,32 @@ def get_relative_time(dt: datetime) -> str:
     except:
         return "Recently"
 
+# Load AI once at startup. This will use about 1.2GB of your 24GB RAM.
+print("Initializing FinBERT Sentiment AI...")
+sentiment_pipe = pipeline("sentiment-analysis", model="ProsusAI/finbert", device=-1)
+
+def apply_sentiment_to_news(news_list):
+    """Helper function to process headlines in batch for speed."""
+    if not news_list:
+        return news_list
+
+    # Extract just titles
+    titles = [item['title'] for item in news_list]
+
+    # Run AI batch analysis
+    results = sentiment_pipe(titles, padding=True, truncation=True)
+
+    # Map labels and merge back
+    mapping = {"positive": "Bullish", "negative": "Bearish", "neutral": "Neutral"}
+
+    for i in range(len(news_list)):
+        label = results[i]['label']
+        news_list[i]['sentiment'] = mapping.get(label, "Neutral")
+        news_list[i]['sentiment_class'] = news_list[i]['sentiment'].lower() # for CSS
+        news_list[i]['confidence'] = f"{round(results[i]['score'] * 100, 1)}%"
+
+    return news_list
+
 
 # ========================================================================
 # ROUTES
@@ -286,6 +313,8 @@ def news_page():
         news_items = fetch_combined_news(queries, max_per_query=12, total_max=40)
     else:
         news_items = fetch_google_news_rss(category_info["query"], max_results=35)
+
+    news_items = apply_sentiment_to_news(news_items)
 
     return render_template(
         "news/index.html",
@@ -319,6 +348,7 @@ def news_search():
 
     search_query = f"{query} India stock market"
     news_items = fetch_google_news_rss(search_query, max_results=35)
+    news_items = apply_sentiment_to_news(news_items)
 
     return render_template(
         "news/index.html",
@@ -339,6 +369,7 @@ def stock_news(ticker: str):
     ticker = ticker.upper().strip()
     query = f"{ticker} stock NSE India news"
     news_items = fetch_google_news_rss(query, max_results=25)
+    news_items = apply_sentiment_to_news(news_items)
 
     return render_template(
         "news/index.html",
@@ -383,6 +414,7 @@ def api_fetch_news():
     else:
         return jsonify({"error": "Invalid category"}), 400
 
+    news_items = apply_sentiment_to_news(news_items)
     return jsonify(
         {
             "success": True,
@@ -401,6 +433,7 @@ def api_stock_news(ticker: str):
     ticker = ticker.upper().strip()
     query = f"{ticker} stock NSE India news"
     news_items = fetch_google_news_rss(query, max_results=20)
+    news_items = apply_sentiment_to_news(news_items)
 
     return jsonify(
         {

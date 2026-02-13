@@ -338,11 +338,26 @@ def clear_sector_cache():
 @lru_cache(maxsize=1)
 def _get_insights_dates_cached():
     """
-    Get available dates from CashStocks_Database.
-    This ensures dates align with actual cash market trading days.
+    Get available dates from CashStocks_Database AND FII/DII Loop.
+    This ensures latest FII/DII data is visible even if cash data is lagging.
     """
+    all_dates = set()
+
     try:
-        # Get list of tables in cash database
+        # 1. Get dates from FII/DII Activity (Primary Source for FII/DII tab)
+        if _check_fii_dii_table_exists():
+            with engine.connect() as conn:
+                fii_dates = conn.execute(text("""
+                    SELECT DISTINCT trade_date::text
+                    FROM fii_dii_activity
+                    ORDER BY trade_date DESC
+                    LIMIT 30
+                """)).fetchall()
+                for row in fii_dates:
+                    all_dates.add(row[0])
+            print(f"[INFO] Found {len(fii_dates)} dates from FII/DII activity")
+
+        # 2. Get dates from Cash Database (Primary Source for Heatmap)
         query = text(
             """
             SELECT table_name
@@ -357,36 +372,30 @@ def _get_insights_dates_cached():
             result = conn.execute(query)
             tables = [row[0] for row in result]
 
-        if not tables:
-            print("[WARN] No tables found in cash database for dates")
-            return tuple()
-
-        # Use first available table to get dates
-        sample_table = tables[0]
-        date_query = text(
-            f"""
-            SELECT DISTINCT CAST("BizDt" AS DATE)::text AS date
-            FROM public."{sample_table}"
-            WHERE "BizDt" IS NOT NULL
-            ORDER BY date DESC
-            LIMIT 100;
-        """
-        )
-        df = pd.read_sql(date_query, con=engine_cash)
-
-        if df.empty:
-            print(f"[WARN] No dates found in {sample_table}")
-            return tuple()
-
-        print(f"[INFO] Found {len(df)} dates from Cash database")
-        return tuple(df["date"].tolist())
+            if tables:
+                sample_table = tables[0]
+                date_query = text(
+                    f"""
+                    SELECT DISTINCT CAST("BizDt" AS DATE)::text AS date
+                    FROM public."{sample_table}"
+                    WHERE "BizDt" IS NOT NULL
+                    ORDER BY date DESC
+                    LIMIT 100;
+                """
+                )
+                cash_dates = conn.execute(date_query).fetchall()
+                for row in cash_dates:
+                    all_dates.add(row[0])
+                print(f"[INFO] Found {len(cash_dates)} dates from Cash database")
 
     except Exception as e:
         print(f"[ERROR] _get_insights_dates_cached(): {e}")
         import traceback
-
         traceback.print_exc()
-        return tuple()
+
+    # Sort descending
+    sorted_dates = sorted(list(all_dates), reverse=True)
+    return tuple(sorted_dates)
 
 
 def get_insights_dates():
@@ -853,6 +862,8 @@ def get_fii_dii_summary(start_date: str, end_date: str):
     else:
         sentiment = "Neutral"
 
+    latest_date = data[0]["date"] if data else (datetime.now().strftime("%Y-%m-%d"))
+
     return {
         "total_fii_buy": round(total_fii_buy, 2),
         "total_fii_sell": round(total_fii_sell, 2),
@@ -863,6 +874,7 @@ def get_fii_dii_summary(start_date: str, end_date: str):
         "combined_net": round(combined_net, 2),
         "overall_sentiment": sentiment,
         "days_count": len(data),
+        "latest_date": latest_date,
     }
 
 
@@ -917,6 +929,54 @@ def _get_fii_derivatives_data_cached(start_date: str, end_date: str):
         return tuple()
 
 
+# def get_fii_derivatives_data(start_date: str, end_date: str):
+#     """
+#     Get structured FII derivatives data for API.
+#     Returns dictionary grouped by date.
+#     """
+#     cached_data = _get_fii_derivatives_data_cached(start_date, end_date)
+
+#     if not cached_data:
+#         return {}
+
+#     # Group by date
+#     grouped = {}
+#     for row in cached_data:
+#         date = row[0]
+#         # Normalize category to snake_case (e.g. "Index Futures" -> "index_futures")
+#         raw_cat = row[1] if row[1] else ""
+#         category = raw_cat.lower().replace(" ", "_")
+
+#         buy_val = row[2]
+#         sell_val = row[3]
+#         oi_val = row[4]
+#         oi_con = row[5]
+#         p_type = row[6]
+#         # Handle new columns safely (in case of cache mismatch before reload, though reload should clear it)
+#         oi_long = row[7] if len(row) > 7 else 0
+#         oi_short = row[8] if len(row) > 8 else 0
+
+#         if date not in grouped:
+#             grouped[date] = []
+
+#         net_value = buy_val - sell_val  # Buy - Sell
+
+#         grouped[date].append(
+#             {
+#                 "category": category,
+#                 "participant_type": p_type,
+#                 "buy_value": buy_val,
+#                 "sell_value": sell_val,
+#                 "net_value": round(net_value, 2),
+#                 "oi_value": oi_val,
+#                 "oi_contracts": oi_con,
+#                 "oi_long": oi_long,
+#                 "oi_short": oi_short,
+#             }
+#         )
+
+#     return grouped
+
 def get_fii_derivatives_data(start_date: str, end_date: str):
     """
     Get structured FII derivatives data for API.
@@ -927,27 +987,41 @@ def get_fii_derivatives_data(start_date: str, end_date: str):
     if not cached_data:
         return {}
 
+    # Category normalization map (handle singular/plural variations)
+    CATEGORY_MAP = {
+        'index_future': 'index_futures',
+        'index_futures': 'index_futures',
+        'stock_future': 'stock_futures',
+        'stock_futures': 'stock_futures',
+        'index_option': 'index_options',
+        'index_options': 'index_options',
+        'stock_option': 'stock_options',
+        'stock_options': 'stock_options',
+    }
+
     # Group by date
     grouped = {}
     for row in cached_data:
         date = row[0]
         # Normalize category to snake_case (e.g. "Index Futures" -> "index_futures")
         raw_cat = row[1] if row[1] else ""
-        category = raw_cat.lower().replace(" ", "_")
+        category_lower = raw_cat.lower().replace(" ", "_")
+
+        # Apply normalization map
+        category = CATEGORY_MAP.get(category_lower, category_lower)
 
         buy_val = row[2]
         sell_val = row[3]
         oi_val = row[4]
         oi_con = row[5]
         p_type = row[6]
-        # Handle new columns safely (in case of cache mismatch before reload, though reload should clear it)
         oi_long = row[7] if len(row) > 7 else 0
         oi_short = row[8] if len(row) > 8 else 0
 
         if date not in grouped:
             grouped[date] = []
 
-        net_value = buy_val - sell_val  # Buy - Sell
+        net_value = buy_val - sell_val
 
         grouped[date].append(
             {
@@ -1608,8 +1682,11 @@ def get_nifty_pe():
         if not pe_data:
             return None
 
+        # Add calculation date
+        pe_data["date"] = date_key
+
         # Return EOD data without any live adjustments
-        print(f"[INFO] Nifty PE (EOD): {pe_data['pe']}")
+        print(f"[INFO] Nifty PE (EOD): {pe_data['pe']} as of {date_key}")
         return pe_data
 
     except Exception as e:

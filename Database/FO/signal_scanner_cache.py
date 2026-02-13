@@ -33,102 +33,35 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================
 
+# =============================================================
+# CONFIGURATION
+# =============================================================
+
 # Database Config
-from Analysis_Tools.app.models.db_config import engine
+from Analysis_Tools.app.models.db_config import engine, get_available_dates
 
 # Hardcoded constants removed - using shared engine
-DB_USER = "postgres"
-DB_PASS = os.getenv("DB_PASSWORD")
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "BhavCopy_Database"
+# DB_USER = "postgres"
+# DB_PASS = os.getenv("DB_PASSWORD")
+# DB_HOST = "localhost"
+# DB_PORT = "5432"
+# DB_NAME = "BhavCopy_Database"
 
 MIN_DATA_POINTS = 25
 MIN_VOLUME = 10
 BINS = 50
 
 # =============================================================
-# CALCULATION LOGIC (Cloned from signal_scanner_model.py)
+# CALCULATION LOGIC
 # =============================================================
 
+from Analysis_Tools.utils import (
+    calc_pivot_levels,
+    calculate_rsi as calc_rsi, # Alias to match existing usage
+    calc_volume_profile
+)
 
-def calc_pivot_levels(high, low, close):
-    """Calculate Standard Pivot Points."""
-    pp = (high + low + close) / 3
-    r1 = 2 * pp - low
-    s1 = 2 * pp - high
-    r2 = pp + (high - low)
-    s2 = pp - (high - low)
-    r3 = high + 2 * (pp - low)
-    s3 = low - 2 * (high - pp)
-    return pp, r1, s1, r2, s2, r3, s3
-
-
-def calc_rsi(series, period=14):
-    """Calculate RSI."""
-    try:
-        delta = series.diff()
-        gain = delta.clip(lower=0).rolling(period).mean()
-        loss = -delta.clip(upper=0).rolling(period).mean()
-        rs = gain / loss.replace(0, np.nan)
-        rsi = 100 - (100 / (1 + rs))
-        return rsi
-    except Exception:
-        return pd.Series([np.nan] * len(series), index=series.index)
-
-
-def calc_volume_profile(df, bins=50):
-    """Calculate Volume Profile - POC, VAH, VAL."""
-    if "HghPric" not in df.columns or "LwPric" not in df.columns:
-        return None, None, None
-
-    # Filter out invalid prices
-    df_valid = df[(df["HghPric"] > 0) & (df["LwPric"] > 0) & (df["ClsPric"] > 0)].copy()
-
-    if df_valid.empty:
-        return None, None, None
-
-    high = df_valid["HghPric"].max()
-    low = df_valid["LwPric"].min()
-
-    if pd.isna(high) or pd.isna(low) or high == low:
-        return None, None, None
-
-    levels = np.linspace(low, high, bins)
-    vol_dist = np.zeros(bins)
-
-    for _, row in df.iterrows():
-        close_price = row.get("ClsPric", 0)
-        vol = row.get("Volume", 0)
-
-        if pd.isna(close_price) or pd.isna(vol) or vol == 0:
-            continue
-
-        dist = np.abs(levels - close_price)
-        inv = 1 / (dist + 0.01)
-        weighted = inv / inv.sum() * vol  # Matches POC: inv / inv.sum() * vol
-        vol_dist += weighted
-
-    if vol_dist.sum() == 0:
-        return None, None, None
-
-    poc_idx = np.argmax(vol_dist)
-    poc = levels[poc_idx]
-
-    sorted_idx = np.argsort(vol_dist)[::-1]
-    vol_sorted = vol_dist[sorted_idx]
-    levels_sorted = levels[sorted_idx]
-    cum_vol = np.cumsum(vol_sorted)
-
-    try:
-        cutoff = np.where(cum_vol >= cum_vol[-1] * 0.70)[0][0]
-        vah = np.max(levels_sorted[: cutoff + 1])
-        val = np.min(levels_sorted[: cutoff + 1])
-    except IndexError:
-        vah = poc
-        val = poc
-
-    return round(poc, 2), round(vah, 2), round(val, 2)
+# NOTE: Local functions removed in favor of shared utility
 
 
 # =============================================================
@@ -209,24 +142,6 @@ def get_cached_dates() -> set:
             return {str(row[0]) for row in conn.execute(query)}
     except Exception:
         return set()
-
-
-def get_available_dates(tables: List[str]) -> List[str]:
-    """Get all unique dates available across F&O tables."""
-    sample_symbols = ["TBL_NIFTY", "TBL_BANKNIFTY", "TBL_RELIANCE", "TBL_INFY", "TBL_TCS"]
-    found_dates = set()
-
-    with engine.connect() as conn:
-        for tbl in sample_symbols:
-            if tbl in tables:
-                try:
-                    q = text(f'SELECT DISTINCT "BizDt" FROM "{tbl}" ORDER BY "BizDt" DESC LIMIT 60')
-                    res = conn.execute(q)
-                    found_dates.update(str(row[0]) for row in res)
-                except Exception:
-                    continue
-
-    return sorted(list(found_dates), reverse=True)
 
 
 def clean_for_json(obj):
@@ -545,7 +460,7 @@ def update_signal_scanner_cache():
     # Find missing dates
     # Since checking ALL tables for dates is slow, we rely on cached_dates vs a sample
     cached = get_cached_dates()
-    available_dates = get_available_dates(all_tables)  # This checks a few major stocks
+    available_dates = get_available_dates(engine)  # New signature
 
     # Filter 30 days only? Or populate whatever we find?
     # Let's stick to last 30 days to keep it fast initially, then expand if needed

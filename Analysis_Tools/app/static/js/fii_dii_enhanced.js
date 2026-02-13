@@ -404,6 +404,45 @@ function renderDerivativeView(container, category) {
         return;
     }
 
+    const isOptions = (mappedCategory === 'index_options' || mappedCategory === 'stock_options');
+    const isFutures = (mappedCategory === 'index_futures' || mappedCategory === 'stock_futures');
+
+    let tableHeaders = '';
+    let tableRows = '';
+
+    if (isOptions) {
+        tableHeaders = `
+            <th>Date</th>
+            <th>Call Buy OI</th>
+            <th>Call Sell OI</th>
+            <th>Call Net OI</th>
+            <th>Put Buy OI</th>
+            <th>Put Sell OI</th>
+            <th>Put Net OI</th>
+        `;
+        tableRows = renderOptionsTableRows(derivativesData, mappedCategory, participant);
+    } else if (isFutures) {
+        // Futures: Only 4 columns
+        tableHeaders = `
+            <th>Date</th>
+            <th>Buy OI (Cr)</th>
+            <th>Sell OI (Cr)</th>
+            <th>Net OI (Cr)</th>
+        `;
+        tableRows = renderDerivativeTableRows(derivativesData, mappedCategory, participant);
+    } else {
+        tableHeaders = `
+            <th>Date</th>
+            <th>Buy Value (Cr)</th>
+            <th>Sell Value (Cr)</th>
+            <th>Net Value (Cr)</th>
+            <th>OI Contracts</th>
+            <th>OI Long</th>
+            <th>OI Short</th>
+        `;
+        tableRows = renderDerivativeTableRows(derivativesData, mappedCategory, participant);
+    }
+
     container.innerHTML = `
         <div class="chart-card" style="margin-bottom: 16px;">
             <div class="chart-title">${category.replace(/_/g, ' ').toUpperCase()} - ${participant}</div>
@@ -416,18 +455,10 @@ function renderDerivativeView(container, category) {
             </div>
             <table class="card-table">
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Buy Value (Cr)</th>
-                        <th>Sell Value (Cr)</th>
-                        <th>Net Value (Cr)</th>
-                        <th>OI Contracts</th>
-                        <th>OI Long</th>
-                        <th>OI Short</th>
-                    </tr>
+                    <tr>${tableHeaders}</tr>
                 </thead>
                 <tbody>
-                    ${renderDerivativeTableRows(derivativesData, mappedCategory, participant)}
+                    ${tableRows}
                 </tbody>
             </table>
         </div>
@@ -567,28 +598,83 @@ function renderDerivativesChart(data, category, participant) {
     });
 }
 
+function renderOptionsTableRows(derivData, baseCategory, participant) {
+    const dates = Object.keys(derivData).sort().reverse();
+    const type = baseCategory.includes('index') ? 'index' : 'stock';
+    const callCat = `${type}_call_options`;
+    const putCat = `${type}_put_options`;
+
+    let rows = '';
+
+    dates.forEach(date => {
+        const dataArr = derivData[date];
+        const callItem = dataArr.find(x => x.category === callCat && x.participant_type === participant);
+        const putItem = dataArr.find(x => x.category === putCat && x.participant_type === participant);
+
+        if (callItem || putItem) {
+            const cBuy = callItem ? callItem.oi_long : 0;
+            const cSell = callItem ? callItem.oi_short : 0;
+            const cNet = cBuy - cSell;
+
+            const pBuy = putItem ? putItem.oi_long : 0;
+            const pSell = putItem ? putItem.oi_short : 0;
+            const pNet = pBuy - pSell;
+
+            rows += `
+                <tr>
+                    <td>${date}</td>
+                    <td>${formatNumber(cBuy)}</td>
+                    <td>${formatNumber(cSell)}</td>
+                    <td class="${cNet >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(cNet)}</td>
+                    <td>${formatNumber(pBuy)}</td>
+                    <td>${formatNumber(pSell)}</td>
+                    <td class="${pNet >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(pNet)}</td>
+                </tr>
+            `;
+        }
+    });
+
+    return rows || `<tr><td colspan="7" style="text-align:center;">No Options data available</td></tr>`;
+}
+
 function renderDerivativeTableRows(derivData, category, participant) {
     const dates = Object.keys(derivData).sort().reverse();
     let rows = '';
 
+    const isFutures = (category === 'index_futures' || category === 'stock_futures');
+
     dates.forEach(date => {
         const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
         items.forEach(item => {
-            rows += `
-                <tr>
-                    <td>${date}</td>
-                    <td>${formatNumber(item.buy_value)}</td>
-                    <td>${formatNumber(item.sell_value)}</td>
-                    <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
-                    <td>${formatNumber(item.oi_contracts)}</td>
-                    <td>${formatNumber(item.oi_long || 0)}</td>
-                    <td>${formatNumber(item.oi_short || 0)}</td>
-                </tr>
-            `;
+            if (isFutures) {
+                // Futures: Only 4 columns
+                rows += `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${formatNumber(item.buy_value)}</td>
+                        <td>${formatNumber(item.sell_value)}</td>
+                        <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
+                    </tr>
+                `;
+            } else {
+                // Options: Full 7 columns
+                rows += `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${formatNumber(item.buy_value)}</td>
+                        <td>${formatNumber(item.sell_value)}</td>
+                        <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
+                        <td>${formatNumber(item.oi_contracts)}</td>
+                        <td>${formatNumber(item.oi_long || 0)}</td>
+                        <td>${formatNumber(item.oi_short || 0)}</td>
+                    </tr>
+                `;
+            }
         });
     });
 
-    return rows || '<tr><td colspan="7" style="text-align:center;">No data available</td></tr>';
+    const colspan = isFutures ? "4" : "7";
+    return rows || `<tr><td colspan="${colspan}" style="text-align:center;">No data available</td></tr>`;
 }
 
 // ============================================

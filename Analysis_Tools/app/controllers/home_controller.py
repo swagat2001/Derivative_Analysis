@@ -15,6 +15,7 @@ from flask import Blueprint, jsonify, render_template
 import os
 import json
 from ..models.insights_model import get_fii_dii_summary, get_market_stats, get_52_week_analysis, get_insights_dates, get_nifty_pe
+from ..models.market_breadth_model import get_latest_market_breadth
 from ..models.live_indices_model import get_live_indices
 from ..models.stock_model import get_filtered_tickers
 from ..models.homepage_model import get_homepage_sample_stocks
@@ -34,7 +35,8 @@ def get_live_fii_dii():
                 data = json.load(f)
                 return {
                     "fii_net": data.get("fii_net", 0),
-                    "dii_net": data.get("dii_net", 0)
+                    "dii_net": data.get("dii_net", 0),
+                    "date": data.get("date", datetime.now().strftime("%Y-%m-%d"))
                 }
     except Exception as e:
         print(f"[WARNING] Read FiiDiiSpot.json failed: {e}")
@@ -45,10 +47,14 @@ def get_live_fii_dii():
         start_date = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 
         summary = get_fii_dii_summary(start_date, end_date)
-        return {"fii_net": summary.get("total_fii_net", 0), "dii_net": summary.get("total_dii_net", 0)}
+        return {
+            "fii_net": summary.get("total_fii_net", 0),
+            "dii_net": summary.get("total_dii_net", 0),
+            "date": summary.get("latest_date", end_date)
+        }
     except Exception as e:
         print(f"Error fetching FII/DII: {e}")
-        return {"fii_net": 0, "dii_net": 0}
+        return {"fii_net": 0, "dii_net": 0, "date": datetime.now().strftime("%Y-%m-%d")}
 
 
 @home_bp.route("/")
@@ -56,6 +62,7 @@ def home():
     """Landing page - ScanX style"""
     # Get FII/DII data for initial render
     fii_dii_data = get_live_fii_dii()
+    fii_dii_date = fii_dii_data.get("date")
 
     # Get Market Statistics
     try:
@@ -105,13 +112,57 @@ def home():
 
         # 2. Fallback to DB if live data not available
         if not used_live_data:
-            dates = get_insights_dates()
-            if dates:
-                latest_date = dates[0]
-            else:
-                latest_date = datetime.now().strftime("%Y-%m-%d")
+            # Get advances/declines from market_breadth table (full NSE market)
+            breadth_data = get_latest_market_breadth()
+            latest_date = breadth_data.get("date")
 
-            market_stats = get_market_stats(latest_date) or {}
+            # Check if we should trigger a one-time EOD scrape
+            # Logic: If it's after 3:30 PM IST on a weekday, and the DB date is not today
+            from .home_market_check import is_market_hours_ist, get_ist_now
+            ist_now = get_ist_now()
+            is_open, reason = is_market_hours_ist()
+
+            # If market is closed but it's a weekday after 3:30 PM
+            is_after_market = ist_now.hour > 15 or (ist_now.hour == 15 and ist_now.minute >= 30)
+            is_weekday = ist_now.weekday() < 5
+            today_str = ist_now.strftime("%Y-%m-%d")
+
+            if not is_open and is_weekday and is_after_market and latest_date != today_str:
+                print(f"[INFO] Triggering EOD Market Breadth scrape for {today_str}...")
+                try:
+                    from ..services.market_breadth_scraper import get_market_breadth
+                    eod_data = get_market_breadth()
+                    if eod_data and not eod_data.get("error") and (eod_data.get("advances", 0) > 0 or eod_data.get("declines", 0) > 0):
+                        from ..models.market_breadth_model import save_market_breadth
+                        save_market_breadth(eod_data)
+                        breadth_data = eod_data
+                        latest_date = today_str
+                        print(f"[INFO] EOD Market Breadth saved successfully.")
+                except Exception as scrape_err:
+                    print(f"[ERROR] EOD Scrape failed: {scrape_err}")
+
+            if not latest_date:
+                latest_date = today_str
+
+            # Check if breadth_data has valid data
+            if breadth_data.get("total", 0) > 0:
+                # Use breadth data for advances/declines (full market)
+                market_stats = {
+                    "total": breadth_data.get("total", 0),
+                    "advances": breadth_data.get("advances", 0),
+                    "declines": breadth_data.get("declines", 0),
+                    "unchanged": breadth_data.get("unchanged", 0),
+                    "date": latest_date
+                }
+            else:
+                # Fallback to get_market_stats (F&O stocks only) if market_breadth table is empty
+                print("[WARN] market_breadth table empty, falling back to F&O market stats")
+                dates = get_insights_dates()
+                if dates:
+                    latest_date = dates[0]
+                market_stats = get_market_stats(latest_date) or {}
+                market_stats["date"] = latest_date
+                print(f"[INFO] Using F&O market stats - Advances: {market_stats.get('advances', 0)}, Declines: {market_stats.get('declines', 0)}")
 
         # 3. 52 Week Logic
         week52_high_val = market_stats.get("week52_high", 0)
@@ -157,7 +208,8 @@ def home():
         }
 
     # Get Nifty PE
-    nifty_pe = get_nifty_pe() or {"pe": 0, "status": "N/A", "color": "gray", "min": 15, "max": 30}
+    nifty_pe = get_nifty_pe() or {"pe": 0, "status": "N/A", "color": "gray", "min": 15, "max": 30, "date": "N/A"}
+    nifty_pe_date = nifty_pe.get("date")
 
     # Calculate PE position for the range bar
     pe_min = 15
@@ -179,7 +231,8 @@ def home():
         market_stats=final_stats,
         nifty_pe=nifty_pe,
         sample_stocks=sample_stocks,
-        fii_dii_date=latest_date
+        fii_dii_date=fii_dii_date,
+        nifty_pe_date=nifty_pe_date
     )
 
 
@@ -280,6 +333,22 @@ def advance_decline():
         # Debug logging
         print(f"[NSE API] ✅ Advances: {advances}, Declines: {declines}, Timestamp: '{timestamp}'")
         print(f"[NSE API] Response keys: {list(data.keys())}")
+
+        # Save to database for persistence
+        try:
+            from ..models.market_breadth_model import save_market_breadth
+            from .home_market_check import get_ist_now
+            ist_now = get_ist_now()
+
+            save_market_breadth({
+                "advances": advances,
+                "declines": declines,
+                "unchanged": 0, # NSE API doesn't provide unchanged in this endpoint easily
+                "timestamp": timestamp if timestamp else ist_now.strftime("%Y-%m-%d %H:%M:%S"),
+                "date": ist_now.strftime("%Y-%m-%d")
+            })
+        except Exception as db_err:
+            print(f"[ERROR] Failed to persist breadth data: {db_err}")
 
         return jsonify({
             "success": True,

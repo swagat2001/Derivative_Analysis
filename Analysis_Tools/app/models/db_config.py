@@ -163,4 +163,66 @@ def clear_excel_cache():
     global _excel_cache, _excel_cache_time
     _excel_cache = []
     _excel_cache_time = None
-    print("[INFO] Excel cache cleared")
+
+# =============================================================
+# DATA ACCESS UTILITIES
+# =============================================================
+
+def get_available_dates(engine_instance, limit=100) -> list:
+    """
+    Get sorted list of available trading dates from the database.
+
+    Args:
+        engine_instance: SQLAlchemy engine (FO or Cash)
+        limit: Max dates to return (default 100)
+
+    Returns:
+        List of date strings in 'YYYY-MM-DD' format, sorted descending.
+    """
+    from sqlalchemy import text
+
+    # Priority tables to check for dates (High liquidity/reliability)
+    PRIORITY_TABLES = [
+        "TBL_NIFTY", "TBL_BANKNIFTY",  # Indices
+        "TBL_RELIANCE", "TBL_TCS", "TBL_INFY", "TBL_HDFCBANK", # Major Stocks
+        "TBL_SBIN", "TBL_ICICIBANK"
+    ]
+
+    try:
+        with engine_instance.connect() as conn:
+            # 1. Try Priority Tables
+            for table in PRIORITY_TABLES:
+                try:
+                    # Check if table exists first? Or just try-catch query
+                    # Let's try to query directly, it's faster than inspecting
+                    query = text(f'SELECT DISTINCT "BizDt" FROM public."{table}" ORDER BY "BizDt" DESC LIMIT :limit')
+                    result = conn.execute(query, {"limit": limit})
+                    dates = [str(row[0]) for row in result]
+                    if dates:
+                        # print(f"[INFO] Fetched dates from {table}")
+                        return dates
+                except Exception:
+                    continue # Try next table
+
+            # 2. Fallback: Find ANY valid table
+            # Exclude derived tables
+            query_any = text("""
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name LIKE 'TBL_%'
+                AND table_name NOT LIKE '%_DERIVED'
+                LIMIT 1
+            """)
+            fallback_table = conn.execute(query_any).scalar()
+
+            if fallback_table:
+                # print(f"[INFO] Fetched dates from fallback: {fallback_table}")
+                query = text(f'SELECT DISTINCT "BizDt" FROM public."{fallback_table}" ORDER BY "BizDt" DESC LIMIT :limit')
+                result = conn.execute(query, {"limit": limit})
+                return [str(row[0]) for row in result]
+
+    except Exception as e:
+        print(f"[ERROR] get_available_dates failed: {e}")
+
+    return []

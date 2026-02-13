@@ -615,7 +615,7 @@ def parse_participant_oi_stats(file_content, date_obj):
                         return float(row.get(c, 0))
                 return 0.0
 
-            # 1. Index Futures (Keep as base cateogry, but populate long/short)
+            # 1. Index Futures
             idx_long = get_val("future index long")
             idx_short = get_val("future index short")
             records.append(
@@ -653,9 +653,13 @@ def parse_participant_oi_stats(file_content, date_obj):
                 }
             )
 
-            # 3. Index Options - Split into Call/Put
+            # 3. Index Options - Split into Call/Put + Aggregate
             opt_idx_call_long = get_val("option index call long")
             opt_idx_call_short = get_val("option index call short")
+            opt_idx_put_long = get_val("option index put long")
+            opt_idx_put_short = get_val("option index put short")
+
+            # Store individuals
             records.append(
                 {
                     "trade_date": date_obj,
@@ -671,9 +675,6 @@ def parse_participant_oi_stats(file_content, date_obj):
                     "sell_value": 0,
                 }
             )
-
-            opt_idx_put_long = get_val("option index put long")
-            opt_idx_put_short = get_val("option index put short")
             records.append(
                 {
                     "trade_date": date_obj,
@@ -689,10 +690,30 @@ def parse_participant_oi_stats(file_content, date_obj):
                     "sell_value": 0,
                 }
             )
+            # Store Aggregate (Matches XLS category) - Set OI to 0 to avoid pollution/double counting
+            # OI for options should only be viewed in the detailed Call/Put breakdown
+            records.append(
+                {
+                    "trade_date": date_obj,
+                    "category": "INDEX OPTIONS",
+                    "participant_type": p_type,
+                    "oi_contracts": 0,
+                    "oi_value": 0,
+                    "oi_long": 0,
+                    "oi_short": 0,
+                    "buy_contracts": 0,
+                    "buy_value": 0,
+                    "sell_contracts": 0,
+                    "sell_value": 0,
+                }
+            )
 
-            # 4. Stock Options - Split into Call/Put
+            # 4. Stock Options - Split into Call/Put + Aggregate
             opt_stk_call_long = get_val("option stock call long")
             opt_stk_call_short = get_val("option stock call short")
+            opt_stk_put_long = get_val("option stock put long")
+            opt_stk_put_short = get_val("option stock put short")
+
             records.append(
                 {
                     "trade_date": date_obj,
@@ -708,9 +729,6 @@ def parse_participant_oi_stats(file_content, date_obj):
                     "sell_value": 0,
                 }
             )
-
-            opt_stk_put_long = get_val("option stock put long")
-            opt_stk_put_short = get_val("option stock put short")
             records.append(
                 {
                     "trade_date": date_obj,
@@ -720,6 +738,22 @@ def parse_participant_oi_stats(file_content, date_obj):
                     "oi_value": 0,
                     "oi_long": int(opt_stk_put_long),
                     "oi_short": int(opt_stk_put_short),
+                    "buy_contracts": 0,
+                    "buy_value": 0,
+                    "sell_contracts": 0,
+                    "sell_value": 0,
+                }
+            )
+            # Store Aggregate - Set OI to 0 to avoid pollution
+            records.append(
+                {
+                    "trade_date": date_obj,
+                    "category": "STOCK OPTIONS",
+                    "participant_type": p_type,
+                    "oi_contracts": 0,
+                    "oi_value": 0,
+                    "oi_long": 0,
+                    "oi_short": 0,
                     "buy_contracts": 0,
                     "buy_value": 0,
                     "sell_contracts": 0,
@@ -1073,6 +1107,64 @@ def view_fo_data():
     print("\n")
 
 
+def run_refill_fo(days=15):
+    """Refill F&O Derivatives data for the last N days to fix missing values."""
+    print("\n" + "=" * 60)
+    print(f"FII/DII REFILL (DERIVATIVES STATS - Last {days} days)")
+    print("=" * 60)
+
+    create_fii_derivatives_table()
+
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=days)
+
+    print(f"\n📅 Re-scanning from {start_date} to {end_date}")
+    print("⏳ Downloading archives from NSE to fill missing Buy/Sell values...\n")
+
+    total_files = 0
+    total_records = 0
+
+    current_date = start_date
+    while current_date <= end_date:
+        weekday = current_date.weekday()
+        if weekday >= 5:
+            current_date += timedelta(days=1)
+            continue
+
+        print(f"Processing {current_date}... ", end="", flush=True)
+
+        # 1. Download FII Stats (Value + OI)
+        fii_content = download_archive_fo_stats(current_date)
+        records_fii = []
+        if fii_content:
+            records_fii = parse_fo_stats_xls(fii_content, current_date)
+            for r in records_fii:
+                r["participant_type"] = "FII"
+
+        # 2. Download Participant OI (Detailed OI)
+        part_content = download_participant_oi_stats(current_date)
+        records_part = []
+        if part_content:
+            records_part = parse_participant_oi_stats(part_content, current_date)
+
+        # 3. Save (Upsert logic will handle updates)
+        all_records = records_fii + records_part
+        if all_records:
+            count = save_fo_stats_to_db(all_records)
+            total_records += count
+            total_files += 1
+            print(f"✅ Processed {count} rows")
+        else:
+            print("❌ No Data")
+
+        current_date += timedelta(days=1)
+        time.sleep(random.uniform(0.5, 1.0))
+
+    print("\n" + "=" * 60)
+    print("✅ REFILL COMPLETE")
+    print("=" * 60 + "\n")
+
+
 # =============================================================
 # CLI ENTRY POINT
 # =============================================================
@@ -1084,6 +1176,9 @@ if __name__ == "__main__":
             run_historical_cash_download()
         elif cmd == "historical":
             run_historical_fo_download()
+        elif cmd == "refill":
+            days = int(sys.argv[2]) if len(sys.argv) > 2 else 15
+            run_refill_fo(days)
         elif cmd == "view":
             view_stored_data()
         elif cmd == "view_fo":
@@ -1100,12 +1195,14 @@ if __name__ == "__main__":
             print("  (no args)       - Fetch latest Cash Market data (daily)")
             print("  historical_cash - Info about Cash Market historical data")
             print("  historical      - Download F&O Derivatives history (Archives)")
+            print("  refill [days]   - Re-download archives for last N days (default 15)")
             print("  view            - View Cash Market data")
             print("  view_fo         - View F&O Derivatives data")
             print("  setup           - Create database tables")
             print("\nExamples:")
             print("  python fii_dii_update_database.py")
             print("  python fii_dii_update_database.py historical")
+            print("  python fii_dii_update_database.py refill 10")
             print("  python fii_dii_update_database.py view")
             print("=" * 60 + "\n")
     else:

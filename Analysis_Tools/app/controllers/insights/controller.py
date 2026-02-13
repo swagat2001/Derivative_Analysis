@@ -13,8 +13,10 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, jsonify, render_template, request
 from flask_caching import Cache
+from sqlalchemy import text
 
 from ...controllers.dashboard_controller import get_live_indices
+from ...models.db_config import engine
 from ...models.index_model import (
     filter_stocks_by_index,
     get_dynamic_indices,
@@ -212,22 +214,22 @@ def api_indices():
 
 @insights_bp.route("/api/fii-dii")
 def api_fii_dii():
-    """
-    API endpoint for FII/DII institutional activity data.
-
-    Supports time period filters:
-    - period: daily (default), weekly, monthly, yearly
-    - days: number of days to fetch (for daily period)
-    - start_date / end_date: custom date range
-    """
-    end_date = request.args.get("end_date")
     days = int(request.args.get("days", 30))
-    period = request.args.get("period", "daily")  # daily, weekly, monthly, yearly
-    custom_start = request.args.get("start_date")  # For custom range
-
+    period = request.args.get("period", "daily")
+    custom_start = request.args.get("start_date")
+    end_date = request.args.get("end_date")
     if not end_date:
-        dates = get_insights_dates()
-        end_date = dates[0] if dates else None
+        # Get latest date that has ACTUAL FII/DII data, not Cash DB dates
+        try:
+            with engine.connect() as conn:
+                query = text("""
+                    SELECT MAX(trade_date)::text
+                    FROM fii_dii_activity
+                """)
+                end_date = conn.execute(query).scalar()
+        except:
+            dates = get_insights_dates()
+            end_date = dates[0] if dates else None
 
     if not end_date:
         return jsonify({"error": "No data available"}), 404

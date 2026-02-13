@@ -24,16 +24,7 @@ import pandas as pd
 from sqlalchemy import create_engine, inspect, text
 
 # Database config
-from Analysis_Tools.app.models.db_config import engine
-
-# Hardcoded constants removed - using shared engine
-# db_user = "postgres"
-# db_password = os.getenv("DB_PASSWORD")
-# db_host = "localhost"
-# db_port = "5432"
-# db_name = "BhavCopy_Database"
-# db_password_enc = quote_plus(db_password)
-# engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password_enc}@{db_host}:{db_port}/{db_name}")
+from Analysis_Tools.app.models.db_config import engine, get_available_dates
 
 
 def create_technical_screener_table():
@@ -192,21 +183,6 @@ def get_derived_tables():
     return sorted(tables)
 
 
-def get_available_dates():
-    """Get all available dates from database"""
-    tables = get_derived_tables()
-    if not tables:
-        return []
-    sample = tables[0]
-    q = text(f'SELECT DISTINCT "BizDt" FROM "{sample}" WHERE "BizDt" IS NOT NULL ORDER BY "BizDt" ASC')
-    try:
-        df = pd.read_sql(q, engine)
-        return [d.strftime("%Y-%m-%d") if hasattr(d, "strftime") else str(d) for d in df["BizDt"]]
-    except Exception as e:
-        print(f"Error getting dates: {e}")
-        return []
-
-
 # Technical indicator calculations
 def calculate_rsi(close, period=14):
     delta = close.diff()
@@ -310,7 +286,7 @@ def precalculate_technical_screener_cache():
     create_technical_screener_table()
 
     # Get dates
-    all_dates = get_available_dates()
+    all_dates = get_available_dates(engine)
     cached_dates = get_cached_dates()
     tables = get_derived_tables()
 

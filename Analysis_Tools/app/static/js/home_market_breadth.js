@@ -47,9 +47,10 @@ function isMarketHours() {
  * Fetch and update market breadth data
  */
 async function updateMarketBreadth() {
-  // Check if market is open
+  // Only fetch live data during market hours
+  // When market is closed, keep showing the EOD data from template
   if (!isMarketHours()) {
-    console.log('[Market Breadth] Skipping update - Market is closed');
+    console.log('[Market Breadth] Market closed - Showing EOD data from template');
     return;
   }
 
