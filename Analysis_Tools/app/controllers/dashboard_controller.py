@@ -188,7 +188,7 @@ def api_dashboard_data():
         # Sort data
         try:
             data_list.sort(key=lambda x: x.get(sort_column) or "", reverse=reverse)
-        except:
+        except Exception:
             pass  # If sorting fails, keep original order
 
         # Apply pagination
@@ -494,7 +494,7 @@ def get_historical_chart_data():
                         ticker_data = next((item for item in cache_data if item.get("stock") == ticker), None)
                         if ticker_data:
                             rsi_value = float(ticker_data.get("rsi")) if ticker_data.get("rsi") else None
-                    except:
+                    except Exception:
                         pass
 
                 # Calculate metric value

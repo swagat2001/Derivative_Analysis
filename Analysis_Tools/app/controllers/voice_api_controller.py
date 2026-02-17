@@ -151,7 +151,7 @@ def get_market_summary():
                 df = pd.read_sql(q, con=engine, params={"bizdt": latest_date})
                 if not df.empty:
                     nifty_data = float(df.iloc[0]["UndrlygPric"])
-            except:
+            except Exception:
                 pass
 
         # Get Bank Nifty data
@@ -170,7 +170,7 @@ def get_market_summary():
                 df = pd.read_sql(q, con=engine, params={"bizdt": latest_date})
                 if not df.empty:
                     banknifty_data = float(df.iloc[0]["UndrlygPric"])
-            except:
+            except Exception:
                 pass
 
         # Build speech
@@ -492,7 +492,7 @@ def get_voice_help():
     try:
         tables = get_table_list()
         stock_count = len([t for t in tables if t.startswith("TBL_") and t.endswith("_DERIVED")])
-    except:
+    except Exception:
         stock_count = 0
 
     commands = {

@@ -127,7 +127,7 @@ def get_available_dates():
             if not result.empty
             else []
         )
-    except:
+    except Exception:
         return []
 
 
@@ -135,7 +135,7 @@ def get_prev_date(curr, dates):
     try:
         i = dates.index(curr)
         return dates[i + 1] if i + 1 < len(dates) else None
-    except:
+    except Exception:
         return None
 
 
@@ -310,7 +310,7 @@ def calculate_and_store_data(curr_date, prev_date):
                 total_data.append(row_total)
                 otm_data.append(row_otm)
                 itm_data.append(row_itm)
-        except:
+        except Exception:
             pass
 
     return total_data, otm_data, itm_data
@@ -349,7 +349,7 @@ def precalculate_all_dates():
     try:
         existing_df = pd.read_sql(text("SELECT DISTINCT biz_date FROM options_dashboard_cache"), engine)
         existing_dates = set(pd.to_datetime(existing_df["biz_date"]).dt.strftime("%Y-%m-%d"))
-    except:
+    except Exception:
         existing_dates = set()
 
     # Find NEW dates only

@@ -5,6 +5,7 @@ Pre-calculates technical indicators (RSI, MACD, SMA, Bollinger Bands, ADX)
 Stores in technical_screener_cache table for fast retrieval
 
 INCREMENTAL MODE: Only processes NEW dates, never drops existing data
+OPTIMIZED: Per-ticker cache check to fix partial commits.
 """
 
 import os
@@ -13,7 +14,7 @@ import sys
 # Add project root to path to allow imports from Analysis_Tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +25,7 @@ import pandas as pd
 from sqlalchemy import create_engine, inspect, text
 
 # Database config
-from Analysis_Tools.app.models.db_config import engine, get_available_dates
+from Analysis_Tools.app.models.db_config import engine
 
 
 def create_technical_screener_table():
@@ -166,13 +167,21 @@ def create_technical_screener_table():
         print(f"⚠ Column addition note: {e}")
 
 
-def get_cached_dates():
-    """Get dates already in cache"""
+def get_cached_keys():
+    """Get (date, ticker) tuples already in cache"""
     try:
-        q = text("SELECT DISTINCT cache_date FROM public.technical_screener_cache ORDER BY cache_date")
-        df = pd.read_sql(q, engine)
-        return set(d.strftime("%Y-%m-%d") if hasattr(d, "strftime") else str(d) for d in df["cache_date"])
-    except:
+        q = text("SELECT DISTINCT cache_date, ticker FROM public.technical_screener_cache")
+        with engine.connect() as conn:
+            result = conn.execute(q).fetchall()
+            return set(
+                (
+                    row[0].strftime("%Y-%m-%d") if hasattr(row[0], "strftime") else str(row[0]),
+                    str(row[1]),
+                )
+                for row in result
+            )
+    except Exception as e:
+        print(f"Warning reading cache keys: {e}")
         return set()
 
 
@@ -276,41 +285,28 @@ def calculate_momentum_score(close, lookback=10):
 
 def precalculate_technical_screener_cache():
     """
-    INCREMENTAL: Only processes NEW dates, appends to existing cache
+    INCREMENTAL: Processes missing (date, ticker) pairs
+    OPTIMIZED: Per-ticker cache checks preventing partial commits.
     """
     print("\n" + "=" * 70)
-    print("TECHNICAL SCREENER CACHE BUILDER (INCREMENTAL MODE)")
+    print("TECHNICAL SCREENER CACHE BUILDER (OPTIMIZED INCREMENTAL)")
     print("=" * 70)
 
     # Create table if needed (NO DROP)
     create_technical_screener_table()
 
-    # Get dates
-    all_dates = get_available_dates(engine)
-    cached_dates = get_cached_dates()
+    # Get cached keys (Date, Ticker)
+    cached_keys = get_cached_keys()
     tables = get_derived_tables()
 
-    if not all_dates or not tables:
+    if not tables:
         print("✗ No data available")
         return
 
-    # Find NEW dates only
-    new_dates = set(d for d in all_dates if d not in cached_dates)
-
-    print(f"📅 Total dates in database: {len(all_dates)}")
-    print(f"📂 Already cached: {len(cached_dates)}")
-    print(f"🆕 NEW dates to process: {len(new_dates)}")
-    print(f"📊 Tickers: {len(tables)}")
-
-    if not new_dates:
-        print("\n✅ Cache is up to date! No new dates to process.")
-        return
+    print(f"📂 Cached items: {len(cached_keys)}")
+    print(f"📊 Tickers to scan: {len(tables)}")
 
     min_days = 50
-
-    if len(all_dates) < min_days:
-        print(f"✗ Need at least {min_days} days of data, only have {len(all_dates)}")
-        return
 
     # Process each ticker
     all_cache_rows = []
@@ -320,7 +316,35 @@ def precalculate_technical_screener_cache():
         print(f"\n[{ticker_idx}/{len(tables)}] {ticker}...", end=" ", flush=True)
 
         try:
-            # Get all price history for this ticker
+            # OPTIMIZATION: Check if this ticker has ANY missing dates first?
+            # It's hard to know *missing* dates without fetching available dates for this ticker.
+            # So we fetch "BizDt" from DB for this ticker first.
+
+            q_dates = text(f'SELECT DISTINCT "BizDt" FROM "{table}" WHERE "FinInstrmTp" = \'STF\' AND "BizDt" IS NOT NULL ORDER BY "BizDt"')
+
+            # Using read_sql to get dates is fast
+            df_dates = pd.read_sql(q_dates, engine)
+            if df_dates.empty:
+                print("⚠ No dates", end="")
+                continue
+
+            ticker_dates = [d.strftime("%Y-%m-%d") for d in pd.to_datetime(df_dates["BizDt"])]
+
+            # Filter missing
+            missing_dates = [d for d in ticker_dates if (d, ticker) not in cached_keys]
+
+            if not missing_dates:
+                print("✓ Up to date", end="")
+                continue
+
+            # If we have missing dates, we need to calculate indicators.
+            # Indicators require history (e.g. 200 SMA).
+            # So we typically need FULL history OR (Last cached date - 250 days) to NOW.
+
+            # For simplicity & robustness, let's fetch full history for now (it's one query per ticker).
+            # Optimization: If history is HUGE (10 years), we might want to limit.
+            # But let's assume < 3000 rows is fine.
+
             q = text(
                 f"""
                 SELECT DISTINCT "BizDt" AS date, "UndrlygPric" AS close,
@@ -333,7 +357,7 @@ def precalculate_technical_screener_cache():
             df = pd.read_sql(q, engine)
 
             if df.empty or len(df) < min_days:
-                print(f"⚠ Only {len(df)} days", end="")
+                print(f"⚠ Low data ({len(df)})", end="")
                 continue
 
             df["date"] = pd.to_datetime(df["date"])
@@ -347,12 +371,12 @@ def precalculate_technical_screener_cache():
             df = df.set_index("date")
 
             if len(df) < min_days:
-                print(f"⚠ Only {len(df)} valid days", end="")
+                print(f"⚠ Low val data", end="")
                 continue
 
             close = df["close"]
 
-            # Calculate indicators for entire history
+            # Calculate indicators for entire history (Fast in Pandas)
             rsi = calculate_rsi(close, 14)
             macd_line, signal_line, histogram = calculate_macd(close, 12, 26, 9)
             sma_50 = calculate_sma(close, 50)
@@ -364,70 +388,66 @@ def precalculate_technical_screener_cache():
             pivot, r1, r2, r3, s1, s2, s3 = calculate_pivot_points(close)
             momentum = calculate_momentum_score(close, lookback=10)
 
-            # Create cache rows for NEW dates only
-            ticker_rows = 0
-            for i in range(len(df)):
-                date_str = df.index[i].strftime("%Y-%m-%d")
+            # Create cache rows for MISSING dates only
+            # Convert missing_dates to sets of Timestamps for fast lookup
+            missing_dates_ts = set(pd.to_datetime(missing_dates))
 
-                # ONLY process NEW dates
-                if date_str not in new_dates:
+            rows_to_insert = []
+
+            for i in range(len(df)):
+                current_date = df.index[i]
+
+                # ONLY process MISSING dates
+                if current_date not in missing_dates_ts:
                     continue
 
                 latest_close = close.iloc[i]
-                latest_rsi = rsi.iloc[i] if i < len(rsi) else None
-                latest_macd = macd_line.iloc[i] if i < len(macd_line) else None
-                latest_signal = signal_line.iloc[i] if i < len(signal_line) else None
-                latest_histogram = histogram.iloc[i] if i < len(histogram) else None
-                latest_sma_50 = sma_50.iloc[i] if i < len(sma_50) else None
-                latest_sma_200 = sma_200.iloc[i] if i < len(sma_200) else None
-                latest_bb_upper = bb_upper.iloc[i] if i < len(bb_upper) else None
-                latest_bb_middle = bb_middle.iloc[i] if i < len(bb_middle) else None
-                latest_bb_lower = bb_lower.iloc[i] if i < len(bb_lower) else None
-                latest_bb_width = bb_width.iloc[i] if i < len(bb_width) else None
-                latest_adx = adx.iloc[i] if i < len(adx) else None
+
+                # --- Extracts for readability ---
+                latest_rsi = rsi.iloc[i] if pd.notna(rsi.iloc[i]) else None
+                latest_macd = macd_line.iloc[i] if pd.notna(macd_line.iloc[i]) else None
+                latest_signal = signal_line.iloc[i] if pd.notna(signal_line.iloc[i]) else None
+                latest_histogram = histogram.iloc[i] if pd.notna(histogram.iloc[i]) else None
+                latest_sma_50 = sma_50.iloc[i] if pd.notna(sma_50.iloc[i]) else None
+                latest_sma_200 = sma_200.iloc[i] if pd.notna(sma_200.iloc[i]) else None
+                latest_bb_upper = bb_upper.iloc[i] if pd.notna(bb_upper.iloc[i]) else None
+                latest_bb_middle = bb_middle.iloc[i] if pd.notna(bb_middle.iloc[i]) else None
+                latest_bb_lower = bb_lower.iloc[i] if pd.notna(bb_lower.iloc[i]) else None
+                latest_bb_width = bb_width.iloc[i] if pd.notna(bb_width.iloc[i]) else None
+                latest_adx = adx.iloc[i] if pd.notna(adx.iloc[i]) else None
 
                 # Check for MACD crossover
                 macd_pos_cross = False
                 macd_neg_cross = False
                 if i > 0:
-                    prev_macd = macd_line.iloc[i - 1] if i - 1 < len(macd_line) else None
-                    prev_signal = signal_line.iloc[i - 1] if i - 1 < len(signal_line) else None
+                    prev_macd = macd_line.iloc[i - 1] if pd.notna(macd_line.iloc[i-1]) else None
+                    prev_signal = signal_line.iloc[i - 1] if pd.notna(signal_line.iloc[i-1]) else None
 
                     if (
-                        pd.notnull(prev_macd)
-                        and pd.notnull(prev_signal)
-                        and pd.notnull(latest_macd)
-                        and pd.notnull(latest_signal)
+                        prev_macd is not None and prev_signal is not None
+                        and latest_macd is not None and latest_signal is not None
                     ):
                         if prev_macd < prev_signal and latest_macd > latest_signal:
                             macd_pos_cross = True
                         if prev_macd > prev_signal and latest_macd < latest_signal:
                             macd_neg_cross = True
 
-                # NEW: Get pivot, momentum values for this row
-                latest_pivot = pivot.iloc[i] if i < len(pivot) and pd.notnull(pivot.iloc[i]) else None
-                latest_r1 = r1.iloc[i] if i < len(r1) and pd.notnull(r1.iloc[i]) else None
-                latest_r2 = r2.iloc[i] if i < len(r2) and pd.notnull(r2.iloc[i]) else None
-                latest_r3 = r3.iloc[i] if i < len(r3) and pd.notnull(r3.iloc[i]) else None
-                latest_s1 = s1.iloc[i] if i < len(s1) and pd.notnull(s1.iloc[i]) else None
-                latest_s2 = s2.iloc[i] if i < len(s2) and pd.notnull(s2.iloc[i]) else None
-                latest_s3 = s3.iloc[i] if i < len(s3) and pd.notnull(s3.iloc[i]) else None
-                latest_momentum = momentum.iloc[i] if i < len(momentum) and pd.notnull(momentum.iloc[i]) else None
+                # NEW: Get pivot, momentum values
+                latest_pivot = pivot.iloc[i] if pd.notna(pivot.iloc[i]) else None
+                latest_r1 = r1.iloc[i] if pd.notna(r1.iloc[i]) else None
+                latest_r2 = r2.iloc[i] if pd.notna(r2.iloc[i]) else None
+                latest_r3 = r3.iloc[i] if pd.notna(r3.iloc[i]) else None
+                latest_s1 = s1.iloc[i] if pd.notna(s1.iloc[i]) else None
+                latest_s2 = s2.iloc[i] if pd.notna(s2.iloc[i]) else None
+                latest_s3 = s3.iloc[i] if pd.notna(s3.iloc[i]) else None
+                latest_momentum = momentum.iloc[i] if pd.notna(momentum.iloc[i]) else None
 
                 # NEW: Price & Volume Metrics
                 # ---------------------------
-                # Rolling Highs/Lows for Breakouts
-                # We need historical data up to this point 'i'
-                # 5-day (1 week), 20-day (4 weeks), 250-day (52 weeks)
-
-                # Get history window ending at i (inclusive)
-                # Ensure we have enough data points
-
                 week1_high = week1_low = None
                 week4_high = week4_low = None
                 week52_high = week52_low = None
 
-                vol_sma_20 = None
                 is_week1_high_bo = is_week1_low_bo = False
                 is_week4_high_bo = is_week4_low_bo = False
                 is_week52_high_bo = is_week52_low_bo = False
@@ -436,12 +456,6 @@ def precalculate_technical_screener_cache():
                 is_unusually_high_vol = False
 
                 try:
-                    # Rolling windows calculation (using array slicing for speed)
-                    # We need PREVIOUS highs to check for breakout (i.e. Close > Max of prev N days)
-                    # But typically breakout means Close > Max of Last N Days (including today? or excluding?)
-                    # ScanX "Breakouts" usually mean "Crossed above the High of last N days TODAY"
-                    # So we compare Today's Close vs Max of (Day-1 to Day-N)
-
                     if i >= 5:
                          prev_5_high = close.iloc[i-5:i].max()
                          prev_5_low = close.iloc[i-5:i].min()
@@ -485,12 +499,10 @@ def precalculate_technical_screener_cache():
                          is_week52_high_bo = bool(latest_close > prev_max)
                          is_week52_low_bo = bool(latest_close < prev_min)
 
-                except Exception as e:
-                    # Safety net for calculation errors
+                except Exception:
                     pass
 
                 # Basic Price/Volume Data
-                # -----------------------
                 latest_open = df.iloc[i].get('open') if 'open' in df.columns else None
                 latest_high = df.iloc[i].get('high') if 'high' in df.columns else None
                 latest_low = df.iloc[i].get('low') if 'low' in df.columns else None
@@ -525,22 +537,24 @@ def precalculate_technical_screener_cache():
                 high_momentum_flag = bool(latest_momentum > 5.0) if latest_momentum is not None else False
 
                 row = {
-                    "cache_date": date_str,
+                    "cache_date": current_date.strftime("%Y-%m-%d"),
                     "ticker": ticker,
-                    "underlying_price": latest_close,
+                    "underlying_price": float(latest_close),
 
                     # NEW: Price & Volume
-                    "open_price": latest_open,
-                    "high_price": latest_high,
-                    "low_price": latest_low,
+                    "open_price": float(latest_open) if latest_open is not None else None,
+                    "high_price": float(latest_high) if latest_high is not None else None,
+                    "low_price": float(latest_low) if latest_low is not None else None,
                     "volume": int(latest_volume) if latest_volume is not None and pd.notnull(latest_volume) else 0,
-                    "price_change_pct": price_change_pct,
-                    "volume_change_pct": vol_change_pct,
+                    "price_change_pct": float(price_change_pct),
+                    "volume_change_pct": float(vol_change_pct),
 
-                    "week1_high": week1_high, "week1_low": week1_low,
-                    "week4_high": week4_high, "week4_low": week4_low,
-                    "week52_high": week52_high, "week52_low": week52_low,
-                    #"vol_sma_20": vol_sma_20,
+                    "week1_high": float(week1_high) if week1_high is not None else None,
+                    "week1_low": float(week1_low) if week1_low is not None else None,
+                    "week4_high": float(week4_high) if week4_high is not None else None,
+                    "week4_low": float(week4_low) if week4_low is not None else None,
+                    "week52_high": float(week52_high) if week52_high is not None else None,
+                    "week52_low": float(week52_low) if week52_low is not None else None,
 
                     "is_week1_high_breakout": is_week1_high_bo,
                     "is_week1_low_breakout": is_week1_low_bo,
@@ -551,43 +565,43 @@ def precalculate_technical_screener_cache():
                     "is_potential_high_vol": is_pot_high_vol,
                     "is_unusually_high_vol": is_unusually_high_vol,
 
-                    "rsi_14": latest_rsi if pd.notnull(latest_rsi) else None,
-                    "rsi_above_80": bool(latest_rsi > 80) if pd.notnull(latest_rsi) else False,
-                    "rsi_60_80": bool(60 < latest_rsi <= 80) if pd.notnull(latest_rsi) else False,
-                    "rsi_40_60": bool(40 <= latest_rsi <= 60) if pd.notnull(latest_rsi) else False,
-                    "rsi_20_40": bool(20 <= latest_rsi < 40) if pd.notnull(latest_rsi) else False,
-                    "rsi_below_20": bool(latest_rsi < 20) if pd.notnull(latest_rsi) else False,
-                    "macd": latest_macd if pd.notnull(latest_macd) else None,
-                    "macd_signal": latest_signal if pd.notnull(latest_signal) else None,
-                    "macd_histogram": latest_histogram if pd.notnull(latest_histogram) else None,
+                    "rsi_14": float(latest_rsi) if latest_rsi is not None else None,
+                    "rsi_above_80": bool(latest_rsi > 80) if latest_rsi is not None else False,
+                    "rsi_60_80": bool(60 < latest_rsi <= 80) if latest_rsi is not None else False,
+                    "rsi_40_60": bool(40 <= latest_rsi <= 60) if latest_rsi is not None else False,
+                    "rsi_20_40": bool(20 <= latest_rsi < 40) if latest_rsi is not None else False,
+                    "rsi_below_20": bool(latest_rsi < 20) if latest_rsi is not None else False,
+                    "macd": float(latest_macd) if latest_macd is not None else None,
+                    "macd_signal": float(latest_signal) if latest_signal is not None else None,
+                    "macd_histogram": float(latest_histogram) if latest_histogram is not None else None,
                     "macd_pos_cross": macd_pos_cross,
                     "macd_neg_cross": macd_neg_cross,
-                    "sma_50": latest_sma_50 if pd.notnull(latest_sma_50) else None,
-                    "sma_200": latest_sma_200 if pd.notnull(latest_sma_200) else None,
-                    "above_50_sma": bool(latest_close > latest_sma_50) if pd.notnull(latest_sma_50) else False,
-                    "above_200_sma": bool(latest_close > latest_sma_200) if pd.notnull(latest_sma_200) else False,
-                    "below_50_sma": bool(latest_close < latest_sma_50) if pd.notnull(latest_sma_50) else False,
-                    "below_200_sma": bool(latest_close < latest_sma_200) if pd.notnull(latest_sma_200) else False,
-                    "dist_from_50sma_pct": ((latest_close - latest_sma_50) / latest_sma_50 * 100)
-                    if pd.notnull(latest_sma_50) and latest_sma_50 != 0
+                    "sma_50": float(latest_sma_50) if latest_sma_50 is not None else None,
+                    "sma_200": float(latest_sma_200) if latest_sma_200 is not None else None,
+                    "above_50_sma": bool(latest_close > latest_sma_50) if latest_sma_50 is not None else False,
+                    "above_200_sma": bool(latest_close > latest_sma_200) if latest_sma_200 is not None else False,
+                    "below_50_sma": bool(latest_close < latest_sma_50) if latest_sma_50 is not None else False,
+                    "below_200_sma": bool(latest_close < latest_sma_200) if latest_sma_200 is not None else False,
+                    "dist_from_50sma_pct": float(((latest_close - latest_sma_50) / latest_sma_50 * 100))
+                    if latest_sma_50 is not None and latest_sma_50 != 0
                     else None,
-                    "dist_from_200sma_pct": ((latest_close - latest_sma_200) / latest_sma_200 * 100)
-                    if pd.notnull(latest_sma_200) and latest_sma_200 != 0
+                    "dist_from_200sma_pct": float(((latest_close - latest_sma_200) / latest_sma_200 * 100))
+                    if latest_sma_200 is not None and latest_sma_200 != 0
                     else None,
-                    "bb_upper": latest_bb_upper if pd.notnull(latest_bb_upper) else None,
-                    "bb_middle": latest_bb_middle if pd.notnull(latest_bb_middle) else None,
-                    "bb_lower": latest_bb_lower if pd.notnull(latest_bb_lower) else None,
-                    "bb_width": latest_bb_width if pd.notnull(latest_bb_width) else None,
-                    "adx_14": latest_adx if pd.notnull(latest_adx) else None,
-                    "strong_trend": bool(latest_adx > 25) if pd.notnull(latest_adx) else False,
+                    "bb_upper": float(latest_bb_upper) if latest_bb_upper is not None else None,
+                    "bb_middle": float(latest_bb_middle) if latest_bb_middle is not None else None,
+                    "bb_lower": float(latest_bb_lower) if latest_bb_lower is not None else None,
+                    "bb_width": float(latest_bb_width) if latest_bb_width is not None else None,
+                    "adx_14": float(latest_adx) if latest_adx is not None else None,
+                    "strong_trend": bool(latest_adx > 25) if latest_adx is not None else False,
                     # NEW: Pivot points
-                    "pivot_point": latest_pivot,
-                    "r1": latest_r1,
-                    "r2": latest_r2,
-                    "r3": latest_r3,
-                    "s1": latest_s1,
-                    "s2": latest_s2,
-                    "s3": latest_s3,
+                    "pivot_point": float(latest_pivot) if latest_pivot is not None else None,
+                    "r1": float(latest_r1) if latest_r1 is not None else None,
+                    "r2": float(latest_r2) if latest_r2 is not None else None,
+                    "r3": float(latest_r3) if latest_r3 is not None else None,
+                    "s1": float(latest_s1) if latest_s1 is not None else None,
+                    "s2": float(latest_s2) if latest_s2 is not None else None,
+                    "s3": float(latest_s3) if latest_s3 is not None else None,
                     # NEW: Breakout flags
                     "r1_breakout": r1_bo,
                     "r2_breakout": r2_bo,
@@ -596,28 +610,38 @@ def precalculate_technical_screener_cache():
                     "s2_breakout": s2_bo,
                     "s3_breakout": s3_bo,
                     # NEW: Momentum and squeeze
-                    "momentum_score": latest_momentum,
+                    "momentum_score": float(latest_momentum) if latest_momentum is not None else None,
                     "is_high_momentum": high_momentum_flag,
                     "bb_squeeze": bb_squeeze_flag,
                 }
 
-                all_cache_rows.append(row)
-                ticker_rows += 1
+                rows_to_insert.append(row)
 
-            if ticker_rows > 0:
-                print(f"✓ {ticker_rows} new rows", end="")
+            if rows_to_insert:
+                print(f"✓ {len(rows_to_insert)} new rows", end="")
+                all_cache_rows.extend(rows_to_insert)
             else:
-                print("⚠ No new rows", end="")
+                print("✓ Up to date", end="")
 
         except Exception as e:
             print(f"✗ Error: {e}", end="")
+            import traceback
+            traceback.print_exc()
 
     # Insert all NEW rows into database
+    # BATCHING: If we have 100 tickers * 10 missing days = 1000 rows. Safe to insert.
     if all_cache_rows:
         print(f"\n\n📥 Inserting {len(all_cache_rows)} total new rows into database...")
         try:
-            insert_df = pd.DataFrame(all_cache_rows)
-            insert_df.to_sql("technical_screener_cache", con=engine, if_exists="append", index=False)
+            # Chunk it
+            chunk_size = 5000
+            if len(all_cache_rows) > chunk_size:
+                for i in range(0, len(all_cache_rows), chunk_size):
+                    chunk = all_cache_rows[i:i + chunk_size]
+                    pd.DataFrame(chunk).to_sql("technical_screener_cache", con=engine, if_exists="append", index=False)
+                    print(f"  Batch {i}-{i+len(chunk)} inserted")
+            else:
+                pd.DataFrame(all_cache_rows).to_sql("technical_screener_cache", con=engine, if_exists="append", index=False)
             print("✓ Insert complete!")
         except Exception as e:
             print(f"✗ Insert error: {e}")

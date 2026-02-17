@@ -140,7 +140,7 @@ def download_csv_data():
         else:
             try:
                 start_date = datetime.strptime(start_date_str, "%d-%m-%Y").date()
-            except:
+            except Exception:
                 print("⚠️ Invalid date format. Using 30 days ago.")
                 start_date = datetime.now().date() - timedelta(days=30)
 
@@ -208,7 +208,7 @@ def download_csv_data():
                     }
                 )
                 continue
-            except:
+            except Exception:
                 os.remove(filepath)
 
         # Try download with retries
@@ -338,7 +338,7 @@ def upload_to_database():
                     result = conn.execute(q).scalar()
                 if result and (latest_db_date is None or result > latest_db_date):
                     latest_db_date = result
-            except:
+            except Exception:
                 pass
 
     if latest_db_date:

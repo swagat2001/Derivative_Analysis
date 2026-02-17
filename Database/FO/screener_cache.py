@@ -775,7 +775,7 @@ def precalculate_screener_cache():
             cached_dates_set = set(
                 str(d.date()) if hasattr(d, "date") else str(d) for d in cached_dates["cache_date"].tolist()
             )
-        except:
+        except Exception:
             cached_dates_set = set()
 
         # Find new dates to process

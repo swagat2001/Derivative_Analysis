@@ -16,12 +16,8 @@ from typing import List, Dict
 # Prioritized list of paths for the sector master CSV
 # The user explicitly prefers: C:\Users\Admin\Desktop\Derivative_Analysis\nse_sector_master.csv
 SECTOR_MASTER_PATHS = [
-    r"C:\Users\Admin\Desktop\Derivative_Analysis\nse_sector_master.csv",
     os.getenv("SECTOR_MASTER_PATH"),
-    "C:/NSE_EOD_CASH_WITH_INDICATORS/nse_sector_master.csv",
-    "C:/Users/Admin/Desktop/Derivative_Analysis/SMA/nse_sector_master.csv",
     os.path.join(os.getcwd(), "nse_sector_master.csv"),
-    # Add relative path from this file as final fallback (assuming it might be moved here)
     os.path.join(os.path.dirname(__file__), "..", "..", "nse_sector_master.csv")
 ]
 
@@ -144,6 +140,10 @@ def load_sector_master(force_reload=False):
     if loaded_from_csv:
         _sector_cache_loaded = True
         return
+
+    print(f"[ERROR] Could not load sector master from any of these paths: {SECTOR_MASTER_PATHS}")
+    print(f"[DEBUG] Current Working Directory: {os.getcwd()}")
+    print(f"[DEBUG] SECTOR_MASTER_PATH env var: {os.getenv('SECTOR_MASTER_PATH')}")
 
     # 2. Fallback to JSON
     print("[WARN] No valid sector master CSV found. Attempting index_constituents.json...")

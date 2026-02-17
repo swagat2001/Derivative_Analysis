@@ -116,7 +116,7 @@ def parse_fii_dii_data(raw_data):
                 val_str = str(val).replace(",", "").replace(" ", "")
                 try:
                     return float(val_str)
-                except:
+                except Exception:
                     return 0.0
 
             buy_val = parse_value(item.get("buyValue"))

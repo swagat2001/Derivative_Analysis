@@ -121,7 +121,7 @@ def parse_value(text):
     try:
         text = text.strip().replace(",", "").replace("(", "-").replace(")", "")
         return float(text) if text and text != "-" else 0.0
-    except:
+    except Exception:
         return 0.0
 
 
@@ -132,10 +132,10 @@ def parse_moneycontrol_date(date_str):
         for fmt in ["%d %b %Y", "%d-%b-%Y", "%d %B %Y"]:
             try:
                 return datetime.strptime(date_str.strip(), fmt).date()
-            except:
+            except ValueError:
                 continue
         return None
-    except:
+    except Exception:
         return None
 
 

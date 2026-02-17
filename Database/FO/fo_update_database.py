@@ -170,7 +170,7 @@ def download_csv_data():
             download_with_timeout(url, output_path, timeout=25)
             downloaded_files.append(output_path)
             print(f"   ✅ {d} downloaded")
-        except:
+        except Exception:
             print(f"   ⚠️  Skipped {d} (holiday or missing)")
 
     if not downloaded_files:
@@ -499,7 +499,7 @@ def calculate_greeks():
                 "Theta": theta(flag, asset_price, strike_price, t, rate, iv),
                 "Vega": vega(flag, asset_price, strike_price, t, rate, iv),
             }
-        except:
+        except Exception:
             return {"IV": 0, "Delta": 0, "Gamma": 0, "Rho": 0, "Theta": 0, "Vega": 0}
 
     # ---------------------------------------------------------
@@ -604,7 +604,7 @@ def calculate_greeks():
                                 )
                             else:
                                 return pd.Series([0, 0, 0, 0, 0, 0])
-                        except:
+                        except Exception:
                             return pd.Series([0, 0, 0, 0, 0, 0])
 
                     df[["delta", "gamma", "vega", "theta", "rho", "iv"]] = df.apply(safe_greeks, axis=1)

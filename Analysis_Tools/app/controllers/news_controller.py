@@ -261,7 +261,7 @@ def get_relative_time(dt: datetime) -> str:
             return f"{days} day{'s' if days > 1 else ''} ago"
         else:
             return dt.strftime("%d %b %Y")
-    except:
+    except Exception:
         return "Recently"
 
 # Load AI once at startup. This will use about 1.2GB of your 24GB RAM.

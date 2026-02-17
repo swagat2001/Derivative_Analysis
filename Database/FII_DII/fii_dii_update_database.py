@@ -150,7 +150,7 @@ def get_latest_date_in_db():
         with engine.connect() as conn:
             result = conn.execute(text(query)).scalar()
         return result
-    except:
+    except Exception:
         return None
 
 
@@ -161,7 +161,7 @@ def get_oldest_date_in_db():
         with engine.connect() as conn:
             result = conn.execute(text(query)).scalar()
         return result
-    except:
+    except Exception:
         return None
 
 
@@ -172,7 +172,7 @@ def get_latest_fo_date_in_db():
         with engine.connect() as conn:
             result = conn.execute(text(query)).scalar()
         return result
-    except:
+    except Exception:
         return None
 
 
@@ -185,7 +185,7 @@ def parse_val(val_str):
         return 0.0
     try:
         return float(str(val_str).replace(",", ""))
-    except:
+    except Exception:
         return 0.0
 
 
@@ -230,37 +230,6 @@ def parse_fii_dii_json(json_data, date_obj):
     pass
 
 
-def get_latest_date_in_db():
-    """Get the latest date in Cash Market table."""
-    try:
-        query = "SELECT MAX(trade_date) FROM fii_dii_activity"
-        with engine.connect() as conn:
-            result = conn.execute(text(query)).scalar()
-        return result
-    except:
-        return None
-
-
-def get_oldest_date_in_db():
-    """Get the oldest date in Cash Market table."""
-    try:
-        query = "SELECT MIN(trade_date) FROM fii_dii_activity"
-        with engine.connect() as conn:
-            result = conn.execute(text(query)).scalar()
-        return result
-    except:
-        return None
-
-
-def get_latest_fo_date_in_db():
-    """Get the latest date in Derivatives table."""
-    try:
-        query = "SELECT MAX(trade_date) FROM fii_derivatives_activity"
-        with engine.connect() as conn:
-            result = conn.execute(text(query)).scalar()
-        return result
-    except:
-        return None
 
 
 def get_record_count():
@@ -269,7 +238,7 @@ def get_record_count():
         query = "SELECT COUNT(*) FROM fii_dii_activity"
         with engine.connect() as conn:
             return conn.execute(text(query)).scalar()
-    except:
+    except Exception:
         return 0
 
 
@@ -395,7 +364,7 @@ def parse_fii_dii_data(raw_data):
                 try:
                     trade_date = datetime.strptime(date_str, fmt).date()
                     break
-                except:
+                except ValueError:
                     continue
 
             if not trade_date:
@@ -419,7 +388,7 @@ def parse_fii_dii_data(raw_data):
                     return 0.0
                 try:
                     return float(str(v).replace(",", ""))
-                except:
+                except Exception:
                     return 0.0
 
             buy = parse_val(item.get("buyValue"))
@@ -492,7 +461,7 @@ def parse_archive_csv(df, date_obj):
 
         record["total_net_value"] = record["fii_net_value"] + record["dii_net_value"]
         return [record]
-    except:
+    except Exception:
         return None
 
 
@@ -536,7 +505,7 @@ def parse_fo_stats_xls(file_content, date_obj):
                         clean_val = val.replace(",", "").replace("nan", "").strip()
                         if clean_val:
                             nums.append(float(clean_val))
-                    except:
+                    except Exception:
                         pass
 
                 if len(nums) >= 6:

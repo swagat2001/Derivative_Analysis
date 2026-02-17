@@ -18,12 +18,12 @@ from sqlalchemy import create_engine
 # DATABASE CONNECTION CONFIGURATION
 # =============================================================
 
-db_user = "postgres"
-db_password = os.getenv("DB_PASSWORD")
-db_host = "localhost"
-db_port = "5432"
-db_name = "BhavCopy_Database"
-db_name_cash = "CashStocks_Database"  # Cash/Equity database
+db_user = os.getenv("DB_USER", "postgres")
+db_password = os.getenv("DB_PASSWORD", "")
+db_host = os.getenv("DB_HOST", "localhost")
+db_port = os.getenv("DB_PORT", "5432")
+db_name = os.getenv("DB_NAME", "BhavCopy_Database")
+db_name_cash = os.getenv("DB_NAME_CASH", "CashStocks_Database")  # Cash/Equity database
 
 db_password_enc = quote_plus(db_password)
 

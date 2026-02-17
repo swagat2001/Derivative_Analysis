@@ -144,7 +144,7 @@ def merge_data(old_data, new_data, data_type):
                     # Sort by date
                     try:
                         old_values.sort(key=lambda x: x[0])
-                    except:
+                    except Exception:
                         pass  # robust sort
 
                     old_ds["values"] = old_values

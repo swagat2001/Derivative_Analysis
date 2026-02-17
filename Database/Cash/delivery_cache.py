@@ -107,7 +107,7 @@ def get_cached_dates():
         query = text("SELECT DISTINCT date FROM daily_delivery_data ORDER BY date DESC")
         with engine.connect() as conn:
             return {str(row[0]) for row in conn.execute(query)}
-    except:
+    except Exception:
         return set()
 
 

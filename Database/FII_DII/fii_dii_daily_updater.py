@@ -109,7 +109,7 @@ def parse_nse_data(raw_data):
                 try:
                     trade_date = datetime.strptime(date_str, fmt).date()
                     break
-                except:
+                except ValueError:
                     continue
 
             if not trade_date:
@@ -138,7 +138,7 @@ def parse_nse_data(raw_data):
                 records[trade_date]["dii_buy_value"] = buy
                 records[trade_date]["dii_sell_value"] = sell
                 records[trade_date]["dii_net_value"] = net
-        except:
+        except Exception:
             continue
 
     # Calculate total_net_value
@@ -212,7 +212,7 @@ def scrape_moneycontrol_single_day(year, month, target_date, participant_type):
                         try:
                             row_date = datetime.strptime(date_str, fmt).date()
                             break
-                        except:
+                        except ValueError:
                             continue
 
                     if row_date == target_date:
@@ -221,10 +221,10 @@ def scrape_moneycontrol_single_day(year, month, target_date, participant_type):
                             "sell_value": float(cols[2].text.strip().replace(",", "") or 0),
                             "net_value": float(cols[3].text.strip().replace(",", "") or 0),
                         }
-                except:
+                except Exception:
                     continue
         return None
-    except:
+    except Exception:
         return None
 
 

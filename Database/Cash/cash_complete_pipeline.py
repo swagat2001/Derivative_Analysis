@@ -84,7 +84,7 @@ def download_full_bhavcopy():
     else:
         try:
             start_date = datetime.strptime(start_date_str, "%d-%m-%Y").date()
-        except:
+        except Exception:
             print("⚠️ Invalid date format. Using today.")
             start_date = datetime.now().date()
 
@@ -95,7 +95,7 @@ def download_full_bhavcopy():
     else:
         try:
             end_date = datetime.strptime(end_date_str, "%d-%m-%Y").date()
-        except:
+        except Exception:
             print("⚠️ Invalid date format. Using start date.")
             end_date = start_date
 
@@ -166,7 +166,7 @@ def download_full_bhavcopy():
                 )
                 continue
 
-            except:
+            except Exception:
                 # If file corrupt, delete and redownload
                 os.remove(filepath)
 

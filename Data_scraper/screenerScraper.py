@@ -177,7 +177,7 @@ class stockScreener:
                                 else:
                                     _valkey = float(_valkey)
                                 data[_val].append({_key: _valkey})
-                        except:
+                        except Exception:
                             pass
 
             except Exception as e:
@@ -345,7 +345,7 @@ class ScreenerScrape(stockScreener):
             self.tokendf = pd.read_csv(
                 os.path.join(self.TOKENS_DIR, "tokens_{dt}.csv".format(dt=datetime.datetime.now().strftime("%Y%m%d")))
             )
-        except:
+        except Exception:
             if os.path.exists(self.TOKENS_DIR):
                 files = os.listdir(self.TOKENS_DIR)
                 for file in files:

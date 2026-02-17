@@ -245,7 +245,7 @@ def api_fii_dii():
                     FROM fii_dii_activity
                 """)
                 end_date = conn.execute(query).scalar()
-        except:
+        except Exception:
             dates = get_insights_dates()
             end_date = dates[0] if dates else None
 

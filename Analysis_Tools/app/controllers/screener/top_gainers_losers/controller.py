@@ -537,7 +537,7 @@ def create_screener_pdf(screener_data, selected_date):
                 if format_type == "pct":
                     return f"{float(value):+.1f}%" if value else "—"
                 return str(value)
-            except:
+            except Exception:
                 return "—"
 
         def safe(key):
@@ -632,7 +632,7 @@ def create_screener_pdf(screener_data, selected_date):
                                 change_style = " style='color:#28a745; font-weight:bold;'"
                             elif float(itm["change"]) < 0:
                                 change_style = " style='color:#dc3545; font-weight:bold;'"
-                        except:
+                        except Exception:
                             change_style = ""
 
                     bg = "#f5f5f5" if i % 2 == 0 else "white"
@@ -939,7 +939,7 @@ def create_screener_pdf(screener_data, selected_date):
             try:
                 os.unlink(cover_temp_path)
                 os.unlink(tables_temp_path)
-            except:
+            except Exception:
                 pass
 
         # ============================================================
@@ -968,10 +968,7 @@ def create_screener_pdf(screener_data, selected_date):
 
         traceback.print_exc()
         return None, str(e)
-        import traceback
 
-        traceback.print_exc()
-        return None, str(e)
 
 
 # ========================================================================

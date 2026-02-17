@@ -748,10 +748,11 @@
     }
 
     function getOptionBadge(type) {
+        if (!type || type === '' || type === 'FUT') return '<span class="signal-badge fut">FUT</span>';
         if (type === 'CE') return '<span class="signal-badge ce">CE</span>';
         if (type === 'PE') return '<span class="signal-badge pe">PE</span>';
-        if (!type || type === '') return '<span class="signal-badge fut">FUT</span>';
-        return '';
+        // Handle other types (STO, STF, etc.)
+        return `<span class="signal-badge fut">${type}</span>`;
     }
 
     function getSignalBadges(signal) {

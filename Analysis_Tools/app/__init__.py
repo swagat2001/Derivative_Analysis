@@ -24,7 +24,7 @@ from .controllers.screener.technical_screener.controller import technical_screen
 from .controllers.screener.top_gainers_losers.controller import cache as gainers_cache
 from .controllers.screener.top_gainers_losers.controller import gainers_losers_bp
 from .controllers.stock_controller import stock_bp
-from .controllers.stock_controller import stock_bp
+
 from .controllers.voice_api_controller import voice_api_bp
 from .models.stock_model import cache as stock_cache
 from .utils.logger import setup_logger
@@ -49,7 +49,7 @@ def create_app():
     futures_cache.init_app(app)
     tech_cache.init_app(app)
     insights_cache.init_app(app)
-    insights_cache.init_app(app)
+
     scanner_cache.init_app(app)
     stock_cache.init_app(app)
 

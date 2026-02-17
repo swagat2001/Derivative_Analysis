@@ -33,29 +33,19 @@ from .db_config import engine, engine_cash
 
 # Build sector master paths from environment variables
 def _get_sector_master_paths():
-    """Get sector master CSV paths from environment variables with fallbacks."""
+    """Get sector master CSV paths."""
     paths = []
 
-    # Primary path from environment
-    primary_path = os.getenv("SECTOR_MASTER_PATH")
-    if primary_path:
-        paths.append(primary_path)
+    # 1. Environment Variable (User Preference)
+    env_path = os.getenv("SECTOR_MASTER_PATH")
+    if env_path:
+        paths.append(env_path)
 
-    # Fallback paths from environment (comma-separated)
-    fallback_paths = os.getenv("SECTOR_MASTER_FALLBACK_PATHS", "")
-    if fallback_paths:
-        paths.extend([p.strip() for p in fallback_paths.split(",") if p.strip()])
+    # 2. Project Root (Dynamic)
+    paths.append(os.path.join(os.getcwd(), "nse_sector_master.csv"))
 
-    # Default fallback if no env vars set
-    if not paths:
-        paths = [
-            "C:/Users/Admin/Desktop/Derivative_Analysis/nse_sector_master.csv",
-            "C:/NSE_EOD_CASH_WITH_INDICATORS/nse_sector_master.csv",
-            "C:/Users/Admin/Desktop/Derivative_Analysis/SMA/nse_sector_master.csv",
-        ]
-
-    # Always add local path as final fallback
-    paths.append(os.path.join(os.path.dirname(__file__), "nse_sector_master.csv"))
+    # 3. Relative to this file
+    paths.append(os.path.join(os.path.dirname(__file__), "..", "..", "..", "nse_sector_master.csv"))
 
     return paths
 
@@ -561,7 +551,7 @@ def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: st
                 start_date = selected_date
             else:
                 start_date = (date_obj - timedelta(days=delta)).strftime("%Y-%m-%d")
-        except:
+        except Exception:
             start_date = selected_date
 
     if start_date == selected_date:
@@ -1182,7 +1172,7 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
             try:
                 prev_close = close / (1 + (change_pct / 100))
                 change = close - prev_close
-            except:
+            except Exception:
                 change = 0
 
             result.append(
