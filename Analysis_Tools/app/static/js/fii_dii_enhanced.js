@@ -446,7 +446,7 @@ function renderDerivativeView(container, category) {
             <div class="card-header">
                 <span class="card-title">Activity Details</span>
             </div>
-            <table class="card-table">
+            <table class="card-table sortable-table">
                 <thead>
                     <tr>${tableHeaders}</tr>
                 </thead>
@@ -456,6 +456,7 @@ function renderDerivativeView(container, category) {
             </table>
         </div>
     `;
+    if (window.initTableSorting) window.initTableSorting();
 
     // Render appropriate chart
     if (isOptions) {

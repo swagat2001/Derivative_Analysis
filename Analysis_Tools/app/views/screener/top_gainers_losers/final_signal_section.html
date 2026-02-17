@@ -9,7 +9,7 @@
     <div class="screener-card">
 
         <div class="card-table">
-            <table>
+            <table class="sortable-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -20,26 +20,27 @@
 
                 <tbody>
 
-                {% if final_signals and final_signals|length > 0 %}
+                    {% if final_signals and final_signals|length > 0 %}
 
                     {% for symbol, signal in final_signals.items() %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td class="symbol-link">{{ symbol }}</td>
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="symbol-link">{{ symbol }}</td>
 
-                            <td style="font-weight:700; text-transform:uppercase; white-space:nowrap; {% if signal == 'BULLISH' %}color:#16a34a !important;{% else %}color:#dc2626 !important;{% endif %}">
-                                {{ signal }}
-                            </td>
-                        </tr>
+                        <td
+                            style="font-weight:700; text-transform:uppercase; white-space:nowrap; {% if signal == 'BULLISH' %}color:#16a34a !important;{% else %}color:#dc2626 !important;{% endif %}">
+                            {{ signal }}
+                        </td>
+                    </tr>
                     {% endfor %}
 
-                {% else %}
+                    {% else %}
                     <tr>
                         <td colspan="3" style="text-align:center; padding:14px; color:#777;">
                             No final signals available
                         </td>
                     </tr>
-                {% endif %}
+                    {% endif %}
 
                 </tbody>
             </table>

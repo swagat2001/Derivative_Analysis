@@ -1648,7 +1648,7 @@
 
                 <div class="screener-card" style="margin-top:16px">
                     <div class="card-header"><span class="card-title">Daily Breakdown (${participant})</span></div>
-                    <table class="card-table">
+                    <table class="card-table sortable-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -1689,7 +1689,7 @@
 
                 <div class="screener-card" style="margin-top:16px">
                     <div class="card-header"><span class="card-title">Detailed Logs</span></div>
-                    <table class="card-table">
+                    <table class="card-table sortable-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -1985,7 +1985,7 @@
 
                 <div class="screener-card" style="margin-top:16px">
                     <div class="card-header"><span class="card-title">Detailed Logs (${selectedParticipant.toUpperCase()})</span></div>
-                    <table class="card-table">
+                    <table class="card-table sortable-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -2405,6 +2405,7 @@
         } else {
             // Sector filtering
             loadHeatmap();
+            if (window.initTableSorting) window.initTableSorting();
         }
     }
 
@@ -2877,7 +2878,7 @@
             html += `
             <div class="screener-card" style="padding:0; overflow:hidden;">
             <div style="overflow-x:auto;">
-            <table class="delivery-table">
+            <table class="delivery-table sortable-table">
                 <thead>
                     <tr>
                         <th>Stock</th>
@@ -2923,6 +2924,7 @@
 
             html += `</tbody></table></div></div>`;
             container.innerHTML = html;
+            if (window.initTableSorting) window.initTableSorting();
 
         } catch (e) {
             console.error('Error loading delivery data:', e);
@@ -2938,7 +2940,8 @@
             const response = await fetch(`/neev/api/52-week?date=${currentDate}&index=${currentIndex}`);
             const data = await response.json();
             if (!data.success) { container.innerHTML = '<div class="empty-state"><p>No 52-week data</p></div>'; return; }
-            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
+            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
+            if (window.initTableSorting) window.initTableSorting();
         } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
     }
 
@@ -2968,7 +2971,7 @@
             let html = `
             <div class="screener-card" style="padding:0; overflow:hidden;">
             <div style="overflow-x:auto;">
-            <table class="delivery-table">
+            <table class="delivery-table sortable-table">
                 <thead>
                     <tr>
                         <th>Stock</th>
@@ -3019,6 +3022,7 @@
 
             html += `</tbody></table></div></div>`;
             container.innerHTML = html;
+            if (window.initTableSorting) window.initTableSorting();
 
         } catch (e) {
             console.error('Error loading volume data:', e);
@@ -3034,7 +3038,8 @@
             const response = await fetch(`/neev/api/sector-performance?date=${currentDate}`);
             const data = await response.json();
             if (!data.success || !data.sectors.length) { container.innerHTML = '<div class="empty-state"><p>No sector data</p></div>'; return; }
-            container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Sector Performance</span></div><table class="card-table"><thead><tr><th>#</th><th>Sector</th><th>Avg Change</th><th>Turnover</th><th>Stocks</th><th>Top Movers</th></tr></thead><tbody>${data.sectors.filter(s => s.stock_count > 0).map((s, i) => `<tr><td>${i + 1}</td><td><strong>${s.sector}</strong></td><td class="${s.avg_change >= 0 ? 'positive' : 'negative'}">${s.avg_change >= 0 ? '+' : ''}${s.avg_change}%</td><td>${formatNumber(s.total_turnover)}</td><td>${s.stock_count}</td><td>${s.stocks.slice(0, 3).map(sym => `<a href="/stock/${sym}" class="symbol-link">${sym}</a>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
+            container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Sector Performance</span></div><table class="card-table sortable-table"><thead><tr><th>#</th><th>Sector</th><th>Avg Change</th><th>Turnover</th><th>Stocks</th><th>Top Movers</th></tr></thead><tbody>${data.sectors.filter(s => s.stock_count > 0).map((s, i) => `<tr><td>${i + 1}</td><td><strong>${s.sector}</strong></td><td class="${s.avg_change >= 0 ? 'positive' : 'negative'}">${s.avg_change >= 0 ? '+' : ''}${s.avg_change}%</td><td>${formatNumber(s.total_turnover)}</td><td>${s.stock_count}</td><td>${s.stocks.slice(0, 3).map(sym => `<a href="/stock/${sym}" class="symbol-link">${sym}</a>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
+            if (window.initTableSorting) window.initTableSorting();
         } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
     }
 

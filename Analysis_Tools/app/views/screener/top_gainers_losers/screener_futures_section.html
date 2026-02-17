@@ -10,7 +10,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 Future OI Gainers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -24,10 +24,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -43,7 +42,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 Future OI Losers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -57,10 +56,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -77,7 +75,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 Future Moneyness Gainers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -91,10 +89,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -110,7 +107,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 Future Moneyness Losers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -124,10 +121,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>

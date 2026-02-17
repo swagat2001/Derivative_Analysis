@@ -8,15 +8,14 @@
   <div class="section-right-control">
     <select id="dateSelect" name="date" onchange="window.location.href='/scanner/top-gainers-losers?date='+this.value;">
       {% for d in dates %}
-      <option value="{{ d }}" {% if d == selected_date %}selected{% endif %}>{{ d }}</option>
+      <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
       {% endfor %}
     </select>
 
     <!-- PDF Export Button -->
     {% if selected_date and screener_data %}
     <div class="control-group">
-      <a href="{{ url_for('gainers_losers.export_screener_pdf', date=selected_date) }}"
-        class="btn-export-pdf"
+      <a href="{{ url_for('gainers_losers.export_screener_pdf', date=selected_date) }}" class="btn-export-pdf"
         title="Download Screener Report as PDF">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -34,7 +33,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 Call OI Gainers (All)</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -49,10 +48,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -69,7 +67,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 Call OI Losers (All)</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -84,10 +82,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -105,7 +102,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 ITM Call OI Gainers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -120,10 +117,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -140,7 +136,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 ITM Call OI Losers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -155,10 +151,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -176,7 +171,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 OTM Call OI Gainers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -191,10 +186,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -211,7 +205,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 OTM Call OI Losers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -226,10 +220,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -247,7 +240,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 Put OI Gainers (All)</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -262,10 +255,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -282,7 +274,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 Put OI Losers (All)</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -297,10 +289,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -318,7 +309,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 ITM Put OI Gainers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -333,10 +324,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -353,7 +343,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 ITM Put OI Losers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -368,10 +358,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -389,7 +378,7 @@
       <div class="card-header">
         <div class="card-title">🟢 Top 10 OTM Put OI Gainers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -404,10 +393,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
@@ -424,7 +412,7 @@
       <div class="card-header">
         <div class="card-title">🔴 Top 10 OTM Put OI Losers</div>
       </div>
-      <table class="card-table">
+      <table class="card-table sortable-table">
         <thead>
           <tr>
             <th>#</th>
@@ -439,10 +427,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>
-              <a href="/stock/{{ item.ticker }}" class="symbol-link"
-                 data-ticker="{{ item.ticker }}"
-                 data-toggle="tooltip"
-                 title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
+              <a href="/stock/{{ item.ticker }}" class="symbol-link" data-ticker="{{ item.ticker }}"
+                data-toggle="tooltip"
+                title="{% if ticker_map.get(item.ticker) %}{{ ticker_map[item.ticker] }}{% endif %}">
                 {{ item.ticker }}
               </a>
             </td>
