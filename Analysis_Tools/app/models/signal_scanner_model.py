@@ -232,21 +232,42 @@ def filter_signals(signals: list, filters: dict):
     filtered = signals.copy()
 
     # Filter by signal type
-    signal_type = filters.get("signal_type", "all")
-    if signal_type == "high_volume":
-        filtered = [s for s in filtered if s["high_volume"]]
-    elif signal_type == "oi_spike":
-        filtered = [s for s in filtered if s["oi_spike"]]
-    elif signal_type == "pivot":
-        filtered = [s for s in filtered if any(sig in s.get('signals', []) for sig in ["Near S1 Support", "Near R1 Resistance", "Near Pivot Point", "S1 Support", "S2 Support", "S3 Support", "R1 Resistance", "R2 Resistance", "R3 Resistance"])]
-    elif signal_type == "divergence":
-        filtered = [s for s in filtered if any(sig in s.get('signals', []) for sig in ["Bullish Divergence", "Bearish Divergence"])]
-    elif signal_type == "rsi_cross":
-        filtered = [s for s in filtered if any(sig in s.get('signals', []) for sig in ["RSI Cross Up", "RSI Cross Down"])]
-    elif signal_type == "oversold":
-        filtered = [s for s in filtered if s.get("rsi_trend") == "OVERSOLD"]
-    elif signal_type == "overbought":
-        filtered = [s for s in filtered if s.get("rsi_trend") == "OVERBOUGHT"]
+    signal_type_str = filters.get("signal_type", "all")
+    if signal_type_str == "all" or not signal_type_str:
+        pass  # No filtering needed
+    else:
+        # Split comma-separated values into a set
+        requested_types = set(s.strip() for s in signal_type_str.split(","))
+
+        # If "all" is somehow in the list, ignore other filters
+        if "all" in requested_types:
+            pass
+        else:
+            # OR Logic: Match any of the selected types
+            matched_signals = []
+
+            for s in filtered:
+                is_match = False
+
+                if "high_volume" in requested_types and s["high_volume"]:
+                    is_match = True
+                elif "oi_spike" in requested_types and s["oi_spike"]:
+                    is_match = True
+                elif "pivot" in requested_types and any(sig in s.get('signals', []) for sig in ["Near S1 Support", "Near R1 Resistance", "Near Pivot Point", "S1 Support", "S2 Support", "S3 Support", "R1 Resistance", "R2 Resistance", "R3 Resistance"]):
+                    is_match = True
+                elif "divergence" in requested_types and any(sig in s.get('signals', []) for sig in ["Bullish Divergence", "Bearish Divergence"]):
+                    is_match = True
+                elif "rsi_cross" in requested_types and any(sig in s.get('signals', []) for sig in ["RSI Cross Up", "RSI Cross Down"]):
+                    is_match = True
+                elif "oversold" in requested_types and s.get("rsi_trend") == "OVERSOLD":
+                    is_match = True
+                elif "overbought" in requested_types and s.get("rsi_trend") == "OVERBOUGHT":
+                    is_match = True
+
+                if is_match:
+                    matched_signals.append(s)
+
+            filtered = matched_signals
 
     # Filter by option type
     option_type = filters.get("option_type", "all")

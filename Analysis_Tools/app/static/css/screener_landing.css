@@ -198,7 +198,7 @@
 .screener-card:hover {
     border-color: var(--goldmine-maroon);
     box-shadow: 0 4px 16px rgba(11, 92, 255, 0.12);
-    transform: translateX(4px);
+    /* transform: translateX(4px); */
 }
 
 #screenerList .screener-card {

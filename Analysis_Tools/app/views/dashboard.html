@@ -187,6 +187,37 @@
     overflow-y: auto;
   }
 
+  /* Sortable Headers */
+  th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+
+  th.sortable:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+  }
+
+  th.sortable::after {
+    content: '↕';
+    font-size: 10px;
+    margin-left: 4px;
+    opacity: 0.3;
+  }
+
+  th.sortable.asc::after {
+    content: '↑';
+    opacity: 1;
+    color: #b91c1c;
+  }
+
+  th.sortable.desc::after {
+    content: '↓';
+    opacity: 1;
+    color: #b91c1c;
+  }
+
   /* Scrollbar styling */
   .table-container::-webkit-scrollbar {
     width: 8px;
@@ -267,39 +298,39 @@
     <table id="derivativesTable" class="dashboard-table">
       <thead>
         <tr>
-          <th rowspan="2">Stock</th>
+          <th rowspan="2" class="sortable" data-sort-idx="0">Stock</th>
           <th colspan="2">Call Δ+</th>
           <th colspan="2">Call Δ−</th>
           <th colspan="2">Call Vega+</th>
           <th colspan="2">Call Vega−</th>
-          <th rowspan="2">Call ATV</th>
-          <th rowspan="2">Call AMoney</th>
-          <th rowspan="2">Close</th>
-          <th rowspan="2">RSI</th>
+          <th rowspan="2" class="sortable" data-sort-idx="9">Call ATV</th>
+          <th rowspan="2" class="sortable" data-sort-idx="10">Call AMoney</th>
+          <th rowspan="2" class="sortable" data-sort-idx="11">Close</th>
+          <th rowspan="2" class="sortable" data-sort-idx="12">RSI</th>
           <th colspan="2">Put Δ+</th>
           <th colspan="2">Put Δ−</th>
           <th colspan="2">Put Vega+</th>
           <th colspan="2">Put Vega−</th>
-          <th rowspan="2">Put ATV</th>
-          <th rowspan="2">Put AMoney</th>
+          <th rowspan="2" class="sortable" data-sort-idx="21">Put ATV</th>
+          <th rowspan="2" class="sortable" data-sort-idx="22">Put AMoney</th>
         </tr>
         <tr>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
-          <th>Strike</th>
-          <th>%</th>
+          <th class="sortable" data-sort-idx="1">Strike</th>
+          <th class="sortable" data-sort-idx="2">%</th>
+          <th class="sortable" data-sort-idx="3">Strike</th>
+          <th class="sortable" data-sort-idx="4">%</th>
+          <th class="sortable" data-sort-idx="5">Strike</th>
+          <th class="sortable" data-sort-idx="6">%</th>
+          <th class="sortable" data-sort-idx="7">Strike</th>
+          <th class="sortable" data-sort-idx="8">%</th>
+          <th class="sortable" data-sort-idx="13">Strike</th>
+          <th class="sortable" data-sort-idx="14">%</th>
+          <th class="sortable" data-sort-idx="15">Strike</th>
+          <th class="sortable" data-sort-idx="16">%</th>
+          <th class="sortable" data-sort-idx="17">Strike</th>
+          <th class="sortable" data-sort-idx="18">%</th>
+          <th class="sortable" data-sort-idx="19">Strike</th>
+          <th class="sortable" data-sort-idx="20">%</th>
         </tr>
       </thead>
       <tbody id="tableBody">

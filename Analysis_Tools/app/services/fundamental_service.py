@@ -269,13 +269,17 @@ class FundamentalService:
                 p_past = get_val(past_date, "NetProfit")
 
                 if s_past > 0:
-                    data["sales_growth_3yr"] = ((s_latest / s_past) ** (1 / 3) - 1) * 100
+                    if s_latest > 0:
+                        data["sales_growth_3yr"] = ((s_latest / s_past) ** (1 / 3) - 1) * 100
+                    else:
+                        data["sales_growth_3yr"] = -100  # Significant decline if turned negative
+
                 if p_past > 0:
                     # Handle absolute growth if base is negative? Complex. Simple calc for now.
-                    if p_latest > p_past:
+                    if p_latest > 0:
                         data["profit_growth_3yr"] = ((p_latest / p_past) ** (1 / 3) - 1) * 100
                     else:
-                        data["profit_growth_3yr"] = -10  # Decline
+                        data["profit_growth_3yr"] = -100  # Significant decline if turned negative
 
         # Cashflow
         if ticker in self._cashflow_data:

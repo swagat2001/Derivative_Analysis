@@ -730,7 +730,8 @@
 
 {% block page_js %}
 <script>
-    let currentSignalType = 'all';
+    // Changed: Use a Set for multi-select
+    let currentSignalTypes = new Set(['all']);
     let allSignals = [];
 
     function formatNumber(num) {
@@ -751,7 +752,6 @@
         if (!type || type === '' || type === 'FUT') return '<span class="signal-badge fut">FUT</span>';
         if (type === 'CE') return '<span class="signal-badge ce">CE</span>';
         if (type === 'PE') return '<span class="signal-badge pe">PE</span>';
-        // Handle other types (STO, STF, etc.)
         return `<span class="signal-badge fut">${type}</span>`;
     }
 
@@ -864,13 +864,41 @@
     }
 
     function filterByType(type) {
-        currentSignalType = type;
+        if (type === 'all') {
+            currentSignalTypes.clear();
+            currentSignalTypes.add('all');
+        } else {
+            // If selecting a specific type, ensure 'all' is removed
+            if (currentSignalTypes.has('all')) {
+                currentSignalTypes.delete('all');
+            }
 
-        document.querySelectorAll('.filter-tab').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.type === type);
-        });
+            // Toggle selection
+            if (currentSignalTypes.has(type)) {
+                currentSignalTypes.delete(type);
+            } else {
+                currentSignalTypes.add(type);
+            }
 
+            // If nothing selected, revert to 'all'
+            if (currentSignalTypes.size === 0) {
+                currentSignalTypes.add('all');
+            }
+        }
+
+        updateFilterButtons();
         applyFilters();
+    }
+
+    function updateFilterButtons() {
+        document.querySelectorAll('.filter-tab').forEach(btn => {
+            const type = btn.dataset.type;
+            if (currentSignalTypes.has(type)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
 
     async function applyFilters() {
@@ -878,7 +906,9 @@
         const optionType = document.getElementById('optionType').value;
         const sortBy = document.getElementById('sortBy').value;
 
-        const url = `/scanner/signal-scanner/api/filter?signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
+        // Join types with comma
+        const typesStr = Array.from(currentSignalTypes).join(',');
+        const url = `/scanner/signal-scanner/api/filter?signal_type=${typesStr}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
 
         try {
             const response = await fetch(url);
@@ -894,11 +924,8 @@
     }
 
     async function runScanner() {
-        // const btn = document.getElementById('scanBtn'); // Removed
         const container = document.getElementById('resultsContainer');
 
-        // btn.disabled = true; // Removed
-        // btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Scanning...'; // Removed
         container.innerHTML = `<div class="loading-spinner">
         <div class="spinner"></div>
         <span class="loading-text">Scanning F&O data for signals...</span>
@@ -908,9 +935,10 @@
         const symbolFilter = document.getElementById('symbolFilter').value;
         const optionType = document.getElementById('optionType').value;
         const sortBy = document.getElementById('sortBy').value;
+        const typesStr = Array.from(currentSignalTypes).join(',');
 
         try {
-            const url = `/scanner/signal-scanner/api/scan?days_back=${daysBack}&signal_type=${currentSignalType}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
+            const url = `/scanner/signal-scanner/api/scan?days_back=${daysBack}&signal_type=${typesStr}&option_type=${optionType}&symbol=${symbolFilter}&sort_by=${sortBy}&sort_order=desc`;
             const response = await fetch(url);
             const data = await response.json();
 
@@ -933,9 +961,6 @@
             <h3>Connection Error</h3>
             <p>Please check your connection and try again</p>
         </div>`;
-        } finally {
-            // btn.disabled = false; // Removed
-            // btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Run Scanner`; // Removed
         }
     }
 
