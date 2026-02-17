@@ -1,11 +1,4 @@
 // ============================================
-// ENHANCED FII/DII MODULE - SCANX STYLE
-// Features:
-// 1. Single Dynamic Chart (Dual Axis: Net Value + Nifty Price)
-// 2. Single Dynamic Table with Column Filters
-// 3. Time-based Aggregation (Daily/Weekly/Monthly/Yearly)
-// 4. Clean Tab Switching
-// ============================================
 
 // Global State
 let globalFiiDiiState = {
@@ -464,8 +457,14 @@ function renderDerivativeView(container, category) {
         </div>
     `;
 
-    // Render chart with aggregated data
-    renderDerivativesChart(aggregatedData, category, participant);
+    // Render appropriate chart
+    if (isOptions) {
+        renderOptionsChart(derivativesData, mappedCategory, participant);
+    } else if (isFutures) {
+        renderFuturesChart(derivativesData, mappedCategory, participant);
+    } else {
+        renderDerivativesChart(aggregatedData, category, participant);
+    }
 }
 
 function aggregateDerivativesForChart(derivData, category, participant) {
@@ -506,94 +505,104 @@ function aggregateDerivativesForChart(derivData, category, participant) {
     return result;
 }
 
-function renderDerivativesChart(data, category, participant) {
-    console.log('[FII/DII Enhanced] renderDerivativesChart() called with', data.length, 'points');
-
-    const labels = data.map(d => {
-        const date = new Date(d.date);
+// NEW: Specific Chart for Futures (Long vs Short)
+function renderFuturesChart(derivData, category, participant) {
+    console.log('[FII/DII Enhanced] renderFuturesChart called');
+    const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
+    const labels = dates.map(d => {
+        const date = new Date(d);
         return `${date.getDate()}/${date.getMonth() + 1}`;
     });
 
-    const netData = data.map(d => d.net_value);
-    const oiData = data.map(d => d.oi_contracts);
+    const longData = [];
+    const shortData = [];
+    const netData = [];
+    const niftyPrices = [];
 
-    // Get Nifty prices for the same dates
-    const niftyPrices = data.map(d => {
-        const dateStr = d.date;
-        return globalFiiDiiState.niftyData[dateStr] || null;
+    dates.forEach(d => {
+        const item = derivData[d].find(x => x.category === category && x.participant_type === participant);
+        const l = item ? (item.oi_long || 0) : 0;
+        const s = item ? (item.oi_short || 0) : 0;
+        longData.push(l);
+        shortData.push(s);
+        netData.push(l - s);
+
+        // Nifty Price
+        niftyPrices.push(globalFiiDiiState.niftyData[d] || null);
     });
 
     const hasNiftyData = niftyPrices.some(v => v !== null);
-    console.log('[FII/DII Enhanced] Nifty data for derivatives:', hasNiftyData ? niftyPrices.filter(v => v !== null).length : 0, 'points');
 
-    if (typeof Highcharts === 'undefined') {
-        console.error('[FII/DII Enhanced] Highcharts not loaded');
-        return;
-    }
+    if (typeof Highcharts === 'undefined') return;
 
     Highcharts.chart('dynamicMainChart', {
-        chart: {
-            backgroundColor: 'transparent',
-            style: { fontFamily: 'Inter, system-ui, sans-serif' },
-            height: data.length === 1 ? 350 : 400
-        },
+        chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' }, height: 400 },
         title: { text: null },
-        xAxis: {
-            categories: labels,
-            crosshair: true,
-            min: 0,
-            max: data.length === 1 ? 0 : undefined
-        },
-        plotOptions: {
-            column: {
-                pointWidth: data.length === 1 ? 60 : undefined,
-                maxPointWidth: 80
-            }
-        },
+        xAxis: { categories: labels, crosshair: true },
         yAxis: [
-            {
-                title: { text: 'Net Value (₹ Cr)' },
-                labels: { style: { color: '#64748b' } }
-            },
-            {
-                title: { text: 'OI Contracts' },
-                labels: { style: { color: '#8b5cf6' } },
-                opposite: true
-            },
-            {
-                title: { text: 'Nifty 50', style: { color: '#3b82f6' } },
-                labels: { style: { color: '#3b82f6' } },
-                opposite: false,
-                visible: hasNiftyData
-            }
+            { title: { text: 'Contracts' }, labels: { style: { color: '#64748b' } } },
+            { title: { text: 'Nifty 50' }, opposite: true, visible: hasNiftyData }
         ],
         tooltip: { shared: true },
         credits: { enabled: false },
         series: [
-            {
-                name: 'Net Value',
-                type: 'column',
-                data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
-                yAxis: 0
-            },
-            {
-                name: 'OI Contracts',
-                type: 'line',
-                data: oiData,
-                yAxis: 1,
-                color: '#8b5cf6',
-                marker: { radius: 3 }
-            },
-            {
-                name: 'Nifty 50',
-                type: 'line',
-                data: niftyPrices,
-                yAxis: 2,
-                color: '#3b82f6',
-                marker: { radius: 3 },
-                visible: hasNiftyData,
-                dashStyle: 'Dash'
-            }
+            { name: 'Long OI', type: 'column', data: longData, color: '#22c55e', borderWidth: 0 },
+            { name: 'Short OI', type: 'column', data: shortData, color: '#ef4444', borderWidth: 0 },
+            { name: 'Net OI', type: 'line', data: netData, color: '#f59e0b', marker: { radius: 3 }, yAxis: 0 },
+            { name: 'Nifty 50', type: 'line', data: niftyPrices, yAxis: 1, color: '#3b82f6', visible: hasNiftyData, dashStyle: 'ShortDot', marker: { enabled: false } }
+        ]
+    });
+}
+
+// NEW: Specific Chart for Options (Call vs Put Net OI)
+function renderOptionsChart(derivData, category, participant) {
+    console.log('[FII/DII Enhanced] renderOptionsChart called');
+    const dates = Object.keys(derivData).sort().slice(-30);
+    const labels = dates.map(d => {
+        const date = new Date(d);
+        return `${date.getDate()}/${date.getMonth() + 1}`;
+    });
+
+    const type = category.split('_')[0]; // index or stock
+    const callCat = `${type}_call_options`;
+    const putCat = `${type}_put_options`;
+
+    const callNetData = [];
+    const putNetData = [];
+    const netPremiumData = [];
+    const niftyPrices = [];
+
+    dates.forEach(d => {
+        const items = derivData[d];
+        const callItem = items.find(x => x.category === callCat && x.participant_type === participant);
+        const putItem = items.find(x => x.category === putCat && x.participant_type === participant);
+        const aggItem = items.find(x => x.category === category && x.participant_type === participant);
+
+        callNetData.push(callItem ? (callItem.oi_long - callItem.oi_short) : 0);
+        putNetData.push(putItem ? (putItem.oi_long - putItem.oi_short) : 0);
+        netPremiumData.push(aggItem ? aggItem.net_value : 0);
+
+        niftyPrices.push(globalFiiDiiState.niftyData[d] || null);
+    });
+
+    const hasNiftyData = niftyPrices.some(v => v !== null);
+
+    if (typeof Highcharts === 'undefined') return;
+
+    Highcharts.chart('dynamicMainChart', {
+        chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' }, height: 400 },
+        title: { text: null },
+        xAxis: { categories: labels, crosshair: true },
+        yAxis: [
+            { title: { text: 'Net OI (Contracts)' }, labels: { style: { color: '#64748b' } } },
+            { title: { text: 'Nifty 50' }, opposite: true, visible: hasNiftyData }
+        ],
+        tooltip: { shared: true },
+        credits: { enabled: false },
+        series: [
+            { name: 'Call Net OI', type: 'column', data: callNetData, color: '#22c55e', yAxis: 0 },
+            { name: 'Put Net OI', type: 'column', data: putNetData, color: '#ef4444', yAxis: 0 },
+            { name: 'Nifty 50', type: 'line', data: niftyPrices, yAxis: 1, color: '#3b82f6', visible: hasNiftyData, marker: { enabled: false } }
         ]
     });
 }

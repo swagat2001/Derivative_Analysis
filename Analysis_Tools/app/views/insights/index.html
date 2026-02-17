@@ -1678,12 +1678,12 @@
 
                 <div class="charts-grid-2">
                      <div class="chart-card">
-                        <div class="chart-title">Net Value (Cr)</div>
-                        <div id="derivNetChart" style="height: 300px;"></div>
+                        <div class="chart-title">Option Net OI (Contracts)</div>
+                        <div id="derivOiChart" style="height: 300px;"></div>
                     </div>
                      <div class="chart-card">
-                        <div class="chart-title">Open Interest (Contracts)</div>
-                        <div id="derivOiChart" style="height: 300px;"></div>
+                        <div class="chart-title">Net Value (Premium)</div>
+                        <div id="derivNetChart" style="height: 300px;"></div>
                     </div>
                 </div>
 
@@ -1693,10 +1693,10 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Buy Value (Cr)</th>
-                                <th>Sell Value (Cr)</th>
-                                <th>Net Value (Cr)</th>
-                                <th>OI Contracts</th>
+                                <th>Call Net OI</th>
+                                <th>Put Net OI</th>
+                                <th>Net Prem (Cr)</th>
+                                <th>Sentiment</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1762,18 +1762,39 @@
                 const dates = Object.keys(derivData).sort().reverse();
                 let rows = '';
 
+                // Determine sub-categories
+                const base = category.split('_')[0]; // "index" or "stock"
+                const callCat = `${base}_call_options`;
+                const putCat = `${base}_put_options`;
+
                 dates.forEach(date => {
-                    const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
-                    items.forEach(item => {
+                    const items = derivData[date];
+                    if (!items) return;
+
+                    // Get Call Net OI
+                    const callItem = items.find(x => x.category === callCat && x.participant_type === participant);
+                    const putItem = items.find(x => x.category === putCat && x.participant_type === participant);
+                    const aggItem = items.find(x => x.category === category && x.participant_type === participant); // For Net Value
+
+                    if (callItem || putItem || aggItem) {
+                        const callNet = callItem ? (callItem.oi_long - callItem.oi_short) : 0;
+                        const putNet = putItem ? (putItem.oi_long - putItem.oi_short) : 0;
+                        const netVal = aggItem ? aggItem.net_value : 0;
+
+                        let sentiment = 'Neutral';
+                        if (callNet > putNet && callNet > 0) sentiment = 'Bullish';
+                        else if (putNet > callNet && putNet > 0) sentiment = 'Bearish';
+                        else if (callNet < 0 && putNet < 0) sentiment = 'Mixed';
+
                         rows += `
                         <tr>
                             <td>${date}</td>
-                            <td>${formatNumber(item.buy_value)}</td>
-                            <td>${formatNumber(item.sell_value)}</td>
-                            <td class="${item.net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(item.net_value)}</td>
-                            <td>${formatNumber(item.oi_contracts)}</td>
+                            <td class="${callNet >= 0 ? 'positive' : 'negative'}">${Intl.NumberFormat('en-IN').format(callNet)}</td>
+                            <td class="${putNet >= 0 ? 'negative' : 'positive'}">${Intl.NumberFormat('en-IN').format(putNet)}</td>
+                            <td class="${netVal >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${Intl.NumberFormat('en-IN').format(netVal)}</td>
+                            <td><span class="badge ${sentiment === 'Bullish' ? 'bg-success' : sentiment === 'Bearish' ? 'bg-danger' : 'bg-secondary'}">${sentiment}</span></td>
                         </tr>`;
-                    });
+                    }
                 });
                 if (!rows) return '<tr><td colspan="5" style="text-align:center;">No data</td></tr>';
                 return rows;
@@ -2826,6 +2847,7 @@
 
 
     async function loadDelivery() {
+        document.getElementById('heatmapTitleText').innerHTML = "Delivery Percentage Analysis";
         const container = document.getElementById('delivery-container');
         const minPct = document.getElementById('minDelivery').value;
         const sort = document.getElementById('deliverySort').value;
@@ -2909,6 +2931,7 @@
     }
 
     async function load52Week() {
+        document.getElementById('heatmapTitleText').innerHTML = "52 Week High/Low Analysis";
         const container = document.getElementById('week52-container');
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
         try {
@@ -2920,6 +2943,7 @@
     }
 
     async function loadVolume() {
+        document.getElementById('heatmapTitleText').innerHTML = "Volume Analysis";
         const container = document.getElementById('volume-container');
         const multiplier = document.getElementById('volumeMultiplier').value;
         const index = currentIndex || 'all';
@@ -3003,6 +3027,7 @@
     }
 
     async function loadSectors() {
+        document.getElementById('heatmapTitleText').innerHTML = "Sector Performance Analysis";
         const container = document.getElementById('sectors-container');
         container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
         try {

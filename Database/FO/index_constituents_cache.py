@@ -85,6 +85,29 @@ def _create_session():
     return session
 
 
+def sanitize_symbol(symbol):
+    """
+    Sanitize NSE symbol to match Database ticker format.
+    Handles special characters that are stored differently in DB.
+    """
+    symbol = str(symbol).strip().upper()
+
+    # Mapping from NSE Website format -> Database format
+    mapping = {
+        "M&M": "M_M",
+        "BAJAJ-AUTO": "BAJAJ_AUTO",
+        "L&T": "LT",
+        "M&MFIN": "M_MFIN",
+        "M&M FIN": "M_MFIN",
+        "TATAMTRDVR": "TATAMTRDVR",
+        "BAJAJFINSV": "BAJAJFINSV",
+        "ADANIPOWER": "ADANIPOWER",
+        "BAJAJHLDNG": "BAJAJHLDNG"
+    }
+
+    return mapping.get(symbol, symbol)
+
+
 def _fetch_single_index(session, index_key, url):
     """Fetch constituents for a single index."""
     try:
@@ -96,8 +119,19 @@ def _fetch_single_index(session, index_key, url):
 
             for item in data.get("data", []):
                 symbol = item.get("symbol", "")
-                if symbol and not symbol.startswith("NIFTY") and symbol != "SENSEX":
-                    constituents.append(symbol)
+
+                # Basic validation
+                if not symbol or symbol.startswith("NIFTY") or symbol == "SENSEX":
+                    continue
+
+                # Sanitize symbol (Handle M&M -> M_M, etc.)
+                clean_symbol = sanitize_symbol(symbol)
+
+                # Filter out known invalid entries
+                if clean_symbol in ["KWIL", "ENRIN"]:
+                    continue
+
+                constituents.append(clean_symbol)
 
             if constituents:
                 print(f"   ✓ {index_key}: {len(constituents)} stocks")

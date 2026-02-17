@@ -469,15 +469,15 @@ def _get_heatmap_data_cached(selected_date: str):
             cached_df = pd.read_sql(query_cache, con=conn, params={"result_date": selected_date})
 
         if not cached_df.empty:
-            # FILTER: Only F&O stocks
-            fo_symbols = _get_fo_symbols_cached()
-            if fo_symbols:
-                cached_df = cached_df[cached_df["symbol"].isin(fo_symbols)]
-                print(f"[INFO] Filtered to {len(cached_df)} F&O stocks (from {len(cached_df) + len(set(cached_df['symbol']) - fo_symbols)} total)")
+            # FILTER REMOVED: Moved to get_heatmap_data to allow optional filtering
+            # fo_symbols = _get_fo_symbols_cached()
+            # if fo_symbols:
+            #     cached_df = cached_df[cached_df["symbol"].isin(fo_symbols)]
+            #     print(f"[INFO] Filtered to {len(cached_df)} F&O stocks (from {len(cached_df) + len(set(cached_df['symbol']) - fo_symbols)} total)")
 
-            if cached_df.empty:
-                print(f"[WARN] No F&O stocks found for {selected_date} after filtering")
-                return tuple()
+            # if cached_df.empty:
+            #     print(f"[WARN] No F&O stocks found for {selected_date} after filtering")
+            #     return tuple()
 
             # OPTIMIZATION: Vectorized type conversion (100x faster than iterrows)
             cached_df["symbol"] = cached_df["symbol"].astype(str)
@@ -504,7 +504,7 @@ def _get_heatmap_data_cached(selected_date: str):
         return tuple()
 
 
-def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: str = None):
+def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: str = None, filter_fo: bool = True):
     """
     Get heatmap data with multi-timeframe support.
 
@@ -523,10 +523,20 @@ def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: st
     # If standard daily view, return fast
     if period == "1D" and not comparison_date:
         result = []
+
+        # Apply F&O Filter if requested
+        fo_symbols = _get_fo_symbols_cached() if filter_fo else None
+
         for row in cached_data:
+            symbol = row[0]
+
+            # FILTER LOGIC
+            if filter_fo and fo_symbols and symbol not in fo_symbols:
+                continue
+
             result.append(
                 {
-                    "symbol": row[0],
+                    "symbol": symbol,
                     "close": row[1],
                     "change_pct": row[2],
                     "volume": row[3],
@@ -550,8 +560,32 @@ def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: st
                 # Default fallback
                 start_date = selected_date
             else:
-                start_date = (date_obj - timedelta(days=delta)).strftime("%Y-%m-%d")
-        except Exception:
+                target_date_obj = date_obj - timedelta(days=delta)
+                target_date = target_date_obj.strftime("%Y-%m-%d")
+
+                # NEW: Find nearest valid trading date from available dates
+                # This fixes the issue where target_date is a holiday/weekend
+                available_dates = get_insights_dates()
+
+                if target_date in available_dates:
+                    start_date = target_date
+                else:
+                    # Logic to find nearest date
+                    # valid_dates are strings YYYY-MM-DD
+                    if not available_dates:
+                        start_date = target_date # Fallback
+                    else:
+                        # Convert to datetime for comparison
+                        valid_dts = [datetime.strptime(d, "%Y-%m-%d") for d in available_dates]
+
+                        # Find closest date
+                        nearest_dt = min(valid_dts, key=lambda x: abs(x - target_date_obj))
+                        start_date = nearest_dt.strftime("%Y-%m-%d")
+
+                        print(f"[INFO] Period {period}: Target {target_date} unavailable. Using nearest: {start_date}")
+
+        except Exception as e:
+            print(f"[ERROR] Date calculation error: {e}")
             start_date = selected_date
 
     if start_date == selected_date:
@@ -582,9 +616,19 @@ def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: st
     start_prices = {row[0]: row[1] for row in start_data_raw}
 
     # Compute Change
+    # Compute Change
     result = []
+
+    # Apply F&O Filter if requested
+    fo_symbols = _get_fo_symbols_cached() if filter_fo else None
+
     for row in cached_data:
         symbol = row[0]
+
+        # FILTER LOGIC
+        if filter_fo and fo_symbols and symbol not in fo_symbols:
+            continue
+
         current_close = row[1]
 
         start_close = start_prices.get(symbol, current_close)

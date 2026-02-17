@@ -6,6 +6,7 @@ from functools import lru_cache
 import pandas as pd
 
 from ..models.dashboard_model import get_available_dates, get_dashboard_data
+from ..models.insights_model import get_heatmap_data
 
 # Path to the data directory - Adjust based on your actual structure
 # Assuming we are in Analysis_Tools/app/services
@@ -51,7 +52,90 @@ class FundamentalService:
                         if ticker in prev_map:
                             data["prev_close"] = prev_map[ticker]
 
-                # print(f"[INFO] Loaded market data for {len(self._market_data)} stocks.")
+                # --- NEW: Load correct MARKET DATA (Price, Vol, Change) from Cash Heatmap ---
+                # This fixes "Zero Price/Volume" for non-F&O stocks in Scanner
+                try:
+                    print(f"[INFO] Loading Full Heatmap Data (Cash & F&O) for {latest_date}...")
+                    # Fetch ALL stocks (filter_fo=False)
+                    heatmap_records = get_heatmap_data(latest_date, filter_fo=False)
+
+                    # Create Maps
+                    volume_map = {}
+                    price_map = {}
+                    change_map = {}
+                    change_pct_map = {}
+
+                    if heatmap_records:
+                        for item in heatmap_records:
+                            sym = item.get("symbol", "").upper()
+                            if sym:
+                                volume_map[sym] = item.get("volume", 0)
+                                price_map[sym] = item.get("close", 0)
+                                change_pct_map[sym] = item.get("change_pct", 0)
+                                # Calculate approximate change if not available directly
+                                # change = close - prev_close. We only have close and change_pct.
+                                # prev = close / (1 + pct/100)
+                                # change = close - (close / (1 + pct/100))
+                                try:
+                                    close = item.get("close", 0)
+                                    pct = item.get("change_pct", 0)
+                                    if close and pct is not None:
+                                        prev = close / (1 + (pct / 100.0))
+                                        change_map[sym] = close - prev
+                                    else:
+                                        change_map[sym] = 0
+                                except:
+                                    change_map[sym] = 0
+
+                    # Merge into Market Data
+                    # Note: self._market_data currently only has F&O stocks (from get_dashboard_data)
+                    # We need to ADD non-F&O stocks too!
+
+                    # 1. Update existing F&O stocks with Volume (and fallback price)
+                    for ticker, data in self._market_data.items():
+                        if ticker in volume_map:
+                            data["volume"] = volume_map[ticker]
+
+                        # Use Heatmap price if dashboard price is missing/zero (unlikely but safe)
+                        if data.get("closing_price", 0) == 0 and ticker in price_map:
+                            data["closing_price"] = price_map[ticker]
+
+                        # Try mapping "M_M" -> "M&M"
+                        if ticker not in volume_map:
+                             alt_ticker = ticker.replace("_", "&")
+                             if alt_ticker in volume_map:
+                                 data["volume"] = volume_map[alt_ticker]
+
+                    # 2. Add Non-F&O Stocks to self._market_data
+                    # Fundamental Scanner iterates over all_tickers (from Ratios/PnL files) and looks up market data.
+                    # So we just need to ensure they are in self._market_data.
+
+                    added_count = 0
+                    for sym, vol in volume_map.items():
+                        # Check if already in market data (handling M&M vs M_M mismatch if possible)
+                        # Simple check:
+                        if sym not in self._market_data and sym.replace("&", "_") not in self._market_data:
+                            # Create new entry for Non-F&O stock
+                            self._market_data[sym] = {
+                                "stock": sym,
+                                "closing_price": price_map.get(sym, 0),
+                                "volume": vol,
+                                "prev_close": 0, # Not strictly needed if we have change/change_pct
+                                "call_total_tradval": 0, # Dummy
+                                "put_total_tradval": 0,  # Dummy
+                                "rsi": 50 # Default
+                            }
+                            # Hack: Store calculated change/pct in the dict so we can retrieve it later
+                            # The dict structure is usually strict, but Python allows adding keys.
+                            self._market_data[sym]["custom_change"] = change_map.get(sym, 0)
+                            self._market_data[sym]["custom_change_pct"] = change_pct_map.get(sym, 0)
+                            added_count += 1
+
+                    print(f"[INFO] Merged Cash Market Data. Added {added_count} non-F&O stocks.")
+
+                except Exception as e:
+                    print(f"[ERROR] Failed to merge heatmap data: {e}")
+                # --------------------------------------------------
         except Exception as e:
             print(f"[ERROR] Failed to load market data: {e}")
 
@@ -193,8 +277,13 @@ class FundamentalService:
                 change_pct = (change / prev_close) * 100
                 data["change"] = change
                 data["change_pct"] = change_pct
+            elif "custom_change" in m:
+                # Fallback for Non-F&O stocks (populated in _load_data)
+                data["change"] = m.get("custom_change", 0)
+                data["change_pct"] = m.get("custom_change_pct", 0)
 
-            data["volume"] = (m.get("call_total_tradval", 0) or 0) + (m.get("put_total_tradval", 0) or 0)
+            # Volume is now pre-merged from Heatmap in _load_data
+            data["volume"] = m.get("volume", 0)
             data["oi"] = 0  # Not available
             data["iv"] = 0  # Not available
 
