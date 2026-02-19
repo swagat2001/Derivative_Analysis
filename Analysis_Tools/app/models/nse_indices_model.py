@@ -51,7 +51,7 @@ KEY_TO_NSE_URL: dict[str, str] = {
     "nifty50":    "NIFTY%2050",
     "banknifty":  "NIFTY%20BANK",
     "sensex":     "SENSEX",
-    "niftyfin":   "NIFTY%20FINANCIAL%20SERVICES",
+    "niftyfin":   "NIFTY%20FIN%20SERVICE",   # NOTE: graph API uses shorter name, NOT FINANCIAL SERVICES
     "niftynext50":"NIFTY%20NEXT%2050",
     "nifty100":   "NIFTY%20100",
     "indiavix":   "India%20VIX",
@@ -198,18 +198,30 @@ def get_nse_chart_data(index_key: str) -> dict:
         print(f"[NSE] unexpected chart payload for {index_key}: {exc}")
         return {"error": "Unexpected NSE chart payload"}
 
-    # Deduplicate on timestamp, keep only "NM" (normal-market) points
+    # gives the correct IST seconds-since-Unix-epoch equivalent.
+    _MARKET_OPEN_TOT_MIN  = 9 * 60        # 09:00 IST → 540 mins
+    _MARKET_CLOSE_TOT_MIN = 15 * 60 + 30  # 15:30 IST → 930 mins
+
     unique: dict = {}
     for r in raw:
         try:
             ts_ms, price, status = r[0], r[1], r[2]
         except (IndexError, TypeError):
             continue
-        if status == "NM":
-            unique[ts_ms] = (ts_ms, price)
+        if status != "NM":
+            continue
+
+        # Extract IST minutes-since-midnight from the raw epoch
+        # (NSE epoch is already in IST, so no offset needed)
+        ist_minutes_today = int((ts_ms / 1000) % 86400 // 60)
+
+        if ist_minutes_today < _MARKET_OPEN_TOT_MIN or ist_minutes_today > _MARKET_CLOSE_TOT_MIN:
+            continue  # Skip pre-market, post-market, and next-day data
+
+        unique[ts_ms] = (ts_ms, price)
 
     if not unique:
-        return {"error": "No NM data points in NSE chart"}
+        return {"error": "No NM data points in NSE chart within market hours"}
 
     series = sorted(unique.values(), key=lambda x: x[0])  # sort by time
     prices = [p for _, p in series]
@@ -227,5 +239,80 @@ def get_nse_chart_data(index_key: str) -> dict:
 
     with _chart_lock:
         _chart_cache[index_key] = {"data": result, "ts": now}
+
+    return result
+
+
+# ── Public: SENSEX chart (BSE – via yfinance) ─────────────────────────────────
+
+_SENSEX_CACHE_KEY = "__sensex__"   # separate entry in _chart_cache
+
+def get_sensex_chart_data() -> dict:
+    """
+    Fetch 1D intraday chart data for SENSEX using yfinance (^BSESN).
+    NSE's graph API returns 404 for SENSEX (it's a BSE index).
+    yfinance provides IST-aware 1-minute OHLC bars from ~9:15 AM IST.
+
+    Returns same shape as get_nse_chart_data():
+        {
+          "series":  [[epoch_ms_ist, close_price], ...],
+          "open", "high", "low", "close", "change", "percent"
+        }
+    Returns {"error": ...} on failure.
+    """
+    import yfinance as yf  # lazy import – only used for sensex
+
+    now = time.time()
+    with _chart_lock:
+        cached = _chart_cache.get(_SENSEX_CACHE_KEY)
+        if cached and (now - cached["ts"]) < _CHART_CACHE_TTL:
+            return cached["data"]
+
+    try:
+        ticker = yf.Ticker("^BSESN")
+        hist   = ticker.history(period="1d", interval="1m")
+    except Exception as exc:
+        print(f"[yfinance] SENSEX fetch failed: {exc}")
+        with _chart_lock:
+            stale = _chart_cache.get(_SENSEX_CACHE_KEY)
+        return stale["data"] if stale else {"error": str(exc)}
+
+    if hist.empty:
+        return {"error": "yfinance returned empty SENSEX data"}
+
+    # Epoch-ms in IST = timestamp converted to UTC+5:30 numerically.
+    _MARKET_OPEN_TOT_MIN  = 9 * 60 + 15   # 09:15 IST (BSE opens 9:15)
+    _MARKET_CLOSE_TOT_MIN = 15 * 60 + 30  # 15:30 IST
+
+    series: list = []
+    for ts, row in hist.iterrows():
+        # ts is a timezone-aware pandas Timestamp in IST
+        ist_h = ts.hour
+        ist_m = ts.minute
+        total_min = ist_h * 60 + ist_m
+        if total_min < _MARKET_OPEN_TOT_MIN or total_min > _MARKET_CLOSE_TOT_MIN:
+            continue
+        price = float(row["Close"])
+        # Build IST epoch_ms: treat IST datetime as if it were UTC to match JS side
+        epoch_ms_ist = int(ts.replace(tzinfo=None).timestamp() * 1000)
+        series.append([epoch_ms_ist, round(price, 2)])
+
+    if not series:
+        return {"error": "No SENSEX data within market hours"}
+
+    prices = [p for _, p in series]
+    result = {
+        "series":  series,
+        "open":    round(prices[0],    2),
+        "high":    round(max(prices),  2),
+        "low":     round(min(prices),  2),
+        "close":   round(prices[-1],   2),
+        "change":  round(prices[-1] - prices[0], 2),
+        "percent": round(((prices[-1] - prices[0]) / prices[0]) * 100, 2)
+                   if prices[0] != 0 else 0.0,
+    }
+
+    with _chart_lock:
+        _chart_cache[_SENSEX_CACHE_KEY] = {"data": result, "ts": now}
 
     return result

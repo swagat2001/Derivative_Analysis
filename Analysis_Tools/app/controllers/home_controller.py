@@ -20,7 +20,7 @@ from ..models.market_breadth_model import get_latest_market_breadth
 from ..models.live_indices_model import get_live_indices
 from ..models.stock_model import get_filtered_tickers
 from ..models.homepage_model import get_homepage_sample_stocks
-from ..models.nse_indices_model import get_nse_index_data, get_nse_chart_data
+from ..models.nse_indices_model import get_nse_index_data, get_nse_chart_data, get_sensex_chart_data
 # from .dashboard_controller import get_live_indices # Removed to avoid conflict
 
 home_bp = Blueprint("home", __name__)
@@ -265,13 +265,19 @@ def api_nse_indices():
 @home_bp.route("/api/nse-chart/<index_name>")
 def api_nse_chart(index_name: str):
     """
-    Always-on: 1-day intraday chart series from NSE for *index_name*.
+    Always-on: 1-day intraday chart series for *index_name*.
+    - SENSEX: fetched from BSE via yfinance (^BSESN) — NSE doesn't carry SENSEX.
+    - All others: fetched from NSE graph API.
     index_name must match an app key: nifty50, banknifty, sensex,
     niftyfin, niftynext50, nifty100, indiavix.
     Returns: { series: [[epoch_ms, price], ...], open, high, low, close, change, percent }
     """
     try:
-        data = get_nse_chart_data(index_name.lower())
+        key = index_name.lower()
+        if key == "sensex":
+            data = get_sensex_chart_data()
+        else:
+            data = get_nse_chart_data(key)
         if "error" in data:
             return jsonify({"success": False, "message": data["error"]}), 200
         return jsonify({"success": True, **data}), 200

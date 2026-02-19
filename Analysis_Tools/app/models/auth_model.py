@@ -418,6 +418,40 @@ def resend_otp(username: str) -> Tuple[bool, str]:
 # PASSWORD RESET
 # =============================================================
 
+def get_all_users() -> list:
+    """Get all users for admin dashboard."""
+    try:
+        query = text("""
+            SELECT id, username, full_name, email, role, is_active,
+                   is_verified, created_at, last_login
+            FROM users
+            ORDER BY created_at DESC
+        """)
+        with engine.connect() as conn:
+            rows = conn.execute(query).fetchall()
+            return [{
+                "id": r[0], "username": r[1], "full_name": r[2],
+                "email": r[3], "role": r[4], "is_active": r[5],
+                "is_verified": r[6], "created_at": r[7], "last_login": r[8]
+            } for r in rows]
+    except Exception as e:
+        print(f"[ERROR] get_all_users: {e}")
+        return []
+
+
+def toggle_user_active(username: str) -> Tuple[bool, str]:
+    """Toggle user active status."""
+    try:
+        with engine.begin() as conn:
+            conn.execute(
+                text("UPDATE users SET is_active = NOT is_active WHERE username = :u AND role != 'admin'"),
+                {"u": username}
+            )
+        return True, "Status updated"
+    except Exception as e:
+        return False, str(e)
+
+
 def create_password_reset_otp(email: str) -> Tuple[bool, str]:
     """Generate a reset OTP for the given email. Returns (success, otp_or_error)."""
     from datetime import datetime, timedelta

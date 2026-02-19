@@ -64,6 +64,10 @@ class LiveIndicesUpdater {
         this.selectedIndex = 'nifty50';
         this.latestUpstoxData = null;
         this.latestNseData = null;
+        // Cache the full NSE day chart per index so Upstox ticks can be appended to it
+        this.nseBaseChart = {};  // { 'nifty50': { labels: [], values: [] }, ... }
+        // Cache full-day OHLC from NSE chart API for the Open/High/Low detail panel
+        this.nseChartOhlc = {}; // { 'nifty50': { open, high, low, close }, ... }
     }
 
     // ─── DOM helpers ──────────────────────────────────────────────────────────
@@ -150,6 +154,12 @@ class LiveIndicesUpdater {
      * Accepts two formats:
      *   NSE:    { series: [[epoch_ms, price], ...], percent, open, high, low }
      *   Upstox: { history: [{timestamp: "YYYY-MM-DD HH:MM:SS", value}], percentChange }
+     *
+     * Strategy:
+     *   - NSE series  → parse, cache as base chart (full day from 9am), render directly.
+     *   - Upstox hist → merge NSE base (up to first Upstox tick) + Upstox live ticks.
+     *     This ensures the chart always shows from 9:00 AM even when the Upstox
+     *     streamer only started mid-session.
      */
     updateChart(indexKey, data) {
         if (typeof marketCharts === 'undefined') return;
@@ -160,20 +170,63 @@ class LiveIndicesUpdater {
 
         // ── NSE epoch-ms series ────────────────────────────────────────────────
         if (data.series && data.series.length > 0) {
+            // NSE sends IST-epoch timestamps (not UTC), so reading UTC fields
+            // from the Date object directly gives the correct IST time.
             for (const [ts_ms, price] of data.series) {
                 const d = new Date(ts_ms);
-                const hh = d.getHours().toString().padStart(2, '0');
-                const mm = d.getMinutes().toString().padStart(2, '0');
-                labels.push(`${hh}:${mm}`);
+                const hh = d.getUTCHours();
+                const mm = d.getUTCMinutes();
+                const totalMin = hh * 60 + mm;
+                // Safety net: skip anything outside 09:00–15:30 IST
+                if (totalMin < 9 * 60 || totalMin > 15 * 60 + 30) continue;
+                labels.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`);
                 values.push(price);
+            }
+            // Cache this as the NSE base chart for this index
+            if (labels.length > 0) {
+                this.nseBaseChart[indexKey] = { labels: [...labels], values: [...values] };
+                // Cache full-day OHLC so detail panel shows correct day-range values
+                this.nseChartOhlc[indexKey] = {
+                    open: data.open ?? values[0],
+                    high: data.high ?? Math.max(...values),
+                    low: data.low ?? Math.min(...values),
+                    close: data.close ?? values[values.length - 1]
+                };
             }
         }
         // ── Upstox timestamp string history ───────────────────────────────────
         else if (data.history && data.history.length > 0) {
+            // Deduplicate Upstox ticks to ONE per HH:MM minute (keep latest value).
+            // Upstox sends 1 tick/sec so without dedup we get 60+ same-label points
+            // per minute, creating a visually flat/crowded line.
+            const minuteMap = new Map(); // "HH:MM" → latest price
             for (const item of data.history) {
                 const parts = (item.timestamp || '').split(' ');
-                labels.push(parts.length >= 2 ? parts[1].substring(0, 5) : '');
-                values.push(item.value);
+                const label = parts.length >= 2 ? parts[1].substring(0, 5) : '';
+                if (label) minuteMap.set(label, item.value); // overwrite keeps latest
+            }
+            const upstoxLabels = [...minuteMap.keys()];
+            const upstoxValues = [...minuteMap.values()];
+
+            // Merge: NSE base (9am → just before first Upstox minute) + Upstox ticks.
+            // This gives a complete 9am→now chart even when streamer started mid-session.
+            const base = this.nseBaseChart[indexKey];
+            if (base && base.labels.length > 0 && upstoxLabels.length > 0) {
+                const firstUpstoxTime = upstoxLabels[0]; // e.g. "12:27"
+                // Take NSE base points strictly before the first Upstox minute
+                for (let i = 0; i < base.labels.length; i++) {
+                    if (base.labels[i] < firstUpstoxTime) {
+                        labels.push(base.labels[i]);
+                        values.push(base.values[i]);
+                    }
+                }
+                // Append deduplicated Upstox live ticks
+                labels.push(...upstoxLabels);
+                values.push(...upstoxValues);
+            } else {
+                // No NSE base yet — use Upstox only (fallback)
+                labels.push(...upstoxLabels);
+                values.push(...upstoxValues);
             }
         }
 
@@ -253,12 +306,16 @@ class LiveIndicesUpdater {
     }
 
     async _pollNseChart() {
-        // Skip if Upstox already providing today's chart
-        const selUpstox = this.latestUpstoxData && this.latestUpstoxData[this.selectedIndex];
-        if (selUpstox && upstoxHistoryIsToday(selUpstox.history)) return;
-
         const data = await this.fetchNseChart(this.selectedIndex);
-        if (data) this.updateChart(this.selectedIndex, data);
+        if (!data) return;
+
+        // Always update the NSE chart cache (base chart + OHLC) so High/Low stay accurate
+        this.updateChart(this.selectedIndex, data);
+
+        const selUpstox = this.latestUpstoxData && this.latestUpstoxData[this.selectedIndex];
+        if (selUpstox && upstoxHistoryIsToday(selUpstox.history)) {
+            this.updateChart(this.selectedIndex, selUpstox);
+        }
     }
 
     async _pollUpstox() {
@@ -271,11 +328,27 @@ class LiveIndicesUpdater {
 
         // Only use Upstox data if it's from TODAY's session
         if (upstoxHistoryIsToday(sel.history)) {
-            // Override NSE with live tick data
+
             for (const key of Object.keys(data)) {
-                this.updateIndexCard(key, data[key]);
+                const nseCard = this.latestNseData && this.latestNseData[key];
+                const cardData = nseCard
+                    ? { ...data[key], change: nseCard.change, percentChange: nseCard.percentChange }
+                    : data[key];
+                this.updateIndexCard(key, cardData);
             }
-            this.updateIndexDetail(this.selectedIndex, sel);
+
+            // For Open/High/Low, prefer NSE full-day OHLC (Upstox only covers its session).
+            // For change/%, prefer NSE price data which calculates from previous close.
+            // Upstox change/% only reflects movement since the streamer started — not full day.
+            const nseOhlc = this.nseChartOhlc[this.selectedIndex];
+            const nsePrice = this.latestNseData && this.latestNseData[this.selectedIndex];
+            const detailData = {
+                ...sel,
+                ...(nseOhlc ? { open: nseOhlc.open, high: nseOhlc.high, low: nseOhlc.low } : {}),
+                ...(nsePrice ? { change: nsePrice.change, percentChange: nsePrice.percentChange } : {}),
+            };
+            this.updateIndexDetail(this.selectedIndex, detailData);
+
             this.updateChart(this.selectedIndex, sel);
         }
         // (if not today → NSE is primary, do nothing here)
@@ -302,18 +375,33 @@ class LiveIndicesUpdater {
                 document.querySelectorAll('.hero-card').forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
 
-                // Update detail from best available source
                 const selUpstox = this.latestUpstoxData && this.latestUpstoxData[indexKey];
                 const hasToday = selUpstox && upstoxHistoryIsToday(selUpstox.history);
-                const best = hasToday ? selUpstox : (this.latestNseData && this.latestNseData[indexKey]);
-                if (best) this.updateIndexDetail(indexKey, best);
 
-                // Load chart: use Upstox if today, else NSE
+                // Always fetch NSE chart for this index:
+                //  - Populates nseBaseChart[indexKey] so the merged chart covers 9am→now
+                //  - Populates nseChartOhlc[indexKey] for correct Open/High/Low
+                const chartData = await this.fetchNseChart(indexKey);
+                if (chartData) this.updateChart(indexKey, chartData);
+
                 if (hasToday) {
+                    // Re-render merged chart (NSE base + Upstox live ticks)
                     this.updateChart(indexKey, selUpstox);
+
+                    // Detail panel: use NSE for OHLC + change/%, Upstox for current price
+                    const nseOhlc = this.nseChartOhlc[indexKey];
+                    const nsePrice = this.latestNseData && this.latestNseData[indexKey];
+                    const detailData = {
+                        ...selUpstox,
+                        ...(nseOhlc ? { open: nseOhlc.open, high: nseOhlc.high, low: nseOhlc.low } : {}),
+                        ...(nsePrice ? { change: nsePrice.change, percentChange: nsePrice.percentChange } : {}),
+                    };
+                    this.updateIndexDetail(indexKey, detailData);
                 } else {
-                    const chartData = await this.fetchNseChart(indexKey);
-                    if (chartData) this.updateChart(indexKey, chartData);
+                    // Upstox not today — NSE drives everything
+                    const nsePrice = this.latestNseData && this.latestNseData[indexKey];
+                    const best = nsePrice || (chartData ? { value: chartData.close, change: chartData.change, percentChange: chartData.percent, open: chartData.open, high: chartData.high, low: chartData.low } : null);
+                    if (best) this.updateIndexDetail(indexKey, best);
                 }
             });
         }

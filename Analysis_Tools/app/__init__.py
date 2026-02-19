@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, redirect, request, session, url_for
 
 from .controllers.auth_controller import auth_bp
+from .controllers.admin_controller import admin_bp
 from .controllers.dashboard_controller import dashboard_bp
 from .controllers.home_controller import home_bp
 from .controllers.insights.controller import cache as insights_cache
@@ -28,6 +29,18 @@ from .controllers.stock_controller import stock_bp
 from .controllers.voice_api_controller import voice_api_bp
 from .models.stock_model import cache as stock_cache
 from .utils.logger import setup_logger
+
+# In-memory active session tracker {username: last_seen_datetime}
+_active_sessions = {}
+
+def update_active_session(username):
+    from datetime import datetime
+    _active_sessions[username] = datetime.utcnow()
+
+def get_active_sessions():
+    from datetime import datetime, timedelta
+    cutoff = datetime.utcnow() - timedelta(minutes=5)
+    return {u: t for u, t in _active_sessions.items() if t > cutoff}
 
 # from .health_check import health_bp
 
@@ -61,6 +74,7 @@ def create_app():
     # Register blueprints
     # app.register_blueprint(health_bp)  # Health check at /health
     app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
     app.register_blueprint(home_bp)  # Home page at /
     app.register_blueprint(news_bp)  # News at /news
     app.register_blueprint(insights_bp)  # Neev at /neev
@@ -143,6 +157,8 @@ def create_app():
         if "user" not in session:
             return redirect(url_for("auth.login"))
 
+        # Track active session
+        update_active_session(session["user"])
         return None
 
     @app.context_processor
