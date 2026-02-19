@@ -415,6 +415,94 @@ def resend_otp(username: str) -> Tuple[bool, str]:
 
 
 # =============================================================
+# PASSWORD RESET
+# =============================================================
+
+def create_password_reset_otp(email: str) -> Tuple[bool, str]:
+    """Generate a reset OTP for the given email. Returns (success, otp_or_error)."""
+    from datetime import datetime, timedelta
+    import random
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(
+                text("SELECT username, is_active FROM users WHERE email = :email"),
+                {"email": email}
+            )
+            row = result.fetchone()
+            if not row:
+                return False, "No account found with that email address."
+            username, is_active = row
+            if not is_active:
+                return False, "This account is inactive."
+
+            otp = str(random.randint(100000, 999999))
+            expiry = datetime.utcnow() + timedelta(minutes=10)
+
+            conn.execute(
+                text("""
+                    UPDATE users
+                    SET verification_code = :otp,
+                        verification_code_expires_at = :expiry
+                    WHERE email = :email
+                """),
+                {"otp": otp, "expiry": expiry, "email": email}
+            )
+        return True, otp
+    except Exception as e:
+        print(f"[ERROR] create_password_reset_otp: {e}")
+        return False, str(e)
+
+
+def verify_reset_otp(email: str, code: str) -> Tuple[bool, str]:
+    """Verify reset OTP for email. Returns (success, username_or_error)."""
+    from datetime import datetime
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(
+                text("""
+                    SELECT username, verification_code, verification_code_expires_at
+                    FROM users WHERE email = :email
+                """),
+                {"email": email}
+            )
+            row = result.fetchone()
+            if not row:
+                return False, "No account found with that email."
+            username, stored_code, expires_at = row
+
+            if expires_at and datetime.utcnow() > expires_at:
+                return False, "OTP has expired. Please request a new one."
+            if str(stored_code) != str(code):
+                return False, "Invalid OTP. Please check and try again."
+
+        return True, username
+    except Exception as e:
+        print(f"[ERROR] verify_reset_otp: {e}")
+        return False, str(e)
+
+
+def reset_password(email: str, new_password: str) -> Tuple[bool, str]:
+    """Reset password for the given email and clear OTP."""
+    try:
+        password_hash = hash_password(new_password)
+        with engine.begin() as conn:
+            conn.execute(
+                text("""
+                    UPDATE users
+                    SET password_hash = :hash,
+                        verification_code = NULL,
+                        verification_code_expires_at = NULL
+                    WHERE email = :email
+                """),
+                {"hash": password_hash, "email": email}
+            )
+        return True, "Password reset successfully."
+    except Exception as e:
+        print(f"[ERROR] reset_password: {e}")
+        return False, str(e)
+
+
+# =============================================================
 # INITIALIZE ON MODULE IMPORT
 # =============================================================
 

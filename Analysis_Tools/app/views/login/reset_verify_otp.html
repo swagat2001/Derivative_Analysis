@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Reset Code | Market Neev</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box" style="justify-content:center;">
+      <div class="login-card-wrapper" style="width:100%; max-width:440px;">
+        <div class="login-card">
+
+          <div style="text-align:center; margin-bottom:20px;">
+            <div style="width:64px; height:64px; background:linear-gradient(135deg,#8B2432,#c14858);
+                        border-radius:50%; display:inline-flex; align-items:center;
+                        justify-content:center; font-size:28px;">&#128231;</div>
+          </div>
+
+          <h2 class="login-title" style="text-align:center;">Enter Reset Code</h2>
+          <p class="login-subtitle" style="text-align:center;">
+            We sent a 6-digit code to <strong>{{ email }}</strong>.<br>
+            Enter it below to continue.
+          </p>
+
+          {% with messages = get_flashed_messages(category_filter=['error']) %}
+          {% if messages %}
+          <div class="login-error"><strong>&#9888;</strong> {{ messages[0] }}</div>
+          {% endif %}
+          {% endwith %}
+
+          <form method="post" class="login-form" action="{{ url_for('auth.reset_verify_otp') }}">
+            <div class="form-group">
+              <label for="code" style="text-align:center; display:block;">Reset Code</label>
+              <input id="code" name="code" type="text" required autofocus
+                placeholder="&#9679; &#9679; &#9679; &#9679; &#9679; &#9679;"
+                pattern="\d{6}" maxlength="6" inputmode="numeric"
+                style="letter-spacing:8px; font-size:26px; text-align:center;
+                       font-weight:700; font-family:'Courier New',monospace;" />
+            </div>
+            <button type="submit" class="login-button">Verify Code</button>
+          </form>
+
+          <!-- Resend -->
+          <div style="text-align:center; margin-top:20px; padding-top:16px; border-top:1px solid #e5e7eb;">
+            <p style="color:#6b7280; font-size:13px; margin-bottom:12px;">
+              Didn't receive it? Check spam or request a new code.
+            </p>
+            <form method="post" action="{{ url_for('auth.forgot_password') }}">
+              <input type="hidden" name="email" value="{{ email }}" />
+              <button type="submit"
+                style="background:transparent; border:1.5px solid #8B2432; color:#8B2432;
+                       padding:8px 20px; border-radius:6px; font-size:13px; font-weight:600;
+                       cursor:pointer; transition:all 0.2s;"
+                onmouseover="this.style.background='#8B2432';this.style.color='white';"
+                onmouseout="this.style.background='transparent';this.style.color='#8B2432';">
+                Resend Code
+              </button>
+            </form>
+          </div>
+
+          <div class="login-footnote" style="text-align:center; margin-top:16px;">
+            <a href="{{ url_for('auth.forgot_password') }}" style="color:#6b7280; font-size:13px;">
+              &#8592; Change Email
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

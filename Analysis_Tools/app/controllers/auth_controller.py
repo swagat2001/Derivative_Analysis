@@ -2,7 +2,8 @@ import random
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from ..models.auth_model import create_user, get_user_display_name, resend_otp, validate_user, verify_user_email
+from ..models.auth_model import (create_user, get_user_display_name, resend_otp, validate_user,
+                                   verify_user_email, create_password_reset_otp, verify_reset_otp, reset_password)
 from ..services.email_service import send_otp_email
 
 auth_bp = Blueprint("auth", __name__)
@@ -154,6 +155,107 @@ def resend_otp_route(username):
         flash(f"Failed to send email: {email_msg}", "error")
 
     return redirect(url_for("auth.verify", username=username))
+
+
+# ============================================================
+# FORGOT PASSWORD - Step 1: Enter email
+# ============================================================
+@auth_bp.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+
+        if not email or "@" not in email:
+            flash("Please enter a valid email address.", "error")
+            return render_template("login/forgot_password.html")
+
+        success, result = create_password_reset_otp(email)
+
+        if not success:
+            # Don't reveal if email exists — show generic message to prevent enumeration
+            flash("If that email is registered, a reset code has been sent.", "success")
+            return render_template("login/forgot_password.html")
+
+        otp = result
+        # Get username for email greeting
+        from ..models.auth_model import get_username_by_login
+        username = get_username_by_login(email) or "User"
+
+        email_ok, email_msg = send_otp_email(to_email=email, username=username, otp=otp)
+        if not email_ok:
+            flash(f"Failed to send reset email: {email_msg}", "error")
+            return render_template("login/forgot_password.html")
+
+        flash("A 6-digit reset code has been sent to your email.", "success")
+        # Store email in session temporarily for next steps
+        session["reset_email"] = email
+        return redirect(url_for("auth.reset_verify_otp"))
+
+    return render_template("login/forgot_password.html")
+
+
+# ============================================================
+# FORGOT PASSWORD - Step 2: Verify OTP
+# ============================================================
+@auth_bp.route("/reset-verify", methods=["GET", "POST"])
+def reset_verify_otp():
+    email = session.get("reset_email")
+    if not email:
+        flash("Session expired. Please start again.", "error")
+        return redirect(url_for("auth.forgot_password"))
+
+    if request.method == "POST":
+        code = request.form.get("code", "").strip()
+        success, result = verify_reset_otp(email, code)
+
+        if not success:
+            flash(result, "error")
+            return render_template("login/reset_verify_otp.html", email=email)
+
+        # OTP valid — allow password reset
+        session["reset_verified"] = True
+        return redirect(url_for("auth.reset_new_password"))
+
+    return render_template("login/reset_verify_otp.html", email=email)
+
+
+# ============================================================
+# FORGOT PASSWORD - Step 3: Set new password
+# ============================================================
+@auth_bp.route("/reset-password", methods=["GET", "POST"])
+def reset_new_password():
+    email = session.get("reset_email")
+    verified = session.get("reset_verified")
+
+    if not email or not verified:
+        flash("Session expired. Please start again.", "error")
+        return redirect(url_for("auth.forgot_password"))
+
+    if request.method == "POST":
+        password = request.form.get("password", "").strip()
+        confirm  = request.form.get("confirm_password", "").strip()
+
+        if len(password) < 6:
+            flash("Password must be at least 6 characters.", "error")
+            return render_template("login/reset_new_password.html")
+
+        if password != confirm:
+            flash("Passwords do not match.", "error")
+            return render_template("login/reset_new_password.html")
+
+        success, message = reset_password(email, password)
+        if not success:
+            flash(message, "error")
+            return render_template("login/reset_new_password.html")
+
+        # Clear reset session keys
+        session.pop("reset_email", None)
+        session.pop("reset_verified", None)
+
+        flash("Password reset successfully! You can now log in.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("login/reset_new_password.html")
 
 
 # ============================================================

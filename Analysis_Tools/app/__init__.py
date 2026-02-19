@@ -130,6 +130,10 @@ def create_app():
             "auth.signup",
             "auth.verify",
             "auth.logout",
+            "auth.resend_otp_route",
+            "auth.forgot_password",
+            "auth.reset_verify_otp",
+            "auth.reset_new_password",
             "health.health_check",
             "static",
         ]:
