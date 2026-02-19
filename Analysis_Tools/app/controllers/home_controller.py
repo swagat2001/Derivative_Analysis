@@ -5,6 +5,7 @@ Landing page for Goldmine - ScanX style
 Updated: 2026-02-02 - Added FII/DII API endpoint
 Updated: 2026-02-11 - Added Market Breadth API endpoint
 Updated: 2026-02-11 - Added dynamic sample stocks display
+Updated: 2026-02-19 - Added NSE API endpoints so charts always show data
 """
 
 from datetime import datetime, timedelta
@@ -19,6 +20,7 @@ from ..models.market_breadth_model import get_latest_market_breadth
 from ..models.live_indices_model import get_live_indices
 from ..models.stock_model import get_filtered_tickers
 from ..models.homepage_model import get_homepage_sample_stocks
+from ..models.nse_indices_model import get_nse_index_data, get_nse_chart_data
 # from .dashboard_controller import get_live_indices # Removed to avoid conflict
 
 home_bp = Blueprint("home", __name__)
@@ -244,6 +246,37 @@ def api_live_indices():
         return jsonify(data), 200
     except Exception as e:
         return jsonify({"success": True, "message": "Using fallback data", "indices": {}}), 200
+
+
+@home_bp.route("/api/nse-indices")
+def api_nse_indices():
+    """
+    Always-on: current index prices fetched directly from NSE public API.
+    Works 24/7 – not limited to Upstox streamer hours.
+    Returns the same shape as /api/live-indices so the JS can merge them.
+    """
+    try:
+        indices = get_nse_index_data()
+        return jsonify({"success": True, "indices": indices}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e), "indices": {}}), 200
+
+
+@home_bp.route("/api/nse-chart/<index_name>")
+def api_nse_chart(index_name: str):
+    """
+    Always-on: 1-day intraday chart series from NSE for *index_name*.
+    index_name must match an app key: nifty50, banknifty, sensex,
+    niftyfin, niftynext50, nifty100, indiavix.
+    Returns: { series: [[epoch_ms, price], ...], open, high, low, close, change, percent }
+    """
+    try:
+        data = get_nse_chart_data(index_name.lower())
+        if "error" in data:
+            return jsonify({"success": False, "message": data["error"]}), 200
+        return jsonify({"success": True, **data}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 200
 
 
 @home_bp.route("/api/live-fii-dii")

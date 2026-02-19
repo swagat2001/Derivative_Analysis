@@ -120,34 +120,34 @@ def create_app():
     app.jinja_env.filters["format_number"] = format_number
 
     # =============================================================
-    # AUTHENTICATION MIDDLEWARE (DISABLED: LOGIN OPTIONAL)
+    # AUTHENTICATION MIDDLEWARE
     # =============================================================
-    # @app.before_request
-    # def require_login():
-    #     # Allow access to login, signup, logout, health check, and static files
-    #     if request.endpoint in [
-    #         "auth.login",
-    #         "auth.signup",
-    #         "auth.verify",
-    #         "auth.logout",
-    #         "health.health_check",
-    #         "static",
-    #     ]:
-    #         return None
-    #
-    #     # Check if user is logged in
-    #     if "user" not in session:
-    #         return redirect(url_for("auth.login"))
-    #
-    #     return None
+    @app.before_request
+    def require_login():
+        # Allow access to login, signup, logout, health check, and static files
+        if request.endpoint in [
+            "auth.login",
+            "auth.signup",
+            "auth.verify",
+            "auth.logout",
+            "health.health_check",
+            "static",
+        ]:
+            return None
 
-    # User context removed - public access mode
-    # Authentication is disabled for this application
+        # Check if user is logged in
+        if "user" not in session:
+            return redirect(url_for("auth.login"))
+
+        return None
+
     @app.context_processor
     def inject_user():
+        from .models.auth_model import get_user_display_name
+        username = session.get("user")
         return {
-            "current_user": None,
-            "user_display_name": None,
+            "current_user": username,
+            "user_display_name": get_user_display_name(username) if username else None,
         }
 
     return app

@@ -1,26 +1,20 @@
-import datetime
-import json
-import os
-from functools import lru_cache
+"""
+Fundamental Service — DB-driven implementation.
+Loads fundamental metrics from stock_fundamentals table (populated by
+Database/Cash/fetch_fundamentals.py via yfinance).
+Market data (price, volume, change, signal) from daily_market_heatmap
+and technical_screener_cache. Zero JSON file dependency.
+"""
 
-import pandas as pd
+from sqlalchemy import text
 
-from ..models.dashboard_model import get_available_dates, get_dashboard_data
-from ..models.insights_model import get_heatmap_data
-
-# Path to the data directory - Adjust based on your actual structure
-# Assuming we are in Analysis_Tools/app/services
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-DATA_DIR = os.path.join(BASE_DIR, "Data_scraper", "data")
+from ..models.db_config import engine, engine_cash
 
 
 class FundamentalService:
     _instance = None
-    _ratios_data = {}
-    _pnl_data = {}
-    _cashflow_data = {}
-    _shareholding_data = {}
-    _market_data = {}  # New: Store live market data
+    _fundamentals_data = {}  # symbol -> {market_cap, pe_ratio, sales, ...}
+    _market_data = {}        # symbol -> {price, volume, change, change_pct, signal}
 
     def __new__(cls):
         if cls._instance is None:
@@ -29,425 +23,234 @@ class FundamentalService:
         return cls._instance
 
     def _load_data(self):
-        """Load all JSON files and latest market data into memory"""
-        print(f"[INFO] Loading Fundamental Data from {DATA_DIR}...")
+        """Load fundamental + market data from DB into memory."""
+        print("[INFO] Loading FundamentalService from DB...")
+        self._load_fundamentals_from_db()
+        self._load_market_data()
+        print(f"[INFO] FundamentalService ready: {len(self._fundamentals_data)} fundamental stocks, "
+              f"{len(self._market_data)} market records.")
 
-        # Load Market Data (Price, Change, Volume)
+    # ------------------------------------------------------------------
+    # FUNDAMENTAL DATA — from stock_fundamentals table
+    # ------------------------------------------------------------------
+
+    def _load_fundamentals_from_db(self):
+        """Load all rows from stock_fundamentals into memory dict."""
         try:
-            dates = get_available_dates()
-            if dates and len(dates) >= 1:
-                latest_date = dates[0]
-                print(f"[INFO] Loading Market Data for {latest_date}...")
-                market_records = get_dashboard_data(latest_date, "TOTAL")
-                self._market_data = {item["stock"]: item for item in market_records}
+            with engine_cash.connect() as conn:
+                result = conn.execute(text("""
+                    SELECT symbol, market_cap, pe_ratio, book_value, eps,
+                           sales, net_profit, opm_pct, sales_growth_3yr,
+                           profit_growth_3yr, capex_growth_pct, working_capital_days
+                    FROM stock_fundamentals
+                """))
+                rows = result.fetchall()
 
-                # Fetch previous day for change calculation
-                if len(dates) >= 2:
-                    prev_date = dates[1]
-                    print(f"[INFO] Loading Prev Market Data for {prev_date}...")
-                    prev_records = get_dashboard_data(prev_date, "TOTAL")
-                    # Merge previous close into market data dict
-                    prev_map = {item["stock"]: item["closing_price"] for item in prev_records}
-                    for ticker, data in self._market_data.items():
-                        if ticker in prev_map:
-                            data["prev_close"] = prev_map[ticker]
-
-                # --- NEW: Load correct MARKET DATA (Price, Vol, Change) from Cash Heatmap ---
-                # This fixes "Zero Price/Volume" for non-F&O stocks in Scanner
-                try:
-                    print(f"[INFO] Loading Full Heatmap Data (Cash & F&O) for {latest_date}...")
-                    # Fetch ALL stocks (filter_fo=False)
-                    heatmap_records = get_heatmap_data(latest_date, filter_fo=False)
-
-                    # Create Maps
-                    volume_map = {}
-                    price_map = {}
-                    change_map = {}
-                    change_pct_map = {}
-
-                    if heatmap_records:
-                        for item in heatmap_records:
-                            sym = item.get("symbol", "").upper()
-                            if sym:
-                                volume_map[sym] = item.get("volume", 0)
-                                price_map[sym] = item.get("close", 0)
-                                change_pct_map[sym] = item.get("change_pct", 0)
-                                # Calculate approximate change if not available directly
-                                # change = close - prev_close. We only have close and change_pct.
-                                # prev = close / (1 + pct/100)
-                                # change = close - (close / (1 + pct/100))
-                                try:
-                                    close = item.get("close", 0)
-                                    pct = item.get("change_pct", 0)
-                                    if close and pct is not None:
-                                        prev = close / (1 + (pct / 100.0))
-                                        change_map[sym] = close - prev
-                                    else:
-                                        change_map[sym] = 0
-                                except:
-                                    change_map[sym] = 0
-
-                    # Merge into Market Data
-                    # Note: self._market_data currently only has F&O stocks (from get_dashboard_data)
-                    # We need to ADD non-F&O stocks too!
-
-                    # 1. Update existing F&O stocks with Volume (and fallback price)
-                    for ticker, data in self._market_data.items():
-                        if ticker in volume_map:
-                            data["volume"] = volume_map[ticker]
-
-                        # Use Heatmap price if dashboard price is missing/zero (unlikely but safe)
-                        if data.get("closing_price", 0) == 0 and ticker in price_map:
-                            data["closing_price"] = price_map[ticker]
-
-                        # Try mapping "M_M" -> "M&M"
-                        if ticker not in volume_map:
-                             alt_ticker = ticker.replace("_", "&")
-                             if alt_ticker in volume_map:
-                                 data["volume"] = volume_map[alt_ticker]
-
-                    # 2. Add Non-F&O Stocks to self._market_data
-                    # Fundamental Scanner iterates over all_tickers (from Ratios/PnL files) and looks up market data.
-                    # So we just need to ensure they are in self._market_data.
-
-                    added_count = 0
-                    for sym, vol in volume_map.items():
-                        # Check if already in market data (handling M&M vs M_M mismatch if possible)
-                        # Simple check:
-                        if sym not in self._market_data and sym.replace("&", "_") not in self._market_data:
-                            # Create new entry for Non-F&O stock
-                            self._market_data[sym] = {
-                                "stock": sym,
-                                "closing_price": price_map.get(sym, 0),
-                                "volume": vol,
-                                "prev_close": 0, # Not strictly needed if we have change/change_pct
-                                "call_total_tradval": 0, # Dummy
-                                "put_total_tradval": 0,  # Dummy
-                                "rsi": 50 # Default
-                            }
-                            # Hack: Store calculated change/pct in the dict so we can retrieve it later
-                            # The dict structure is usually strict, but Python allows adding keys.
-                            self._market_data[sym]["custom_change"] = change_map.get(sym, 0)
-                            self._market_data[sym]["custom_change_pct"] = change_pct_map.get(sym, 0)
-                            added_count += 1
-
-                    print(f"[INFO] Merged Cash Market Data. Added {added_count} non-F&O stocks.")
-
-                except Exception as e:
-                    print(f"[ERROR] Failed to merge heatmap data: {e}")
-                # --------------------------------------------------
+            self._fundamentals_data = {}
+            for row in rows:
+                self._fundamentals_data[row[0]] = {
+                    "market_cap":           self._f(row[1]),
+                    "pe_ratio":             self._f(row[2]),
+                    "book_value":           self._f(row[3]),
+                    "eps":                  self._f(row[4]),
+                    "sales":                self._f(row[5]),
+                    "net_profit":           self._f(row[6]),
+                    "opm_pct":              self._f(row[7]),
+                    "sales_growth_3yr":     self._f(row[8]),
+                    "profit_growth_3yr":    self._f(row[9]),
+                    "capex_growth_pct":     self._f(row[10]),
+                    "working_capital_days": self._f(row[11]),
+                }
+            print(f"[INFO] Loaded {len(self._fundamentals_data)} rows from stock_fundamentals.")
         except Exception as e:
-            print(f"[ERROR] Failed to load market data: {e}")
+            print(f"[ERROR] stock_fundamentals load failed: {e}")
+            print("[WARN] Run 'py Database/Cash/fetch_fundamentals.py' to populate the table.")
+            self._fundamentals_data = {}
 
-        # Load Ratios
-        ratios_dir = os.path.join(DATA_DIR, "ratios")
-        if os.path.exists(ratios_dir):
-            for filename in os.listdir(ratios_dir):
-                if filename.endswith(".json"):
-                    ticker = filename.replace(".json", "")
-                    try:
-                        with open(os.path.join(ratios_dir, filename), "r") as f:
-                            self._ratios_data[ticker] = json.load(f)
-                    except Exception as e:
-                        print(f"[ERROR] Failed to load ratios for {ticker}: {e}")
+    # ------------------------------------------------------------------
+    # MARKET DATA — from daily_market_heatmap + technical_screener_cache
+    # ------------------------------------------------------------------
 
-        # Load PnL
-        pnl_dir = os.path.join(DATA_DIR, "pnl")
-        if os.path.exists(pnl_dir):
-            for filename in os.listdir(pnl_dir):
-                if filename.endswith(".json"):
-                    ticker = filename.replace(".json", "")
-                    try:
-                        with open(os.path.join(pnl_dir, filename), "r") as f:
-                            self._pnl_data[ticker] = json.load(f)
-                    except Exception as e:
-                        print(f"[ERROR] Failed to load pnl for {ticker}: {e}")
+    def _load_market_data(self):
+        """Load latest price, volume, change%, and RSI signal for all stocks."""
+        self._market_data = {}
 
-        # Load Cashflow
-        cf_dir = os.path.join(DATA_DIR, "cashflow")
-        if os.path.exists(cf_dir):
-            for filename in os.listdir(cf_dir):
-                if filename.endswith(".json"):
-                    ticker = filename.replace(".json", "")
-                    try:
-                        with open(os.path.join(cf_dir, filename), "r") as f:
-                            self._cashflow_data[ticker] = json.load(f)
-                    except Exception as e:
-                        print(f"[ERROR] Failed to load cashflow for {ticker}: {e}")
+        # Step 1: Latest date from heatmap
+        try:
+            with engine_cash.connect() as conn:
+                latest_date = conn.execute(
+                    text("SELECT MAX(date) FROM daily_market_heatmap")
+                ).scalar()
+                if not latest_date:
+                    print("[WARN] No data in daily_market_heatmap.")
+                    return
 
-        # Load Shareholding
-        sh_dir = os.path.join(DATA_DIR, "shareholding")
-        if os.path.exists(sh_dir):
-            for filename in os.listdir(sh_dir):
-                if filename.endswith(".json"):
-                    ticker = filename.replace(".json", "")
-                    try:
-                        with open(os.path.join(sh_dir, filename), "r") as f:
-                            self._shareholding_data[ticker] = json.load(f)
-                    except Exception as e:
-                        print(f"[ERROR] Failed to load shareholding for {ticker}: {e}")
+                # Load price, volume, change% for all stocks on latest date
+                result = conn.execute(text("""
+                    SELECT symbol, close, prev_close, change_pct, volume, high, low
+                    FROM daily_market_heatmap
+                    WHERE date = :d
+                """), {"d": latest_date})
+                rows = result.fetchall()
 
-        # print(f"[INFO] Loaded {len(self._ratios_data)} ratios, {len(self._pnl_data)} pnl, {len(self._cashflow_data)} cashflow, {len(self._shareholding_data)} shareholding files.")
+            for row in rows:
+                symbol, close, prev_close, change_pct, volume, high, low = row
+                change = round(close - prev_close, 2) if close and prev_close else 0
+                self._market_data[symbol] = {
+                    "price":      self._f(close),
+                    "prev_close": self._f(prev_close),
+                    "change":     change,
+                    "change_pct": self._f(change_pct),
+                    "volume":     int(volume) if volume else 0,
+                    "signal":     "NEUTRAL",  # Will be updated from RSI below
+                }
 
-    def _get_latest_metric(self, data_dict, metric_name):
-        """Helper to get the latest value for a metric from the messy JSON structure"""
-        # Structure: {"date": [{"key": val}, ...]}
-        latest_date = None
-        latest_val = None
+            print(f"[INFO] Loaded {len(self._market_data)} market records for {latest_date}.")
+        except Exception as e:
+            print(f"[ERROR] Market data load failed: {e}")
 
-        # Find latest date
-        sorted_dates = sorted(data_dict.keys(), reverse=True)
+        # Step 2: RSI signals from technical_screener_cache (F&O DB)
+        try:
+            with engine.connect() as conn:
+                latest_cache = conn.execute(
+                    text("SELECT MAX(cache_date) FROM technical_screener_cache")
+                ).scalar()
+                if latest_cache:
+                    result = conn.execute(text("""
+                        SELECT ticker, rsi_14
+                        FROM technical_screener_cache
+                        WHERE cache_date = :d
+                    """), {"d": latest_cache})
+                    rsi_rows = result.fetchall()
+                    for ticker, rsi in rsi_rows:
+                        rsi = rsi or 50
+                        if ticker in self._market_data:
+                            self._market_data[ticker]["signal"] = self._rsi_to_signal(rsi)
+                        # Also try without suffix variants
+                        for variant in [ticker.replace("_", "&"), ticker.replace("_", "-")]:
+                            if variant in self._market_data:
+                                self._market_data[variant]["signal"] = self._rsi_to_signal(rsi)
+            print(f"[INFO] RSI signals loaded from technical_screener_cache ({latest_cache}).")
+        except Exception as e:
+            print(f"[WARN] RSI signal load skipped: {e}")
 
-        for date_str in sorted_dates:
-            if date_str == "TTM" and metric_name in ["Sales", "NetProfit", "EPSinRs"]:
-                # Prefer TTM for PnL items if available
-                items = data_dict["TTM"]
-                for item in items:
-                    # Keys often have trailing spaces or special chars in the JSON
-                    # e.g. "Sales\u00a0"
-                    clean_keys = {k.replace("\u00a0", "").replace("\u00c2", "").strip(): v for k, v in item.items()}
-                    if metric_name in clean_keys:
-                        return float(clean_keys[metric_name])
+    # ------------------------------------------------------------------
+    # PUBLIC API — used by the fundamental scanner controllers
+    # ------------------------------------------------------------------
 
-            # Process regular dates
-            if date_str != "TTM":
-                items = data_dict[date_str]
-                for item in items:
-                    # Robust cleaning: remove \u00a0, \u00c2, and spaces
-                    clean_keys = {k.replace("\u00a0", "").replace("\u00c2", "").strip(): v for k, v in item.items()}
-                    if metric_name in clean_keys:
-                        # Found it! Since dates are sorted descending, this is the latest
-                        return float(clean_keys[metric_name])
-
-        return None
-
-    def get_stock_fundamentals(self, ticker):
-        """Get consolidated fundamentals for a stock"""
+    def get_stock_fundamentals(self, ticker: str) -> dict:
+        """Return consolidated fundamental + market data dict for one stock."""
         data = {
-            "ticker": ticker,
-            "roe": 0,
-            "roce": 0,
-            "pe": 0,
-            "debt_to_equity": 0,
-            "net_profit_margin": 0,
-            "opm": 0,
-            "interest_coverage": 0,
-            "sales_growth": 0,
-            "profit_growth": 0,
-            "eps": 0,
-            "cash_from_ops": 0,
-            "promoter_holding": 0,
-            "fii_holding": 0,
-            "fii_holding_prev": 0,
-            "dividend_payout": 0,
-            "inventory_days": 0,
+            "ticker":               ticker,
+            "market_cap":           0,
+            "pe":                   0,
+            "eps":                  0,
+            "sales":                0,
+            "net_profit":           0,
+            "opm":                  0,
+            "sales_growth_3yr":     0,
+            "profit_growth_3yr":    0,
+            "capex_growth_pct":     0,
             "working_capital_days": 0,
-            "sales": 0,
-            "net_profit": 0,
-            "sales_growth_3yr": 0,
-            "profit_growth_3yr": 0,
-            "cash_from_investing": 0,
-            "capex_growth_pct": 0,
-            "market_cap": 0,
-            # Market Data
-            "price": 0,
-            "change": 0,
+            # Market columns
+            "price":      0,
+            "change":     0,
             "change_pct": 0,
-            "volume": 0,
-            "oi": 0,
-            "iv": 0,
+            "volume":     0,
+            "signal":     "NEUTRAL",
+            # Legacy fields kept for controller compatibility
+            "roce":              0,
+            "roe":               0,
+            "promoter_holding":  0,
+            "fii_holding":       0,
+            "cash_from_ops":     0,
+            "cash_from_investing": 0,
         }
 
-        # Merge Market Data
-        # Handle Symbol Mismatches (Excel/File vs DB)
-        market_ticker = ticker
-        symbol_map = {"M&M": "M_M", "BAJAJ-AUTO": "BAJAJ_AUTO", "ARE&M": "ARE_M"}
-        if ticker in symbol_map:
-            market_ticker = symbol_map[ticker]
+        # Fundamental data
+        if ticker in self._fundamentals_data:
+            f = self._fundamentals_data[ticker]
+            data["market_cap"]           = f["market_cap"]
+            data["pe"]                   = f["pe_ratio"]
+            data["eps"]                  = f["eps"]
+            data["sales"]                = f["sales"]
+            data["net_profit"]           = f["net_profit"]
+            data["opm"]                  = f["opm_pct"]
+            data["sales_growth_3yr"]     = f["sales_growth_3yr"]
+            data["profit_growth_3yr"]    = f["profit_growth_3yr"]
+            data["capex_growth_pct"]     = f["capex_growth_pct"]
+            data["working_capital_days"] = f["working_capital_days"]
 
-        if market_ticker in self._market_data:
-            m = self._market_data[market_ticker]
-            price = m.get("closing_price", 0) or 0
-            data["price"] = price
-
-            # Calculate Change
-            prev_close = m.get("prev_close", 0)
-            if prev_close and prev_close > 0 and price > 0:
-                change = price - prev_close
-                change_pct = (change / prev_close) * 100
-                data["change"] = change
-                data["change_pct"] = change_pct
-            elif "custom_change" in m:
-                # Fallback for Non-F&O stocks (populated in _load_data)
-                data["change"] = m.get("custom_change", 0)
-                data["change_pct"] = m.get("custom_change_pct", 0)
-
-            # Volume is now pre-merged from Heatmap in _load_data
-            data["volume"] = m.get("volume", 0)
-            data["oi"] = 0  # Not available
-            data["iv"] = 0  # Not available
-
-            # Signal based on RSI
-            rsi = m.get("rsi", 50) or 50
-            if rsi > 70:
-                data["signal"] = "BEARISH (Reversal)"
-            elif rsi < 30:
-                data["signal"] = "BULLISH (Reversal)"
-            elif 50 < rsi <= 70:
-                data["signal"] = "BULLISH"
-            else:
-                data["signal"] = "BEARISH"
-
-        # Ratios
-        if ticker in self._ratios_data:
-            rData = self._ratios_data[ticker]
-            # Try ROCE first, then fallback to ROE (common for financial stocks)
-            roce = self._get_latest_metric(rData, "ROCE%") or 0
-            if roce == 0:
-                roce = self._get_latest_metric(rData, "ROE%") or 0
-
-            data["roce"] = roce
-            data["inventory_days"] = self._get_latest_metric(rData, "InventoryDays") or 0
-            data["working_capital_days"] = self._get_latest_metric(rData, "WorkingCapitalDays") or 0
-
-        # PnL
-        if ticker in self._pnl_data:
-            pData = self._pnl_data[ticker]
-            data["eps"] = self._get_latest_metric(pData, "EPSinRs") or 0
-            data["opm"] = self._get_latest_metric(pData, "OPM%") or 0
-            data["dividend_payout"] = self._get_latest_metric(pData, "DividendPayout%") or 0
-            if data["eps"] > 0 and data["price"] > 0:
-                data["pe"] = data["price"] / data["eps"]
-
-            # Sales & Profit (Latest)
-            sales = self._get_latest_metric(pData, "Sales")
-            profit = self._get_latest_metric(pData, "NetProfit")
-            data["sales"] = sales or 0
-            data["net_profit"] = profit or 0
-
-            if sales and profit and sales > 0:
-                data["net_profit_margin"] = (profit / sales) * 100
-
-            # Interest Coverage
-            op_profit = self._get_latest_metric(pData, "OperatingProfit")
-            interest = self._get_latest_metric(pData, "Interest")
-            if op_profit and interest and interest > 0:
-                data["interest_coverage"] = op_profit / interest
-            elif op_profit and (not interest or interest == 0):
-                data["interest_coverage"] = 999
-
-            # Growth Calculation (3-Year CAGR rough approx: Latest vs 3 years ago)
-            # data structure: {"2024-03-01": [...], ...}
-            sorted_dates = sorted([d for d in pData.keys() if d != "TTM"], reverse=True)
-            if len(sorted_dates) >= 4:
-                # Latest vs 3 years ago (Item 0 vs Item 3)
-                latest_date = sorted_dates[0]
-                past_date = sorted_dates[3]
-
-                # Helper to extract value from list of dicts for a specific date
-                def get_val(d_str, key):
-                    for x in pData[d_str]:
-                        clean_k = {k.replace("\u00a0", "").replace("\u00c2", "").strip(): v for k, v in x.items()}
-                        if key in clean_k:
-                            return float(clean_k[key])
-                    return 0
-
-                s_latest = get_val(latest_date, "Sales")
-                s_past = get_val(past_date, "Sales")
-                p_latest = get_val(latest_date, "NetProfit")
-                p_past = get_val(past_date, "NetProfit")
-
-                if s_past > 0:
-                    if s_latest > 0:
-                        data["sales_growth_3yr"] = ((s_latest / s_past) ** (1 / 3) - 1) * 100
-                    else:
-                        data["sales_growth_3yr"] = -100  # Significant decline if turned negative
-
-                if p_past > 0:
-                    # Handle absolute growth if base is negative? Complex. Simple calc for now.
-                    if p_latest > 0:
-                        data["profit_growth_3yr"] = ((p_latest / p_past) ** (1 / 3) - 1) * 100
-                    else:
-                        data["profit_growth_3yr"] = -100  # Significant decline if turned negative
-
-        # Cashflow
-        if ticker in self._cashflow_data:
-            cData = self._cashflow_data[ticker]
-            data["cash_from_ops"] = self._get_latest_metric(cData, "CashfromOperatingActivity") or 0
-            data["cash_from_investing"] = self._get_latest_metric(cData, "CashfromInvestingActivity") or 0
-
-            # Calculate Capex Growth (Investing Outflow Increase)
-            sorted_dates = sorted([d for d in cData.keys() if d != "TTM"], reverse=True)
-            if len(sorted_dates) >= 2:
-                latest_date = sorted_dates[0]
-                prev_date = sorted_dates[1]
-
-                def get_cf_val(d_str, key):
-                    for x in cData[d_str]:
-                        clean_k = {k.replace("\u00a0", "").replace("\u00c2", "").strip(): v for k, v in x.items()}
-                        if key in clean_k:
-                            return float(clean_k[key])
-                    return 0
-
-                # Investing activity is usually negative for Capex.
-                # We want to see if the OUTFLOW increased.
-                # e.g. -100 to -150 -> 50% increase in spending.
-                inv_latest = get_cf_val(latest_date, "CashfromInvestingActivity")
-                inv_prev = get_cf_val(prev_date, "CashfromInvestingActivity")
-
-                # Check if both are negative (spending)
-                if inv_latest < 0 and inv_prev < 0:
-                    # Calculate growth in absolute terms (spending growth)
-                    # (Abs(Latest) - Abs(Prev)) / Abs(Prev)
-                    abs_latest = abs(inv_latest)
-                    abs_prev = abs(inv_prev)
-                    data["capex_growth_pct"] = ((abs_latest - abs_prev) / abs_prev) * 100
-
-                # If moving from pos to neg (started spending), that's huge growth?
-                elif inv_latest < 0 and inv_prev >= 0:
-                    data["capex_growth_pct"] = 100  # Arbitrary high growth indicator
-
-        # Shareholding
-        if ticker in self._shareholding_data:
-            sData = self._shareholding_data[ticker]
-            sorted_dates = sorted(sData.keys(), reverse=True)
-            if sorted_dates:
-                latest_date = sorted_dates[0]
-                latest_items = sData[latest_date]
-                for item in latest_items:
-                    clean_keys = {k.replace("\u00a0", "").replace("\u00c2", "").strip(): v for k, v in item.items()}
-                    if "Promoters" in clean_keys:
-                        data["promoter_holding"] = float(clean_keys["Promoters"]) * 100
-                    if "FIIs" in clean_keys:
-                        data["fii_holding"] = float(clean_keys["FIIs"]) * 100
-
-        # Calculate Market Cap (Proxy: NetProfit/EPS * Price)
-        # Done at end to ensure NetProfit, EPS, and Price are available
-        if data.get("eps", 0) > 0 and data.get("net_profit", 0) > 0 and data.get("price", 0) > 0:
-            data["market_cap"] = (data["net_profit"] / data["eps"]) * data["price"]
+        # Market data — try symbol variants for special cases like M&M / BAJAJ-AUTO
+        m = self._find_market_data(ticker)
+        if m:
+            data["price"]      = m["price"]
+            data["change"]     = m["change"]
+            data["change_pct"] = m["change_pct"]
+            data["volume"]     = m["volume"]
+            data["signal"]     = m["signal"]
 
         return data
 
-    def filter_stocks(self, criteria_func):
+    def filter_stocks(self, criteria_func) -> list:
         """
-        Filter stocks based on a criteria function.
-        criteria_func(data_dict) -> bool
+        Apply a filter function to all stocks in stock_fundamentals table.
+        Returns list of matching stock dicts.
         """
         results = []
-        all_tickers = set(
-            list(self._ratios_data.keys())
-            + list(self._pnl_data.keys())
-            + list(self._cashflow_data.keys())
-            + list(self._shareholding_data.keys())
-        )
-
-        for ticker in all_tickers:
-            stats = self.get_stock_fundamentals(ticker)
-            if criteria_func(stats):
-                results.append(stats)
-
+        for ticker in self._fundamentals_data:
+            try:
+                stats = self.get_stock_fundamentals(ticker)
+                if criteria_func(stats):
+                    results.append(stats)
+            except Exception:
+                continue
         return results
 
+    def reload(self):
+        """Force full reload from DB. Call after running fetch_fundamentals.py."""
+        print("[INFO] Reloading FundamentalService from DB...")
+        self._fundamentals_data = {}
+        self._market_data = {}
+        self._load_data()
 
-# Singleton instance
+    # ------------------------------------------------------------------
+    # HELPERS
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _f(val, default=0.0) -> float:
+        """Safe float conversion."""
+        if val is None:
+            return default
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            return default
+
+    @staticmethod
+    def _rsi_to_signal(rsi: float) -> str:
+        if rsi > 70:
+            return "BEARISH (Reversal)"
+        elif rsi < 30:
+            return "BULLISH (Reversal)"
+        elif rsi > 50:
+            return "BULLISH"
+        else:
+            return "BEARISH"
+
+    def _find_market_data(self, ticker: str) -> dict | None:
+        """Try ticker and common NSE symbol variants."""
+        for variant in [
+            ticker,
+            ticker.replace("&", "_"),
+            ticker.replace("-", "_"),
+            ticker.replace("_", "&"),
+            ticker.replace("_", "-"),
+        ]:
+            if variant in self._market_data:
+                return self._market_data[variant]
+        return None
+
+
 fundamental_service = FundamentalService()

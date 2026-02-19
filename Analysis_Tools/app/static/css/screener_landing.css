@@ -257,6 +257,7 @@
     transition: all 0.2s ease;
     flex-shrink: 0;
     margin-left: 12px;
+    display: none;
 }
 
 .screener-card:hover .screener-right {

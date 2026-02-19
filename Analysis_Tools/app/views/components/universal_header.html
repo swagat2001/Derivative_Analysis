@@ -56,9 +56,21 @@
       </div>
     </div>
 
-    <!-- RIGHT: Empty Actions Section (Auth removed) -->
+    <!-- RIGHT: User Actions -->
     <div class="header-actions">
-      <!-- Authentication removed - public access -->
+      {% if current_user %}
+      <div class="user-info" style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:13px; color:#374151; font-weight:600;">
+          👤 {{ user_display_name or current_user }}
+        </span>
+        <a href="{{ url_for('auth.logout') }}"
+           style="font-size:13px; color:#8B2432; font-weight:600; text-decoration:none; padding:6px 14px; border:1.5px solid #8B2432; border-radius:6px; transition:all 0.2s;"
+           onmouseover="this.style.background='#8B2432';this.style.color='white';"
+           onmouseout="this.style.background='transparent';this.style.color='#8B2432';">
+          Logout
+        </a>
+      </div>
+      {% endif %}
     </div>
 
   </div>

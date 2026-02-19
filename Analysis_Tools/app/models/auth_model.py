@@ -35,8 +35,21 @@ def verify_password(password: str, hashed: str) -> bool:
 
 
 def init_users_table():
-    """Create users table if it doesn't exist."""
+    """Create users table if it doesn't exist, and migrate existing tables."""
     try:
+        # Add missing columns to existing table if they don't exist
+        migration_queries = [
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMP",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(100)",
+        ]
+        try:
+            with engine.begin() as conn:
+                for q in migration_queries:
+                    conn.execute(text(q))
+            print("[INFO] User table migration applied")
+        except Exception as me:
+            print(f"[INFO] Migration skipped (table may not exist yet): {me}")
+
         create_table_query = text(
             """
             CREATE TABLE IF NOT EXISTS users (
@@ -45,9 +58,10 @@ def init_users_table():
                 password_hash VARCHAR(255) NOT NULL,
                 role VARCHAR(20) DEFAULT 'user',
                 full_name VARCHAR(100),
-                email VARCHAR(100),
+                email VARCHAR(100) UNIQUE,
                 is_active BOOLEAN DEFAULT TRUE,
                 verification_code VARCHAR(6),
+                verification_code_expires_at TIMESTAMP,
                 is_verified BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_login TIMESTAMP
@@ -113,7 +127,7 @@ def create_default_admin():
 
 
 def validate_user(username: str, password: str) -> bool:
-    """Validate user credentials against database."""
+    """Validate user credentials against database. Accepts username OR email."""
     if not username or not password:
         return False
 
@@ -122,7 +136,7 @@ def validate_user(username: str, password: str) -> bool:
             """
             SELECT password_hash, is_active, role, is_verified
             FROM users
-            WHERE username = :username
+            WHERE username = :username OR email = :username
         """
         )
 
@@ -195,6 +209,23 @@ def get_user(username: str) -> Optional[dict]:
         return None
 
 
+def get_username_by_login(login: str) -> Optional[str]:
+    """Given a username or email, return the actual username."""
+    try:
+        query = text("""
+            SELECT username FROM users
+            WHERE username = :login OR email = :login
+            LIMIT 1
+        """)
+        with engine.connect() as conn:
+            result = conn.execute(query, {"login": login})
+            row = result.fetchone()
+            return row[0] if row else None
+    except Exception as e:
+        print(f"[ERROR] get_username_by_login: {e}")
+        return None
+
+
 def get_user_display_name(username: str) -> Optional[str]:
     """Get user's display name (full_name or username)."""
     user = get_user(username)
@@ -212,29 +243,43 @@ def create_user(
     verification_code: str = None,
 ) -> Tuple[bool, str]:
     """Create a new user. Returns (success, message)."""
+    from datetime import datetime, timedelta
     try:
-        # Check if user exists
+        # Check if username exists
         if get_user(username):
             return False, "Username already exists"
 
+        # Check if email already registered
+        if email:
+            with engine.connect() as conn:
+                result = conn.execute(
+                    text("SELECT id FROM users WHERE email = :email"),
+                    {"email": email}
+                )
+                if result.fetchone():
+                    return False, "Email address is already registered"
+
         # Hash password
         password_hash = hash_password(password)
+
+        # OTP expires in 10 minutes
+        otp_expiry = datetime.utcnow() + timedelta(minutes=10) if verification_code else None
 
         # Insert user
         insert_query = text(
             """
             INSERT INTO users (
                 username, password_hash, role, full_name, email,
-                is_active, verification_code, is_verified
+                is_active, verification_code, verification_code_expires_at, is_verified
             )
             VALUES (
                 :username, :password_hash, :role, :full_name, :email,
-                :is_active, :verification_code, :is_verified
+                :is_active, :verification_code, :otp_expiry, :is_verified
             )
         """
         )
 
-        # Auto-verify admin or if no code provided (legacy support)
+        # Auto-verify admin only
         is_verified = role == "admin"
 
         with engine.begin() as conn:
@@ -248,6 +293,7 @@ def create_user(
                     "email": email,
                     "is_active": True,
                     "verification_code": verification_code,
+                    "otp_expiry": otp_expiry,
                     "is_verified": is_verified,
                 },
             )
@@ -280,13 +326,13 @@ def update_user_password(username: str, new_password: str) -> bool:
 
 
 def verify_user_email(username: str, code: str) -> Tuple[bool, str]:
-    """Verify user email with code."""
+    """Verify user email with code, checking expiry."""
+    from datetime import datetime
     try:
-        # Get user and update in single transaction
         with engine.begin() as conn:
             query = text(
                 """
-                SELECT verification_code, is_verified
+                SELECT verification_code, verification_code_expires_at, is_verified
                 FROM users
                 WHERE username = :username
             """
@@ -297,19 +343,25 @@ def verify_user_email(username: str, code: str) -> Tuple[bool, str]:
             if not row:
                 return False, "User not found"
 
-            stored_code, is_verified = row
+            stored_code, expires_at, is_verified = row
 
             if is_verified:
                 return True, "User already verified"
 
-            if str(stored_code) != str(code):
-                return False, "Invalid verification code"
+            # Check expiry
+            if expires_at and datetime.utcnow() > expires_at:
+                return False, "Verification code has expired. Please request a new one."
 
-            # Update status
+            if str(stored_code) != str(code):
+                return False, "Invalid verification code. Please check and try again."
+
+            # Mark verified
             update_query = text(
                 """
                 UPDATE users
-                SET is_verified = TRUE, verification_code = NULL
+                SET is_verified = TRUE,
+                    verification_code = NULL,
+                    verification_code_expires_at = NULL
                 WHERE username = :username
             """
             )
@@ -320,6 +372,46 @@ def verify_user_email(username: str, code: str) -> Tuple[bool, str]:
     except Exception as e:
         print(f"[ERROR] Verification failed: {e}")
         return False, f"Verification failed: {str(e)}"
+
+
+def resend_otp(username: str) -> Tuple[bool, str]:
+    """Generate a new OTP and update expiry for a user."""
+    from datetime import datetime, timedelta
+    import random
+    try:
+        with engine.begin() as conn:
+            # Check user exists and is not yet verified
+            result = conn.execute(
+                text("SELECT email, is_verified FROM users WHERE username = :username"),
+                {"username": username}
+            )
+            row = result.fetchone()
+            if not row:
+                return False, "User not found"
+            email, is_verified = row
+            if is_verified:
+                return False, "Account is already verified"
+            if not email:
+                return False, "No email on record"
+
+            # Generate new OTP
+            new_code = str(random.randint(100000, 999999))
+            new_expiry = datetime.utcnow() + timedelta(minutes=10)
+
+            conn.execute(
+                text("""
+                    UPDATE users
+                    SET verification_code = :code,
+                        verification_code_expires_at = :expiry
+                    WHERE username = :username
+                """),
+                {"code": new_code, "expiry": new_expiry, "username": username}
+            )
+
+        return True, new_code  # Caller sends the email
+    except Exception as e:
+        print(f"[ERROR] Resend OTP failed: {e}")
+        return False, str(e)
 
 
 # =============================================================

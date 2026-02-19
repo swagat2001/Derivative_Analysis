@@ -99,7 +99,7 @@ def load_sector_master(force_reload=False):
             try:
                 # Read CSV
                 df = pd.read_csv(path, encoding="utf-8-sig")
-                df.columns = df.columns.str.strip().upper()
+                df.columns = df.columns.str.strip().str.upper()
 
                 # Identify Columns
                 symbol_col = next((c for c in df.columns if c in ["SYMBOL", "TICKER"]), df.columns[0])
