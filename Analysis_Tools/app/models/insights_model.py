@@ -881,6 +881,12 @@ def get_fii_dii_summary(start_date: str, end_date: str):
             "days_count": 0,
         }
 
+    # IMPORTANT FIX: Only use the single most recent day's data (first row in descending order)
+    # instead of summing all 5 fallback days.
+    # Fallback fetches 5 days to ensure we get at least 1 day over weekends/holidays,
+    # but we only want to show the latest single day's values on the homepage.
+    data = [data[0]]
+
     total_fii_buy = sum(d["fii_buy_value"] for d in data)
     total_fii_sell = sum(d["fii_sell_value"] for d in data)
     total_fii_net = sum(d["fii_net_value"] for d in data)

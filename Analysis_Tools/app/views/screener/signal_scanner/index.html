@@ -122,7 +122,7 @@
     /* ===== SUMMARY CARDS ===== */
     .summary-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        grid-template-columns: repeat(11, 1fr);
         gap: 12px;
         margin-bottom: 20px;
     }
@@ -131,7 +131,7 @@
         background: white;
         border-radius: 10px;
         border: 1px solid #e5e7eb;
-        padding: 14px 12px;
+        padding: 10px 8px;
         text-align: center;
         transition: all 0.2s;
     }
@@ -143,17 +143,17 @@
     }
 
     .summary-card .value {
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 700;
         color: #1f2937;
     }
 
     .summary-card .label {
-        font-size: 10px;
+        font-size: 9px;
         color: #6b7280;
         text-transform: uppercase;
-        margin-top: 4px;
-        letter-spacing: 0.5px;
+        margin-top: 3px;
+        letter-spacing: 0.4px;
     }
 
     .summary-card.bullish .value {
@@ -561,7 +561,7 @@
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1200px) {
         .summary-grid {
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
         }
     }
 
@@ -682,8 +682,8 @@
                     Up</span></div>
             <div class="summary-card bearish"><span class="value" id="rsiDown">-</span><span class="label">RSI Cross
                     Down</span></div>
-            <div class="summary-card bullish"><span class="value" id="oversold">-</span><span
-                    class="label">Oversold</span></div>
+            <div class="summary-card bullish"><span class="value" id="oversold">-</span><span class="label">Oversold</span></div>
+            <div class="summary-card bearish"><span class="value" id="overbought">-</span><span class="label">Overbought</span></div>
         </div>
 
         <!-- Filter Tabs -->
@@ -795,6 +795,7 @@
         document.getElementById('rsiUp').textContent = (summary.rsi_cross_up || 0).toLocaleString();
         document.getElementById('rsiDown').textContent = (summary.rsi_cross_down || 0).toLocaleString();
         document.getElementById('oversold').textContent = (summary.oversold_count || 0).toLocaleString();
+        document.getElementById('overbought').textContent = (summary.overbought_count || 0).toLocaleString();
     }
 
     function renderTable(signals) {

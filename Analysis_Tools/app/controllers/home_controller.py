@@ -27,22 +27,6 @@ home_bp = Blueprint("home", __name__)
 
 def get_live_fii_dii():
     """Helper to get latest FII/DII summary (Live from Spot or DB Fallback)"""
-    # 1. Try reading from spot_data JSON
-    try:
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        spot_file = os.path.join(base_dir, "spot_data", "Data", "FiiDiiSpot.json")
-
-        if os.path.exists(spot_file):
-            with open(spot_file, "r") as f:
-                data = json.load(f)
-                return {
-                    "fii_net": data.get("fii_net", 0),
-                    "dii_net": data.get("dii_net", 0),
-                    "date": data.get("date", datetime.now().strftime("%Y-%m-%d"))
-                }
-    except Exception as e:
-        print(f"[WARNING] Read FiiDiiSpot.json failed: {e}")
-
     # 2. Fallback to Database
     try:
         end_date = datetime.now().strftime("%Y-%m-%d")
