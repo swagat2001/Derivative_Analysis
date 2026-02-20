@@ -257,6 +257,10 @@ def filter_signals(signals: list, filters: dict):
                     is_match = True
                 elif "divergence" in requested_types and any(sig in s.get('signals', []) for sig in ["Bullish Divergence", "Bearish Divergence"]):
                     is_match = True
+                elif "bull_divergence" in requested_types and "Bullish Divergence" in s.get('signals', []):
+                    is_match = True
+                elif "bear_divergence" in requested_types and "Bearish Divergence" in s.get('signals', []):
+                    is_match = True
                 elif "rsi_cross" in requested_types and any(sig in s.get('signals', []) for sig in ["RSI Cross Up", "RSI Cross Down"]):
                     is_match = True
                 elif "oversold" in requested_types and s.get("rsi_trend") == "OVERSOLD":
@@ -276,7 +280,7 @@ def filter_signals(signals: list, filters: dict):
     elif option_type == "PE":
         filtered = [s for s in filtered if s["option_type"] == "PE"]
     elif option_type == "FUT":
-        filtered = [s for s in filtered if not s["option_type"] or s["option_type"] == ""]
+        filtered = [s for s in filtered if s["option_type"] in ("", "FUT", "STF")]
 
     # Filter by symbol search
     symbol_search = filters.get("symbol", "").upper().strip()

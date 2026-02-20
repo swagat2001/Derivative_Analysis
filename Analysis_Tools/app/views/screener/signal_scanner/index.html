@@ -689,11 +689,11 @@
         <!-- Filter Tabs -->
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-tab active" data-type="all" onclick="filterByType('all')">All Signals</button>
-            <button class="filter-tab" data-type="high_volume" onclick="filterByType('high_volume')">High
-                Volume</button>
+            <button class="filter-tab" data-type="high_volume" onclick="filterByType('high_volume')">High Volume</button>
             <button class="filter-tab" data-type="oi_spike" onclick="filterByType('oi_spike')">OI Spike</button>
             <button class="filter-tab" data-type="pivot" onclick="filterByType('pivot')">Pivot Levels</button>
-            <button class="filter-tab" data-type="divergence" onclick="filterByType('divergence')">Divergence</button>
+            <button class="filter-tab" data-type="bull_divergence" onclick="filterByType('bull_divergence')">Bull Div</button>
+            <button class="filter-tab" data-type="bear_divergence" onclick="filterByType('bear_divergence')">Bear Div</button>
             <button class="filter-tab" data-type="rsi_cross" onclick="filterByType('rsi_cross')">RSI Cross</button>
             <button class="filter-tab" data-type="oversold" onclick="filterByType('oversold')">Oversold</button>
             <button class="filter-tab" data-type="overbought" onclick="filterByType('overbought')">Overbought</button>
@@ -749,35 +749,38 @@
     }
 
     function getOptionBadge(type) {
-        if (!type || type === '' || type === 'FUT') return '<span class="signal-badge fut">FUT</span>';
+        if (!type || type === 'STF') return '<span class="signal-badge fut">FUT</span>';
         if (type === 'CE') return '<span class="signal-badge ce">CE</span>';
         if (type === 'PE') return '<span class="signal-badge pe">PE</span>';
+        if (type === 'STO') return '<span class="signal-badge" style="background:#e0e7ff;color:#3730a3">OPT</span>';
         return `<span class="signal-badge fut">${type}</span>`;
     }
 
     function getSignalBadges(signal) {
         let badges = [];
+        const sigList = signal.signals || [];
 
         if (signal.high_volume) badges.push('<span class="signal-badge high-vol">High Vol</span>');
         if (signal.oi_spike) badges.push('<span class="signal-badge oi-spike">OI Spike</span>');
 
-        if (signal.pivot_signal) {
-            if (['S1', 'S2', 'S3'].includes(signal.pivot_signal)) {
-                badges.push(`<span class="signal-badge pivot-support">${signal.pivot_signal}</span>`);
-            } else {
-                badges.push(`<span class="signal-badge pivot-resist">${signal.pivot_signal}</span>`);
-            }
-        }
+        // Pivot signals from actual signals list
+        const supports = ['Near S1 Support','S1 Support','S2 Support','S3 Support','Near Pivot Point'];
+        const resists  = ['Near R1 Resistance','R1 Resistance','R2 Resistance','R3 Resistance'];
+        if (sigList.some(s => supports.includes(s))) badges.push('<span class="signal-badge pivot-support">Pivot Sup</span>');
+        if (sigList.some(s => resists.includes(s)))  badges.push('<span class="signal-badge pivot-resist">Pivot Res</span>');
 
-        if (signal.divergence === 'BULL') badges.push('<span class="signal-badge bull-div">Bull Div</span>');
-        if (signal.divergence === 'BEAR') badges.push('<span class="signal-badge bear-div">Bear Div</span>');
+        // Divergence — read directly from signals list
+        if (sigList.includes('Bullish Divergence')) badges.push('<span class="signal-badge bull-div">Bull Div</span>');
+        if (sigList.includes('Bearish Divergence')) badges.push('<span class="signal-badge bear-div">Bear Div</span>');
 
-        if (signal.rsi_cross === 'UP') badges.push('<span class="signal-badge rsi-up">RSI ↑30</span>');
-        if (signal.rsi_cross === 'DOWN') badges.push('<span class="signal-badge rsi-down">RSI ↓70</span>');
+        // RSI cross
+        if (sigList.includes('RSI Cross Up'))   badges.push('<span class="signal-badge rsi-up">RSI ↑</span>');
+        if (sigList.includes('RSI Cross Down')) badges.push('<span class="signal-badge rsi-down">RSI ↓</span>');
 
-        if (signal.rsi_trend === 'OVERSOLD') badges.push('<span class="signal-badge oversold">Oversold</span>');
+        if (signal.rsi_trend === 'OVERSOLD')   badges.push('<span class="signal-badge oversold">Oversold</span>');
         if (signal.rsi_trend === 'OVERBOUGHT') badges.push('<span class="signal-badge overbought">Overbought</span>');
 
+        if (badges.length === 0) badges.push('<span style="color:#9ca3af;font-size:11px">No Signal</span>');
         return badges.join(' ');
     }
 

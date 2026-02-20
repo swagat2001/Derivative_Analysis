@@ -253,7 +253,8 @@ def process_ticker(ticker, table_name, dates_to_process):
         q = text(f"""
             SELECT "BizDt", "FininstrmActlXpryDt", "StrkPric", "FinInstrmTp",
                    "ClsPric", "HghPric", "LwPric", "OpnPric",
-                   "OpnIntrst", "ChngInOpnIntrst", "TtlTradgVol", "UndrlygPric"
+                   "OpnIntrst", "ChngInOpnIntrst", "TtlTradgVol", "UndrlygPric",
+                   COALESCE("OptnTp", '') AS "OptnTp"
             FROM "{table_name}"
             WHERE "BizDt" >= :buffer_date
             ORDER BY "BizDt" ASC
@@ -275,11 +276,11 @@ def process_ticker(ticker, table_name, dates_to_process):
 
         # 2. Iterate through contracts (Expiry + Strike + OptionType)
         # This is much faster in memory
-        grouped = df_raw.groupby(["FininstrmActlXpryDt", "StrkPric", "FinInstrmTp"])
+        grouped = df_raw.groupby(["FininstrmActlXpryDt", "StrkPric", "FinInstrmTp", "OptnTp"])
 
         all_ticker_signals = []
 
-        for (expiry, strike, opt_type), group in grouped:
+        for (expiry, strike, opt_type, optn_tp), group in grouped:
             group = group.reset_index(drop=True)
 
             # 3. For each contract, we need to check if we have data for the requested dates
@@ -415,7 +416,7 @@ def process_ticker(ticker, table_name, dates_to_process):
                     "ticker": ticker,
                     "expiry_date": expiry,
                     "strike_price": float(strike),
-                    "option_type": opt_type,
+                    "option_type": optn_tp if optn_tp else opt_type,
                     "close_price": close,
                     "spot_price": spot,
                     "high_price": high,
