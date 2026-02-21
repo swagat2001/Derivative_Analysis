@@ -160,13 +160,13 @@
                 <div class="activity-row">
                   <span class="activity-label">FII (Net)</span>
                   <span class="activity-value {{ 'up' if fii_dii.fii_net >= 0 else 'down' }}" id="fiiNetValue">
-                    {{ '+' if fii_dii.fii_net >= 0 else '' }}₹{{ '{:,.0f}'.format(fii_dii.fii_net|abs) }} Cr
+                    ₹{{ '+' if fii_dii.fii_net >= 0 else '-' }}{{ '{:,.0f}'.format(fii_dii.fii_net|abs) }} Cr
                   </span>
                 </div>
                 <div class="activity-row">
                   <span class="activity-label">DII (Net)</span>
                   <span class="activity-value {{ 'up' if fii_dii.dii_net >= 0 else 'down' }}" id="diiNetValue">
-                    {{ '+' if fii_dii.dii_net >= 0 else '' }}₹{{ '{:,.0f}'.format(fii_dii.dii_net|abs) }} Cr
+                    ₹{{ '+' if fii_dii.dii_net >= 0 else '-' }}{{ '{:,.0f}'.format(fii_dii.dii_net|abs) }} Cr
                   </span>
                 </div>
                 <p class="insight-note">Check the money flow by FIIs and DIIs. This reveals the true strength of

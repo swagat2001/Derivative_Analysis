@@ -2,93 +2,173 @@ import subprocess
 import sys
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Reconfigure stdout for UTF-8 support (Windows console workaround)
 try:
     sys.stdout.reconfigure(encoding='utf-8')
 except AttributeError:
     pass
 
-
-def run_script(script_path, description):
+def run_script(name, script_path, args=None):
     """
-    Runs a python script as a subprocess.
+    Runs a python script as a subprocess and captures output.
     """
-    print(f"\n{'='*80}")
-    print(f"🚀 STARTING: {description}")
-    print(f"📂 Script: {script_path}")
-    print(f"{'='*80}\n")
+    if args is None:
+        args = []
 
     start_time = time.time()
 
-    # Check if file exists
     if not os.path.exists(script_path):
-        print(f"❌ ERROR: Script not found: {script_path}")
-        return False
+        return {"name": name, "success": False, "error": f"Script not found: {script_path}", "duration": 0}
+
+    command = [sys.executable, script_path] + args
+    cwd = os.path.dirname(script_path)
+
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
 
     try:
-        # Run the script
-        # check=False allows us to handle the error manually without raising exception immediately
-        result = subprocess.run([sys.executable, script_path], check=False)
+        print(f"[{name}] ⏳ Starting...")
+        process = subprocess.run(
+            command,
+            cwd=cwd,
+            capture_output=True,
+            input='\n',
+            text=True,
+            encoding='utf-8',
+            errors='replace',
+            env=env
+        )
+
         duration = time.time() - start_time
+        output_lines = process.stdout.splitlines()
 
-        if result.returncode != 0:
-            print(f"\n❌ FAILED: {description}")
-            print(f"   Exit Code: {result.returncode}")
-            return False
+        if process.returncode == 0:
+            out_str = "\n".join(output_lines).lower()
 
-        print(f"\n✅ COMPLETED: {description} (took {duration:.1f}s)")
-        return True
+            already_up_to_date_markers = [
+                "database is already up to date",
+                "no new dates found",
+                "no new bizdt dates",
+                "up to date"
+            ]
+
+            new_data_markers = [
+                "records saved",
+                "downloaded",
+                "inserted",
+                "successfully added"
+            ]
+
+            new_data_added = False
+
+            if any(marker in out_str for marker in already_up_to_date_markers):
+                new_data_added = False
+            elif any(marker in out_str for marker in new_data_markers) or "records saved: 0" not in out_str:
+
+                new_data_added = True
+
+            if "records saved: 0" in out_str:
+                 new_data_added = False
+
+            print(f"[{name}] ✅ COMPLETED in {duration:.1f}s")
+            return {"name": name, "success": True, "output": output_lines, "duration": duration, "new_data_added": new_data_added}
+        else:
+            print(f"[{name}] ❌ FAILED with exit code {process.returncode} in {duration:.1f}s")
+            return {"name": name, "success": False, "output": output_lines, "duration": duration, "error_code": process.returncode}
 
     except Exception as e:
-        print(f"\n❌ EXECUTION ERROR: {e}")
-        return False
+        duration = time.time() - start_time
+        print(f"[{name}] 🔴 EXCEPTION: {str(e)}")
+        return {"name": name, "success": False, "output": [str(e)], "duration": duration}
 
 def main():
-    # Base directory is the directory where this script is located
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
+    tasks = [
+        (
+            "F&O Database",
+            os.path.join(base_dir, "Database", "FO", "fo_update_database.py"),
+            []
+        ),
+        (
+            "Cash Database",
+            os.path.join(base_dir, "Database", "Cash", "cash_update_database.py"),
+            []
+        ),
+        (
+            "FII/DII Historical",
+            os.path.join(base_dir, "Database", "FII_DII", "fii_dii_update_database.py"),
+            ["historical"]
+        ),
+        (
+            "FII/DII Historical Cash",
+            os.path.join(base_dir, "Database", "FII_DII", "fii_dii_update_database.py"),
+            ["historical_cash"]
+        )
+    ]
+
     print("\n" + "="*80)
-    print("       🔄 MARKET DATA UNIFIED UPDATE UTILITY")
+    print("       � MARKET DATA PARALLEL UPDATE UTILITY")
     print("="*80)
     print(f"Root Directory: {base_dir}")
-    print("This utility will sequentially update:")
-    print("  1. Cash Market Data (Price + Delivery + Heatmap)")
-    print("  2. F&O Market Data (Price + OI + Greeks + Dashboard)")
-    print("  3. FII/DII Activity (Daily Flows)")
+    print("This utility will concurrently update:")
+    for task_name, _, _ in tasks:
+        print(f"  - {task_name}")
+    print("="*80 + "\n")
+
+    overall_start = time.time()
+    results = []
+
+    # Run all tasks concurrently
+    with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
+        future_to_task = {
+            executor.submit(run_script, name, path, args): name
+            for name, path, args in tasks
+        }
+
+        for future in as_completed(future_to_task):
+            task_name = future_to_task[future]
+            try:
+                result = future.result()
+                results.append(result)
+            except Exception as exc:
+                print(f"[{task_name}] generated an exception: {exc}")
+                results.append({"name": task_name, "success": False, "duration": 0})
+
+    overall_end = time.time()
+
+    # Print Summary
+    print("\n" + "="*80)
+    print(f"📊 TASK SUMMARY (Total Time: {overall_end - overall_start:.1f}s)")
     print("="*80)
 
-    # ---------------------------------------------------------
-    # 1. Cash Market Data (Base for everything)
-    # ---------------------------------------------------------
-    cash_script = os.path.join(base_dir, "Database", "Cash", "cash_update_database.py")
-    if not run_script(cash_script, "Cash Market Data Update"):
-        print("\n⚠️ CRITICAL: Cash market update failed. Stopping pipeline.")
-        print("   (Subsequent steps depend on valid cash market data)")
-        input("\nPress Enter to exit...")
-        sys.exit(1)
+    all_success = True
+    for res in sorted(results, key=lambda x: x["name"]):
+        if res.get("success"):
+            status_msg = "🆕 NEW DATA ADDED" if res.get("new_data_added") else "✅ ALREADY UP TO DATE"
+            print(f"{status_msg} - {res['name']} ({res.get('duration', 0):.1f}s)")
+        else:
+            all_success = False
+            print(f"❌ FAILED - {res['name']} ({res.get('duration', 0):.1f}s)")
+            if "error_code" in res:
+                print(f"   Exit Code: {res['error_code']}")
+            elif "error" in res:
+                print(f"   Error: {res['error']}")
 
-    # ---------------------------------------------------------
-    # 2. F&O Market Data (Derivatives)
-    # ---------------------------------------------------------
-    fo_script = os.path.join(base_dir, "Database", "FO", "fo_update_database.py")
-    if not run_script(fo_script, "F&O Market Data Update"):
-        print("\n⚠️ CRITICAL: F&O market update failed. Stopping pipeline.")
-        input("\nPress Enter to exit...")
-        sys.exit(1)
+            # Print last 5 lines of output for debugging
+            if "output" in res and res["output"]:
+                print("   Last output:")
+                for line in res["output"][-5:]:
+                    print(f"     {line}")
 
-    # ---------------------------------------------------------
-    # 3. FII/DII Data (Institutional Activity)
-    # ---------------------------------------------------------
-    fii_script = os.path.join(base_dir, "Database", "FII_DII", "fii_dii_update_database.py")
-    # This is less critical, so we might not want to hard exit, but let's stick to strict success for now
-    if not run_script(fii_script, "FII/DII Data Update"):
-        print("\n⚠️ WARNING: FII/DII update failed.")
-
-    print("\n" + "="*80)
-    print("✅✅✅ ALL UPDATES COMPLETED SUCCESSFULLY! ✅✅✅")
-    print("="*80 + "\n")
+    print("="*80)
+    if all_success:
+        print("🎉 ALL UPDATES COMPLETED SUCCESSFULLY!")
+    else:
+        print("⚠️ SOME UPDATES FAILED. Check the logs above.")
 
 if __name__ == "__main__":
     main()
+    print("\n")
     input("Press Enter to exit...")
