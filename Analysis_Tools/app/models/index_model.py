@@ -7,6 +7,7 @@ Falls back to NSE API if file not found, with hardcoded fallback if API fails.
 import json
 import os
 import time
+import re
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -14,14 +15,9 @@ import pandas as pd
 import requests
 from sqlalchemy import inspect, text
 
-from .db_config import engine
+from .db_config import engine, engine_cash
 
-# =============================================================================
-# FILE-BASED INDEX DATA (pre-fetched for instant loading)
-# =============================================================================
-# Path to pre-fetched index constituents JSON file
-# __file__ = Analysis_Tools/app/models/index_model.py
-# We need to go up 4 levels: models -> app -> Analysis_Tools -> project_root
+
 INDEX_DATA_FILE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
     "Data_scraper",
@@ -33,8 +29,31 @@ _prefetched_indices = {}
 
 
 def _load_prefetched_indices():
-    """Load index data from pre-fetched JSON file."""
+    """Load index data from database (primary) or pre-fetched JSON file (fallback)."""
     global _prefetched_indices
+
+    # 1. Try loading from Database first (most up-to-date)
+    try:
+        query = text("SELECT index_key, symbol FROM index_constituents")
+        with engine_cash.connect() as conn:
+            result = conn.execute(query).fetchall()
+            if result:
+                db_data = {}
+                for row in result:
+                    key = row[0]
+                    sym = row[1]
+                    if key not in db_data:
+                        db_data[key] = []
+                    db_data[key].append(sym)
+                _prefetched_indices = db_data
+                print(f"[INFO] Loaded {len(_prefetched_indices)} indices from database")
+                return True
+    except Exception as e:
+        import traceback
+        print(f"[DEBUG] DB constituent load failed: {e}")
+        # traceback.print_exc()
+
+    # 2. Fallback to JSON file
     if os.path.exists(INDEX_DATA_FILE):
         try:
             with open(INDEX_DATA_FILE, "r", encoding="utf-8") as f:
@@ -443,12 +462,35 @@ def fetch_index_constituents(index_key: str) -> List[str]:
     if index_key == "all":
         return None
 
-    # 1. Check pre-fetched file data first (instant)
-    if _prefetched_indices and index_key in _prefetched_indices:
-        return _prefetched_indices[index_key]
+    # Normalize index key (UPPERCASE, alphanumeric only) to match DB
+    norm_key = re.sub(r'[^A-Z0-9]', '', index_key.upper())
+
+    # 1. Check pre-fetched data (which now includes DB data)
+    if _prefetched_indices:
+        # Check both the raw key and the normalized key
+        if index_key in _prefetched_indices:
+            return _prefetched_indices[index_key]
+        if norm_key in _prefetched_indices:
+            return _prefetched_indices[norm_key]
+        # Also handle lowercase matches if any legacy JSON data exists
+        if index_key.lower() in _prefetched_indices:
+            return _prefetched_indices[index_key.lower()]
+
+    # 1.5 Try querying DB directly for this index (if not in _prefetched_indices or out of sync)
+    try:
+        query = text("SELECT symbol FROM index_constituents WHERE index_key = :key OR index_name = :raw_key")
+        with engine_cash.connect() as conn:
+            result = conn.execute(query, {"key": norm_key, "raw_key": index_key}).fetchall()
+            if result:
+                constituents = [row[0] for row in result]
+                # Update local cache for next time
+                _prefetched_indices[norm_key] = constituents
+                return constituents
+    except Exception as e:
+        print(f"[DEBUG] DB direct constituent fetch failed for {index_key}: {e}")
 
     # 2. Check in-memory cache
-    cache_key = f"index_{index_key}"
+    cache_key = f"index_{norm_key}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
@@ -508,15 +550,44 @@ def get_index_stocks(index_key: str) -> Optional[List[str]]:
     Returns:
         List of stock symbols or None for 'all'
     """
-    if index_key == "all" or index_key not in INDEX_METADATA:
+    if index_key == "all":
         return None
 
     return fetch_index_constituents(index_key)
 
 
 def get_index_list() -> List[Dict]:
-    """Return list of available indices for dropdown."""
-    return [{"key": key, "name": val["name"], "icon": val["icon"]} for key, val in INDEX_METADATA.items()]
+    """Return list of available indices for dropdown and Matrix."""
+    indices = []
+    seen = set()
+
+    # 1. Add defaults from metadata
+    for key, info in INDEX_METADATA.items():
+        indices.append({"key": key, "name": info["name"], "icon": info.get("icon", "📊")})
+        seen.add(key)
+
+    # 2. Add all dynamically fetched indices from JSON
+    if _prefetched_indices:
+        for idx_key, constituents in _prefetched_indices.items():
+            if idx_key not in seen and constituents:
+                # Basic formatting for unknown indices (e.g. "niftymidcap50" -> "NIFTY MIDCAP 50")
+                raw_name = idx_key.upper()
+                if raw_name.startswith("NIFTY"):
+                    # Check if it has ALPHA, QUALITY, etc to add spaces
+                    # For now just use the name from the DB if available or format it
+                    name = "NIFTY " + raw_name[5:]
+                    # Heuristic: Add space before keywords
+                    for kw in ["ALPHA", "QUALITY", "LOWVOLATILITY", "VALUE", "50", "100", "200", "500"]:
+                        if kw in name and f" {kw}" not in name:
+                            name = name.replace(kw, f" {kw}")
+                    name = name.replace("LOWVOLATILITY", "LOW VOLATILITY")
+                else:
+                    name = raw_name
+
+                indices.append({"key": idx_key, "name": name, "icon": "📊"})
+                seen.add(idx_key)
+
+    return indices
 
 
 def get_index_info(index_key: str) -> Dict:

@@ -75,23 +75,23 @@
 
   <!-- Table -->
   <div class="table-wrap">
-    <table id="stocksTable">
+    <table id="stocksTable" class="sortable-table">
       <thead>
         <tr>
-          <th class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /></th>
-          <th class="col-name sortable" data-sort="name">
+          <th class="col-checkbox no-sort"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /></th>
+          <th class="col-name" data-type="string">
             Name
             <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2">
               <path d="M7 15l5 5 5-5M7 9l5-5 5 5" />
             </svg>
           </th>
-          <th class="col-price sortable" data-sort="price">Price</th>
-          <th class="col-change sortable" data-sort="change">Day Change</th>
-          <th class="col-pct sortable" data-sort="change_pct">Change %</th>
-          <th class="col-volume sortable" data-sort="volume">Volume</th>
-          <th class="col-oi sortable" data-sort="oi">Open Interest</th>
-          <th class="col-iv sortable" data-sort="iv">IV %</th>
+          <th class="col-price" data-type="number">Price</th>
+          <th class="col-change" data-type="number">Day Change</th>
+          <th class="col-pct" data-type="number">Change %</th>
+          <th class="col-volume" data-type="number">Volume</th>
+          <th class="col-oi" data-type="number">Open Interest</th>
+          <th class="col-iv" data-type="number">IV %</th>
           <th class="col-signal">Signal</th>
           <th class="col-action">Action</th>
         </tr>
@@ -195,41 +195,6 @@
     window.URL.revokeObjectURL(url);
   }
 
-  // Sortable columns
-  document.querySelectorAll('.sortable').forEach(th => {
-    th.addEventListener('click', function () {
-      const sortKey = this.dataset.sort;
-      const table = document.getElementById('stocksTable');
-      const tbody = table.querySelector('tbody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-
-      // Toggle sort direction
-      const isAsc = this.classList.contains('sort-asc');
-      document.querySelectorAll('.sortable').forEach(h => {
-        h.classList.remove('sort-asc', 'sort-desc');
-      });
-      this.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
-
-      rows.sort((a, b) => {
-        let aVal, bVal;
-        const aCell = a.querySelector(`td:nth-child(${this.cellIndex + 1})`);
-        const bCell = b.querySelector(`td:nth-child(${this.cellIndex + 1})`);
-
-        if (sortKey === 'name') {
-          aVal = aCell.textContent.trim().toLowerCase();
-          bVal = bCell.textContent.trim().toLowerCase();
-          return isAsc ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
-        } else {
-          aVal = parseFloat(aCell.textContent.replace(/[₹,%,+]/g, '').replace(/,/g, '')) || 0;
-          bVal = parseFloat(bCell.textContent.replace(/[₹,%,+]/g, '').replace(/,/g, '')) || 0;
-          return isAsc ? aVal - bVal : bVal - aVal;
-        }
-      });
-
-      rows.forEach(row => tbody.appendChild(row));
-    });
-  });
-
   // Row click to navigate
   document.querySelectorAll('.stock-row').forEach(row => {
     row.addEventListener('dblclick', function () {
@@ -260,4 +225,5 @@
     });
   });
 </script>
+<script src="{{ url_for('static', filename='js/table_sort.js') }}"></script>
 {% endblock %}

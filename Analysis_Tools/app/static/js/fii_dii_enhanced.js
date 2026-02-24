@@ -181,27 +181,27 @@ function renderEquityView(container) {
 
     if (activeParticipant === 'fii') {
         tableHeaders = `
-            <th class="sortable" onclick="sortTable(0)">Date <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(1)">FII Buy (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(2)">FII Sell (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(3)">FII Net (Cr) <span class="sort-icon">↕</span></th>
+            <th>Date</th>
+            <th>FII Buy (Cr)</th>
+            <th>FII Sell (Cr)</th>
+            <th>FII Net (Cr)</th>
         `;
     } else if (activeParticipant === 'dii') {
         tableHeaders = `
-            <th class="sortable" onclick="sortTable(0)">Date <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(1)">DII Buy (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(2)">DII Sell (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(3)">DII Net (Cr) <span class="sort-icon">↕</span></th>
+            <th>Date</th>
+            <th>DII Buy (Cr)</th>
+            <th>DII Sell (Cr)</th>
+            <th>DII Net (Cr)</th>
         `;
     } else {
         tableHeaders = `
-            <th class="sortable" onclick="sortTable(0)">Date <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(1)">FII Buy (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(2)">FII Sell (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(3)">FII Net (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(4)">DII Buy (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(5)">DII Sell (Cr) <span class="sort-icon">↕</span></th>
-            <th class="sortable" onclick="sortTable(6)">DII Net (Cr) <span class="sort-icon">↕</span></th>
+            <th>Date</th>
+            <th>FII Buy (Cr)</th>
+            <th>FII Sell (Cr)</th>
+            <th>FII Net (Cr)</th>
+            <th>DII Buy (Cr)</th>
+            <th>DII Sell (Cr)</th>
+            <th>DII Net (Cr)</th>
         `;
     }
 
@@ -250,7 +250,7 @@ function renderEquityView(container) {
             <div class="card-header">
                 <span class="card-title">Detailed Activity Log (${activeParticipant.toUpperCase()})</span>
             </div>
-            <table class="card-table" id="fiiDiiDataTable">
+            <table class="card-table sortable-table" id="fiiDiiDataTable">
                 <thead>
                     <tr>${tableHeaders}</tr>
                 </thead>
@@ -259,15 +259,43 @@ function renderEquityView(container) {
         </div>
     `;
 
+    // Initialize Sorting
+    if (window.initTableSorting) {
+        setTimeout(window.initTableSorting, 50);
+    }
+
     // Render chart
     console.log('[FII/DII Enhanced] About to render chart with', aggregatedData?.length, 'data points');
     renderDualAxisChart(aggregatedData, showFii, showDii);
 }
 
 // ============================================
+// HIGHCHARTS LOAD WAITER
+// ============================================
+function waitForHighcharts(timeoutMs = 5000) {
+    return new Promise((resolve, reject) => {
+        if (typeof Highcharts !== 'undefined') {
+            resolve();
+            return;
+        }
+
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+            if (typeof Highcharts !== 'undefined') {
+                clearInterval(interval);
+                resolve();
+            } else if (Date.now() - startTime > timeoutMs) {
+                clearInterval(interval);
+                reject(new Error('Highcharts failed to load within timeout'));
+            }
+        }, 100);
+    });
+}
+
+// ============================================
 // DUAL-AXIS CHART (NET VALUE + NIFTY PRICE)
 // ============================================
-function renderDualAxisChart(data, showFii, showDii) {
+async function renderDualAxisChart(data, showFii, showDii) {
     console.log('[FII/DII Enhanced] renderDualAxisChart() called');
     console.log('[FII/DII Enhanced] Data points:', data?.length);
     console.log('[FII/DII Enhanced] showFii:', showFii, 'showDii:', showDii);
@@ -315,10 +343,11 @@ function renderDualAxisChart(data, showFii, showDii) {
     });
 
     console.log('[FII/DII Enhanced] Series configuration:', series.length, 'series');
-    console.log('[FII/DII Enhanced] Highcharts available:', typeof Highcharts !== 'undefined');
 
-    if (typeof Highcharts === 'undefined') {
-        console.error('[FII/DII Enhanced] Highcharts library not loaded!');
+    try {
+        await waitForHighcharts();
+    } catch (e) {
+        console.error('[FII/DII Enhanced]', e.message);
         document.getElementById('dynamicMainChart').innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;">Highcharts library not loaded. Please refresh the page.</div>';
         return;
     }
@@ -456,7 +485,11 @@ function renderDerivativeView(container, category) {
             </table>
         </div>
     `;
-    if (window.initTableSorting) window.initTableSorting();
+
+    // Initialize Sorting
+    if (window.initTableSorting) {
+        setTimeout(window.initTableSorting, 50);
+    }
 
     // Render appropriate chart
     if (isOptions) {
@@ -507,7 +540,7 @@ function aggregateDerivativesForChart(derivData, category, participant) {
 }
 
 // NEW: Specific Chart for Futures (Long vs Short)
-function renderFuturesChart(derivData, category, participant) {
+async function renderFuturesChart(derivData, category, participant) {
     console.log('[FII/DII Enhanced] renderFuturesChart called');
     const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
     const labels = dates.map(d => {
@@ -534,7 +567,12 @@ function renderFuturesChart(derivData, category, participant) {
 
     const hasNiftyData = niftyPrices.some(v => v !== null);
 
-    if (typeof Highcharts === 'undefined') return;
+    try {
+        await waitForHighcharts();
+    } catch (e) {
+        console.error('[FII/DII Enhanced]', e.message);
+        return;
+    }
 
     Highcharts.chart('dynamicMainChart', {
         chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' }, height: 400 },
@@ -556,7 +594,7 @@ function renderFuturesChart(derivData, category, participant) {
 }
 
 // NEW: Specific Chart for Options (Call vs Put Net OI)
-function renderOptionsChart(derivData, category, participant) {
+async function renderOptionsChart(derivData, category, participant) {
     console.log('[FII/DII Enhanced] renderOptionsChart called');
     const dates = Object.keys(derivData).sort().slice(-30);
     const labels = dates.map(d => {
@@ -588,7 +626,12 @@ function renderOptionsChart(derivData, category, participant) {
 
     const hasNiftyData = niftyPrices.some(v => v !== null);
 
-    if (typeof Highcharts === 'undefined') return;
+    try {
+        await waitForHighcharts();
+    } catch (e) {
+        console.error('[FII/DII Enhanced]', e.message);
+        return;
+    }
 
     Highcharts.chart('dynamicMainChart', {
         chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' }, height: 400 },
@@ -715,48 +758,4 @@ function updateParticipant() {
 function updateTimePeriod() {
     globalFiiDiiState.timePeriod = document.getElementById('fiiTimePeriod').value;
     renderEnhancedDashboard();
-}
-
-// ============================================
-// TABLE SORTING
-// ============================================
-let currentSortColumn = -1;
-let currentSortDirection = 'asc';
-
-function sortTable(columnIndex) {
-    const table = document.getElementById('fiiDiiDataTable');
-    const tbody = table.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-
-    if (currentSortColumn === columnIndex) {
-        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-        currentSortColumn = columnIndex;
-        currentSortDirection = 'asc';
-    }
-
-    rows.sort((a, b) => {
-        const aValue = a.querySelectorAll('td')[columnIndex].textContent.replace(/[^0-9.-]/g, '');
-        const bValue = b.querySelectorAll('td')[columnIndex].textContent.replace(/[^0-9.-]/g, '');
-
-        const aNum = parseFloat(aValue) || aValue;
-        const bNum = parseFloat(bValue) || bValue;
-
-        if (currentSortDirection === 'asc') {
-            return aNum > bNum ? 1 : -1;
-        } else {
-            return aNum < bNum ? 1 : -1;
-        }
-    });
-
-    rows.forEach(row => tbody.appendChild(row));
-
-    // Update sort icons
-    table.querySelectorAll('.sort-icon').forEach((icon, idx) => {
-        if (idx === columnIndex) {
-            icon.textContent = currentSortDirection === 'asc' ? '↑' : '↓';
-        } else {
-            icon.textContent = '↕';
-        }
-    });
 }

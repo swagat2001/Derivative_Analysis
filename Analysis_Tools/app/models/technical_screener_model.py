@@ -7,7 +7,7 @@ Database queries for Technical Screener cache data
 import pandas as pd
 from sqlalchemy import text
 
-from .db_config import engine
+from .db_config import engine_cash as engine
 
 
 def get_technical_available_dates():

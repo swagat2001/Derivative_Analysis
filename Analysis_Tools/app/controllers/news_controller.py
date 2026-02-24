@@ -203,6 +203,12 @@ def fetch_google_news_rss(query: str, max_results: int = 30) -> list:
                 if len(clean_description) > 200:
                     clean_description = clean_description[:200] + "..."
 
+                # Filter out news older than 1 year (365 days)
+                if published_at:
+                    days_old = (datetime.utcnow() - published_at).days
+                    if days_old > 365:
+                        continue
+
                 news_list.append(
                     {
                         "title": title,
@@ -217,6 +223,8 @@ def fetch_google_news_rss(query: str, max_results: int = 30) -> list:
             except Exception as e:
                 continue
 
+        # Sort news by latest date descending
+        news_list.sort(key=lambda x: x.get("published_at") or "", reverse=True)
         return news_list
 
     except Exception as e:

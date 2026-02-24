@@ -297,6 +297,10 @@ function renderTable(stocks, dataKey) {
   // Use optional chaining for safety
   const total = SCREENER_DATA[dataKey]?.stocks?.length || stocks.length;
   if (document.getElementById('totalCount')) document.getElementById('totalCount').textContent = total;
+
+  if (typeof initTableSorting === 'function') {
+    setTimeout(initTableSorting, 50);
+  }
 }
 
 /* ===== UTILS ===== */

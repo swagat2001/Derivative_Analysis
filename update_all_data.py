@@ -87,6 +87,11 @@ def main():
 
     tasks = [
         (
+            "Index True OHLC",
+            os.path.join(base_dir, "Database", "FO", "index_ohlc_scraper.py"),
+            []
+        ),
+        (
             "F&O Database",
             os.path.join(base_dir, "Database", "FO", "fo_update_database.py"),
             []
@@ -135,6 +140,14 @@ def main():
             except Exception as exc:
                 print(f"[{task_name}] generated an exception: {exc}")
                 results.append({"name": task_name, "success": False, "duration": 0})
+
+    # Run RS Matrix Precomputation Synchronously AFTER downloads finish
+    print("\n" + "="*80)
+    print("       ⏳ PRECOMPUTING RS MATRICES (CACHE)")
+    print("="*80)
+    cache_script = os.path.join(base_dir, "Database", "Cache", "precompute_rs_matrices.py")
+    res = run_script("RS Matrix Cache", cache_script, [])
+    results.append(res)
 
     overall_end = time.time()
 

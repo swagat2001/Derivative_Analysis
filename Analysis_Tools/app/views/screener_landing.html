@@ -61,17 +61,17 @@
 
       <!-- Table -->
       <div class="table-wrap">
-        <table class="detail-table" id="stocksTable">
+        <table class="detail-table sortable-table" id="stocksTable">
           <thead>
             <tr>
               <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /></th>
-              <th onclick="sortTable('name')">Name</th>
-              <th onclick="sortTable('price')">Price</th>
-              <th onclick="sortTable('change')">Day Change</th>
-              <th onclick="sortTable('change_pct')">Change %</th>
-              <th onclick="sortTable('volume')">Volume</th>
-              <th onclick="sortTable('oi')">Open Interest</th>
-              <th onclick="sortTable('iv')">IV %</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Day Change</th>
+              <th>Change %</th>
+              <th>Volume</th>
+              <th>Open Interest</th>
+              <th>IV %</th>
               <th>Signal</th>
 
             </tr>
@@ -426,17 +426,17 @@
 
 
     <div class="table-wrap">
-      <table class="detail-table" id="stocksTable">
+      <table class="detail-table sortable-table" id="stocksTable">
         <thead>
           <tr>
             <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"/></th>
-            <th onclick="sortTable('name')">Name</th>
-            <th onclick="sortTable('price')">Price</th>
-            <th onclick="sortTable('market_cap')">Market Cap (Cr)</th>
-            <th onclick="sortTable('pe')">P/E Ratio</th>
-            <th onclick="sortTable('change')">Day Change</th>
-            <th onclick="sortTable('change_pct')">Change %</th>
-            <th onclick="sortTable('volume')">Volume</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Market Cap (Cr)</th>
+            <th>P/E Ratio</th>
+            <th>Day Change</th>
+            <th>Change %</th>
+            <th>Volume</th>
             <th>Key Metric</th>
             <th>Signal</th>
 
@@ -526,6 +526,11 @@
     // Update counts
     document.getElementById('showingCount').textContent = stocks.length;
     document.getElementById('totalCount').textContent = STOCK_DATA[currentDataKey] ? STOCK_DATA[currentDataKey].stocks.length : stocks.length;
+
+    // Re-initialize sorting after dynamic content load
+    if (typeof initTableSorting === 'function') {
+      setTimeout(initTableSorting, 100);
+    }
   }
 
   /* ===== FILTER & SORT ===== */
@@ -549,20 +554,7 @@
     renderStocksTable(filtered);
   }
 
-  let sortDirection = {};
-  function sortTable(column) {
-    sortDirection[column] = !sortDirection[column];
-    const dir = sortDirection[column] ? 1 : -1;
 
-    currentStocks.sort((a, b) => {
-      if (column === 'name') {
-        return dir * a.ticker.localeCompare(b.ticker);
-      }
-      return dir * (a[column] - b[column]);
-    });
-
-    renderStocksTable(currentStocks);
-  }
 
   /* ===== UTILITY FUNCTIONS ===== */
   function toggleSelectAll() {
@@ -592,5 +584,11 @@
   /* INIT */
   // buildMenu(); // Removed as we are showing flat list only
   renderAll();
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initTableSorting === 'function') {
+      initTableSorting();
+    }
+  });
 </script>
+<script src="{{ url_for('static', filename='js/table_sort.js') }}"></script>
 {% endblock %}

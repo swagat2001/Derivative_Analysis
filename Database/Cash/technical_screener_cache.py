@@ -11,6 +11,12 @@ OPTIMIZED: Per-ticker cache check to fix partial commits.
 import os
 import sys
 
+# Reconfigure stdout for UTF-8 support (Windows console workaround)
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 # Add project root to path to allow imports from Analysis_Tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
@@ -25,7 +31,7 @@ import pandas as pd
 from sqlalchemy import create_engine, inspect, text
 
 # Database config
-from Analysis_Tools.app.models.db_config import engine
+from Analysis_Tools.app.models.db_config import engine_cash as engine
 
 
 def create_technical_screener_table():
@@ -185,12 +191,16 @@ def get_cached_keys():
         return set()
 
 
-def get_derived_tables():
-    """Get all DERIVED tables"""
-    inspector = inspect(engine)
-    tables = [t for t in inspector.get_table_names() if t.endswith("_DERIVED")]
-    return sorted(tables)
-
+def get_ticker_symbols():
+    """Get all unique symbols from the centralized table"""
+    try:
+        q = text("SELECT DISTINCT symbol FROM public.cash_eod_data ORDER BY symbol")
+        with engine.connect() as conn:
+            result = conn.execute(q).fetchall()
+            return [row[0] for row in result]
+    except Exception as e:
+        print(f"Warning reading symbols from cash_eod_data: {e}")
+        return []
 
 # Technical indicator calculations
 def calculate_rsi(close, period=14):
@@ -205,7 +215,6 @@ def calculate_rsi(close, period=14):
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
-
 def calculate_macd(close, fast=12, slow=26, signal=9):
     ema_fast = close.ewm(span=fast, adjust=False).mean()
     ema_slow = close.ewm(span=slow, adjust=False).mean()
@@ -215,10 +224,8 @@ def calculate_macd(close, fast=12, slow=26, signal=9):
     histogram = macd_line - signal_line
     return macd_line, signal_line, histogram
 
-
 def calculate_sma(close, period):
     return close.rolling(window=period, min_periods=period).mean()
-
 
 def calculate_bollinger_bands(close, period=20, std_dev=2):
     sma = close.rolling(window=period, min_periods=period).mean()
@@ -228,7 +235,6 @@ def calculate_bollinger_bands(close, period=20, std_dev=2):
     lower = sma - (rolling_std * std_dev)
     width = (upper - lower) / sma * 100
     return upper, sma, lower, width
-
 
 def calculate_adx(close, period=14):
     high = close * 1.001
@@ -249,7 +255,6 @@ def calculate_adx(close, period=14):
     dx = 100 * ((plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.inf))
     adx = dx.rolling(window=period, min_periods=period).mean()
     return adx
-
 
 def calculate_pivot_points(close):
     """
@@ -297,38 +302,33 @@ def precalculate_technical_screener_cache():
 
     # Get cached keys (Date, Ticker)
     cached_keys = get_cached_keys()
-    tables = get_derived_tables()
+    symbols = get_ticker_symbols()
 
-    if not tables:
-        print("✗ No data available")
+    if not symbols:
+        print("✗ No data available in central table")
         return
 
     print(f"📂 Cached items: {len(cached_keys)}")
-    print(f"📊 Tickers to scan: {len(tables)}")
+    print(f"📊 Tickers to scan: {len(symbols)}")
 
     min_days = 50
 
     # Process each ticker
     all_cache_rows = []
 
-    for ticker_idx, table in enumerate(tables, 1):
-        ticker = table.replace("TBL_", "").replace("_DERIVED", "")
-        print(f"\n[{ticker_idx}/{len(tables)}] {ticker}...", end=" ", flush=True)
+    for ticker_idx, ticker in enumerate(symbols, 1):
+        print(f"\n[{ticker_idx}/{len(symbols)}] {ticker}...", end=" ", flush=True)
 
         try:
-            # OPTIMIZATION: Check if this ticker has ANY missing dates first?
-            # It's hard to know *missing* dates without fetching available dates for this ticker.
-            # So we fetch "BizDt" from DB for this ticker first.
-
-            q_dates = text(f'SELECT DISTINCT "BizDt" FROM "{table}" WHERE "FinInstrmTp" = \'STF\' AND "BizDt" IS NOT NULL ORDER BY "BizDt"')
+            q_dates = text('SELECT DISTINCT trade_date FROM public.cash_eod_data WHERE symbol = :sym ORDER BY trade_date')
 
             # Using read_sql to get dates is fast
-            df_dates = pd.read_sql(q_dates, engine)
+            df_dates = pd.read_sql(q_dates, engine, params={"sym": ticker})
             if df_dates.empty:
                 print("⚠ No dates", end="")
                 continue
 
-            ticker_dates = [d.strftime("%Y-%m-%d") for d in pd.to_datetime(df_dates["BizDt"])]
+            ticker_dates = [d.strftime("%Y-%m-%d") for d in pd.to_datetime(df_dates["trade_date"])]
 
             # Filter missing
             missing_dates = [d for d in ticker_dates if (d, ticker) not in cached_keys]
@@ -337,24 +337,16 @@ def precalculate_technical_screener_cache():
                 print("✓ Up to date", end="")
                 continue
 
-            # If we have missing dates, we need to calculate indicators.
-            # Indicators require history (e.g. 200 SMA).
-            # So we typically need FULL history OR (Last cached date - 250 days) to NOW.
-
-            # For simplicity & robustness, let's fetch full history for now (it's one query per ticker).
-            # Optimization: If history is HUGE (10 years), we might want to limit.
-            # But let's assume < 3000 rows is fine.
-
             q = text(
-                f"""
-                SELECT DISTINCT "BizDt" AS date, "UndrlygPric" AS close,
-                       "OpnPric" AS open, "HghPric" AS high, "LwPric" AS low, "TtlTradgVol" AS volume
-                FROM "{table}"
-                WHERE "BizDt" IS NOT NULL AND "FinInstrmTp" = 'STF'
-                ORDER BY "BizDt"
+                """
+                SELECT trade_date AS date, close,
+                       open, high, low, volume
+                FROM public.cash_eod_data
+                WHERE symbol = :sym
+                ORDER BY trade_date
             """
             )
-            df = pd.read_sql(q, engine)
+            df = pd.read_sql(q, engine, params={"sym": ticker})
 
             if df.empty or len(df) < min_days:
                 print(f"⚠ Low data ({len(df)})", end="")

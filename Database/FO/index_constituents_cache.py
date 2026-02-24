@@ -152,13 +152,46 @@ def fetch_index_constituents_cache():
     session = _create_session()
     all_indices = {}
 
+    import urllib.parse
+    import time
+
+    print("Fetching master list of all indices...")
+    all_index_names = []
+    try:
+        r = session.get('https://www.nseindia.com/api/allIndices', timeout=10)
+        if r.status_code == 200:
+            indices_data = r.json().get('data', [])
+            all_index_names = [item['index'] for item in indices_data if 'index' in item]
+            print(f"Found {len(all_index_names)} indices dynamically from NSE.")
+        else:
+            print("Failed to fetch allIndices, falling back to priority list.")
+    except Exception as e:
+        print(f"Error fetching allIndices: {e}")
+
+    # Fallback if API fails
+    if not all_index_names:
+        # The original dictionary keys
+        all_index_names = [
+            "NIFTY 50", "NIFTY NEXT 50", "NIFTY BANK", "NIFTY IT", "NIFTY PHARMA",
+            "NIFTY AUTO", "NIFTY METAL", "NIFTY FMCG", "NIFTY ENERGY",
+            "NIFTY PSU BANK", "NIFTY FINANCIAL SERVICES"
+        ]
+
     # Fetch from NSE API
-    for index_key, url in NSE_INDEX_URLS.items():
+    for index_name in all_index_names:
+        # Format index_key for saving (lowercase, remove spaces)
+        index_key = str(index_name).lower().replace(" ", "").replace("-", "")
+
+        encoded_index = urllib.parse.quote(index_name)
+        url = f"https://www.nseindia.com/api/equity-stockIndices?index={encoded_index}"
+
         constituents = _fetch_single_index(session, index_key, url)
         if constituents:
             all_indices[index_key] = constituents
 
-    # Add Sensex (BSE - use fallback)
+        time.sleep(0.5)  # Prevent rate limiting when fetching 140 indices
+
+    # Sensex is technically BSE, so we add it manually from FALLBACK_SENSEX
     all_indices["sensex"] = FALLBACK_SENSEX
     print(f"   ✓ sensex: {len(FALLBACK_SENSEX)} stocks (BSE)")
 

@@ -109,9 +109,9 @@ class FundamentalService:
         except Exception as e:
             print(f"[ERROR] Market data load failed: {e}")
 
-        # Step 2: RSI signals from technical_screener_cache (F&O DB)
+        # Step 2: RSI signals from technical_screener_cache (Cash DB)
         try:
-            with engine.connect() as conn:
+            with engine_cash.connect() as conn:
                 latest_cache = conn.execute(
                     text("SELECT MAX(cache_date) FROM technical_screener_cache")
                 ).scalar()
@@ -201,6 +201,11 @@ class FundamentalService:
         for ticker in self._fundamentals_data:
             try:
                 stats = self.get_stock_fundamentals(ticker)
+
+                # Exclude inactive/suspended stocks with no recent price
+                if stats.get("price", 0) <= 0:
+                    continue
+
                 if criteria_func(stats):
                     results.append(stats)
             except Exception:

@@ -507,6 +507,47 @@ def upload_to_database():
             upload_count += 1
             print(f"   ✅ Processed ({len(unique_symbols)} symbols)")
 
+            # ==========================================
+            # 🚀 CENTRALIZED TABLE UPLOAD
+            # ==========================================
+            try:
+                print("   ➕ Uploading to centralized cash_eod_data table...")
+                central_df = df.copy()
+                if latest_db_date:
+                    central_df = central_df[central_df["BizDt"].astype(str) > str(latest_db_date)]
+
+                if not central_df.empty:
+                    central_df.drop_duplicates(subset=["BizDt", "SYMBOL", "SERIES"], keep="last", inplace=True)
+                    # For Cash centralized table, we prefer EQ series only
+                    eq_df = central_df[central_df["SERIES"].str.strip() == "EQ"].copy()
+
+                    if not eq_df.empty:
+                        master_df = pd.DataFrame()
+                        master_df["trade_date"] = eq_df["BizDt"]
+                        master_df["symbol"] = eq_df["SYMBOL"]
+                        master_df["open"] = pd.to_numeric(eq_df.get("OPEN_PRICE", 0), errors="coerce")
+                        master_df["high"] = pd.to_numeric(eq_df.get("HIGH_PRICE", 0), errors="coerce")
+                        master_df["low"] = pd.to_numeric(eq_df.get("LOW_PRICE", 0), errors="coerce")
+                        master_df["close"] = pd.to_numeric(eq_df.get("CLOSE_PRICE", 0), errors="coerce")
+                        master_df["prev_close"] = pd.to_numeric(eq_df.get("PREV_CLOSE", 0), errors="coerce")
+                        master_df["volume"] = pd.to_numeric(eq_df.get("TTL_TRD_QNTY", 0), errors="coerce").fillna(0).astype(int)
+                        master_df["turnover"] = pd.to_numeric(eq_df.get("TURNOVER_LACS", eq_df.get("TTL_TRD_VAL", 0)), errors="coerce")
+                        master_df["deliverable_qty"] = pd.to_numeric(eq_df.get("DELIV_QTY", 0), errors="coerce").fillna(0).astype(int)
+                        master_df["delivery_pct"] = pd.to_numeric(eq_df.get("DELIV_PER", 0), errors="coerce")
+
+                        with engine.begin() as conn:
+                            # Idempotency
+                            unique_dates = master_df["trade_date"].unique()
+                            for d in unique_dates:
+                                conn.execute(text('DELETE FROM public.cash_eod_data WHERE trade_date = :bizdt'), {"bizdt": d})
+
+                            master_df.to_sql("cash_eod_data", con=conn, if_exists="append", index=False)
+                        print(f"   ✅ Successfully added {len(master_df)} rows to cash_eod_data")
+            except Exception as e:
+                print(f"   ❌ Failed to upload to centralized table: {e}")
+
+
+
         except Exception as e:
             logger.error(f"   ❌ Error: {e}")
             import traceback
@@ -590,6 +631,24 @@ def main():
             logger.error(f"⚠️ Failed to run delivery cache update: {e}")
 
         print("=" * 80 + "\n")
+
+        # ===========================================
+        # 🚀 STEP 5: UPDATE TECHNICAL SCREENER CACHE
+        # ===========================================
+        print("\n" + "=" * 80)
+        logger.info("🚀 STEP 5: UPDATING TECHNICAL SCREENER CACHE (For Technical and Volume Screeners)")
+        print("=" * 80 + "\n")
+        try:
+            import subprocess
+
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            tech_script = os.path.join(script_dir, "technical_screener_cache.py")
+
+            logger.info(f"▶ Running: {tech_script}")
+            subprocess.run([sys.executable, tech_script], check=False)
+            logger.info("\n✅ Technical Screener Cache Update Triggered")
+        except Exception as e:
+            logger.error(f"⚠️ Failed to run technical screener cache update: {e}")
 
         return True
 

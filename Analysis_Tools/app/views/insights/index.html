@@ -1567,648 +1567,31 @@
             </div>
         </div>
 
-        <script>
-            // State Variables
-            let activeFiiSubTab = 'equity';
-            let selectedParticipant = 'both';
-            let globalFiiData = null;
-
-            function switchFiiTab(tab) {
-                // Map frontend ID to backend category key
-                const map = {
-                    'equity': 'equity',
-                    'index_futures': 'index_futures',
-                    'index_options': 'index_options',
-                    'stock_futures': 'stock_futures',
-                    'stock_options': 'stock_options',
-                    // legacy support
-                    'idxFut': 'index_futures',
-                    'idxOpt': 'index_options',
-                    'stkFut': 'stock_futures',
-                    'stkOpt': 'stock_options'
-                };
-
-                activeFiiSubTab = map[tab] || tab;
-
-                document.querySelectorAll('.fii-tab-btn').forEach(b => b.classList.remove('active'));
-
-                // Highlight button - handle mapped IDs and original IDs
-                const btnId = 'btn-' + tab;
-                const btn = document.getElementById(btnId);
-                if (btn) {
-                    btn.classList.add('active');
-                } else {
-                    // Try highlighting by the mapped value if direct match fails
-                    const alternateBtnId = 'btn-' + activeFiiSubTab;
-                    const altBtn = document.getElementById(alternateBtnId);
-                    if (altBtn) altBtn.classList.add('active');
-                }
-
-                renderFiiDiiData();
-            }
-
-
-            // FIXED: Detect Futures vs Options and render appropriately
-            function renderDerivative(container, data, category) {
-                if (!data.derivatives || !Object.keys(data.derivatives).length) {
-                    container.innerHTML = '<div class="empty-state"><p>No Derivative Data Available</p></div>';
-                    return;
-                }
-
-                // Check if Futures
-                const isFutures = (category === 'index_futures' || category === 'stock_futures');
-
-                if (isFutures) {
-                    renderFuturesTab(container, data, category);
-                } else {
-                    renderOptionsTab(container, data, category);
-                }
-            }
-
-            // NEW: Futures rendering with Long/Short OI
-            function renderFuturesTab(container, data, category) {
-                const title = category === 'index_futures' ? 'Index Futures' : 'Stock Futures';
-                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII';
-
-                container.innerHTML = `
-                <div style="margin-bottom:12px;">
-                    <span class="chart-title" style="margin:0">📊 ${title} - ${participant} Position Analysis</span>
+        <div id="rs-matrix-tab" class="tab-content {% if active_tab == 'rs-matrix' %}active{% endif %}">
+            <div class="controls-bar scanx-controls" style="margin-bottom: 16px; padding: 10px 16px;">
+                <div class="control-group">
+                    <label>Box % :</label>
+                    <select id="rsMatrixBoxPct" onchange="handleRSMatrixBoxPctChange()">
+                        <option value="0.25" selected>0.25%</option>
+                        <option value="0.5">0.5%</option>
+                        <option value="1.0">1.0%</option>
+                        <option value="2.0">2.0%</option>
+                    </select>
                 </div>
-
-                <div class="charts-grid-2">
-                     <div class="chart-card">
-                        <div class="chart-title">Long vs Short Positions</div>
-                        <div id="futuresPositionChart" style="height: 300px;"></div>
-                    </div>
-                     <div class="chart-card">
-                        <div class="chart-title">Net Position Trend</div>
-                        <div id="futuresNetChart" style="height: 300px;"></div>
-                    </div>
+                <div class="controls-spacer"></div>
+                <div style="font-size: 12px; color: #64748b; font-weight: 500;">
+                    Shows Point & Figure Relative Strength based on 2-Year Index Daily Closes
                 </div>
-
-                <div class="screener-card" style="margin-top:16px">
-                    <div class="card-header"><span class="card-title">Daily Breakdown (${participant})</span></div>
-                    <table class="card-table sortable-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Buy OI (Contracts)</th>
-                                <th>Sell OI (Contracts)</th>
-                                <th>Net OI (Contracts)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${getFuturesTableRows(data.derivatives, category, participant)}
-                        </tbody>
-                    </table>
-                </div>`;
-
-                setTimeout(() => initFuturesCharts(data.derivatives, category, participant), 0);
-            }
-
-            // NEW: Options rendering (keeps buy/sell value)
-            function renderOptionsTab(container, data, category) {
-                const title = category === 'index_options' ? 'Index Options' : 'Stock Options';
-                const participant = selectedParticipant === 'dii' ? 'DII' : 'FII';
-
-                container.innerHTML = `
-                <div style="margin-bottom:12px;">
-                    <span class="chart-title" style="margin:0">📊 ${title} Analysis (${participant})</span>
+            </div>
+            <div id="rs-matrix-container"
+                style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto;">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
                 </div>
+            </div>
+        </div>
 
-                <div class="charts-grid-2">
-                     <div class="chart-card">
-                        <div class="chart-title">Option Net OI (Contracts)</div>
-                        <div id="derivOiChart" style="height: 300px;"></div>
-                    </div>
-                     <div class="chart-card">
-                        <div class="chart-title">Net Value (Premium)</div>
-                        <div id="derivNetChart" style="height: 300px;"></div>
-                    </div>
-                </div>
 
-                <div class="screener-card" style="margin-top:16px">
-                    <div class="card-header"><span class="card-title">Detailed Logs</span></div>
-                    <table class="card-table sortable-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Call Net OI</th>
-                                <th>Put Net OI</th>
-                                <th>Net Prem (Cr)</th>
-                                <th>Sentiment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${getOptionsTableRows(data.derivatives, category, participant)}
-                        </tbody>
-                    </table>
-                </div>`;
-
-                setTimeout(() => initDerivativeCharts(data.derivatives, category, participant), 0);
-            }
-
-            // NEW: Futures table - shows Long/Short contracts
-            function getFuturesTableRows(derivData, category, participant) {
-                const dates = Object.keys(derivData).sort().reverse();
-                let rows = '';
-
-                console.log('[DEBUG] getFuturesTableRows called:', { category, participant });
-                console.log('[DEBUG] Available data:', derivData);
-
-                dates.forEach(date => {
-                    // LOG what's in this date
-                    console.log(`[DEBUG] Date ${date} data:`, derivData[date]);
-
-                    // Try FLEXIBLE matching (case-insensitive, handle spaces)
-                    const item = derivData[date].find(x => {
-                        const catMatch = x.category && x.category.toLowerCase().replace(/[_\s]/g, '') === category.toLowerCase().replace(/[_\s]/g, '');
-                        const partMatch = x.participant_type === participant;
-                        console.log(`[DEBUG] Checking:`, x.category, '===', category, '?', catMatch, '&& part:', partMatch);
-                        return catMatch && partMatch;
-                    });
-
-                    if (item) {
-                        console.log('[DEBUG] MATCHED ITEM:', item);
-                    } else {
-                        console.log('[DEBUG] NO MATCH for', category, participant, 'in date', date);
-                    }
-
-                    if (item) {
-                        const long_oi = item.oi_long || 0;
-                        const short_oi = item.oi_short || 0;
-                        const net_oi = long_oi - short_oi;
-                        const position = net_oi > 0 ? 'Bullish' : net_oi < 0 ? 'Bearish' : 'Neutral';
-                        const posClass = net_oi > 0 ? 'positive' : net_oi < 0 ? 'negative' : '';
-
-                        rows += `
-                        <tr>
-                            <td>${date}</td>
-                            <td>${formatNumber(long_oi)}</td>
-                            <td>${formatNumber(short_oi)}</td>
-                            <td class="${posClass}" style="font-weight:700">
-                                ${net_oi >= 0 ? '+' : ''}${formatNumber(net_oi)}
-                            </td>
-                        </tr>`;
-                    }
-                });
-
-                if (!rows) return '<tr><td colspan="5" style="text-align:center;">No data matching ' + category + ' for ' + participant + '</td></tr>';
-                return rows;
-            }
-
-            // Options table - shows Buy/Sell value
-            function getOptionsTableRows(derivData, category, participant) {
-                const dates = Object.keys(derivData).sort().reverse();
-                let rows = '';
-
-                // Determine sub-categories
-                const base = category.split('_')[0]; // "index" or "stock"
-                const callCat = `${base}_call_options`;
-                const putCat = `${base}_put_options`;
-
-                dates.forEach(date => {
-                    const items = derivData[date];
-                    if (!items) return;
-
-                    // Get Call Net OI
-                    const callItem = items.find(x => x.category === callCat && x.participant_type === participant);
-                    const putItem = items.find(x => x.category === putCat && x.participant_type === participant);
-                    const aggItem = items.find(x => x.category === category && x.participant_type === participant); // For Net Value
-
-                    if (callItem || putItem || aggItem) {
-                        const callNet = callItem ? (callItem.oi_long - callItem.oi_short) : 0;
-                        const putNet = putItem ? (putItem.oi_long - putItem.oi_short) : 0;
-                        const netVal = aggItem ? aggItem.net_value : 0;
-
-                        let sentiment = 'Neutral';
-                        if (callNet > putNet && callNet > 0) sentiment = 'Bullish';
-                        else if (putNet > callNet && putNet > 0) sentiment = 'Bearish';
-                        else if (callNet < 0 && putNet < 0) sentiment = 'Mixed';
-
-                        rows += `
-                        <tr>
-                            <td>${date}</td>
-                            <td class="${callNet >= 0 ? 'positive' : 'negative'}">${Intl.NumberFormat('en-IN').format(callNet)}</td>
-                            <td class="${putNet >= 0 ? 'negative' : 'positive'}">${Intl.NumberFormat('en-IN').format(putNet)}</td>
-                            <td class="${netVal >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${Intl.NumberFormat('en-IN').format(netVal)}</td>
-                            <td><span class="badge ${sentiment === 'Bullish' ? 'bg-success' : sentiment === 'Bearish' ? 'bg-danger' : 'bg-secondary'}">${sentiment}</span></td>
-                        </tr>`;
-                    }
-                });
-                if (!rows) return '<tr><td colspan="5" style="text-align:center;">No data</td></tr>';
-                return rows;
-            }
-
-            // NEW: Futures charts
-            function initFuturesCharts(derivData, category, participant) {
-                const dates = Object.keys(derivData).sort().slice(-30);
-                const labels = dates.map(d => d.split('-').slice(1).reverse().join('/'));
-
-                const longData = [];
-                const shortData = [];
-
-                dates.forEach(d => {
-                    const item = derivData[d].find(x =>
-                        x.category === category && x.participant_type === participant
-                    );
-                    longData.push(item ? (item.oi_long || 0) : 0);
-                    shortData.push(item ? (item.oi_short || 0) : 0);
-                });
-
-                const netData = longData.map((long, i) => long - shortData[i]);
-
-                const commonOptions = {
-                    chart: { backgroundColor: 'transparent' },
-                    title: { text: null },
-                    xAxis: { categories: labels },
-                    yAxis: { title: { text: 'Contracts' } },
-                    credits: { enabled: false }
-                };
-
-                // Chart 1: Stacked Area
-                Highcharts.chart('futuresPositionChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'area' },
-                    plotOptions: { area: { stacking: 'normal' } },
-                    series: [{
-                        name: 'Long OI',
-                        data: longData,
-                        color: '#22c55e'
-                    }, {
-                        name: 'Short OI',
-                        data: shortData,
-                        color: '#ef4444'
-                    }]
-                });
-
-                // Chart 2: Net Column
-                Highcharts.chart('futuresNetChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'column' },
-                    series: [{
-                        name: 'Net OI',
-                        data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' }))
-                    }]
-                });
-            }
-
-            function updateFiiParticipant() {
-                selectedParticipant = document.getElementById('fiiParticipant').value;
-                renderFiiDiiData();
-            }
-
-            async function loadFiiDii() {
-                const container = document.getElementById('fii-dii-container');
-                const days = document.getElementById('fiiDiiPeriod').value;
-                if (!globalFiiData) container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>'; // Only spinner on first load
-                try {
-                    const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
-                    const response = await fetch(`/neev/api/fii-dii?end_date=${dateParam}&days=${days}`);
-                    const data = await response.json();
-
-                    if ((!data.data || !data.data.length) && (!data.derivatives || !Object.keys(data.derivatives).length)) {
-                        container.innerHTML = '<div class="empty-state"><p>No FII/DII Data Available</p></div>';
-                        return;
-                    }
-                    globalFiiData = data;
-                    renderFiiDiiData();
-                } catch (e) {
-                    console.error(e);
-                    container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>';
-                }
-            }
-
-            function renderFiiDiiData() {
-                if (!globalFiiData) return;
-                const container = document.getElementById('fii-dii-container');
-                const data = globalFiiData;
-
-                if (activeFiiSubTab === 'equity') {
-                    renderEquity(container, data);
-                } else {
-                    renderDerivative(container, data, activeFiiSubTab);
-                }
-            }
-
-            function renderEquity(container, data) {
-                // Filter Logic
-                let showFii = (selectedParticipant === 'both' || selectedParticipant === 'fii');
-                let showDii = (selectedParticipant === 'both' || selectedParticipant === 'dii');
-                let isBoth = selectedParticipant === 'both';
-
-                const summary = data.summary;
-                const sentimentClass = summary.overall_sentiment === 'Bullish' ? 'bullish' :
-                    summary.overall_sentiment === 'Bearish' ? 'bearish' : 'neutral';
-
-                let fiiCard = `
-                            <div class="summary-stat ${summary.total_fii_net >= 0 ? 'advances' : 'declines'}" style="${showFii ? '' : 'display:none'}">
-                                <span class="stat-value">₹${formatNumber(summary.total_fii_net)} Cr</span>
-                                <span class="stat-label">FII Net</span>
-                            </div>`;
-                let diiCard = `
-                            <div class="summary-stat ${summary.total_dii_net >= 0 ? 'advances' : 'declines'}" style="${showDii ? '' : 'display:none'}">
-                                <span class="stat-value">₹${formatNumber(summary.total_dii_net)} Cr</span>
-                                <span class="stat-label">DII Net</span>
-                            </div>`;
-
-                // Table Headers & Rows Logic
-                let tableHeaders = '';
-                let tableRows = '';
-
-                if (selectedParticipant === 'fii') {
-                    tableHeaders = `
-                        <th>Date</th>
-                        <th>FII Buy Cash (Cr)</th>
-                        <th>FII Sell Cash (Cr)</th>
-                        <th>FII Net Cash (Cr)</th>
-                    `;
-                    tableRows = data.data.map(row => `
-                        <tr>
-                            <td>${row.date}</td>
-                            <td>${formatNumber(row.fii_buy_value)}</td>
-                            <td>${formatNumber(row.fii_sell_value)}</td>
-                            <td class="${row.fii_net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(row.fii_net_value)}</td>
-                        </tr>
-                    `).join('');
-                } else if (selectedParticipant === 'dii') {
-                    tableHeaders = `
-                        <th>Date</th>
-                        <th>DII Buy Cash (Cr)</th>
-                        <th>DII Sell Cash (Cr)</th>
-                        <th>DII Net Cash (Cr)</th>
-                    `;
-                    tableRows = data.data.map(row => `
-                        <tr>
-                            <td>${row.date}</td>
-                            <td>${formatNumber(row.dii_buy_value)}</td>
-                            <td>${formatNumber(row.dii_sell_value)}</td>
-                            <td class="${row.dii_net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(row.dii_net_value)}</td>
-                        </tr>
-                    `).join('');
-                } else {
-                    // Both - Keep condensed view
-                    tableHeaders = `
-                        <th>Date</th>
-                        <th>FII Net</th>
-                        <th>DII Net</th>
-                        <th>Total Net</th>
-                    `;
-                    tableRows = data.data.map(row => `
-                        <tr>
-                            <td>${row.date}</td>
-                            <td class="${row.fii_net_value >= 0 ? 'positive' : 'negative'}">${formatNumber(row.fii_net_value)}</td>
-                            <td class="${row.dii_net_value >= 0 ? 'positive' : 'negative'}">${formatNumber(row.dii_net_value)}</td>
-                            <td class="${row.total_net_value >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(row.total_net_value)}</td>
-                        </tr>
-                    `).join('');
-                }
-
-                container.innerHTML = `
-                <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <span class="chart-title" style="margin:0">🏦 Cash Market Summary</span>
-                    <span style="font-size:11px;color:#64748b;">(${summary.days_count} days)</span>
-                </div>
-
-                <!-- Market Summary Bar Removed as per user request -->
-
-                <div class="charts-grid-2">
-                     <div class="chart-card">
-                        <div class="chart-title">Daily Net Activity</div>
-                        <div id="dailyNetChart" style="height: 300px; width: 100%;"></div>
-                    </div>
-                     <div class="chart-card">
-                        <div class="chart-title">Cumulative Trend</div>
-                        <div id="cumulativeChart" style="height: 300px; width: 100%;"></div>
-                    </div>
-                </div>
-
-                <div class="screener-card" style="margin-top:16px">
-                    <div class="card-header"><span class="card-title">Detailed Logs (${selectedParticipant.toUpperCase()})</span></div>
-                    <table class="card-table sortable-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>${selectedParticipant === 'fii' ? 'FII Net (Cr)' : selectedParticipant === 'dii' ? 'DII Net (Cr)' : 'Total Net (Cr)'}</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                             ${data.data.slice().reverse().map(row => {
-                    let val = 0;
-                    if (selectedParticipant === 'fii') val = row.fii_net_value;
-                    else if (selectedParticipant === 'dii') val = row.dii_net_value;
-                    else val = row.total_net_value;
-
-                    return `
-                                    <tr>
-                                        <td>${row.date}</td>
-                                        <td class="${val >= 0 ? 'positive' : 'negative'}" style="font-weight:700">${formatNumber(val)}</td>
-                                        <td><span class="badge ${val >= 0 ? 'bg-success' : 'bg-danger'}">${val >= 0 ? 'Buy' : 'Sell'}</span></td>
-                                    </tr>
-                                `;
-                }).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
-
-                initCashCharts(data.data, showFii, showDii);
-            }
-
-
-
-
-
-            // Updated init signature
-            function initDerivativeCharts(derivData, category, participant) {
-                const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
-                const labels = dates.map(d => d.split('-')[2] + '/' + d.split('-')[1]);
-
-                const getData = (key) => dates.map(d => {
-                    const item = derivData[d].find(x => x.category === category && x.participant_type === participant);
-                    return item ? item[key] : 0;
-                });
-
-                const netData = getData('net_value');
-                const oiData = getData('oi_contracts');
-
-                const hasNetValue = participant === 'FII';
-
-                const commonOptions = {
-                    chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' } },
-                    title: { text: null },
-                    xAxis: { categories: labels, crosshair: true, labels: { style: { color: '#64748b' } } },
-                    yAxis: { gridLineColor: '#f1f5f9', title: { text: null }, labels: { style: { color: '#64748b' } } },
-                    tooltip: {
-                        shared: true,
-                        useHTML: true,
-                        headerFormat: '<div style="font-size:12px;font-weight:700;margin-bottom:5px;">{point.key}</div><table>',
-                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y}</b></td></tr>',
-                        footerFormat: '</table>',
-                    },
-                    credits: { enabled: false },
-                    legend: { enabled: false }
-                };
-
-                // Net Value Chart (Column) - Only if FII
-                if (hasNetValue) {
-                    Highcharts.chart('derivNetChart', {
-                        ...commonOptions,
-                        chart: { ...commonOptions.chart, type: 'column' },
-                        tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>₹{point.y:,.0f} Cr</b></td></tr>' },
-                        series: [{
-                            name: 'Net Value',
-                            data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
-                            borderWidth: 0
-                        }]
-                    });
-                }
-
-                // OI Chart (Line/Area)
-                Highcharts.chart('derivOiChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'area' },
-                    tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:,.0f} Contracts</b></td></tr>' },
-                    series: [{
-                        name: 'Open Interest',
-                        data: oiData,
-                        color: participant === 'FII' ? '#8b5cf6' : '#f97316', // Orange for DII to match theme
-                        fillColor: {
-                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                            stops: [[0, participant === 'FII' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(249, 115, 22, 0.2)'], [1, 'rgba(0,0,0,0)']]
-                        },
-                        marker: { radius: 3 }
-                    }]
-                });
-            }
-
-            function initCashCharts(dailyData, showFii, showDii) {
-                const labels = dailyData.map(d => d.date.split('-')[2] + '/' + d.date.split('-')[1]).reverse();
-                const fiiNet = dailyData.map(d => d.fii_net_value).reverse();
-                const diiNet = dailyData.map(d => d.dii_net_value).reverse();
-
-                // Cumulative logic (recalc based on visibility? No, cumulative is usually total trend.
-                // Scanx cumulative likely matches the filter. Let's recalc based on what is shown.)
-
-                let combinedFlow = dailyData.map(d => {
-                    let val = 0;
-                    if (showFii) val += d.fii_net_value;
-                    if (showDii) val += d.dii_net_value;
-                    return val;
-                }).reverse();
-
-                let cumVal = 0;
-                const cumData = combinedFlow.map(v => { cumVal += v; return cumVal; });
-
-                // Common Highcharts Theme Settings
-                const commonOptions = {
-                    chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' } },
-                    title: { text: null },
-                    xAxis: { categories: labels, crosshair: true, labels: { style: { color: '#64748b' } } },
-                    yAxis: { gridLineColor: '#f1f5f9', title: { text: null }, labels: { style: { color: '#64748b' } } },
-                    tooltip: { shared: true, backgroundColor: 'rgba(255, 255, 255, 0.95)', shadow: true, borderRadius: 8 },
-                    credits: { enabled: false },
-                    legend: { itemStyle: { color: '#475569', fontWeight: '500' } }
-                };
-
-                // Daily Net Activity Chart
-                const seriesData = [];
-                if (showFii) {
-                    seriesData.push({
-                        name: 'FII Net',
-                        data: fiiNet.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
-                        borderWidth: 0
-                    });
-                }
-                if (showDii) {
-                    seriesData.push({
-                        name: 'DII Net',
-                        data: diiNet.map(v => ({ y: v, color: '#f97316' })),
-                        borderWidth: 0
-                    });
-                }
-
-                Highcharts.chart('dailyNetChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'column' },
-                    series: seriesData
-                });
-
-                // Cumulative Trend Chart
-                Highcharts.chart('cumulativeChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'area' },
-                    series: [{
-                        name: 'Cumulative Flow',
-                        data: cumData,
-                        color: showFii && !showDii ? '#22c55e' : showDii && !showFii ? '#f97316' : '#3b82f6', // Blue for mix
-                        fillColor: {
-                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                            stops: [[0, showFii && !showDii ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)'], [1, 'rgba(0,0,0,0)']]
-                        },
-                        threshold: null
-                    }]
-                });
-            }
-
-            function initDerivativeCharts(derivData, category) {
-                const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
-                const labels = dates.map(d => d.split('-')[2] + '/' + d.split('-')[1]);
-
-                const getData = (key) => dates.map(d => {
-                    const item = derivData[d].find(x => x.category === category);
-                    return item ? item[key] : 0;
-                });
-
-                const netData = getData('net_value');
-                const oiData = getData('oi_contracts');
-
-                const commonOptions = {
-                    chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter, system-ui, sans-serif' } },
-                    title: { text: null },
-                    xAxis: { categories: labels, crosshair: true, labels: { style: { color: '#64748b' } } },
-                    yAxis: { gridLineColor: '#f1f5f9', title: { text: null }, labels: { style: { color: '#64748b' } } },
-                    tooltip: {
-                        shared: true,
-                        useHTML: true,
-                        headerFormat: '<div style="font-size:12px;font-weight:700;margin-bottom:5px;">{point.key}</div><table>',
-                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y}</b></td></tr>',
-                        footerFormat: '</table>',
-                    },
-                    credits: { enabled: false },
-                    legend: { enabled: false }
-                };
-
-                // Net Value Chart (Column)
-                Highcharts.chart('derivNetChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'column' },
-                    tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>₹{point.y:,.0f} Cr</b></td></tr>' },
-                    series: [{
-                        name: 'Net Value',
-                        data: netData.map(v => ({ y: v, color: v >= 0 ? '#22c55e' : '#ef4444' })),
-                        borderWidth: 0
-                    }]
-                });
-
-                // OI Chart (Line/Area)
-                Highcharts.chart('derivOiChart', {
-                    ...commonOptions,
-                    chart: { ...commonOptions.chart, type: 'area' },
-                    tooltip: { ...commonOptions.tooltip, pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:,.0f} Contracts</b></td></tr>' },
-                    series: [{
-                        name: 'Open Interest',
-                        data: oiData,
-                        color: '#8b5cf6',
-                        fillColor: {
-                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                            stops: [[0, 'rgba(139, 92, 246, 0.2)'], [1, 'rgba(139, 92, 246, 0.0)']]
-                        },
-                        marker: { radius: 3 }
-                    }]
-                });
-            }
-        </script>
 
 
         <div id="delivery-tab" class="tab-content {% if active_tab == 'delivery' %}active{% endif %}">
@@ -2269,8 +1652,8 @@
 {% endblock %}
 
 {% block page_js %}
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/highcharts-accessibility.js') }}"></script>
 <script>
     let currentDate = '{{ selected_date }}';
     if (currentDate === 'None') currentDate = '';
@@ -2327,7 +1710,7 @@
             titleText.textContent = titles[tab] || 'Market Neev';
         }
 
-        const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDii, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors };
+        const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDiiEnhanced, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors, 'rs-matrix': loadRSMatrix };
         if (loaders[tab]) loaders[tab]();
     }
 
@@ -3043,6 +2426,72 @@
         } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
     }
 
+    let currentRSMatrixIndex = null;
+
+    function handleRSMatrixBoxPctChange() {
+        if (currentRSMatrixIndex) {
+            loadStockRSMatrix(currentRSMatrixIndex);
+        } else {
+            loadRSMatrix();
+        }
+    }
+
+    async function loadRSMatrix() {
+        currentRSMatrixIndex = null;
+        document.getElementById('heatmapTitleText').innerHTML = "RS Matrix Scanner";
+        const container = document.getElementById('rs-matrix-container');
+        const boxPctSelect = document.getElementById('rsMatrixBoxPct');
+        const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
+
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/neev/api/rs-matrix?box_pct=${boxPct}`);
+            const data = await response.json();
+            if (!data.success) {
+                container.innerHTML = `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
+                return;
+            }
+            container.innerHTML = data.html;
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = '<div class="empty-state"><p>Error loading RS Matrix</p></div>';
+        }
+    }
+
+    async function loadStockRSMatrix(indexName) {
+        currentRSMatrixIndex = indexName;
+        document.getElementById('heatmapTitleText').innerHTML = `${indexName} Constituent RS Matrix`;
+        const container = document.getElementById('rs-matrix-container');
+        const boxPctSelect = document.getElementById('rsMatrixBoxPct');
+        const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
+
+        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        try {
+            const response = await fetch(`/neev/api/rs-matrix/stock?index_name=${encodeURIComponent(indexName)}&box_pct=${boxPct}`);
+            const data = await response.json();
+
+            let backButtonHtml = `<div style="margin-bottom: 15px;">
+                <button onclick="loadRSMatrix()" class="button primary" style="padding: 6px 14px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back to All Indices
+                </button>
+            </div>`;
+
+            if (!data.success) {
+                container.innerHTML = backButtonHtml + `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
+                return;
+            }
+
+            container.innerHTML = backButtonHtml + data.html;
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = `<div class="empty-state">
+                <button onclick="loadRSMatrix()" class="button primary">Back to All Indices</button>
+                <p>Error loading Stock RS Matrix</p>
+            </div>`;
+        }
+    }
+
     // Update globalFiiDiiState period when user changes selection
     function updateFiiPeriodSelection() {
         if (typeof globalFiiDiiState !== 'undefined') {
@@ -3090,6 +2539,7 @@
         else if (tabName === '52week') load52Week();
         else if (tabName === 'volume') loadVolume();
         else if (tabName === 'sectors') loadSectors();
+        else if (tabName === 'rs-matrix') loadRSMatrix();
 
         // Handle control visibility
         const heatmapControls = document.getElementById('heatmapControls');

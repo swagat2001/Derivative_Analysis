@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Activity | Admin</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -21,8 +26,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
     }
+
     .admin-header h1 {
       color: #fff;
       font-size: 20px;
@@ -31,25 +37,31 @@
       align-items: center;
       gap: 10px;
     }
+
     .header-right {
       display: flex;
       align-items: center;
       gap: 16px;
     }
+
     .last-updated {
-      color: rgba(255,255,255,0.75);
+      color: rgba(255, 255, 255, 0.75);
       font-size: 13px;
     }
+
     .btn-back {
       color: #fff;
       text-decoration: none;
       font-size: 13px;
-      border: 1.5px solid rgba(255,255,255,0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
       padding: 6px 14px;
       border-radius: 6px;
       transition: background 0.2s;
     }
-    .btn-back:hover { background: rgba(255,255,255,0.15); }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
 
     /* ── STATS CARDS ── */
     .stats-row {
@@ -57,21 +69,35 @@
       gap: 20px;
       padding: 24px 32px 0;
     }
+
     .stat-card {
       flex: 1;
       background: #fff;
       border-radius: 12px;
       padding: 20px 24px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
       display: flex;
       align-items: center;
       gap: 16px;
       border-left: 4px solid transparent;
     }
-    .stat-card.online  { border-color: #16a34a; }
-    .stat-card.total   { border-color: #8B2432; }
-    .stat-card.verified { border-color: #d97706; }
-    .stat-card.inactive { border-color: #6b7280; }
+
+    .stat-card.online {
+      border-color: #16a34a;
+    }
+
+    .stat-card.total {
+      border-color: #8B2432;
+    }
+
+    .stat-card.verified {
+      border-color: #d97706;
+    }
+
+    .stat-card.inactive {
+      border-color: #6b7280;
+    }
+
     .stat-icon {
       font-size: 28px;
       width: 48px;
@@ -81,12 +107,34 @@
       align-items: center;
       justify-content: center;
     }
-    .stat-card.online  .stat-icon { background: #dcfce7; }
-    .stat-card.total   .stat-icon { background: #fee2e2; }
-    .stat-card.verified .stat-icon { background: #fef3c7; }
-    .stat-card.inactive .stat-icon { background: #f3f4f6; }
-    .stat-value { font-size: 32px; font-weight: 800; line-height: 1; }
-    .stat-label { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+    .stat-card.online .stat-icon {
+      background: #dcfce7;
+    }
+
+    .stat-card.total .stat-icon {
+      background: #fee2e2;
+    }
+
+    .stat-card.verified .stat-icon {
+      background: #fef3c7;
+    }
+
+    .stat-card.inactive .stat-icon {
+      background: #f3f4f6;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
 
     /* ── FILTER BAR ── */
     .filter-bar {
@@ -96,6 +144,7 @@
       gap: 12px;
       flex-wrap: wrap;
     }
+
     .search-box {
       flex: 1;
       min-width: 220px;
@@ -106,7 +155,11 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .search-box:focus { border-color: #8B2432; }
+
+    .search-box:focus {
+      border-color: #8B2432;
+    }
+
     .filter-btn {
       padding: 9px 16px;
       border: 1.5px solid #e5e7eb;
@@ -117,7 +170,9 @@
       transition: all 0.2s;
       font-weight: 500;
     }
-    .filter-btn.active, .filter-btn:hover {
+
+    .filter-btn.active,
+    .filter-btn:hover {
       background: #8B2432;
       color: #fff;
       border-color: #8B2432;
@@ -127,20 +182,24 @@
     .table-wrapper {
       padding: 20px 32px 32px;
     }
+
     .table-card {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
       overflow: hidden;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
     }
+
     thead {
       background: #f8fafc;
       border-bottom: 2px solid #e5e7eb;
     }
+
     th {
       padding: 13px 16px;
       text-align: left;
@@ -150,14 +209,21 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     td {
       padding: 14px 16px;
       font-size: 14px;
       border-bottom: 1px solid #f3f4f6;
       vertical-align: middle;
     }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafafa; }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #fafafa;
+    }
 
     /* ── STATUS BADGES ── */
     .badge {
@@ -169,14 +235,46 @@
       font-size: 12px;
       font-weight: 600;
     }
-    .badge-online  { background: #dcfce7; color: #166534; }
-    .badge-offline { background: #f3f4f6; color: #6b7280; }
-    .badge-admin   { background: #fee2e2; color: #991b1b; }
-    .badge-user    { background: #eff6ff; color: #1d4ed8; }
-    .badge-active  { background: #dcfce7; color: #166534; }
-    .badge-inactive { background: #fef3c7; color: #92400e; }
-    .badge-verified { background: #dcfce7; color: #166534; }
-    .badge-unverified { background: #fef3c7; color: #92400e; }
+
+    .badge-online {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-offline {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .badge-admin {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-user {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .badge-active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-inactive {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-verified {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-unverified {
+      background: #fef3c7;
+      color: #92400e;
+    }
 
     /* pulse dot for online */
     .pulse {
@@ -187,14 +285,28 @@
       display: inline-block;
       animation: pulse 1.5s infinite;
     }
+
     @keyframes pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(22,163,74,0.5); }
-      70%  { box-shadow: 0 0 0 6px rgba(22,163,74,0); }
-      100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5);
+      }
+
+      70% {
+        box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+      }
     }
 
     /* ── USER AVATAR ── */
-    .user-cell { display: flex; align-items: center; gap: 10px; }
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .avatar {
       width: 36px;
       height: 36px;
@@ -208,8 +320,16 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    .user-name { font-weight: 600; font-size: 14px; }
-    .user-fullname { font-size: 12px; color: #9ca3af; }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .user-fullname {
+      font-size: 12px;
+      color: #9ca3af;
+    }
 
     /* ── TOGGLE BUTTON ── */
     .toggle-btn {
@@ -222,10 +342,26 @@
       transition: all 0.2s;
       background: transparent;
     }
-    .toggle-btn.deactivate { border-color: #dc2626; color: #dc2626; }
-    .toggle-btn.deactivate:hover { background: #dc2626; color: #fff; }
-    .toggle-btn.activate { border-color: #16a34a; color: #16a34a; }
-    .toggle-btn.activate:hover { background: #16a34a; color: #fff; }
+
+    .toggle-btn.deactivate {
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+
+    .toggle-btn.deactivate:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .toggle-btn.activate {
+      border-color: #16a34a;
+      color: #16a34a;
+    }
+
+    .toggle-btn.activate:hover {
+      background: #16a34a;
+      color: #fff;
+    }
 
     /* ── LIVE INDICATOR ── */
     .live-badge {
@@ -239,6 +375,7 @@
       font-size: 12px;
       font-weight: 700;
     }
+
     .live-dot {
       width: 7px;
       height: 7px;
@@ -246,10 +383,19 @@
       border-radius: 50%;
       animation: pulse-red 1s infinite;
     }
+
     @keyframes pulse-red {
-      0%   { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
-      70%  { box-shadow: 0 0 0 5px rgba(220,38,38,0); }
-      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5);
+      }
+
+      70% {
+        box-shadow: 0 0 0 5px rgba(220, 38, 38, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
     }
 
     .empty-state {
@@ -260,6 +406,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- HEADER -->
@@ -308,7 +455,8 @@
 
   <!-- FILTER BAR -->
   <div class="filter-bar">
-    <input type="text" class="search-box" id="searchInput" placeholder="🔍  Search by name, username or email..." oninput="filterTable()">
+    <input type="text" class="search-box" id="searchInput" placeholder="🔍  Search by name, username or email..."
+      oninput="filterTable()">
     <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
     <button class="filter-btn" onclick="setFilter('online', this)">🟢 Online</button>
     <button class="filter-btn" onclick="setFilter('offline', this)">⚫ Offline</button>
@@ -334,96 +482,108 @@
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="9" class="empty-state">Loading...</td></tr>
+          <tr>
+            <td colspan="9" class="empty-state">Loading...</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-<script>
-  let allUsers = [];
-  let currentFilter = 'all';
+  <script>
+    let allUsers = [];
+    let currentFilter = 'all';
 
-  async function fetchUsers() {
-    try {
-      const res = await fetch('/admin/api/users');
-      const data = await res.json();
-      allUsers = data.users;
+    async function fetchUsers() {
+      try {
+        const res = await fetch('/admin/api/users');
+        const data = await res.json();
+        allUsers = data.users;
 
-      // Update stats
-      document.getElementById('statOnline').textContent = data.online_count;
-      document.getElementById('statTotal').textContent = data.total_count;
-      document.getElementById('statVerified').textContent = data.users.filter(u => u.is_verified).length;
-      document.getElementById('statInactive').textContent = data.users.filter(u => !u.is_active).length;
-      document.getElementById('lastUpdated').textContent = data.timestamp;
+        // Update stats
+        document.getElementById('statOnline').textContent = data.online_count;
+        document.getElementById('statTotal').textContent = data.total_count;
+        document.getElementById('statVerified').textContent = data.users.filter(u => u.is_verified).length;
+        document.getElementById('statInactive').textContent = data.users.filter(u => !u.is_active).length;
+        document.getElementById('lastUpdated').textContent = data.timestamp;
 
+        renderTable();
+      } catch (e) {
+        console.error('Failed to fetch users:', e);
+      }
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       renderTable();
-    } catch (e) {
-      console.error('Failed to fetch users:', e);
-    }
-  }
-
-  function setFilter(filter, btn) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderTable();
-  }
-
-  function filterTable() {
-    renderTable();
-  }
-
-  function renderTable() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    let users = allUsers;
-
-    // Apply filter
-    if (currentFilter === 'online')     users = users.filter(u => u.online);
-    if (currentFilter === 'offline')    users = users.filter(u => !u.online);
-    if (currentFilter === 'admin')      users = users.filter(u => u.role === 'admin');
-    if (currentFilter === 'unverified') users = users.filter(u => !u.is_verified);
-
-    // Apply search
-    if (search) {
-      users = users.filter(u =>
-        (u.username || '').toLowerCase().includes(search) ||
-        (u.full_name || '').toLowerCase().includes(search) ||
-        (u.email || '').toLowerCase().includes(search)
-      );
     }
 
-    const tbody = document.getElementById('tableBody');
-    if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No users found</td></tr>';
-      return;
-    }
+    // Initial load + auto-refresh every 10 seconds
+    fetchUsers();
+    setInterval(fetchUsers, 10000);
+  </script>
 
-    tbody.innerHTML = users.map(u => {
-      const initials = (u.full_name || u.username || '?').charAt(0).toUpperCase();
-      const onlineBadge = u.online
-        ? `<span class="badge badge-online"><span class="pulse"></span> Online</span>`
-        : `<span class="badge badge-offline">⚫ Offline</span>`;
-      const roleBadge = u.role === 'admin'
-        ? `<span class="badge badge-admin">🔴 Admin</span>`
-        : `<span class="badge badge-user">👤 User</span>`;
-      const activeBadge = u.is_active
-        ? `<span class="badge badge-active">Active</span>`
-        : `<span class="badge badge-inactive">Inactive</span>`;
-      const verifiedBadge = u.is_verified
-        ? `<span class="badge badge-verified">✓ Yes</span>`
-        : `<span class="badge badge-unverified">⚠ No</span>`;
-      const lastSeen = u.online && u.last_seen_ago !== null
-        ? `<small style="color:#16a34a">${u.last_seen_ago}s ago</small>`
-        : '';
-      const actionBtn = u.role !== 'admin'
-        ? `<button class="toggle-btn ${u.is_active ? 'deactivate' : 'activate'}"
+  <script src="{{ url_for('static', filename='js/table_sort.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof initTableSorting === 'function') {
+        initTableSorting();
+      }
+    });
+
+    // Since this table is dynamically generated, we need to re-initialize sorting after render
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      let users = allUsers;
+
+      // Apply filter
+      if (currentFilter === 'online') users = users.filter(u => u.online);
+      if (currentFilter === 'offline') users = users.filter(u => !u.online);
+      if (currentFilter === 'admin') users = users.filter(u => u.role === 'admin');
+      if (currentFilter === 'unverified') users = users.filter(u => !u.is_verified);
+
+      // Apply search
+      if (search) {
+        users = users.filter(u =>
+          (u.username || '').toLowerCase().includes(search) ||
+          (u.full_name || '').toLowerCase().includes(search) ||
+          (u.email || '').toLowerCase().includes(search)
+        );
+      }
+
+      const tbody = document.getElementById('tableBody');
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No users found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const initials = (u.full_name || u.username || '?').charAt(0).toUpperCase();
+        const onlineBadge = u.online
+          ? `<span class="badge badge-online"><span class="pulse"></span> Online</span>`
+          : `<span class="badge badge-offline">⚫ Offline</span>`;
+        const roleBadge = u.role === 'admin'
+          ? `<span class="badge badge-admin">🔴 Admin</span>`
+          : `<span class="badge badge-user">👤 User</span>`;
+        const activeBadge = u.is_active
+          ? `<span class="badge badge-active">Active</span>`
+          : `<span class="badge badge-inactive">Inactive</span>`;
+        const verifiedBadge = u.is_verified
+          ? `<span class="badge badge-verified">✓ Yes</span>`
+          : `<span class="badge badge-unverified">⚠ No</span>`;
+        const lastSeen = u.online && u.last_seen_ago !== null
+          ? `<small style="color:#16a34a">${u.last_seen_ago}s ago</small>`
+          : '';
+        const actionBtn = u.role !== 'admin'
+          ? `<button class="toggle-btn ${u.is_active ? 'deactivate' : 'activate'}"
               onclick="toggleUser('${u.username}', this)">
               ${u.is_active ? 'Deactivate' : 'Activate'}
            </button>`
-        : `<span style="color:#9ca3af; font-size:12px;">Protected</span>`;
+          : `<span style="color:#9ca3af; font-size:12px;">Protected</span>`;
 
-      return `<tr data-online="${u.online}" data-role="${u.role}" data-verified="${u.is_verified}" data-active="${u.is_active}">
+        return `<tr data-online="${u.online}" data-role="${u.role}" data-verified="${u.is_verified}" data-active="${u.is_active}">
         <td>
           <div class="user-cell">
             <div class="avatar">${initials}</div>
@@ -442,24 +602,14 @@
         <td style="color:#6b7280; font-size:13px">${u.created_at}</td>
         <td>${actionBtn}</td>
       </tr>`;
-    }).join('');
-  }
+      }).join('');
 
-  async function toggleUser(username, btn) {
-    btn.disabled = true;
-    try {
-      const res = await fetch(`/admin/api/users/${username}/toggle`, { method: 'POST' });
-      const data = await res.json();
-      if (data.success) await fetchUsers();
-    } catch(e) {
-      console.error(e);
+      // Re-initialize sorting after dynamic content load
+      if (typeof initTableSorting === 'function') {
+        setTimeout(initTableSorting, 100);
+      }
     }
-    btn.disabled = false;
-  }
-
-  // Initial load + auto-refresh every 10 seconds
-  fetchUsers();
-  setInterval(fetchUsers, 10000);
-</script>
+  </script>
 </body>
+
 </html>

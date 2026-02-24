@@ -13,7 +13,7 @@ import pandas as pd
 from sqlalchemy import inspect, text
 
 from .dashboard_model import get_available_dates
-from .db_config import engine, get_stock_list_from_excel
+from .db_config import engine, get_stock_list_from_excel, engine_cash
 
 # =============================================================
 # CACHE TABLE LOOKUP - ULTRA FAST
@@ -314,7 +314,7 @@ def get_technical_indicators_screeners(selected_date):
         """
         )
 
-        with engine.connect() as conn:
+        with engine_cash.connect() as conn:
             result = conn.execute(query, {"date": selected_date})
             rows = result.fetchall()
 
@@ -435,7 +435,7 @@ def get_all_technical_stocks(selected_date):
         """
         )
 
-        with engine.connect() as conn:
+        with engine_cash.connect() as conn:
             result = conn.execute(query, {"date": selected_date})
             rows = result.fetchall()
 

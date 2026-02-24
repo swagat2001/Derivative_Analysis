@@ -673,6 +673,19 @@ def main():
             return False
 
         try:
+            print("\n" + "=" * 80)
+            print("STEP 3B: UPDATING CENTRALIZED FO_EOD_DATA TABLE")
+            print("=" * 80 + "\n")
+            import subprocess
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            migration_script = os.path.join(os.path.dirname(os.path.dirname(script_dir)), "migrate_fo_to_centralized.py")
+            subprocess.run([sys.executable, migration_script], check=False)
+            print("✓ Centralized Table Update Triggered")
+        except Exception as e:
+            print(f"\n⚠️ Centralized FO update error: {e}")
+            print("   Continuing with pipeline...")
+
+        try:
             import screener_cache
 
             precalculate_screener_cache = screener_cache.precalculate_screener_cache
@@ -700,21 +713,6 @@ def main():
             print("\n⚠️ futures_oi_cache module not found. Skipping Step 4b.")
         except Exception as e:
             print(f"\n⚠️ Futures OI cache error: {e}")
-            print("   Continuing with pipeline...")
-
-        try:
-            import technical_screener_cache
-
-            precalculate_technical_screener_cache = technical_screener_cache.precalculate_technical_screener_cache
-            print("\n" + "=" * 80)
-            print("STEP 4c: PRE-CALCULATING TECHNICAL SCREENER CACHE (OPTIONAL)")
-            print("=" * 80 + "\n")
-            precalculate_technical_screener_cache()
-            print("✓ Technical Screener cache pre-calculated")
-        except ImportError:
-            print("\n⚠️ technical_screener_cache module not found. Skipping Step 4c.")
-        except Exception as e:
-            print(f"\n⚠️ Technical Screener cache error: {e}")
             print("   Continuing with pipeline...")
 
         try:

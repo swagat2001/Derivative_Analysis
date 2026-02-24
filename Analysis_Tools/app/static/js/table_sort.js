@@ -17,11 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
 window.initTableSorting = function () {
     const tables = document.querySelectorAll('table.sortable-table');
     tables.forEach(table => {
-        if (table.getAttribute('data-sort-initialized')) return;
-
         const headers = table.querySelectorAll('thead th');
+
         headers.forEach((th, index) => {
             if (th.classList.contains('no-sort')) return;
+
+            // Avoid adding multiple event listeners if already initialized
+            if (th.classList.contains('sortable')) return;
 
             // Add sortable class for styling
             th.classList.add('sortable');
@@ -61,15 +63,22 @@ function sortTable(table, colIndex) {
 
     // Auto-detect type from first non-empty cell if not specified
     if (!th.getAttribute('data-type')) {
-        const sampleCell = rows.find(r => {
-            const cell = r.children[colIndex];
-            return cell && cell.textContent.trim() !== '' && cell.textContent.trim() !== '-';
-        });
+        let typeFound = false;
 
-        if (sampleCell) {
-            const text = sampleCell.children[colIndex].textContent.trim();
-            if (isNumeric(text)) type = 'number';
-            else if (isDate(text)) type = 'date';
+        for (let i = 0; i < rows.length; i++) {
+            const cell = rows[i].children[colIndex];
+            if (cell && cell.textContent.trim() !== '' && cell.textContent.trim() !== '-') {
+                const text = cell.textContent.trim();
+                if (isNumeric(text)) {
+                    type = 'number';
+                    typeFound = true;
+                    break;
+                } else if (isDate(text)) {
+                    type = 'date';
+                    typeFound = true;
+                    break;
+                }
+            }
         }
     }
 
@@ -103,16 +112,36 @@ function sortTable(table, colIndex) {
 // Helpers
 function isNumeric(str) {
     if (!str) return false;
-    // Remove currency symbols, commas, percentages
-    const clean = str.replace(/[₹,%\s]/g, '');
-    return !isNaN(parseFloat(clean)) && isFinite(clean);
+
+    // If it clearly matches a date format (YYYY-MM-DD, DD-MMM-YYYY, DD/MM/YYYY), let the date parser handle it completely.
+    if (/^\d{2,4}[-/\s][a-zA-Z0-9]{2,3}[-/\s]\d{2,4}(?:\s\d{2}:\d{2}:\d{2})?$/.test(str.trim())) {
+        return false;
+    }
+
+    const cleanStr = str.replace(/,/g, '');
+    // Match standard numbers, or accounting format like (150)
+    const match = cleanStr.match(/-?\d+(?:\.\d+)?/);
+    if (!match) return false;
+
+    return true;
 }
 
 function parseNumber(str) {
-    if (!str || str === '-') return -Infinity;
-    const clean = str.replace(/[₹,%\s]/g, '');
-    const num = parseFloat(clean);
-    return isNaN(num) ? -Infinity : num;
+    if (!str || str.trim() === '-' || str.trim() === 'N/A') return -Infinity;
+
+    // Support accounting negative format: (15.5) -> -15.5
+    let isNegative = str.includes('(') && str.includes(')');
+
+    // Remove typical noise chars
+    const cleanStr = str.replace(/[,₹%\s]/g, '');
+
+    const match = cleanStr.match(/-?\d+(?:\.\d+)?/);
+    if (match) {
+        let val = parseFloat(match[0]);
+        if (isNegative && val > 0) val = -val;
+        return val;
+    }
+    return -Infinity;
 }
 
 function isDate(str) {

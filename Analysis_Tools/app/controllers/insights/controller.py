@@ -16,7 +16,7 @@ from flask_caching import Cache
 from sqlalchemy import text
 
 from ...controllers.dashboard_controller import get_live_indices
-from ...models.db_config import engine
+from ...models.db_config import engine, engine_cash
 from ...models.index_model import (
     filter_stocks_by_index,
     get_dynamic_indices,
@@ -39,6 +39,7 @@ from ...models.insights_model import (
     get_volume_breakouts,
 )
 from ...models.stock_model import get_filtered_tickers
+from ...models.pf_matrix_model import generate_rs_matrix_html, generate_stock_rs_matrix_html
 
 # Blueprint setup
 insights_bp = Blueprint("insights", __name__, url_prefix="/neev", template_folder="../../views/insights")
@@ -751,6 +752,74 @@ def api_sector_performance():
             "sectors": sector_data,
         }
     )
+
+
+# =============================================================
+# RS MATRIX API endpoint
+# =============================================================
+
+@insights_bp.route("/api/rs-matrix")
+def api_rs_matrix():
+    """API endpoint for Point & Figure RS Matrix."""
+    box_pct = request.args.get("box_pct", 0.5, type=float)
+    cache_key = f"index_{box_pct}"
+
+    try:
+        query = text("SELECT html_content FROM rs_matrix_cache WHERE cache_key = :cache_key")
+        with engine_cash.connect() as conn:
+            result = conn.execute(query, {"cache_key": cache_key}).scalar()
+
+        if result:
+            return jsonify({
+                "success": True,
+                "box_pct": box_pct,
+                "html": result
+            })
+    except Exception as e:
+        print(f"[ERROR] Cache read failed: {e}")
+
+    # Fallback to live generation if cache misses or fails
+    html_content = generate_rs_matrix_html(box_pct)
+    return jsonify({
+        "success": True,
+        "box_pct": box_pct,
+        "html": html_content
+    })
+
+@insights_bp.route("/api/rs-matrix/stock")
+def api_rs_matrix_stock():
+    """API endpoint for Stock Point & Figure RS Matrix within an Index."""
+    box_pct = request.args.get("box_pct", 0.5, type=float)
+    index_name = request.args.get("index_name", type=str)
+
+    if not index_name:
+        return jsonify({"success": False, "error": "index_name is required"})
+
+    cache_key = f"stock_{index_name}_{box_pct}"
+
+    try:
+        query = text("SELECT html_content FROM rs_matrix_cache WHERE cache_key = :cache_key")
+        with engine_cash.connect() as conn:
+            result = conn.execute(query, {"cache_key": cache_key}).scalar()
+
+        if result:
+            return jsonify({
+                "success": True,
+                "box_pct": box_pct,
+                "index_name": index_name,
+                "html": result
+            })
+    except Exception as e:
+        print(f"[ERROR] Cache read failed: {e}")
+
+    # Fallback to live generation if cache misses
+    html_content = generate_stock_rs_matrix_html(index_name, box_pct)
+    return jsonify({
+        "success": True,
+        "box_pct": box_pct,
+        "index_name": index_name,
+        "html": html_content
+    })
 
 
 # =============================================================

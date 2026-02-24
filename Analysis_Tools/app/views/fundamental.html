@@ -417,7 +417,7 @@
 
 {% block page_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
 <script id="chart-data-json" type="application/json">{{ chart_data | tojson }}</script>
 <script>
     // Price chart data (Chart.js implementation kept as is)
@@ -795,6 +795,14 @@
                 hidePopup();
             });
         });
+    });
+</script>
+<script src="{{ url_for('static', filename='js/table_sort.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof initTableSorting === 'function') {
+            initTableSorting();
+        }
     });
 </script>
 {% endblock %}
