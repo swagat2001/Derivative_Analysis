@@ -3,7 +3,7 @@
  * GOLDMINE VOICE ASSISTANT v3.0 - FULLY DYNAMIC EDITION
  * Complete voice control with 100% database-driven stock validation
  *
- * ✨ NEW in v3.0:
+ *  NEW in v3.0:
  * - Zero hardcoded stocks - all data from database
  * - Dynamic alias loading from backend API
  * - Automatic validation against available stocks
@@ -264,7 +264,7 @@ class GoldmineVoiceAssistant {
         <div class="voice-response" id="voiceResponse"></div>
 
         <div class="voice-context" id="voiceContext">
-          <span class="context-badge">📍 <span id="currentPageName">Page</span></span>
+          <span class="context-badge"> <span id="currentPageName">Page</span></span>
           <span class="stock-count-badge" id="stockCountBadge"></span>
         </div>
 
@@ -307,7 +307,7 @@ class GoldmineVoiceAssistant {
 
     const countEl = document.getElementById('stockCountBadge');
     if (countEl && this.availableStocks.length > 0) {
-      countEl.textContent = `📊 ${this.availableStocks.length} stocks`;
+      countEl.textContent = ` ${this.availableStocks.length} stocks`;
     }
   }
 
@@ -463,7 +463,7 @@ class GoldmineVoiceAssistant {
   showWelcomeBadge() {
     const badge = document.createElement('div');
     badge.className = 'voice-supported-badge';
-    badge.innerHTML = '🎤 Voice ready! Press <kbd>Space</kbd>';
+    badge.innerHTML = ' Voice ready! Press <kbd>Space</kbd>';
     document.body.appendChild(badge);
 
     setTimeout(() => badge.classList.add('show'), 500);

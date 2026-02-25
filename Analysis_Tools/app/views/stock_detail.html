@@ -4,43 +4,43 @@
 {% block content %}
 
 <!-- ============================= -->
-<!-- 🔗 Component & Page Styles -->
+<!--  Component & Page Styles -->
 <!-- ============================= -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/stock_detail.css') }}">
 
 <!-- ============================= -->
-<!-- 🌐 Universal Header -->
+<!--  Universal Header -->
 <!-- ============================= -->
 <!-- Header is already included via base.html -->
 
 <!-- ============================= -->
-<!-- 🎛️ Stock Detail Controls Bar -->
+<!--  Stock Detail Controls Bar -->
 <!-- ============================= -->
 {% include 'stock_detail/stock_detail_controls_bar.html' %}
 
 <!-- ============================= -->
-<!-- 📌 Symbol Header -->
+<!--  Symbol Header -->
 <!-- ============================= -->
 {% include 'stock_detail/stock_detail_header.html' %}
 
 <!-- ============================= -->
-<!-- 📈 Stock Detail Section -->
+<!--  Stock Detail Section -->
 <!-- ============================= -->
 <div class="stock-detail-container" data-ticker="{{ ticker }}" data-date="{{ selected_date }}">
 
   {% if data %}
 
-  <!-- 🧱 Main Grid Layout: Expiry Table + Stats (Left) | Gauges (Right) -->
+  <!--  Main Grid Layout: Expiry Table + Stats (Left) | Gauges (Right) -->
   <div class="main-grid">
 
     <!-- LEFT SIDE: Expiry Table + Stats Stacked -->
     <div class="left-side">
-      <!-- 📅 Expiry Summary Table -->
+      <!--  Expiry Summary Table -->
       <div class="card">
         {% include 'stock_detail/stock_detail_expiry.html' %}
       </div>
 
-      <!-- 📊 Stats Table -->
+      <!--  Stats Table -->
       <div class="card">
         {% include 'stock_detail/stock_detail_stats.html' %}
       </div>
@@ -54,10 +54,10 @@
     </div>
   </div>
 
-  <!-- 📈 Price Chart -->
+  <!--  Price Chart -->
   {% include 'stock_detail/stock_detail_chart.html' %}
 
-  <!-- 📘 Option Chain Table -->
+  <!--  Option Chain Table -->
   {% include 'stock_detail/stock_detail_option_chain.html' %}
 
   {% include 'stock_detail/stock_detail_oi_charts.html' %}
@@ -69,7 +69,7 @@
 </div>
 
 <!-- ============================= -->
-<!-- 📜 JavaScript -->
+<!--  JavaScript -->
 <!-- ============================= -->
 <!-- Highcharts Stock for Price Chart -->
 <script src="{{ url_for('static', filename='js/highstock.js') }}"></script>

@@ -31,10 +31,10 @@ FETCH_BALANCE_SHEET = True
 FETCH_CASHFLOW = True
 FETCH_RATIOS = True
 FETCH_SHAREHOLDING = True
-FETCH_PRICE = True
-FETCH_ANNUAL_REPORTS = True  # Links to annual report PDFs
-FETCH_CORPORATE_ANNOUNCEMENTS = True  # Company announcements from BSE
-FETCH_COMPANY_INFO = True  # Market Cap, High/Low, PE, etc.
+FETCH_PRICE = False              # Price/chart data comes from our DB, not scraped
+FETCH_ANNUAL_REPORTS = False     # Not needed for fundamental analysis page
+FETCH_CORPORATE_ANNOUNCEMENTS = False  # Not needed for fundamental analysis page
+FETCH_COMPANY_INFO = False       # Market Cap/PE/etc come from DB; scraping removed
 
 # Corporate announcements date range
 ANNOUNCEMENTS_START_DATE = datetime.date(2020, 1, 1)  # Start date for announcements

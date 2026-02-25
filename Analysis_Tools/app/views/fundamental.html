@@ -200,21 +200,8 @@
             Back to Option Chain
         </a>
 
-        <!-- No Data Warning -->
-        {% if not quarterly and not pnl and not balance_sheet %}
-        <div class="fund-alert">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                </path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <div>
-                <strong>No Fundamental Data Available for {{ symbol }}</strong>
-                <p>Fundamental data is currently available for: {{ available_stocks|join(', ') }}</p>
-            </div>
-        </div>
-        {% endif %}
+
+
 
         <!-- Hero Summary Section -->
         <section id="summary" class="fund-content-section">
@@ -234,7 +221,13 @@
                                     {% if metrics.price_change >= 0 %}+{% endif %}{{ "%.2f"|format(metrics.price_change
                                     if metrics.price_change else 0) }}%
                                 </span>
-                                <span class="fund-price-date">Latest close price</span>
+                                <span class="fund-price-date">
+                                    {% if metrics.price_date %}
+                                    as of {{ metrics.price_date }}
+                                    {% else %}
+                                    &mdash;
+                                    {% endif %}
+                                </span>
                             </div>
 
                             <div class="fund-company-meta">
@@ -243,14 +236,7 @@
                         </div>
 
                         <div class="fund-metrics-grid">
-                            <!-- Metric Cards -->
-                            {% if metrics.market_cap and metrics.market_cap > 0 %}
-                            <div class="fund-metric-row">
-                                <span class="fund-metric-label">Market Cap</span>
-                                <span class="fund-metric-value">₹{{ "{:,.0f}".format(metrics.market_cap) }} Cr</span>
-                            </div>
-                            {% endif %}
-
+                            <!-- Metric Cards: Only DB-sourced fields are shown -->
                             {% if metrics.current_price and metrics.current_price > 0 %}
                             <div class="fund-metric-row">
                                 <span class="fund-metric-label">Current Price</span>
@@ -268,45 +254,17 @@
                             </div>
                             {% endif %}
 
-                            {% if metrics.stock_pe and metrics.stock_pe > 0 %}
+                            {% if metrics.volume_display %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">Stock P/E</span>
-                                <span class="fund-metric-value">{{ "%.1f"|format(metrics.stock_pe) }}</span>
+                                <span class="fund-metric-label">Volume</span>
+                                <span class="fund-metric-value">{{ metrics.volume_display }}</span>
                             </div>
                             {% endif %}
 
-                            {% if metrics.book_value and metrics.book_value > 0 %}
+                            {% if metrics.pe_ratio and metrics.pe_ratio > 0 %}
                             <div class="fund-metric-row">
-                                <span class="fund-metric-label">Book Value</span>
-                                <span class="fund-metric-value">₹{{ "%.0f"|format(metrics.book_value) }}</span>
-                            </div>
-                            {% endif %}
-
-                            {% if metrics.dividend_yield and metrics.dividend_yield > 0 %}
-                            <div class="fund-metric-row">
-                                <span class="fund-metric-label">Dividend Yield</span>
-                                <span class="fund-metric-value">{{ "%.2f"|format(metrics.dividend_yield) }}%</span>
-                            </div>
-                            {% endif %}
-
-                            {% if metrics.roce and metrics.roce > 0 %}
-                            <div class="fund-metric-row">
-                                <span class="fund-metric-label">ROCE</span>
-                                <span class="fund-metric-value">{{ "%.2f"|format(metrics.roce * 100) }}%</span>
-                            </div>
-                            {% endif %}
-
-                            {% if metrics.roe and metrics.roe > 0 %}
-                            <div class="fund-metric-row">
-                                <span class="fund-metric-label">ROE</span>
-                                <span class="fund-metric-value">{{ "%.2f"|format(metrics.roe * 100) }}%</span>
-                            </div>
-                            {% endif %}
-
-                            {% if metrics.face_value and metrics.face_value > 0 %}
-                            <div class="fund-metric-row">
-                                <span class="fund-metric-label">Face Value</span>
-                                <span class="fund-metric-value">₹{{ "%.1f"|format(metrics.face_value) }}</span>
+                                <span class="fund-metric-label">P/E Ratio</span>
+                                <span class="fund-metric-value">{{ "%.1f"|format(metrics.pe_ratio) }}x</span>
                             </div>
                             {% endif %}
                         </div>
@@ -331,12 +289,11 @@
                                 <li><strong>52-Week Range:</strong> ₹{{ "%.0f"|format(metrics.low_52w if metrics.low_52w
                                     else 0) }} - ₹{{ "%.0f"|format(metrics.high_52w if metrics.high_52w else 0) }}</li>
                                 {% endif %}
-                                {% if metrics.market_cap and metrics.market_cap > 0 %}
-                                <li><strong>Market Capitalization:</strong> ₹{{ "{:,.0f}".format(metrics.market_cap) }}
-                                    Cr</li>
+                                {% if metrics.volume_display %}
+                                <li><strong>Volume:</strong> {{ metrics.volume_display }}</li>
                                 {% endif %}
-                                {% if metrics.stock_pe and metrics.stock_pe > 0 %}
-                                <li><strong>P/E Ratio:</strong> {{ "%.1f"|format(metrics.stock_pe) }}x</li>
+                                {% if metrics.pe_ratio and metrics.pe_ratio > 0 %}
+                                <li><strong>P/E Ratio:</strong> {{ "%.1f"|format(metrics.pe_ratio) }}x</li>
                                 {% endif %}
                             </ul>
                         </div>
@@ -453,7 +410,8 @@
         const filteredData = filterDataByPeriod(chartData, period);
         const dates = filteredData.map(d => d.date);
         const prices = filteredData.map(d => parseFloat(d.value));
-        const volumes = prices.map(() => Math.random() * 1000000 + 500000);
+        // Use real volume from DB — fallback to 0 if not provided
+        const volumes = filteredData.map(d => (d.volume !== undefined ? d.volume : 0));
 
         const checkboxes = document.querySelectorAll('.fund-chart-checkbox input[type="checkbox"]');
         const showPrice = checkboxes[0] ? checkboxes[0].checked : true;

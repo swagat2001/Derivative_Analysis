@@ -211,7 +211,7 @@ def _get_stock_detail_data_cached(
             greeks.append('"iv" AS "IV"')
         greeks_sql = ",\n                    ".join(greeks) if greeks else ""
 
-        # 🚀 OPTIMIZED: Single combined query for current + previous data (instead of 2 separate queries)
+        #  OPTIMIZED: Single combined query for current + previous data (instead of 2 separate queries)
         if use_derived:
             if prev_date:
                 # Combined query using CTE
@@ -1326,7 +1326,7 @@ def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = No
             print(f"[DEBUG] No strikes_dict built")
             return None
 
-        # ✅ Get futures expiry data (use provided or fetch)
+        #  Get futures expiry data (use provided or fetch)
         if expiry_data is None:
             expiry_data = get_stock_expiry_data(ticker, selected_date)
         futures_prices = []
@@ -1350,7 +1350,7 @@ def generate_oi_chart(ticker: str, selected_date: str, selected_expiry: str = No
             "ce_oi_chg": ce_oi_chg,
             "pe_oi_chg": pe_oi_chg,
             "underlying_price": float(underlying) if underlying else None,
-            "futures_prices": futures_prices,  # ✅ Add futures data
+            "futures_prices": futures_prices,  #  Add futures data
             "meta": {"ticker": ticker, "expiry": selected_expiry, "date": selected_date},
         }
 

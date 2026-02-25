@@ -12,7 +12,7 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
 # ============================================================================
-# 🧠 LIVE INDICES - DISABLED (SpotData.csv streaming eliminated)
+#  LIVE INDICES - DISABLED (SpotData.csv streaming eliminated)
 # ============================================================================
 # NOTE: Live data streaming has been removed from this project.
 # The SpotData.csv file and real-time index streaming are no longer used.
@@ -43,7 +43,7 @@ def get_live_indices():
 
 
 # --------------------------------------------------------------------
-# 🔍 Helper: Get stock list for search dropdown
+#  Helper: Get stock list for search dropdown
 # --------------------------------------------------------------------
 def get_stock_list():
     """Get filtered stock list for search dropdown in header"""
@@ -57,7 +57,7 @@ def get_stock_list():
 
 
 # --------------------------------------------------------------------
-# 📊 Dashboard route
+#  Dashboard route
 # --------------------------------------------------------------------
 @dashboard_bp.route("/")
 def dashboard():
@@ -126,7 +126,7 @@ def dashboard():
 
 
 # --------------------------------------------------------------------
-# 📊 Server-Side DataTables API Endpoint
+#  Server-Side DataTables API Endpoint
 # --------------------------------------------------------------------
 @dashboard_bp.route("/api/dashboard_data")
 def api_dashboard_data():
@@ -255,7 +255,7 @@ def api_dashboard_data():
 
 
 # --------------------------------------------------------------------
-# 🔁 API endpoint - Returns zeros (live streaming disabled)
+#  API endpoint - Returns zeros (live streaming disabled)
 # --------------------------------------------------------------------
 @dashboard_bp.route("/api/live_indices")
 def api_live_indices():
@@ -267,7 +267,7 @@ def api_live_indices():
 
 
 # -----------------------------------------------------------
-# 📤 Export to Excel
+#  Export to Excel
 # -----------------------------------------------------------
 @dashboard_bp.route("/export", methods=["GET"])
 def export_dashboard():
@@ -330,7 +330,7 @@ def export_dashboard():
 
 
 # --------------------------------------------------------------------
-# 🧩 Server-Sent Events (live streaming) - DISABLED
+#  Server-Sent Events (live streaming) - DISABLED
 # --------------------------------------------------------------------
 # NOTE: Live data streaming has been eliminated from this project.
 # The SSE endpoint below is commented out as SpotData.csv is no longer used.

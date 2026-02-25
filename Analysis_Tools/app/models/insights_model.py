@@ -321,7 +321,7 @@ def clear_sector_cache():
 
 
 # =============================================================
-# 1️⃣ AVAILABLE DATES FOR INSIGHTS - FROM CASH DATABASE
+# 1 AVAILABLE DATES FOR INSIGHTS - FROM CASH DATABASE
 # =============================================================
 
 
@@ -408,7 +408,7 @@ def clear_insights_cache():
 
 
 # =============================================================
-# 2️⃣ HEATMAP DATA - FROM CASH DATABASE (REAL OHLCV DATA)
+# 2 HEATMAP DATA - FROM CASH DATABASE (REAL OHLCV DATA)
 #    Like ScanX - Uses actual Cash market prices
 #    FILTERED: Shows ONLY F&O stocks (stocks with derivatives)
 # =============================================================
@@ -671,7 +671,8 @@ def get_sector_performance(selected_date: str, comparison_date: str = None):
         }
 
     # Get heatmap data
-    heatmap_data = get_heatmap_data(selected_date, comparison_date)
+    heatmap_data = get_heatmap_data(selected_date, comparison_date=comparison_date, filter_fo=False)
+
 
     # Populate with actual stock data
     if heatmap_data:
@@ -710,7 +711,7 @@ def get_sector_performance(selected_date: str, comparison_date: str = None):
 
 
 # =============================================================
-# 3️⃣ FII/DII DATA - REAL INSTITUTIONAL ACTIVITY
+# 3 FII/DII DATA - REAL INSTITUTIONAL ACTIVITY
 #    Uses fii_dii_activity table with actual FII/DII cash market data
 #    Data sourced from NSE via fii_dii_scraper.py
 # =============================================================
@@ -1136,7 +1137,7 @@ def get_nifty50_data(start_date: str, end_date: str):
 
 
 # =============================================================
-# 4️⃣ DELIVERY DATA - From Cash Database
+# 4 DELIVERY DATA - From Cash Database
 # =============================================================
 
 
@@ -1242,7 +1243,7 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0, filter_fo
 
 
 # =============================================================
-# 5️⃣ MARKET STATS
+# 5 MARKET STATS
 # =============================================================
 
 
@@ -1298,15 +1299,15 @@ def get_market_stats(selected_date: str):
 
 
 # =============================================================
-# 6️⃣ 52-WEEK HIGH/LOW ANALYSIS
+# 6 52-WEEK HIGH/LOW ANALYSIS
 # =============================================================
 
 
 @lru_cache(maxsize=32)
 def _get_52_week_data_cached(selected_date: str):
-    """Calculates 52-week High/Low for F&O stocks using CashStocks_Database."""
+    """Calculates 52-week High/Low for ALL cash-market stocks using CashStocks_Database."""
     try:
-        heatmap_data = get_heatmap_data(selected_date)
+        heatmap_data = get_heatmap_data(selected_date, filter_fo=False)
         if not heatmap_data:
             return {"near_high": [], "near_low": [], "at_high": [], "at_low": []}
 
@@ -1390,7 +1391,7 @@ def get_52_week_analysis(selected_date: str):
 
 
 # =============================================================
-# 7️⃣ VOLUME BREAKOUTS - REAL IMPLEMENTATION
+# 7 VOLUME BREAKOUTS - REAL IMPLEMENTATION
 #    Calculates actual 20-day average volume from cash database
 # =============================================================
 
@@ -1402,7 +1403,7 @@ def _get_volume_breakouts_cached(selected_date: str):
     Returns stocks where today's volume >= multiplier * avg_20d_volume.
     """
     try:
-        heatmap_data = get_heatmap_data(selected_date)
+        heatmap_data = get_heatmap_data(selected_date, filter_fo=False)
         if not heatmap_data:
             return tuple()
 
@@ -1564,7 +1565,7 @@ def get_volume_breakouts(selected_date: str, multiplier: float = 2.0):
 
 
 # =============================================================
-# 8️⃣ ENHANCED HEATMAP DATA WITH REAL HIGH/LOW/VOLUME
+# 8 ENHANCED HEATMAP DATA WITH REAL HIGH/LOW/VOLUME
 #    Fetches actual intraday data from cash database
 # =============================================================
 
@@ -1636,7 +1637,7 @@ def get_enhanced_heatmap_data(selected_date: str):
 
 
 # =============================================================
-# 9️⃣ NIFTY PE RATIO - REAL CALCULATION
+# 9 NIFTY PE RATIO - REAL CALCULATION
 #    Aggregates Market Cap and Net Profit of Nifty 50 stocks
 # =============================================================
 

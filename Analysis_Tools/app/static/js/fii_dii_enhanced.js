@@ -162,7 +162,7 @@ function renderEquityView(container) {
     if (!aggregatedData || aggregatedData.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <h3>📊 No FII/DII Data</h3>
+                <h3> No FII/DII Data</h3>
                 <p>No cash market data available for the selected period.</p>
                 <p style="color: #6b7280; margin-top: 12px;">Please check if the fii_dii_activity table has been populated.</p>
             </div>
@@ -418,7 +418,7 @@ function renderDerivativeView(container, category) {
     if (aggregatedData.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <h3>📊 No ${category.replace('_', ' ').toUpperCase()} Data</h3>
+                <h3> No ${category.replace('_', ' ').toUpperCase()} Data</h3>
                 <p>No derivatives data available for ${participant} in this category.</p>
                 <p style="color: #6b7280; margin-top: 12px;">Try selecting a different participant or check if derivatives data is populated.</p>
             </div>

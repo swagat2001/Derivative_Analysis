@@ -1,5 +1,5 @@
 /* ==========================================================
-   📊 STOCK DETAIL OI CHARTS — TradingView Layout
+    STOCK DETAIL OI CHARTS — TradingView Layout
    ========================================================== */
 
    document.addEventListener("DOMContentLoaded", function () {
@@ -10,12 +10,12 @@
     try {
       chartData = JSON.parse(container.dataset.chart || "{}");
     } catch (err) {
-      console.error("❌ Failed to parse chart data:", err);
+      console.error(" Failed to parse chart data:", err);
       return;
     }
 
     if (!chartData || !chartData.strikes) {
-      console.warn("⚠️ No chart data found or invalid structure.");
+      console.warn(" No chart data found or invalid structure.");
       return;
     }
 
@@ -69,7 +69,7 @@
     };
 
     // ==============================
-    // 🧩 Chart Block Creator
+    //  Chart Block Creator
     // ==============================
     function createChartBlock(title, legendItems, ceData, peData, maxCE, maxPE, isChangeChart = false) {
       const block = document.createElement("div");
@@ -101,7 +101,7 @@
       maxCELine.setData([maxCE]);
       maxPELine.setData([maxPE]);
 
-      // ✅ Add Underlying Price Vertical Line (DOM overlay)
+      //  Add Underlying Price Vertical Line (DOM overlay)
       let underlyingBarSeries = null; // kept for seriesMap API compatibility via wrapper
       let underlyingBarIndex = null;
       const spotColor = '#FF9800';
@@ -164,7 +164,7 @@
         }
       }
 
-      // ✅ Add Futures Expiry Vertical Lines - 3 lines
+      //  Add Futures Expiry Vertical Lines - 3 lines
       const futuresColors = ['#2196F3', '#9C27B0', '#4CAF50'];
       const futuresBarSeries = [];
       const futuresBarIndices = [];
@@ -196,7 +196,7 @@
       titleLabel.innerText = title;
       block.appendChild(titleLabel);
 
-      // ✅ Build extended legend items (original + spot + futures)
+      //  Build extended legend items (original + spot + futures)
       const extendedLegendItems = [...legendItems];
 
       // Add Spot legend item
@@ -232,7 +232,7 @@
       });
       block.appendChild(legend);
 
-      // ✅ Build series map including spot and futures bars
+      //  Build series map including spot and futures bars
       const seriesMap = {
         maxCE: maxCELine,
         maxPE: maxPELine,
@@ -279,7 +279,7 @@
         const strike = strikes[idx];
         if (strike === undefined) return;
 
-        // ✅ Get raw values directly from the chart data
+        //  Get raw values directly from the chart data
         const ceValue = isChangeChart ? chartData.ce_oi_chg[idx] : chartData.ce_oi[idx];
         const peValue = isChangeChart ? chartData.pe_oi_chg[idx] : chartData.pe_oi[idx];
 
@@ -290,12 +290,12 @@
           <span style="color:${legendItems[3].color}">${legendItems[3].label}:</span> ${formatValue(peValue || 0)}
         `;
 
-        // ✅ Check if hovering over Spot bar
+        //  Check if hovering over Spot bar
         if (underlyingBarIndex !== null && idx === underlyingBarIndex) {
           tooltipContent += `<br><span style="color:${spotColor}"><b>Spot Price:</b> ${underlyingPrice.toFixed(2)}</span>`;
         }
 
-        // ✅ Check if hovering over any Future bar
+        //  Check if hovering over any Future bar
         futuresBarIndices.forEach((futureIdx, futureArrayIdx) => {
           if (futureIdx !== null && idx === futureIdx && futuresPrices[futureArrayIdx]) {
             const future = futuresPrices[futureArrayIdx];
@@ -323,11 +323,11 @@
     }
 
     // ==============================
-    // 📊 Prepare Data
+    //  Prepare Data
     // ==============================
     const ceOI = strikes.map((s, i) => ({ time: i, value: chartData.ce_oi[i] }));
     const peOI = strikes.map((s, i) => ({ time: i, value: chartData.pe_oi[i] }));
-    // ✅ Keep negative values for OI Change (don't use absolute)
+    //  Keep negative values for OI Change (don't use absolute)
     const ceChg = strikes.map((s, i) => ({ time: i, value: chartData.ce_oi_chg[i] || 0 }));
     const peChg = strikes.map((s, i) => ({ time: i, value: chartData.pe_oi_chg[i] || 0 }));
 
@@ -353,7 +353,7 @@
     window.syncLabelEl = label;
 
     // ==============================
-    // 🟢 Create Charts
+    //  Create Charts
     // ==============================
     const oiChart = createChartBlock(
       `${ticker}-${expiry} OI`,
@@ -385,7 +385,7 @@
       true
     );
 
-    // 🔗 Sync crosshair
+    //  Sync crosshair
     oiChart.subscribeCrosshairMove((param) => {
       if (!param?.time) return;
       oiChangeChart.moveCrosshair({ x: param.point?.x || 0, y: 0 });

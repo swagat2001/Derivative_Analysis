@@ -104,7 +104,7 @@ def get_market_breadth():
             "date": datetime.now().strftime("%Y-%m-%d")
         }
 
-        logger.info(f"✅ Market Breadth via API: {result}")
+        logger.info(f" Market Breadth via API: {result}")
         return result
 
     except Exception as e:
@@ -124,5 +124,5 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = get_market_breadth()
     print("\nMarket Breadth Data:", data)
-    print("\n⚠️  NOTE: To save to database, run:")
+    print("\n  NOTE: To save to database, run:")
     print("    python Database/Cash/market_breadth_update.py")

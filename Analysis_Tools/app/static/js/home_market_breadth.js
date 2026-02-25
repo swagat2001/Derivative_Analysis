@@ -66,7 +66,7 @@ async function updateMarketBreadth() {
       const total = advances + declines;
       const timestamp = data.timestamp || '';
 
-      console.log(`[Market Breadth] ✅ Advances: ${advances}, Declines: ${declines}, Time: ${timestamp}`);
+      console.log(`[Market Breadth]  Advances: ${advances}, Declines: ${declines}, Time: ${timestamp}`);
 
       // Update the UI
       updateMarketBreadthUI(advances, declines, total, timestamp);
@@ -75,12 +75,12 @@ async function updateMarketBreadth() {
       lastUpdateTime = new Date();
 
     } else {
-      console.warn('[Market Breadth] ⚠️ API returned error:', data.error);
+      console.warn('[Market Breadth]  API returned error:', data.error);
       // Keep showing existing data, don't reset to zero
     }
 
   } catch (error) {
-    console.error('[Market Breadth] ❌ Error fetching data:', error);
+    console.error('[Market Breadth]  Error fetching data:', error);
     // Keep showing existing data, don't reset to zero
   }
 }

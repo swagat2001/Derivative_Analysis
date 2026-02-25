@@ -28,13 +28,234 @@
 
         <div class="technical-container">
 
-            {% if tech_data %}
+            {% if tech_data or breakout_data is defined %}
+
+            {% if active_filter == 'breakout' and breakout_data is defined and breakout_data %}
+            <!-- BREAKOUT SCANNER SECTION -->
+            <div id="breakout-scanner-section">
+
+                <!-- Header row with date selector -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <button onclick="showBreakoutGroup('pivot')" id="tab-pivot" class="breakout-tab-btn"
+                            style="padding: 7px 16px; border-radius: 6px; border: 1px solid #8b2432; background: #8b2432; color: white; font-size: 13px; font-weight: 600; cursor: pointer;">
+                             Pivot Breakouts
+                        </button>
+                        <button onclick="showBreakoutGroup('support')" id="tab-support" class="breakout-tab-btn"
+                            style="padding: 7px 16px; border-radius: 6px; border: 1px solid #e5e7eb; background: white; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer;">
+                             Support Breakdowns
+                        </button>
+                        <button onclick="showBreakoutGroup('timeframe')" id="tab-timeframe" class="breakout-tab-btn"
+                            style="padding: 7px 16px; border-radius: 6px; border: 1px solid #e5e7eb; background: white; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer;">
+                             Timeframe Breakouts
+                        </button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label
+                            style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT
+                            DATE:</label>
+                        <select
+                            onchange="window.location.href='/scanner/technical-indicators/?filter=breakout{% if source %}&source={{ source }}{% endif %}{% if tab %}&tab={{ tab }}{% endif %}&date='+this.value;"
+                            style="font-size: 13px; padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #1f2937; cursor: pointer;">
+                            {% for d in (breakout_data.dates or dates) %}
+                            <option value="{{ d }}" {% if d==(breakout_data.selected_date or selected_date) %}selected{%
+                                endif %}>{{ d }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ====== PIVOT GROUP ====== -->
+                <div id="grp-pivot" class="breakout-group">
+                    {% for key, title, level_key, level_label, pct_key, is_bullish in [
+                    ('r1', 'R1 Resistance Breakouts', 'r1', 'R1 Level', 'breakout_pct', true),
+                    ('r2', 'R2 Resistance Breakouts', 'r2', 'R2 Level', 'breakout_pct', true),
+                    ('r3', 'R3 Resistance Breakouts', 'r3', 'R3 Level', 'breakout_pct', true)
+                    ] %}
+                    <section class="screener-section">
+                                                <div class="screener-card">
+
+                            <div class="card-header" style="display: flex; align-items: center; gap: 12px;">
+
+                                <div class="card-title">{{ title }}</div>
+
+                                <span style="background: #8b2432; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">{{ breakout_data[key]|length }} Stocks</span>
+
+                            </div>
+
+                            <table class="card-table sortable-table">
+
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Stock</th>
+                                        <th>Price</th>
+                                        <th>{{ level_label }}</th>
+                                        <th>{{ 'Breakout' if is_bullish else 'Breakdown' }} %</th>
+                                        <th>RSI</th>
+                                        <th>ADX</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in breakout_data[key] %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                        </td>
+                                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                        <td>₹{{ "%.2f"|format(item[level_key]) if item[level_key] else 'N/A' }}</td>
+                                        <td><span
+                                                style="display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#d1fae5;color:#065f46;">+{{
+                                                "%.2f"|format(item[pct_key]) if item[pct_key] else 'N/A' }}%</span></td>
+                                        <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
+                                        <td>{{ "%.1f"|format(item.adx_14) if item.adx_14 else 'N/A' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" style="text-align:center;padding:20px;color:#6b7280;">No {{
+                                            title }} found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    {% endfor %}
+                </div>
+
+                <!-- ====== SUPPORT GROUP ====== -->
+                <div id="grp-support" class="breakout-group" style="display:none;">
+                    {% for key, title, level_key, level_label, pct_key in [
+                    ('s1', 'S1 Support Breakdowns', 's1', 'S1 Level', 'breakdown_pct'),
+                    ('s2', 'S2 Support Breakdowns', 's2', 'S2 Level', 'breakdown_pct'),
+                    ('s3', 'S3 Support Breakdowns', 's3', 'S3 Level', 'breakdown_pct')
+                    ] %}
+                    <section class="screener-section">
+                        <div class="screener-card">
+                            <div class="card-header" style="display: flex; align-items: center; gap: 12px;">
+                                <div class="card-title"> {{ title }}</div>
+                                <span
+                                    style="background: #8b2432; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">{{
+                                    breakout_data[key]|length }} Stocks</span>
+                            </div>
+                            <table class="card-table sortable-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Stock</th>
+                                        <th>Price</th>
+                                        <th>{{ level_label }}</th>
+                                        <th>Breakdown %</th>
+                                        <th>RSI</th>
+                                        <th>ADX</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in breakout_data[key] %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                        </td>
+                                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                        <td>₹{{ "%.2f"|format(item[level_key]) if item[level_key] else 'N/A' }}</td>
+                                        <td><span
+                                                style="display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#fee2e2;color:#991b1b;">-{{
+                                                "%.2f"|format(item[pct_key]) if item[pct_key] else 'N/A' }}%</span></td>
+                                        <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
+                                        <td>{{ "%.1f"|format(item.adx_14) if item.adx_14 else 'N/A' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" style="text-align:center;padding:20px;color:#6b7280;">No {{
+                                            title }} found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    {% endfor %}
+                </div>
+
+                <!-- ====== TIMEFRAME GROUP ====== -->
+                <div id="grp-timeframe" class="breakout-group" style="display:none;">
+                    {% for key, title, level_key, level_label, pct_key, is_bullish in [
+                    ('week1_high', '1-Week High Breakouts', 'week1_high', '1W High', 'breakout_pct', true),
+                    ('week1_low', '1-Week Low Breakdowns', 'week1_low', '1W Low', 'breakdown_pct', false),
+                    ('week4_high', '4-Week High Breakouts', 'week4_high', '4W High', 'breakout_pct', true),
+                    ('week4_low', '4-Week Low Breakdowns', 'week4_low', '4W Low', 'breakdown_pct', false),
+                    ('week52_high', '52-Week High Breakouts', 'week52_high', '52W High', 'breakout_pct', true),
+                    ('week52_low', '52-Week Low Breakdowns', 'week52_low', '52W Low', 'breakdown_pct', false)
+                    ] %}
+                    <section class="screener-section">
+                                                <div class="screener-card">
+
+                            <div class="card-header" style="display: flex; align-items: center; gap: 12px;">
+
+                                <div class="card-title">{{ title }}</div>
+
+                                <span style="background: #8b2432; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">{{ breakout_data[key]|length }} Stocks</span>
+
+                            </div>
+
+                            <table class="card-table sortable-table">
+
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Stock</th>
+                                        <th>Price</th>
+                                        <th>{{ level_label }}</th>
+                                        <th>{{ 'Breakout' if is_bullish else 'Breakdown' }} %</th>
+                                        <th>Volume</th>
+                                        <th>RSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in breakout_data[key] %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td><a href="/stock/{{ item.ticker }}" class="symbol-link">{{ item.ticker }}</a>
+                                        </td>
+                                        <td>{{ "%.2f"|format(item.underlying_price) }}</td>
+                                        <td>₹{{ "%.2f"|format(item[level_key]) if item[level_key] else 'N/A' }}</td>
+                                        <td>
+                                            {% if item.get(pct_key) %}
+                                            <span
+                                                style="display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;{{ 'background:#d1fae5;color:#065f46;' if is_bullish else 'background:#fee2e2;color:#991b1b;' }}">
+                                                {{ ('+' if is_bullish else '-') }}{{ "%.2f"|format(item[pct_key]) }}%
+                                            </span>
+                                            {% else %}N/A{% endif %}
+                                        </td>
+                                        <td>{{ "{:,}".format(item.volume) if item.get('volume') else 'N/A' }}</td>
+                                        <td>{{ "%.1f"|format(item.rsi_14) if item.rsi_14 else 'N/A' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" style="text-align:center;padding:20px;color:#6b7280;">No {{
+                                            title }} found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    {% endfor %}
+                </div>
+
+            </div><!-- end #breakout-scanner-section -->
+            {% endif %}
+
+
+            {% if active_filter != 'breakout' %}
 
             <!-- RSI Based Section -->
             <section class="screener-section">
                 <div class="section-title"
                     style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <span>📊 RSI-Based Analysis</span>
+                    <span> RSI-Based Analysis</span>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label
                             style="font-size: 13px; font-weight: 600; color: #b91c1c; text-transform: uppercase;">SELECT
@@ -51,7 +272,7 @@
                     <!-- RSI Overbought -->
                     <div class="screener-card">
                         <div class="card-header">
-                            <div class="card-title">▶ RSI OVERBOUGHT (RSI > 80)</div>
+                            <div class="card-title"> RSI OVERBOUGHT (RSI > 80)</div>
                         </div>
                         <table class="card-table sortable-table">
                             <thead>
@@ -88,7 +309,7 @@
                     <!-- RSI Oversold -->
                     <div class="screener-card">
                         <div class="card-header">
-                            <div class="card-title">▶ RSI OVERSOLD (RSI < 20)</div>
+                            <div class="card-title"> RSI OVERSOLD (RSI < 20)</div>
                             </div>
                             <table class="card-table sortable-table">
                                 <thead>
@@ -126,7 +347,7 @@
 
             <!-- MACD Based Section -->
             <section class="screener-section">
-                <div class="section-title">📉 MACD-Based Analysis</div>
+                <div class="section-title"> MACD-Based Analysis</div>
                 <div class="cards-grid">
                     <!-- MACD Bullish Crossover -->
                     <div class="screener-card">
@@ -206,7 +427,7 @@
 
             <!-- SMA Based Section -->
             <section class="screener-section">
-                <div class="section-title">📈 SMA-Based Analysis</div>
+                <div class="section-title"> SMA-Based Analysis</div>
                 <div class="cards-grid">
                     <!-- Above Both SMA -->
                     <div class="screener-card">
@@ -290,7 +511,7 @@
 
             <!-- ADX Based Section -->
             <section class="screener-section">
-                <div class="section-title">💪 Strong Trending Stocks (ADX > 25)</div>
+                <div class="section-title"> Strong Trending Stocks (ADX > 25)</div>
                 <div class="cards-grid">
                     <div class="screener-card">
                         <div class="card-header">
@@ -338,7 +559,7 @@
 
             <!-- RSI Heatmap - 6 Categories -->
             <div class="tech-section heatmap-section">
-                <div class="section-title">🌡️ RSI Heatmap</div>
+                <div class="section-title"> RSI Heatmap</div>
 
                 <div class="heatmap-container" id="rsi-heatmap">
                     <div class="heatmap-legend">
@@ -412,7 +633,7 @@
 
             <!-- MACD Heatmap -->
             <div class="tech-section heatmap-section">
-                <div class="section-title">📉 MACD Heatmap</div>
+                <div class="section-title"> MACD Heatmap</div>
 
                 <div class="heatmap-container" id="macd-heatmap">
                     <div class="heatmap-legend">
@@ -455,7 +676,7 @@
 
             <!-- SMA Heatmap -->
             <div class="tech-section heatmap-section">
-                <div class="section-title">📈 SMA Heatmap</div>
+                <div class="section-title"> SMA Heatmap</div>
 
                 <div class="heatmap-container" id="sma-heatmap">
                     <div class="heatmap-legend">
@@ -499,7 +720,7 @@
 
             <!-- ADX Heatmap -->
             <div class="tech-section heatmap-section">
-                <div class="section-title">💪 ADX Heatmap (Trend Strength)</div>
+                <div class="section-title"> ADX Heatmap (Trend Strength)</div>
 
                 <div class="heatmap-container" id="adx-heatmap">
                     <div class="heatmap-legend">
@@ -540,6 +761,8 @@
                 </div>
             </div>
 
+            {% endif %}{# end active_filter != 'breakout' #}
+
             {% else %}
             <div
                 style="text-align: center; padding: 60px 20px; color: #6b7280; font-size: 16px; background: white; border-radius: 10px; margin-top: 20px;">
@@ -565,7 +788,41 @@
             // Calculate and display counts on page load
             document.addEventListener('DOMContentLoaded', function () {
                 updateAllCounts();
+
+                // Auto-scroll to breakout section if filter=breakout
+                {% if active_filter == 'breakout' %}
+                var breakoutSection = document.getElementById('breakout-scanner-section');
+                if (breakoutSection) {
+                    setTimeout(function () {
+                        breakoutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 200);
+                }
+                {% endif %}
             });
+
+            // Breakout tab switching
+            function showBreakoutGroup(groupId) {
+                // Hide all groups
+                document.querySelectorAll('.breakout-group').forEach(function (el) {
+                    el.style.display = 'none';
+                });
+                // Show selected group
+                var target = document.getElementById('grp-' + groupId);
+                if (target) target.style.display = 'block';
+
+                // Update tab button styles
+                document.querySelectorAll('.breakout-tab-btn').forEach(function (btn) {
+                    btn.style.background = 'white';
+                    btn.style.color = '#374151';
+                    btn.style.borderColor = '#e5e7eb';
+                });
+                var activeBtn = document.getElementById('tab-' + groupId);
+                if (activeBtn) {
+                    activeBtn.style.background = '#3b82f6';
+                    activeBtn.style.color = 'white';
+                    activeBtn.style.borderColor = '#3b82f6';
+                }
+            }
 
             function updateAllCounts() {
                 // RSI counts - 6 categories

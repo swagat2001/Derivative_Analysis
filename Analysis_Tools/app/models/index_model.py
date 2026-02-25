@@ -121,20 +121,20 @@ NSE_INDEX_URLS = {
 
 # Index metadata
 INDEX_METADATA = {
-    "all": {"name": "All F&O Stocks", "description": "All stocks with F&O trading", "icon": "📊"},
-    "all_market": {"name": "All Market Stocks", "description": "All stocks in the cash market", "icon": "🌐"},
-    "nifty50": {"name": "Nifty 50", "description": "Top 50 companies by market cap", "icon": "🏆"},
-    "niftynext50": {"name": "Nifty Next 50", "description": "Next 50 companies after Nifty 50", "icon": "📈"},
-    "niftybank": {"name": "Nifty Bank", "description": "Banking sector stocks", "icon": "🏦"},
-    "niftyit": {"name": "Nifty IT", "description": "Information Technology stocks", "icon": "💻"},
-    "niftypharma": {"name": "Nifty Pharma", "description": "Pharmaceutical stocks", "icon": "💊"},
-    "niftyauto": {"name": "Nifty Auto", "description": "Automobile sector stocks", "icon": "🚗"},
-    "niftymetal": {"name": "Nifty Metal", "description": "Metal & Mining stocks", "icon": "⚙️"},
-    "niftyfmcg": {"name": "Nifty FMCG", "description": "Fast Moving Consumer Goods", "icon": "🛒"},
-    "niftyenergy": {"name": "Nifty Energy", "description": "Energy & Power stocks", "icon": "⚡"},
-    "niftypsubank": {"name": "Nifty PSU Bank", "description": "Public Sector Banks", "icon": "🏛️"},
-    "niftyfinancial": {"name": "Nifty Financial", "description": "Financial Services stocks", "icon": "💰"},
-    "sensex": {"name": "Sensex", "description": "BSE Top 30 companies", "icon": "🎯"},
+    "all": {"name": "All F&O Stocks", "description": "All stocks with F&O trading", "icon": ""},
+    "all_market": {"name": "All Market Stocks", "description": "All stocks in the cash market", "icon": ""},
+    "nifty50": {"name": "Nifty 50", "description": "Top 50 companies by market cap", "icon": ""},
+    "niftynext50": {"name": "Nifty Next 50", "description": "Next 50 companies after Nifty 50", "icon": ""},
+    "niftybank": {"name": "Nifty Bank", "description": "Banking sector stocks", "icon": ""},
+    "niftyit": {"name": "Nifty IT", "description": "Information Technology stocks", "icon": ""},
+    "niftypharma": {"name": "Nifty Pharma", "description": "Pharmaceutical stocks", "icon": ""},
+    "niftyauto": {"name": "Nifty Auto", "description": "Automobile sector stocks", "icon": ""},
+    "niftymetal": {"name": "Nifty Metal", "description": "Metal & Mining stocks", "icon": ""},
+    "niftyfmcg": {"name": "Nifty FMCG", "description": "Fast Moving Consumer Goods", "icon": ""},
+    "niftyenergy": {"name": "Nifty Energy", "description": "Energy & Power stocks", "icon": ""},
+    "niftypsubank": {"name": "Nifty PSU Bank", "description": "Public Sector Banks", "icon": ""},
+    "niftyfinancial": {"name": "Nifty Financial", "description": "Financial Services stocks", "icon": ""},
+    "sensex": {"name": "Sensex", "description": "BSE Top 30 companies", "icon": ""},
 }
 
 
@@ -261,7 +261,7 @@ def get_index_list() -> List[Dict]:
 
     # 1. Add defaults from metadata
     for key, info in INDEX_METADATA.items():
-        indices.append({"key": key, "name": info["name"], "icon": info.get("icon", "📊")})
+        indices.append({"key": key, "name": info["name"], "icon": info.get("icon", "")})
         seen.add(key)
 
     # 2. Add all dynamically fetched indices from JSON
@@ -282,7 +282,7 @@ def get_index_list() -> List[Dict]:
                 else:
                     name = raw_name
 
-                indices.append({"key": idx_key, "name": name, "icon": "📊"})
+                indices.append({"key": idx_key, "name": name, "icon": ""})
                 seen.add(idx_key)
 
     return indices
@@ -337,7 +337,7 @@ def get_dynamic_indices(available_symbols: list) -> List[Dict]:
         List of index dicts with counts
     """
     if not available_symbols:
-        return [{"key": "all", "name": "All F&O Stocks", "icon": "📊", "count": 0}]
+        return [{"key": "all", "name": "All F&O Stocks", "icon": "", "count": 0}]
 
     available_upper = set(s.upper() for s in available_symbols)
 

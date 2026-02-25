@@ -60,7 +60,7 @@ def _build_otp_email(otp: str, username: str) -> tuple[str, str]:
 <body>
   <div class="wrapper">
     <div class="header">
-      <h1>📊 {APP_NAME}</h1>
+      <h1> {APP_NAME}</h1>
       <p>Professional Derivatives Analysis Platform</p>
     </div>
     <div class="body">

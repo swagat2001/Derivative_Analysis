@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from sqlalchemy import text
 
 from ..controllers.dashboard_controller import get_live_indices
 from ..models.stock_model import (
@@ -17,11 +18,18 @@ from ..models.stock_model import (
     get_stock_expiry_data,
     get_stock_stats,
 )
+from ..models.cash_stock_model import (
+    is_fo_stock,
+    get_cash_stock_info,
+    get_stock_scanner_appearances,
+)
+from ..models.db_config import engine_cash
+from ..services.fundamental_service import fundamental_service
 
 stock_bp = Blueprint("stock", __name__)
 
 # ==============================
-# 📊 Fundamental Data Functions
+#  Fundamental Data Functions
 # ==============================
 # Path to Data_scraper data directory
 FUNDAMENTAL_DATA_DIR = Path(__file__).resolve().parent.parent.parent.parent / "Data_scraper" / "data"
@@ -44,94 +52,136 @@ def load_fundamental_csv(symbol, data_type):
     return None
 
 
-def calculate_fundamental_metrics(symbol):
-    """Calculate key metrics for a stock from fundamental data"""
-    metrics = {
-        "current_price": 0,
-        "price_change": 0,
-        "high_52w": 0,
-        "low_52w": 0,
-        "market_cap": 0,
-        "stock_pe": 0,
-        "book_value": 0,
-        "roce": 0,
-        "roe": 0,
-        "dividend_yield": 0,
-        "face_value": 10.0,
-        "eps": 0,
-        "sales": 0,
-        "net_profit": 0,
-    }
+def get_52w_and_date(symbol):
+    """
+    Fetch 52W high/low and cache_date from technical_screener_cache.
+    Returns dict with high_52w, low_52w, price_date — or empty dict.
+    """
+    result = {}
+    try:
+        with engine_cash.connect() as conn:
+            row = conn.execute(text("""
+                SELECT week52_high, week52_low, cache_date
+                FROM public.technical_screener_cache
+                WHERE ticker = :ticker
+                ORDER BY cache_date DESC
+                LIMIT 1
+            """), {"ticker": symbol}).fetchone()
+        if row:
+            result = {
+                "high_52w":   float(row[0] or 0),
+                "low_52w":    float(row[1] or 0),
+                "price_date": str(row[2]) if row[2] else "",
+            }
+    except Exception as e:
+        print(f"[WARN] get_52w_and_date({symbol}): {e}")
+    return result
 
-    # Load price data
+
+def get_db_price_chart(symbol, limit=1500):
+    """
+    Fetch OHLCV history from CashStocks_Database TBL_<symbol> for the price chart.
+    Returns list of {date, value (close), volume} dicts, oldest-first.
+    Falls back to scraped price CSV if not found in DB.
+    """
+    cash_table = f"TBL_{symbol}"
+    try:
+        with engine_cash.connect() as conn:
+            exists = conn.execute(text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                      AND table_name = :tname
+                )
+            """), {"tname": cash_table}).scalar()
+
+        if exists:
+            with engine_cash.connect() as conn:
+                rows = conn.execute(text(f"""
+                    SELECT
+                        "BizDt"::text      AS date,
+                        "ClsPric"::float   AS close,
+                        "TtlTradgVol"::bigint AS volume
+                    FROM public."{cash_table}"
+                    WHERE "ClsPric" IS NOT NULL
+                    ORDER BY "BizDt" DESC
+                    LIMIT :lim
+                """), {"lim": limit}).fetchall()
+
+            return [
+                {
+                    "date":   r[0],
+                    "value":  float(r[1] or 0),
+                    "volume": int(r[2] or 0) if r[2] else 0,
+                }
+                for r in reversed(rows)  # oldest first for chart
+            ]
+    except Exception as e:
+        print(f"[WARN] get_db_price_chart({symbol}): {e}")
+
+    # Fallback: scraped price CSV
     price_data = load_fundamental_csv(symbol, "price")
     if price_data is not None and not price_data.empty:
         price_df = price_data[price_data["metric"] == "Price"].copy()
-        if not price_df.empty:
-            price_df["value"] = pd.to_numeric(price_df["value"], errors="coerce")
-            latest_price = price_df.iloc[-1]["value"]
-            prev_price = price_df.iloc[-2]["value"] if len(price_df) > 1 else latest_price
-            metrics["current_price"] = latest_price
-            metrics["price_change"] = ((latest_price - prev_price) / prev_price * 100) if prev_price else 0
+        price_df["value"] = pd.to_numeric(price_df["value"], errors="coerce")
+        # No real volume in scraped CSV — set to 0 so chart can show N/A
+        price_df["volume"] = 0
+        return price_df[["date", "value", "volume"]].to_dict("records")
 
-            # Default to all-time or last year if company_info is missing
-            metrics["high_52w"] = price_df["value"].max()
-            metrics["low_52w"] = price_df["value"].min()
+    return []
 
-    # Load Company Info (Scraped Header) - PRIORITY FOR MARKET CAP & HIGH/LOW
-    company_info = load_fundamental_json(symbol, "company_info")
-    if company_info:
-        # Helper to clean and parse float
-        def parse_float(val):
-            if isinstance(val, (int, float)):
-                return float(val)
-            if isinstance(val, str):
-                return float(val.replace(",", "").replace("%", ""))
-            return 0
 
-        if "Market Cap" in company_info:
-            metrics["market_cap"] = parse_float(company_info["Market Cap"])
+def calculate_fundamental_metrics(symbol):
+    """Build metrics dict entirely from DB sources — no JSON file dependency."""
+    metrics = {
+        "current_price": 0,
+        "price_change":  0,
+        "high_52w":      0,
+        "low_52w":       0,
+        "volume":        0,
+        "price_date":    "",
+        "pe_ratio":      0,
+        "market_cap":    0,
+        "book_value":    0,
+        "eps":           0,
+        "sales":         0,
+        "net_profit":    0,
+        "volume_display": "",
+    }
 
-        if "High / Low" in company_info:
-            hl = company_info["High / Low"].split("/")
-            if len(hl) == 2:
-                metrics["high_52w"] = parse_float(hl[0])
-                metrics["low_52w"] = parse_float(hl[1])
+    # ── 1. FundamentalService (same source as goldmine scanner) ───────────
+    # Covers: price, volume, change%, pe_ratio, market_cap, eps, book_value
+    # Price comes from daily_market_heatmap → works for ALL stocks incl. USASEEDS
+    fs = fundamental_service.get_stock_fundamentals(symbol)
+    if fs:
+        metrics["current_price"] = fs.get("price", 0) or 0
+        metrics["price_change"]  = fs.get("change_pct", 0) or 0
+        metrics["volume"]        = fs.get("volume", 0) or 0
+        metrics["pe_ratio"]      = fs.get("pe", 0) or 0
+        metrics["market_cap"]    = fs.get("market_cap", 0) or 0
+        metrics["eps"]           = fs.get("eps", 0) or 0
+        metrics["book_value"]    = fs.get("book_value", 0) or 0
+        metrics["sales"]         = fs.get("sales", 0) or 0
+        metrics["net_profit"]    = fs.get("net_profit", 0) or 0
 
-        if "Stock P/E" in company_info:
-            metrics["stock_pe"] = parse_float(company_info["Stock P/E"])
+    # ── 2. technical_screener_cache → 52W High/Low + price date ──────────
+    # FundamentalService doesn't track 52W range; we get it separately.
+    w52 = get_52w_and_date(symbol)
+    if w52:
+        metrics["high_52w"]   = w52.get("high_52w", 0)
+        metrics["low_52w"]    = w52.get("low_52w", 0)
+        metrics["price_date"] = w52.get("price_date", "")
 
-        if "Book Value" in company_info:
-            metrics["book_value"] = parse_float(company_info["Book Value"])
-
-        if "ROCE" in company_info:
-            metrics["roce"] = parse_float(company_info["ROCE"]) / 100
-
-        if "ROE" in company_info:
-            metrics["roe"] = parse_float(company_info["ROE"]) / 100
-
-        if "Dividend Yield" in company_info:
-            metrics["dividend_yield"] = parse_float(company_info["Dividend Yield"])
-
-        if "Face Value" in company_info:
-            metrics["face_value"] = parse_float(company_info["Face Value"])
-
-    # Load P&L data
-    pnl_data = load_fundamental_json(symbol, "pnl")
-    if pnl_data:
-        dates = sorted(pnl_data.keys(), reverse=True)
-        if dates:
-            latest_data = pnl_data[dates[0]]
-            for item in latest_data:
-                for key, value in item.items():
-                    key_lower = key.lower()
-                    if "sales" in key_lower or "revenue" in key_lower:
-                        metrics["sales"] = value
-                    elif "netprofit" in key_lower.replace(" ", "") or "net profit" in key_lower:
-                        metrics["net_profit"] = value
-                    elif (key == "EPS" or "eps" in key_lower) and metrics["eps"] == 0:
-                         # Only set if not already set (though company_info doesn't have eps usually)
-                        metrics["eps"] = value
+    # ── 3. Volume display format ──────────────────────────────────────────
+    vol = metrics["volume"]
+    if vol >= 10_000_000:
+        metrics["volume_display"] = f"{vol / 10_000_000:.2f} Cr"
+    elif vol >= 100_000:
+        metrics["volume_display"] = f"{vol / 100_000:.2f} L"
+    elif vol >= 1_000:
+        metrics["volume_display"] = f"{vol / 1_000:.1f}K"
+    elif vol > 0:
+        metrics["volume_display"] = str(int(vol))
 
     return metrics
 
@@ -147,18 +197,39 @@ def get_available_fundamental_stocks():
 @stock_bp.route("/stock/<ticker>")
 def stock_detail(ticker):
     """
-    Stock detail page with server-side filtering
+    Stock detail page — routes to F&O page or cash stock page depending on the ticker.
+    F&O stocks  → option chain, greeks, OI charts (existing page)
+    Cash stocks → OHLCV, technicals, scanner appearances (new page)
     Query params: date, expiry
     """
+    ticker = ticker.upper().strip()
+
+    #  Route cash stocks to their own page
+    if not is_fo_stock(ticker):
+        cash_info      = get_cash_stock_info(ticker)
+        scanner_hits   = get_stock_scanner_appearances(ticker)
+        import json as _json
+        ohlcv_json = _json.dumps(cash_info.get("ohlcv", []))
+        return render_template(
+            "cash_stock_detail.html",
+            ticker         = ticker,
+            stock_symbol   = ticker,
+            cash_info      = cash_info,
+            scanner_hits   = scanner_hits,
+            ohlcv_json     = ohlcv_json,
+            indices        = get_live_indices(),
+            stock_list     = get_filtered_tickers(),
+        )
+    #  F&O path continues below
 
     # ==============================
-    # 📅 Fetch all available dates and symbols
+    #  Fetch all available dates and symbols
     # ==============================
     dates = get_available_dates()
-    all_symbols = get_filtered_tickers()  # ✅ Filter by Excel list
+    all_symbols = get_filtered_tickers()  #  Filter by Excel list
 
     # ==============================
-    # 🧭 Determine selected date and expiry
+    #  Determine selected date and expiry
     # ==============================
     selected_date = request.args.get("date", dates[0] if dates else None)
     selected_expiry = request.args.get("expiry", None)
@@ -169,7 +240,7 @@ def stock_detail(ticker):
 
     if selected_date:
         # ==============================
-        # 📘 Expiry data for left panel
+        #  Expiry data for left panel
         # ==============================
         expiry_data = get_stock_expiry_data(ticker, selected_date)
 
@@ -182,7 +253,7 @@ def stock_detail(ticker):
         stats = get_stock_stats(ticker, selected_date, selected_expiry)
 
         # ==============================
-        # 🔍 Detect Underlying Price & Futures Price
+        #  Detect Underlying Price & Futures Price
         # ==============================
         underlying = None
         futures_price = None
@@ -224,7 +295,7 @@ def stock_detail(ticker):
                 futures_price = underlying
 
         # ==============================
-        # 🎯 Find ATM Strike (Closest to Underlying)
+        #  Find ATM Strike (Closest to Underlying)
         # ==============================
         atm = None
         if data and underlying:
@@ -245,7 +316,7 @@ def stock_detail(ticker):
                 atm = None
 
         # ==============================
-        # 📈 Compute Average IV
+        #  Compute Average IV
         # ==============================
         # FIX #5: Only override avg_iv if stats doesn't have it or if we have better data from option chain
         if data:
@@ -263,7 +334,7 @@ def stock_detail(ticker):
             stats["avg_iv"] = 0
 
     # ==============================
-    # 🧠 Generate OI Chart Data
+    #  Generate OI Chart Data
     # ==============================
     chart_data = None
     if selected_date and selected_expiry:
@@ -273,7 +344,7 @@ def stock_detail(ticker):
             chart_data = json.dumps(oi_chart_dict)
 
     # ==============================
-    # 🎨 Render Template
+    #  Render Template
     # ==============================
     return render_template(
         "stock_detail.html",
@@ -287,16 +358,16 @@ def stock_detail(ticker):
         selected_date=selected_date,
         selected_expiry=selected_expiry,
         chart_data=chart_data,
-        underlying=underlying,  # ✅ spot price (for display)
-        futures_price=futures_price,  # ✅ futures price for selected expiry (for Fair Price calculation)
-        atm=atm,  # ✅ correct closest strike
-        indices=get_live_indices(),  # ✅ Add indices for header
-        stock_list=get_filtered_tickers(),  # ✅ Add stock list for search
+        underlying=underlying,  #  spot price (for display)
+        futures_price=futures_price,  #  futures price for selected expiry (for Fair Price calculation)
+        atm=atm,  #  correct closest strike
+        indices=get_live_indices(),  #  Add indices for header
+        stock_list=get_filtered_tickers(),  #  Add stock list for search
     )
 
 
 # ==============================
-# 📈 API endpoint for mini stock chart (price data)
+#  API endpoint for mini stock chart (price data)
 # ==============================
 @stock_bp.route("/api/stock-chart/<ticker>")
 def api_stock_chart(ticker):
@@ -309,7 +380,7 @@ def api_stock_chart(ticker):
 
 
 # ==============================
-# 📊 Fundamental Analysis Page
+#  Fundamental Analysis Page
 # ==============================
 @stock_bp.route("/stock/<ticker>/fundamental")
 def stock_fundamental(ticker):
@@ -324,17 +395,12 @@ def stock_fundamental(ticker):
         cashflow = load_fundamental_json(ticker, "cashflow")
         ratios = load_fundamental_json(ticker, "ratios")
         shareholding = load_fundamental_json(ticker, "shareholding")
-        price_data = load_fundamental_csv(ticker, "price")
 
-        # Calculate metrics
+        # Calculate metrics (DB-first, scrape-supplement)
         metrics = calculate_fundamental_metrics(ticker)
 
-        # Process price data for chart
-        chart_data = []
-        if price_data is not None and not price_data.empty:
-            price_df = price_data[price_data["metric"] == "Price"].copy()
-            price_df["value"] = pd.to_numeric(price_df["value"], errors="coerce")
-            chart_data = price_df[["date", "value"]].to_dict("records")
+        # Price chart data: from DB (OHLCV) — includes real volume
+        chart_data = get_db_price_chart(ticker)
 
         return render_template(
             "fundamental.html",
@@ -368,16 +434,13 @@ def stock_fundamental(ticker):
             chart_data=[],
             metrics={
                 "current_price": 0,
-                "price_change": 0,
-                "high_52w": 0,
-                "low_52w": 0,
-                "market_cap": 0,
-                "stock_pe": 0,
-                "book_value": 0,
-                "roce": 0,
-                "roe": 0,
-                "dividend_yield": 0,
-                "face_value": 10.0,
+                "price_change":  0,
+                "high_52w":      0,
+                "low_52w":       0,
+                "volume":        0,
+                "eps":           0,
+                "sales":         0,
+                "net_profit":    0,
             },
             indices=get_live_indices(),
             stock_list=get_filtered_tickers(),

@@ -10,7 +10,7 @@
  * only use Upstox chart data if its latest history timestamp is from TODAY.
  */
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers
 
 function todayDateStr() {
     const d = new Date();
@@ -48,7 +48,7 @@ function makeGradient(ctx, canvas, isPositive) {
     }
 }
 
-// ─── Main class ───────────────────────────────────────────────────────────────
+//  Main class
 
 class LiveIndicesUpdater {
     constructor() {
@@ -70,7 +70,7 @@ class LiveIndicesUpdater {
         this.nseChartOhlc = {}; // { 'nifty50': { open, high, low, close }, ... }
     }
 
-    // ─── DOM helpers ──────────────────────────────────────────────────────────
+    //  DOM helpers
 
     _cardMap() {
         return {
@@ -96,7 +96,7 @@ class LiveIndicesUpdater {
         });
 
         const pct = data.percentChange ?? 0;
-        const arrow = pct >= 0 ? '▲' : '▼';
+        const arrow = pct >= 0 ? '' : '';
         const sign = pct >= 0 ? '+' : '';
         changeEl.textContent = `${arrow} ${sign}${pct.toFixed(2)}%`;
 
@@ -146,7 +146,7 @@ class LiveIndicesUpdater {
         if (lowEl) lowEl.textContent = fmt(data.low);
     }
 
-    // ─── Chart update ─────────────────────────────────────────────────────────
+    //  Chart update
 
     /**
      * Update the main Chart.js instance.
@@ -168,7 +168,7 @@ class LiveIndicesUpdater {
 
         let values = [], labels = [];
 
-        // ── NSE epoch-ms series ────────────────────────────────────────────────
+        //  NSE epoch-ms series
         if (data.series && data.series.length > 0) {
             // NSE sends IST-epoch timestamps (not UTC), so reading UTC fields
             // from the Date object directly gives the correct IST time.
@@ -194,7 +194,7 @@ class LiveIndicesUpdater {
                 };
             }
         }
-        // ── Upstox timestamp string history ───────────────────────────────────
+        //  Upstox timestamp string history
         else if (data.history && data.history.length > 0) {
             // Deduplicate Upstox ticks to ONE per HH:MM minute (keep latest value).
             // Upstox sends 1 tick/sec so without dedup we get 60+ same-label points
@@ -248,7 +248,7 @@ class LiveIndicesUpdater {
         chart.update('none');
     }
 
-    // ─── Fetch helpers ────────────────────────────────────────────────────────
+    //  Fetch helpers
 
     async fetchNseChart(indexKey) {
         try {
@@ -279,7 +279,7 @@ class LiveIndicesUpdater {
         } catch { return null; }
     }
 
-    // ─── Poll loops ───────────────────────────────────────────────────────────
+    //  Poll loops
 
     async _pollNsePrices() {
         const data = await this.fetchNsePrices();
@@ -354,7 +354,7 @@ class LiveIndicesUpdater {
         // (if not today → NSE is primary, do nothing here)
     }
 
-    // ─── Card click handlers ──────────────────────────────────────────────────
+    //  Card click handlers
 
     setupCardClickHandlers() {
         const cardMap = {
@@ -407,7 +407,7 @@ class LiveIndicesUpdater {
         }
     }
 
-    // ─── Lifecycle ────────────────────────────────────────────────────────────
+    //  Lifecycle
 
     async start() {
         if (this.isRunning) return;
@@ -416,7 +416,7 @@ class LiveIndicesUpdater {
 
         this.setupCardClickHandlers();
 
-        // ── Immediate first loads ─────────────────────────────────────────────
+        //  Immediate first loads
 
         // 1. NSE chart immediately replaces dummy data
         const initChart = await this.fetchNseChart(this.selectedIndex);
@@ -431,7 +431,7 @@ class LiveIndicesUpdater {
         // 3. Upstox override only if today's data exists
         await this._pollUpstox();
 
-        // ── Recurring polls ───────────────────────────────────────────────────
+        //  Recurring polls
         this._nsePriceTimer = setInterval(() => this._pollNsePrices(), this.nsePriceInterval);
         this._nseChartTimer = setInterval(() => this._pollNseChart(), this.nseChartInterval);
         this._upstoxTimer = setInterval(() => this._pollUpstox(), this.upstoxInterval);
@@ -448,7 +448,7 @@ class LiveIndicesUpdater {
     }
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
+//  Boot
 
 let liveUpdater = null;
 

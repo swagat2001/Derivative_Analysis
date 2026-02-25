@@ -1,5 +1,5 @@
 // ==============================
-// 📊 STOCK DETAIL GAUGES SCRIPT
+//  STOCK DETAIL GAUGES SCRIPT
 // ==============================
 // NOTE: Gauges are now server-side rendered as SVG
 // This file is kept minimal for any future client-side enhancements

@@ -7,9 +7,9 @@
   {% if data %}
   <div class="table-container">
     <p style="margin:8px 0;font-size:13px;color:#6b7280;">
-      ⚙️ Underlying: <b>{{ underlying if underlying else 'N/A' }}</b> |
-      🎯 ATM Strike: <b>{{ atm if atm else 'N/A' }}</b> |
-      📈 Futures: <b>{{ "%.2f"|format(futures_price) if futures_price else 'N/A' }}</b>
+       Underlying: <b>{{ underlying if underlying else 'N/A' }}</b> |
+       ATM Strike: <b>{{ atm if atm else 'N/A' }}</b> |
+       Futures: <b>{{ "%.2f"|format(futures_price) if futures_price else 'N/A' }}</b>
     </p>
 
     <table class="option-chain-table">

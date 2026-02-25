@@ -90,7 +90,7 @@ def save_market_breadth(data):
             })
 
             conn.commit()
-            logger.info("✅ Market breadth data saved to database")
+            logger.info(" Market breadth data saved to database")
             return True
 
     except Exception as e:

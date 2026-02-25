@@ -107,7 +107,7 @@
 }
 
 .feature-item::before {
-  content: '✓';
+  content: '';
   display: flex;
   align-items: center;
   justify-content: center;

@@ -90,7 +90,7 @@
           {% with messages = get_flashed_messages(category_filter=['error']) %}
           {% if messages %}
           <div class="login-error">
-            <strong>⚠</strong> {{ messages[0] }}
+            <strong></strong> {{ messages[0] }}
           </div>
           {% endif %}
           {% endwith %}
@@ -123,7 +123,7 @@
           </form>
 
           <div class="login-footnote">
-            <p>🔒 Secure access to your platform</p>
+            <p> Secure access to your platform</p>
             <p style="margin-top: 18px; font-size: 15px;">Don't have an account? <a
                 href="{{ url_for('auth.signup') }}">Sign Up</a></p>
           </div>

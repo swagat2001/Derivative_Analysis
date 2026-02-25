@@ -774,7 +774,7 @@ def create_screener_pdf(screener_data, selected_date):
                     html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0; text-align:center;'>{global_row_num}</td>\n"
                     html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><strong>{html_lib.escape(ticker)}</strong></td>\n"
                     html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><span class='signal-badge {badge_class}'>{signal}</span></td>\n"
-                    html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><div class='signal-strength'><span class='bull'>🟢 {bullish_count}</span><span class='bear'>🔴 {bearish_count}</span></div></td>\n"
+                    html_output += f"                <td style='padding:6px; border:1px solid #e0e0e0;'><div class='signal-strength'><span class='bull'> {bullish_count}</span><span class='bear'> {bearish_count}</span></div></td>\n"
                     html_output += "            </tr>\n"
 
                 html_output += "        </tbody>\n    </table>\n</div>\n"

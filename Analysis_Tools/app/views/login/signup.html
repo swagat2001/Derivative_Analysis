@@ -91,7 +91,7 @@
         {% with messages = get_flashed_messages(category_filter=['error']) %}
         {% if messages %}
         <div class="login-error">
-          <strong>⚠</strong> {{ messages[0] }}
+          <strong></strong> {{ messages[0] }}
         </div>
         {% endif %}
         {% endwith %}
@@ -99,7 +99,7 @@
         {% with messages = get_flashed_messages(category_filter=['success']) %}
         {% if messages %}
         <div class="login-success">
-          <strong>✓</strong> {{ messages[0] }}
+          <strong></strong> {{ messages[0] }}
         </div>
         {% endif %}
         {% endwith %}

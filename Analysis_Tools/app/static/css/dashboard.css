@@ -675,7 +675,7 @@ table.dataTable tbody tr.even {
 }
 
 .col-center::before {
-    content: '⭐';
+    content: '';
     margin-right: 4px;
     font-size: 10px;
 }

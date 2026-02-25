@@ -435,4 +435,4 @@ const STOCK_DATA = {
 STOCK_DATA["high-oi"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.oi - a.oi).slice(0, 15);
 STOCK_DATA["iv-spike"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.iv - a.iv).slice(0, 15);
 
-console.log('✅ screener_data.js loaded -', Object.keys(SCREENER_DATA).length, 'categories');
+console.log(' screener_data.js loaded -', Object.keys(SCREENER_DATA).length, 'categories');

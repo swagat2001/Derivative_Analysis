@@ -109,7 +109,7 @@ body {
 }
 
 .fund-nav-tab.active::before {
-    content: '▶';
+    content: '';
     position: absolute;
     right: 20px;
     font-size: 10px;
@@ -217,7 +217,7 @@ body {
 }
 
 .fund-price-change.positive::before {
-    content: '▲';
+    content: '';
     font-size: 12px;
 }
 
@@ -227,7 +227,7 @@ body {
 }
 
 .fund-price-change.negative::before {
-    content: '▼';
+    content: '';
     font-size: 12px;
 }
 
@@ -335,7 +335,7 @@ body {
 }
 
 .fund-key-points li::before {
-    content: '✓';
+    content: '';
     position: absolute;
     left: 0;
     color: var(--fund-green);

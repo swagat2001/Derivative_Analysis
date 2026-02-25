@@ -140,7 +140,7 @@ def get_all_screener_data(selected_date: str):
                 for filter_type in result[metric][opt_type].keys():
                     count = len(result[metric][opt_type][filter_type])
                     if count < 10:
-                        print(f"  ⚠️  {metric}/{opt_type}/{filter_type}: {count} rows (< 10)")
+                        print(f"    {metric}/{opt_type}/{filter_type}: {count} rows (< 10)")
 
         print(f"[INFO] Cache loaded successfully!")
         return result

@@ -61,12 +61,12 @@
       {% if current_user %}
       <div class="user-info" style="display:flex; align-items:center; gap:12px;">
         <span style="font-size:13px; color:#374151; font-weight:600;">
-          👤 {{ user_display_name or current_user }}
+           {{ user_display_name or current_user }}
         </span>
         {% if current_user == 'admin' %}
         <a href="{{ url_for('admin.users_dashboard') }}"
            style="font-size:12px; color:#6b7280; text-decoration:none; padding:5px 10px;
-                  border:1px solid #e5e7eb; border-radius:5px;">⚙️ Admin</a>
+                  border:1px solid #e5e7eb; border-radius:5px;"> Admin</a>
         {% endif %}
         <a href="{{ url_for('auth.logout') }}"
            style="font-size:13px; color:#8B2432; font-weight:600; text-decoration:none; padding:6px 14px; border:1.5px solid #8B2432; border-radius:6px; transition:all 0.2s;"

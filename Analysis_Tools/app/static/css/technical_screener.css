@@ -149,7 +149,7 @@
 }
 
 .tech-card-title::before {
-    content: '▸';
+    content: '';
     color: #D4AF37;
     margin-right: 8px;
 }

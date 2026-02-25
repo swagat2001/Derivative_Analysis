@@ -110,6 +110,8 @@ def technical_screener():
                 dates=[],
                 selected_date=None,
                 tech_data={},
+                breakout_data=None,
+                active_filter=None,
                 indices=get_live_indices(),
                 stock_list=get_filtered_tickers(),
                 stock_symbol=None,
@@ -117,6 +119,10 @@ def technical_screener():
             )
 
         selected_date = request.args.get("date", dates[0])
+        active_filter = request.args.get("filter")  # e.g., 'breakout'
+        source = request.args.get("source")          # e.g., 'goldmine'
+        tab = request.args.get("tab")                # e.g., 'intraday'
+
         tech_data = get_technical_data_formatted(selected_date)
 
         print(f"[DEBUG] Technical screener data keys: {list(tech_data.keys()) if tech_data else 'NONE'}")
@@ -124,12 +130,42 @@ def technical_screener():
             print(f"[DEBUG]   rsi_overbought: {len(tech_data.get('rsi_overbought', []))} items")
             print(f"[DEBUG]   heatmap: {len(tech_data.get('heatmap', []))} items")
 
-        if not tech_data:
+        # Fetch breakout-specific data when filter=breakout
+        breakout_data = None
+        if active_filter == "breakout":
+            # Use technical_screener dates for breakout data (may differ from screener_model dates)
+            tech_dates = get_technical_available_dates()
+            breakout_date = request.args.get("date", tech_dates[-1] if tech_dates else selected_date)
+            try:
+                breakout_data = {
+                    "r1": get_r1_breakout_stocks(breakout_date, limit=100),
+                    "r2": get_r2_breakout_stocks(breakout_date, limit=100),
+                    "r3": get_r3_breakout_stocks(breakout_date, limit=100),
+                    "s1": get_s1_breakout_stocks(breakout_date, limit=100),
+                    "s2": get_s2_breakout_stocks(breakout_date, limit=100),
+                    "s3": get_s3_breakout_stocks(breakout_date, limit=100),
+                    "week1_high": get_week1_high_breakout_stocks(breakout_date, limit=100),
+                    "week1_low": get_week1_low_breakout_stocks(breakout_date, limit=100),
+                    "week4_high": get_week4_high_breakout_stocks(breakout_date, limit=100),
+                    "week4_low": get_week4_low_breakout_stocks(breakout_date, limit=100),
+                    "week52_high": get_week52_high_breakout_stocks(breakout_date, limit=100),
+                    "week52_low": get_week52_low_breakout_stocks(breakout_date, limit=100),
+                    "selected_date": breakout_date,
+                    "dates": tech_dates,
+                }
+                print(f"[DEBUG] Breakout data fetched for {breakout_date}: r1={len(breakout_data['r1'])}, r2={len(breakout_data['r2'])}")
+            except Exception as e:
+                print(f"[ERROR] Failed to fetch breakout data: {e}")
+                breakout_data = {}
+
+        if not tech_data and not breakout_data:
             return render_template(
                 "screener/technical_screener/index.html",
                 dates=dates,
                 selected_date=selected_date,
                 tech_data={},
+                breakout_data=breakout_data,
+                active_filter=active_filter,
                 indices=get_live_indices(),
                 stock_list=get_filtered_tickers(),
                 stock_symbol=None,
@@ -140,7 +176,11 @@ def technical_screener():
             "screener/technical_screener/index.html",
             dates=dates,
             selected_date=selected_date,
-            tech_data=tech_data,
+            tech_data=tech_data or {},
+            breakout_data=breakout_data,
+            active_filter=active_filter,
+            source=source,
+            tab=tab,
             indices=get_live_indices(),
             stock_list=get_filtered_tickers(),
             stock_symbol=None,
@@ -322,7 +362,7 @@ def rsi_overbought():
     return render_generic_screener(
         title="Overbought RSI Stocks",
         desc="Detects stocks where the RSI exceeds 75, suggesting a possible upcoming price correction.",
-        icon="🔥", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_rsi_overbought_stocks,
         table_columns=[
             {"key": "macd", "label": "MACD", "format": "%.2f"},
@@ -338,7 +378,7 @@ def rsi_oversold():
     return render_generic_screener(
         title="Oversold RSI Stocks",
         desc="Finds stocks with RSI below 25, indicating a potential for price recovery.",
-        icon="❄️", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_rsi_oversold_stocks,
         table_columns=[
             {"key": "macd", "label": "MACD", "format": "%.2f"},
@@ -354,7 +394,7 @@ def r1_breakout():
     return render_generic_screener(
         title="R1 Resistance Breakouts",
         desc="Stocks climbing past R1 resistance levels, potentially signaling sustained upward trends.",
-        icon="📈", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_r1_breakout_stocks,
         table_columns=[
             {"key": "r1", "label": "R1 Level", "format": "₹%.2f"},
@@ -369,7 +409,7 @@ def r2_breakout():
     return render_generic_screener(
         title="R2 Resistance Breakouts",
         desc="Stocks breaking above R2 resistance, showing strong bullish momentum.",
-        icon="📈", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_r2_breakout_stocks,
         table_columns=[
             {"key": "r2", "label": "R2 Level", "format": "₹%.2f"},
@@ -384,7 +424,7 @@ def r3_breakout():
     return render_generic_screener(
         title="R3 Resistance Breakouts",
         desc="Stocks breaking above R3 resistance — extremely strong bullish signal.",
-        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_r3_breakout_stocks,
         table_columns=[
             {"key": "r3", "label": "R3 Level", "format": "₹%.2f"},
@@ -399,7 +439,7 @@ def s1_breakout():
     return render_generic_screener(
         title="S1 Support Breakouts",
         desc="Stocks falling through S1 support lines, possibly forecasting extended declines.",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_s1_breakout_stocks,
         table_columns=[
             {"key": "s1", "label": "S1 Level", "format": "₹%.2f"},
@@ -414,7 +454,7 @@ def s2_breakout():
     return render_generic_screener(
         title="S2 Support Breakouts",
         desc="Stocks falling through S2 support lines, indicating significant bearish pressure.",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_s2_breakout_stocks,
         table_columns=[
             {"key": "s2", "label": "S2 Level", "format": "₹%.2f"},
@@ -429,7 +469,7 @@ def s3_breakout():
     return render_generic_screener(
         title="S3 Support Breakouts",
         desc="Stocks falling through S3 support — extreme bearish signal.",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_s3_breakout_stocks,
         table_columns=[
             {"key": "s3", "label": "S3 Level", "format": "₹%.2f"},
@@ -444,7 +484,7 @@ def momentum_stocks():
     return render_generic_screener(
         title="Momentum Stocks",
         desc="Securities surging in price with strong market enthusiasm and potential for further gains.",
-        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_momentum_stocks,
         table_columns=[
             {"key": "momentum_score", "label": "Momentum Score", "format": "%.2f"},
@@ -460,7 +500,7 @@ def squeezing_range():
     return render_generic_screener(
         title="Squeezing Range",
         desc="Pinpoints stocks with tightening Bollinger Bands, indicating a potential breakout or breakdown.",
-        icon="🎯", signal="NEUTRAL", signal_color="#d97706",
+        icon="", signal="NEUTRAL", signal_color="#d97706",
         data_func=get_squeezing_range_stocks,
         table_columns=[
             {"key": "bb_width", "label": "BB Width %", "format": "%.2f", "suffix": "%"},
@@ -480,7 +520,7 @@ def week1_high_breakout():
     return render_generic_screener(
         title="1 Week High Breakouts",
         desc="Securities surpassing highest price in the last week reflecting immediate bullish sentiment",
-        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_week1_high_breakout_stocks,
         table_columns=[
             {"key": "week1_high", "label": "1W High", "format": "₹%.2f"},
@@ -495,7 +535,7 @@ def week1_low_breakout():
     return render_generic_screener(
         title="1 Week Low Breakouts",
         desc="Indicates immediate bearish sentiment with decline past their lowest price in the previous week",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_week1_low_breakout_stocks,
         table_columns=[
             {"key": "week1_low", "label": "1W Low", "format": "₹%.2f"},
@@ -510,7 +550,7 @@ def week4_high_breakout():
     return render_generic_screener(
         title="4 Week High Breakouts",
         desc="Securities exceeding their highest price in the last month indicating short-term bullish momentum",
-        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_week4_high_breakout_stocks,
         table_columns=[
             {"key": "week4_high", "label": "4W High", "format": "₹%.2f"},
@@ -525,7 +565,7 @@ def week4_low_breakout():
     return render_generic_screener(
         title="4 Week Low Breakouts",
         desc="Pointing to short-term bearish momentum with stocks falling below their lowest price in the past month",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_week4_low_breakout_stocks,
         table_columns=[
             {"key": "week4_low", "label": "4W Low", "format": "₹%.2f"},
@@ -540,7 +580,7 @@ def week52_high_breakout():
     return render_generic_screener(
         title="52 Week High Breakouts",
         desc="Breaking past their highest price in the last year signaling strong bullish trends",
-        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_week52_high_breakout_stocks,
         table_columns=[
             {"key": "week52_high", "label": "52W High", "format": "₹%.2f"},
@@ -555,7 +595,7 @@ def week52_low_breakout():
     return render_generic_screener(
         title="52 Week Low Breakouts",
         desc="Strong bearish trends suggested by dropping below their lowest price in the past year",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_week52_low_breakout_stocks,
         table_columns=[
             {"key": "week52_low", "label": "52W Low", "format": "₹%.2f"},
@@ -570,7 +610,7 @@ def potential_high_volume():
     return render_generic_screener(
         title="Potential High Volume",
         desc="Showing early signs of a spike in trading volume hinting at upcoming activity",
-        icon="📊", signal="NEUTRAL", signal_color="#d97706",
+        icon="", signal="NEUTRAL", signal_color="#d97706",
         data_func=get_potential_high_volume_stocks,
         table_columns=[
             {"key": "volume", "label": "Volume"},
@@ -584,7 +624,7 @@ def unusually_high_volume():
     return render_generic_screener(
         title="Unusually High Volume",
         desc="Points to increased interest or activity with volume much higher than average",
-        icon="📊", signal="NEUTRAL", signal_color="#d97706",
+        icon="", signal="NEUTRAL", signal_color="#d97706",
         data_func=get_unusually_high_volume_stocks,
         table_columns=[
             {"key": "volume", "label": "Volume"},
@@ -599,7 +639,7 @@ def price_gainers():
     return render_generic_screener(
         title="Top Price Gainers",
         desc="Stocks with the highest percentage price increase in the current session.",
-        icon="🚀", signal="BULLISH", signal_color="#16a34a",
+        icon="", signal="BULLISH", signal_color="#16a34a",
         data_func=get_price_gainers_stocks,
         table_columns=[
             {"key": "price_change_pct", "label": "Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
@@ -614,7 +654,7 @@ def price_losers():
     return render_generic_screener(
         title="Top Price Losers",
         desc="Stocks with the highest percentage price decrease in the current session.",
-        icon="📉", signal="BEARISH", signal_color="#dc2626",
+        icon="", signal="BEARISH", signal_color="#dc2626",
         data_func=get_price_losers_stocks,
         table_columns=[
             {"key": "price_change_pct", "label": "Change %", "format": "%.2f", "suffix": "%", "css_class": "negative"},
@@ -629,7 +669,7 @@ def high_volume():
     return render_generic_screener(
         title="High Volume Stocks",
         desc="Stocks with the highest trading volume in the current session.",
-        icon="📊", signal="NEUTRAL", signal_color="#d97706",
+        icon="", signal="NEUTRAL", signal_color="#d97706",
         data_func=get_high_volume_stocks,
         table_columns=[
             {"key": "volume", "label": "Volume"},

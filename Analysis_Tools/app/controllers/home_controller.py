@@ -10,7 +10,7 @@ Updated: 2026-02-19 - Added NSE API endpoints so charts always show data
 
 from datetime import datetime, timedelta
 
-from flask import Blueprint, jsonify, render_template
+from flask import Blueprint, jsonify, render_template, request
 
 
 import os
@@ -381,7 +381,7 @@ def advance_decline():
         declines = count_data.get("Declines", 0)
 
         # Debug logging
-        print(f"[NSE API] ✅ Advances: {advances}, Declines: {declines}, Timestamp: '{timestamp}'")
+        print(f"[NSE API]  Advances: {advances}, Declines: {declines}, Timestamp: '{timestamp}'")
         print(f"[NSE API] Response keys: {list(data.keys())}")
 
         # Save to database for persistence

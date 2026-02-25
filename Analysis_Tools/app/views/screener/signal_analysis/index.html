@@ -264,7 +264,7 @@
 
           <!-- Left: Title + Date -->
           <div style="display: flex; align-items: center; gap: 16px;">
-            <div class="card-title">📊 Signal Analysis</div>
+            <div class="card-title"> Signal Analysis</div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
               <label style="font-size: 11px; font-weight: 600; color: #8B2432; text-transform: uppercase;">Date:</label>
@@ -310,12 +310,12 @@
                 <th style="width: 45px;">#</th>
                 <th class="sortable" data-sort="symbol">
                   Symbol <span class="sort-icon" id="sortSymbol">{% if sort_by == 'symbol' %}{% if sort_order == 'asc'
-                    %}▲{% else %}▼{% endif %}{% endif %}</span>
+                    %}{% else %}{% endif %}{% endif %}</span>
                 </th>
                 <th style="width: 90px;">Signal</th>
                 <th class="sortable" data-sort="strength" style="width: 120px;">
                   Strength <span class="sort-icon" id="sortStrength">{% if sort_by == 'strength' %}{% if sort_order ==
-                    'asc' %}▲{% else %}▼{% endif %}{% endif %}</span>
+                    'asc' %}{% else %}{% endif %}{% endif %}</span>
                 </th>
                 <th style="width: 80px;">Details</th>
               </tr>
@@ -328,8 +328,8 @@
                 <td><span class="signal-badge {{ item.signal|lower }}">{{ item.signal }}</span></td>
                 <td>
                   <div class="signal-score">
-                    <span class="bull">🟢 {{ item.bullish_count }}</span>
-                    <span class="bear">🔴 {{ item.bearish_count }}</span>
+                    <span class="bull"> {{ item.bullish_count }}</span>
+                    <span class="bear"> {{ item.bearish_count }}</span>
                   </div>
                 </td>
                 <td><button class="expand-btn" onclick="toggleDetails('details-{{ loop.index }}')">View</button></td>
@@ -431,8 +431,8 @@
                 <td><span class="signal-badge ${signalClass}">${item.signal}</span></td>
                 <td>
                     <div class="signal-score">
-                        <span class="bull">🟢 ${item.bullish_count}</span>
-                        <span class="bear">🔴 ${item.bearish_count}</span>
+                        <span class="bull"> ${item.bullish_count}</span>
+                        <span class="bear"> ${item.bearish_count}</span>
                     </div>
                 </td>
                 <td><button class="expand-btn" onclick="toggleDetails('${rowId}')">View</button></td>
@@ -490,8 +490,8 @@
 
   // Update sort indicators
   function updateSortIndicators() {
-    document.getElementById('sortSymbol').textContent = currentSortBy === 'symbol' ? (currentSortOrder === 'asc' ? '▲' : '▼') : '';
-    document.getElementById('sortStrength').textContent = currentSortBy === 'strength' ? (currentSortOrder === 'asc' ? '▲' : '▼') : '';
+    document.getElementById('sortSymbol').textContent = currentSortBy === 'symbol' ? (currentSortOrder === 'asc' ? '' : '') : '';
+    document.getElementById('sortStrength').textContent = currentSortBy === 'strength' ? (currentSortOrder === 'asc' ? '' : '') : '';
   }
 
   // Handle stat-filter click (stats on right side work as filters)

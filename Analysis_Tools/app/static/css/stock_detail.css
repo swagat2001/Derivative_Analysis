@@ -251,7 +251,7 @@
 }
 
 /* ============================ */
-/* 📊 STOCK DETAIL STATISTICS STYLES */
+/*  STOCK DETAIL STATISTICS STYLES */
 /* ============================ */
 
 /* Outer Card Container */
@@ -591,7 +591,7 @@
 }
 
 /* ==============================
-   🎯 ATM ROW — GOLDMINE MAROON HIGHLIGHT
+    ATM ROW — GOLDMINE MAROON HIGHLIGHT
    ============================== */
 
 .atm-row {
@@ -621,10 +621,10 @@
 }
 
 /* ==============================
-   🎨 OTM / ITM ZONE LOGIC - LIGHT GOLDEN INSTEAD OF GREY
+    OTM / ITM ZONE LOGIC - LIGHT GOLDEN INSTEAD OF GREY
    ============================== */
 
-/* ✅ Above ATM — Calls are OTM (light golden), Puts are ITM (white) */
+/*  Above ATM — Calls are OTM (light golden), Puts are ITM (white) */
 .otm-call td.ce-td {
     background: #ffffff !important;
     /* white */
@@ -640,7 +640,7 @@
 }
 
 
-/* ✅ Below ATM — Calls are ITM (light golden), Puts are OTM (white) */
+/*  Below ATM — Calls are ITM (light golden), Puts are OTM (white) */
 .otm-put td.ce-td {
     background: #fef9e7 !important;
     /* light golden - improved visibility */
@@ -725,7 +725,7 @@
 }
 
 /* =============================== */
-/* 📊 STOCK DETAIL GAUGES LAYOUT   */
+/*  STOCK DETAIL GAUGES LAYOUT   */
 /* Pure CSS - No JavaScript */
 /* =============================== */
 

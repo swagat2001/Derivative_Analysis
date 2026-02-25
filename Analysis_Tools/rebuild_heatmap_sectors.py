@@ -77,8 +77,8 @@ def rebuild_sectors():
                 if i % 50 == 0:
                     print(f"   Progress: {i}/{len(symbols)} stocks processed...")
 
-        print(f"\n✓ Updated {updated} records")
-        print(f"✓ Skipped {skipped} records")
+        print(f"\n Updated {updated} records")
+        print(f" Skipped {skipped} records")
 
         # Show sector distribution
         print("\n" + "="*60)
@@ -98,11 +98,11 @@ def rebuild_sectors():
             for row in result:
                 print(f"   {row[0]:30s} : {row[1]:4d} stocks")
 
-        print("\n✓ Sector rebuild complete!")
+        print("\n Sector rebuild complete!")
         return True
 
     except Exception as e:
-        print(f"\n✗ ERROR during update: {e}")
+        print(f"\n ERROR during update: {e}")
         import traceback
         traceback.print_exc()
         return False

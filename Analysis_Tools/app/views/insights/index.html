@@ -1341,7 +1341,7 @@
             <div class="header-left">
                 <h1 class="insights-title" id="heatmapTitle">
                     <span id="heatmapTitleText">Nifty 50 Heatmap</span>
-                    <span class="info-icon" title="Stock market heatmap showing price changes">ⓘ</span>
+                    <span class="info-icon" title="Stock market heatmap showing price changes"></span>
                 </h1>
             </div>
             <div class="header-right" id="indexPriceBox">
@@ -1627,7 +1627,7 @@
             let currentIndex = '{{ selected_index }}';
             if (currentIndex === 'None' || !currentIndex) currentIndex = 'all';
 
-            const indexIcons = { 'all': '📊', 'nifty50': '🏆', 'niftynext50': '📈', 'niftybank': '🏦', 'niftyit': '💻', 'niftypharma': '💊', 'niftyauto': '🚗', 'niftymetal': '⚙️', 'niftyfmcg': '🛒', 'niftyenergy': '⚡', 'niftypsubank': '🏛️', 'niftyfinancial': '💰', 'sensex': '🎯' };
+            const indexIcons = { 'all': '', 'nifty50': '', 'niftynext50': '', 'niftybank': '', 'niftyit': '', 'niftypharma': '', 'niftyauto': '', 'niftymetal': '', 'niftyfmcg': '', 'niftyenergy': '', 'niftypsubank': '', 'niftyfinancial': '', 'sensex': '' };
 
             function switchTab(tab) {
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -2216,7 +2216,7 @@
 
                     if (!data.success || !data.data || data.data.length === 0) {
                         container.innerHTML = `<div class="empty-state">
-                        <h3>📦 No Delivery Data Available</h3>
+                        <h3> No Delivery Data Available</h3>
                         <p>Delivery percentage data is not available for ${currentDate}.</p>
                     </div>`;
                         return;
@@ -2280,7 +2280,7 @@
 
                 } catch (e) {
                     console.error('Error loading delivery data:', e);
-                    container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load delivery data.</p></div>';
+                    container.innerHTML = '<div class="empty-state"><h3> Error</h3><p>Failed to load delivery data.</p></div>';
                 }
             }
 
@@ -2313,7 +2313,7 @@
 
                     if (!data.success || !data.data || data.data.length === 0) {
                         container.innerHTML = `<div class="empty-state">
-                        <h3>📊 No Volume Breakout Data</h3>
+                        <h3> No Volume Breakout Data</h3>
                         <p>No stocks found with volume ≥ ${multiplier}x average for ${currentDate}.</p>
                     </div>`;
                         return;
@@ -2378,7 +2378,7 @@
 
                 } catch (e) {
                     console.error('Error loading volume data:', e);
-                    container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load volume breakout data.</p></div>';
+                    container.innerHTML = '<div class="empty-state"><h3> Error</h3><p>Failed to load volume breakout data.</p></div>';
                 }
             }
 

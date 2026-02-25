@@ -9,7 +9,7 @@ import time
 import threading
 import requests
 
-# ── NSE API endpoints ─────────────────────────────────────────────────────────
+#  NSE API endpoints
 _NSE_HOME      = "https://www.nseindia.com/"
 _GRAPH_API     = (
     "https://www.nseindia.com/api/NextApi/apiClient"
@@ -32,7 +32,7 @@ _HEADERS = {
     "Connection":      "keep-alive",
 }
 
-# ── App-key ↔ NSE display-name mapping ───────────────────────────────────────
+#  App-key ↔ NSE display-name mapping
 # Keys match the rest of the app (live_indices_model.py / home_live_updates.js)
 # Names are verified from the live NSE API (indexName field)
 NSE_NAME_TO_KEY: dict[str, str] = {
@@ -57,7 +57,7 @@ KEY_TO_NSE_URL: dict[str, str] = {
     "indiavix":   "India%20VIX",
 }
 
-# ── Simple in-process cache ───────────────────────────────────────────────────
+#  Simple in-process cache
 _PRICE_CACHE_TTL   = 10   # seconds  – index price cards (near-real-time)
 _CHART_CACHE_TTL   = 60   # seconds  – chart series (minute-level NSE data)
 _SESSION_TTL       = 300  # seconds  – reuse one session to keep cookies fresh
@@ -73,7 +73,7 @@ _session: requests.Session | None = None
 _session_ts: float = 0.0
 
 
-# ── Session management ────────────────────────────────────────────────────────
+#  Session management
 
 def _get_session() -> requests.Session:
     """Return a cached requests.Session with NSE cookies, refreshing if stale."""
@@ -92,7 +92,7 @@ def _get_session() -> requests.Session:
         return _session
 
 
-# ── Public: index prices ──────────────────────────────────────────────────────
+#  Public: index prices
 
 def get_nse_index_data() -> dict:
     """
@@ -151,7 +151,7 @@ def get_nse_index_data() -> dict:
     return result or (_price_cache.get("data") or {})
 
 
-# ── Public: 1-day chart series ────────────────────────────────────────────────
+#  Public: 1-day chart series
 
 def get_nse_chart_data(index_key: str) -> dict:
     """
@@ -243,7 +243,7 @@ def get_nse_chart_data(index_key: str) -> dict:
     return result
 
 
-# ── Public: SENSEX chart (BSE – via yfinance) ─────────────────────────────────
+#  Public: SENSEX chart (BSE – via yfinance)
 
 _SENSEX_CACHE_KEY = "__sensex__"   # separate entry in _chart_cache
 
