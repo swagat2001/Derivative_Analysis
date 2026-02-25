@@ -175,27 +175,67 @@
             </div>
 
             <div class="insight-card market-mood">
-              <div class="insight-header">
-                <h3>Market Breadth</h3>
+            <div class="insight-header">
+            <h3>Market Breadth</h3>
+            <div style="display:flex;align-items:center;gap:8px;">
                 <span class="insight-badge">{{ market_stats.date if market_stats.date else 'Today' }}</span>
-              </div>
-              <div class="insight-content">
-                <div class="breadth-visual">
-                  <div class="breadth-bar">
-                    <div class="advance" data-width="{{ market_stats.adv_width | default('50%') }}">
-                      <span>{{ "{:,}".format(market_stats.advances | default(0)) }}</span>
-                    </div>
-                    <div class="decline" data-width="{{ market_stats.dec_width | default('50%') }}">
-                      <span>{{ "{:,}".format(market_stats.declines | default(0)) }}</span>
-                    </div>
-                  </div>
-                  <div class="breadth-labels">
-                    <span class="up">Advances</span>
-                    <span class="down">Declines</span>
-                  </div>
-                </div>
-              </div>
+                <button id="breadthChartBtn" onclick="openBreadthChart()" title="View history chart"
+                style="background:none;border:1px solid #e5e7eb;border-radius:5px;padding:3px 5px;cursor:pointer;display:flex;align-items:center;color:#6b7280;transition:all 0.2s;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            </button>
             </div>
+            </div>
+            <div class="insight-content">
+            <div class="breadth-visual">
+            <div class="breadth-bar">
+            <div class="advance" data-width="{{ market_stats.adv_width | default('50%') }}">
+              <span>{{ "{:,}".format(market_stats.advances | default(0)) }}</span>
+              </div>
+                <div class="decline" data-width="{{ market_stats.dec_width | default('50%') }}">
+                    <span>{{ "{:,}".format(market_stats.declines | default(0)) }}</span>
+                    </div>
+            </div>
+            <div class="breadth-labels">
+              <span class="up">Advances</span>
+              <span class="down">Declines</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MARKET BREADTH HISTORY MODAL ===== -->
+      <div id="breadthModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:14px;padding:24px;width:min(680px,95vw);box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative;">
+          <!-- Header -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <div>
+              <h3 style="margin:0;font-size:16px;font-weight:700;color:#1f2937;">Market Breadth History</h3>
+              <p style="margin:2px 0 0;font-size:12px;color:#6b7280;">Daily Advances &amp; Declines</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <select id="breadthDaysSelect" onchange="loadBreadthChart()" style="font-size:12px;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;">
+                <option value="15">15 Days</option>
+                <option value="30" selected>30 Days</option>
+                <option value="60">60 Days</option>
+                <option value="90">90 Days</option>
+              </select>
+              <button onclick="closeBreadthChart()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#9ca3af;line-height:1;">&#x2715;</button>
+            </div>
+          </div>
+          <!-- Chart -->
+          <div style="position:relative;height:280px;">
+            <canvas id="breadthHistoryChart"></canvas>
+            <div id="breadthChartLoader" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:13px;">Loading...</div>
+          </div>
+          <!-- Legend -->
+          <div style="display:flex;gap:20px;justify-content:center;margin-top:14px;">
+            <span style="font-size:12px;color:#16a34a;display:flex;align-items:center;gap:5px;"><span style="width:12px;height:3px;background:#16a34a;display:inline-block;border-radius:2px;"></span>Advances</span>
+            <span style="font-size:12px;color:#dc2626;display:flex;align-items:center;gap:5px;"><span style="width:12px;height:3px;background:#dc2626;display:inline-block;border-radius:2px;"></span>Declines</span>
+          </div>
+        </div>
+      </div>
 
             <div class="insight-card pe-ratio">
               <div class="insight-header">
@@ -733,6 +773,104 @@
       document.getElementById(tabId).classList.add('active');
     });
   });
+
+  // ===== MARKET BREADTH HISTORY CHART =====
+  let breadthChartInstance = null;
+
+  function openBreadthChart() {
+    const modal = document.getElementById('breadthModal');
+    modal.style.display = 'flex';
+    loadBreadthChart();
+  }
+
+  function closeBreadthChart() {
+    document.getElementById('breadthModal').style.display = 'none';
+  }
+
+  // Close on backdrop click
+  document.getElementById('breadthModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBreadthChart();
+  });
+
+  async function loadBreadthChart() {
+    const days = document.getElementById('breadthDaysSelect').value;
+    const loader = document.getElementById('breadthChartLoader');
+    const canvas = document.getElementById('breadthHistoryChart');
+
+    loader.style.display = 'flex';
+    canvas.style.opacity = '0';
+
+    try {
+      const resp = await fetch(`/api/market-breadth-history?days=${days}`);
+      const json = await resp.json();
+
+      if (!json.success || !json.data.length) {
+        loader.textContent = 'No historical data yet. Data will appear after the first daily update runs.';
+        return;
+      }
+
+      const labels   = json.data.map(d => d.date.slice(5));   // MM-DD
+      const advances = json.data.map(d => d.advances);
+      const declines = json.data.map(d => d.declines);
+
+      if (breadthChartInstance) breadthChartInstance.destroy();
+
+      breadthChartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Advances',
+              data: advances,
+              backgroundColor: 'rgba(22,163,74,0.75)',
+              borderColor: '#16a34a',
+              borderWidth: 1,
+              borderRadius: 3,
+            },
+            {
+              label: 'Declines',
+              data: declines,
+              backgroundColor: 'rgba(220,38,38,0.75)',
+              borderColor: '#dc2626',
+              borderWidth: 1,
+              borderRadius: 3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('en-IN')}`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 10 }, maxRotation: 45 },
+            },
+            y: {
+              grid: { color: '#f3f4f6' },
+              ticks: { font: { size: 10 } },
+            },
+          },
+        },
+      });
+
+      loader.style.display = 'none';
+      canvas.style.opacity = '1';
+
+    } catch (err) {
+      loader.textContent = 'Failed to load chart data.';
+      console.error(err);
+    }
+  }
+  // ===== END MARKET BREADTH CHART =====
 
   // Animate on scroll (simple version)
   const observerOptions = {

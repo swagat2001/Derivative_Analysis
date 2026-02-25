@@ -15,6 +15,31 @@ from Analysis_Tools.app.models.db_config import engine_cash
 from sqlalchemy import text
 import sys
 
+def create_table():
+    """Create the index_constituents table if it doesn't exist."""
+    print("[INFO] Checking/Creating index_constituents table...")
+    try:
+        with engine_cash.connect() as conn:
+            conn.execute(
+                text(
+                    """
+                CREATE TABLE IF NOT EXISTS index_constituents (
+                    index_key VARCHAR(100) NOT NULL,
+                    index_name VARCHAR(200),
+                    symbol VARCHAR(50) NOT NULL,
+                    PRIMARY KEY (index_key, symbol)
+                );
+                CREATE INDEX IF NOT EXISTS idx_index_key ON index_constituents(index_key);
+            """
+                )
+            )
+            conn.commit()
+        print("[SUCCESS] Table verified.")
+        return True
+    except Exception as e:
+        print(f"[ERROR] Could not create table: {e}")
+        return False
+
 def create_session():
     s = requests.Session()
     s.headers.update({
@@ -112,4 +137,5 @@ def fetch_all():
             print(f"Error saving to database: {e}")
 
 if __name__ == '__main__':
-    fetch_all()
+    if create_table():
+        fetch_all()

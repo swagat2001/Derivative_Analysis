@@ -61,8 +61,9 @@ def insights_page():
     active_tab = request.args.get("tab", "heatmap")
     selected_index = request.args.get("index", "all")
 
-    # Get all heatmap data first to build dynamic index list
-    all_heatmap_data = get_heatmap_data(selected_date) if selected_date else []
+    # Get all heatmap data first (UNFILTERED) to build complete dynamic index list
+    # We want index_list to show ALL possible indices, not just F&O ones
+    all_heatmap_data = get_heatmap_data(selected_date, filter_fo=False) if selected_date else []
     available_symbols = [s["symbol"] for s in all_heatmap_data]
 
     # Get dynamic index list based on available stocks
@@ -109,9 +110,10 @@ def api_heatmap():
     if not selected_date:
         return jsonify({"error": "No data available"}), 404
 
-    # Get ALL heatmap data first
-    # Pass period to the model
-    all_heatmap_data = get_heatmap_data(selected_date, period=period, comparison_date=comparison_date)
+    # Get heatmap data
+    # If index is 'all', show all stocks (do not filter by F&O)
+    should_filter_fo = False
+    all_heatmap_data = get_heatmap_data(selected_date, period=period, comparison_date=comparison_date, filter_fo=should_filter_fo)
 
     # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
     if not all_heatmap_data and not comparison_date:
@@ -127,13 +129,20 @@ def api_heatmap():
                 if fallback_date and str(fallback_date) != str(selected_date):
                     print(f"[INFO] Fallback: No heatmap data for {selected_date}, using {fallback_date}")
                     selected_date = str(fallback_date)
-                    all_heatmap_data = get_heatmap_data(selected_date, period=period)
+                    all_heatmap_data = get_heatmap_data(selected_date, period=period, filter_fo=should_filter_fo)
         except Exception as e:
             print(f"[ERROR] Heatmap fallback failed: {e}")
 
     # Build dynamic index list
-    available_symbols = [s["symbol"] for s in all_heatmap_data]
-    dynamic_indices = get_dynamic_indices(available_symbols)
+    # Build dynamic index list for the UI dropdown (always based on ALL market stocks for consistency)
+    if should_filter_fo:
+        # We need the full list to build indices correctly
+        full_market_data = get_heatmap_data(selected_date, filter_fo=False)
+        symbols_for_indices = [s["symbol"] for s in full_market_data]
+    else:
+        symbols_for_indices = [s["symbol"] for s in all_heatmap_data]
+
+    dynamic_indices = get_dynamic_indices(symbols_for_indices)
 
     # Filter by index
     heatmap_data = filter_stocks_by_index(all_heatmap_data, selected_index)
@@ -222,8 +231,8 @@ def api_indices():
     if not selected_date:
         return jsonify({"success": True, "indices": get_index_list()})
 
-    # Get all heatmap data to build dynamic index list
-    all_heatmap_data = get_heatmap_data(selected_date)
+    # Get all heatmap data to build dynamic index list (UNFILTERED)
+    all_heatmap_data = get_heatmap_data(selected_date, filter_fo=False)
     available_symbols = [s["symbol"] for s in all_heatmap_data]
 
     return jsonify(
@@ -515,7 +524,8 @@ def api_delivery():
 
     print(f"[API] Fetching delivery data for {selected_date}, min_pct={min_pct}, index={selected_index}")
 
-    delivery_data = get_delivery_data(selected_date, min_pct)
+    should_filter_fo = False
+    delivery_data = get_delivery_data(selected_date, min_pct, filter_fo=should_filter_fo)
 
     # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
     if not delivery_data:
@@ -531,7 +541,7 @@ def api_delivery():
                 if fallback_date and str(fallback_date) != str(selected_date):
                     print(f"[INFO] Fallback: No delivery data for {selected_date}, using {fallback_date}")
                     selected_date = str(fallback_date)
-                    delivery_data = get_delivery_data(selected_date, min_pct)
+                    delivery_data = get_delivery_data(selected_date, min_pct, filter_fo=should_filter_fo)
         except Exception as e:
             print(f"[ERROR] Delivery data fallback failed: {e}")
 

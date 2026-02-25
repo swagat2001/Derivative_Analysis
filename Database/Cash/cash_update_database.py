@@ -650,6 +650,19 @@ def main():
         except Exception as e:
             logger.error(f"⚠️ Failed to run technical screener cache update: {e}")
 
+        # ===========================================
+        # 🚀 STEP 6: UPDATE MARKET BREADTH EOD
+        # ===========================================
+        print("\n" + "=" * 80)
+        logger.info("🚀 STEP 6: UPDATING MARKET BREADTH EOD (Advances/Declines history)")
+        print("=" * 80 + "\n")
+        try:
+            from market_breadth_eod import run_market_breadth_eod
+            run_market_breadth_eod()
+            logger.info("\n✅ Market Breadth EOD Update Complete")
+        except Exception as e:
+            logger.error(f"⚠️ Failed to run market breadth EOD update: {e}")
+
         return True
 
     except Exception as e:

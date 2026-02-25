@@ -24,7 +24,6 @@ INDEX_DATA_FILE = os.path.join(
     "index_constituents.json",
 )
 
-# Load pre-fetched index data from file
 _prefetched_indices = {}
 
 
@@ -32,7 +31,6 @@ def _load_prefetched_indices():
     """Load index data from database (primary) or pre-fetched JSON file (fallback)."""
     global _prefetched_indices
 
-    # 1. Try loading from Database first (most up-to-date)
     try:
         query = text("SELECT index_key, symbol FROM index_constituents")
         with engine_cash.connect() as conn:
@@ -53,7 +51,6 @@ def _load_prefetched_indices():
         print(f"[DEBUG] DB constituent load failed: {e}")
         # traceback.print_exc()
 
-    # 2. Fallback to JSON file
     if os.path.exists(INDEX_DATA_FILE):
         try:
             with open(INDEX_DATA_FILE, "r", encoding="utf-8") as f:
@@ -66,7 +63,6 @@ def _load_prefetched_indices():
     return False
 
 
-# Try to load on module import
 _load_prefetched_indices()
 
 
@@ -126,6 +122,7 @@ NSE_INDEX_URLS = {
 # Index metadata
 INDEX_METADATA = {
     "all": {"name": "All F&O Stocks", "description": "All stocks with F&O trading", "icon": "📊"},
+    "all_market": {"name": "All Market Stocks", "description": "All stocks in the cash market", "icon": "🌐"},
     "nifty50": {"name": "Nifty 50", "description": "Top 50 companies by market cap", "icon": "🏆"},
     "niftynext50": {"name": "Nifty Next 50", "description": "Next 50 companies after Nifty 50", "icon": "📈"},
     "niftybank": {"name": "Nifty Bank", "description": "Banking sector stocks", "icon": "🏦"},
@@ -138,291 +135,6 @@ INDEX_METADATA = {
     "niftypsubank": {"name": "Nifty PSU Bank", "description": "Public Sector Banks", "icon": "🏛️"},
     "niftyfinancial": {"name": "Nifty Financial", "description": "Financial Services stocks", "icon": "💰"},
     "sensex": {"name": "Sensex", "description": "BSE Top 30 companies", "icon": "🎯"},
-}
-
-
-# =============================================================================
-# FALLBACK DATA (used when NSE API fails)
-# =============================================================================
-FALLBACK_STOCKS = {
-    "nifty50": [
-        "ADANIPORTS",
-        "APOLLOHOSP",
-        "ASIANPAINT",
-        "AXISBANK",
-        "BAJAJ-AUTO",
-        "BAJFINANCE",
-        "BAJAJFINSV",
-        "BEL",
-        "BPCL",
-        "BHARTIARTL",
-        "BRITANNIA",
-        "CIPLA",
-        "COALINDIA",
-        "DRREDDY",
-        "EICHERMOT",
-        "ETERNAL",
-        "GRASIM",
-        "HCLTECH",
-        "HDFCBANK",
-        "HDFCLIFE",
-        "HEROMOTOCO",
-        "HINDALCO",
-        "HINDUNILVR",
-        "ICICIBANK",
-        "INDUSINDBK",
-        "INFY",
-        "ITC",
-        "JSWSTEEL",
-        "KOTAKBANK",
-        "LT",
-        "M&M",
-        "MARUTI",
-        "NESTLEIND",
-        "NTPC",
-        "ONGC",
-        "POWERGRID",
-        "RELIANCE",
-        "SBILIFE",
-        "SHRIRAMFIN",
-        "SBIN",
-        "SUNPHARMA",
-        "TCS",
-        "TATACONSUM",
-        "TATAMOTORS",
-        "TATASTEEL",
-        "TECHM",
-        "TITAN",
-        "TRENT",
-        "ULTRACEMCO",
-        "WIPRO",
-    ],
-    "niftynext50": [
-        "ABB",
-        "ACC",
-        "ADANIENT",
-        "AMBUJACEM",
-        "AUROPHARMA",
-        "BANKBARODA",
-        "BOSCHLTD",
-        "CANBK",
-        "CHOLAFIN",
-        "COLPAL",
-        "DLF",
-        "DABUR",
-        "DMART",
-        "GODREJCP",
-        "GAIL",
-        "HAL",
-        "HAVELLS",
-        "ICICIGI",
-        "ICICIPRULI",
-        "INDHOTEL",
-        "IOC",
-        "IRCTC",
-        "JINDALSTEL",
-        "JIOFIN",
-        "JSWENERGY",
-        "LICI",
-        "LODHA",
-        "LTIM",
-        "LUPIN",
-        "MARICO",
-        "MAXHEALTH",
-        "NAUKRI",
-        "NHPC",
-        "PAGEIND",
-        "PAYTM",
-        "PFC",
-        "PIDILITIND",
-        "PNB",
-        "POLYCAB",
-        "RECLTD",
-        "SIEMENS",
-        "SRF",
-        "TATAPOWER",
-        "TVSMOTOR",
-        "TORNTPHARM",
-        "TRENT",
-        "UNIONBANK",
-        "VEDL",
-        "VBL",
-        "ZOMATO",
-    ],
-    "niftybank": [
-        "AUBANK",
-        "AXISBANK",
-        "BANDHANBNK",
-        "BANKBARODA",
-        "FEDERALBNK",
-        "HDFCBANK",
-        "ICICIBANK",
-        "IDFCFIRSTB",
-        "INDUSINDBK",
-        "KOTAKBANK",
-        "PNB",
-        "SBIN",
-    ],
-    "niftyit": [
-        "COFORGE",
-        "HCLTECH",
-        "INFY",
-        "LTIM",
-        "LTTS",
-        "MPHASIS",
-        "PERSISTENT",
-        "TCS",
-        "TECHM",
-        "WIPRO",
-    ],
-    "niftypharma": [
-        "ALKEM",
-        "APOLLOHOSP",
-        "AUROPHARMA",
-        "BIOCON",
-        "CIPLA",
-        "DIVISLAB",
-        "DRREDDY",
-        "GLAND",
-        "GLENMARK",
-        "LAURUSLABS",
-        "LUPIN",
-        "SUNPHARMA",
-        "TORNTPHARM",
-        "ZYDUSLIFE",
-    ],
-    "niftyauto": [
-        "APOLLOTYRE",
-        "ASHOKLEY",
-        "BAJAJ-AUTO",
-        "BALKRISIND",
-        "BHARATFORG",
-        "BOSCHLTD",
-        "EICHERMOT",
-        "EXIDEIND",
-        "HEROMOTOCO",
-        "M&M",
-        "MARUTI",
-        "MRF",
-        "MOTHERSON",
-        "TATAMOTORS",
-        "TVSMOTOR",
-    ],
-    "niftymetal": [
-        "ADANIENT",
-        "APL",
-        "COALINDIA",
-        "HINDALCO",
-        "HINDCOPPER",
-        "JINDALSTEL",
-        "JSWSTEEL",
-        "NATIONALUM",
-        "NMDC",
-        "RATNAMANI",
-        "SAIL",
-        "TATASTEEL",
-        "VEDL",
-        "WELCORP",
-    ],
-    "niftyfmcg": [
-        "BRITANNIA",
-        "COLPAL",
-        "DABUR",
-        "EMAMILTD",
-        "GODREJCP",
-        "HINDUNILVR",
-        "ITC",
-        "MARICO",
-        "NESTLEIND",
-        "PGHH",
-        "RADICO",
-        "TATACONSUM",
-        "UBL",
-        "VBL",
-        "ZYDUSWELL",
-    ],
-    "niftyenergy": [
-        "ADANIGREEN",
-        "BPCL",
-        "COALINDIA",
-        "GAIL",
-        "HINDPETRO",
-        "IOC",
-        "NTPC",
-        "ONGC",
-        "POWERGRID",
-        "RELIANCE",
-        "TATAPOWER",
-        "ADANIENSOL",
-    ],
-    "niftypsubank": [
-        "BANKBARODA",
-        "BANKINDIA",
-        "CANBK",
-        "CENTRALBK",
-        "INDIANB",
-        "IOB",
-        "MAHABANK",
-        "PNB",
-        "PSB",
-        "SBIN",
-        "UCOBANK",
-        "UNIONBANK",
-    ],
-    "niftyfinancial": [
-        "AXISBANK",
-        "BAJAJFINSV",
-        "BAJFINANCE",
-        "CHOLAFIN",
-        "HDFCAMC",
-        "HDFCBANK",
-        "HDFCLIFE",
-        "ICICIBANK",
-        "ICICIGI",
-        "ICICIPRULI",
-        "KOTAKBANK",
-        "LICHSGFIN",
-        "M&MFIN",
-        "MUTHOOTFIN",
-        "PFC",
-        "RECLTD",
-        "SBICARD",
-        "SBILIFE",
-        "SBIN",
-        "SHRIRAMFIN",
-    ],
-    "sensex": [
-        "ASIANPAINT",
-        "AXISBANK",
-        "BAJAJ-AUTO",
-        "BAJFINANCE",
-        "BHARTIARTL",
-        "HCLTECH",
-        "HDFCBANK",
-        "HEROMOTOCO",
-        "HINDUNILVR",
-        "ICICIBANK",
-        "INDUSINDBK",
-        "INFY",
-        "ITC",
-        "JSWSTEEL",
-        "KOTAKBANK",
-        "LT",
-        "M&M",
-        "MARUTI",
-        "NESTLEIND",
-        "NTPC",
-        "POWERGRID",
-        "RELIANCE",
-        "SBIN",
-        "SUNPHARMA",
-        "TATAMOTORS",
-        "TATASTEEL",
-        "TCS",
-        "TECHM",
-        "TITAN",
-        "ULTRACEMCO",
-    ],
 }
 
 
@@ -495,51 +207,37 @@ def fetch_index_constituents(index_key: str) -> List[str]:
     if cached is not None:
         return cached
 
-    # 3. Try NSE API (only if file data not available)
+    # 3. Try NSE API
     url = NSE_INDEX_URLS.get(index_key)
+    if url:
+        try:
+            session = _create_nse_session()
+            response = session.get(url, timeout=10)
 
-    if url is None:
-        # No API URL - use fallback
-        stocks = FALLBACK_STOCKS.get(index_key, [])
-        _set_cached(cache_key, stocks)
-        return stocks
+            if response.status_code == 200:
+                data = response.json()
+                constituents = []
 
-    try:
-        session = _create_nse_session()
-        response = session.get(url, timeout=10)
+                for item in data.get("data", []):
+                    symbol = item.get("symbol", "")
+                    # Filter out the index name itself
+                    if symbol and not symbol.startswith("NIFTY") and symbol != "SENSEX":
+                        constituents.append(symbol)
 
-        if response.status_code == 200:
-            data = response.json()
-            constituents = []
+                if constituents:
+                    print(f"[INFO] Fetched {len(constituents)} constituents for {index_key} from NSE")
+                    _set_cached(cache_key, constituents)
+                    return constituents
+        except Exception as e:
+            print(f"[ERROR] Failed to fetch {index_key} from NSE: {e}")
 
-            for item in data.get("data", []):
-                symbol = item.get("symbol", "")
-                # Filter out the index name itself
-                if symbol and not symbol.startswith("NIFTY") and symbol != "SENSEX":
-                    constituents.append(symbol)
-
-            if constituents:
-                print(f"[INFO] Fetched {len(constituents)} constituents for {index_key} from NSE")
-                _set_cached(cache_key, constituents)
-                return constituents
-
-        # Fall back if API returned no data
-        print(f"[WARNING] NSE API returned no data for {index_key}, using fallback")
-        stocks = FALLBACK_STOCKS.get(index_key, [])
-        _set_cached(cache_key, stocks)
-        return stocks
-
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch {index_key} from NSE: {e}")
-        stocks = FALLBACK_STOCKS.get(index_key, [])
-        _set_cached(cache_key, stocks)
-        return stocks
+    return []
 
 
 def get_index_stocks(index_key: str) -> Optional[List[str]]:
     """
     Get list of stocks for a specific index.
-    Returns None if index_key is 'all' (means no filter).
+    Returns None if index_key is 'all' or 'all_market' (means no filter).
 
     Uses NSE API with 24-hour caching - fetches once per day.
     After first fetch, all subsequent calls are instant from cache.
@@ -550,7 +248,7 @@ def get_index_stocks(index_key: str) -> Optional[List[str]]:
     Returns:
         List of stock symbols or None for 'all'
     """
-    if index_key == "all":
+    if index_key in ["all", "all_market"]:
         return None
 
     return fetch_index_constituents(index_key)
@@ -592,7 +290,16 @@ def get_index_list() -> List[Dict]:
 
 def get_index_info(index_key: str) -> Dict:
     """Get information about an index."""
-    return INDEX_METADATA.get(index_key, INDEX_METADATA["all"])
+    if index_key in INDEX_METADATA:
+        return INDEX_METADATA[index_key]
+
+    # Check dynamic indices
+    indices = get_index_list()
+    for idx in indices:
+        if idx["key"] == index_key:
+            return idx
+
+    return INDEX_METADATA["all"]
 
 
 def filter_stocks_by_index(stocks: list, index_key: str) -> list:
@@ -623,8 +330,6 @@ def get_dynamic_indices(available_symbols: list) -> List[Dict]:
     Get list of indices with count of matching stocks from available_symbols.
     Only returns indices that have at least 1 matching stock.
 
-    Uses NSE API with 24-hour caching - first call fetches, rest are instant.
-
     Args:
         available_symbols: List of available stock symbols
 
@@ -637,11 +342,14 @@ def get_dynamic_indices(available_symbols: list) -> List[Dict]:
     available_upper = set(s.upper() for s in available_symbols)
 
     result = []
-    for key, val in INDEX_METADATA.items():
+    indices = get_index_list()
+
+    for idx_info in indices:
+        key = idx_info["key"]
         if key == "all":
-            result.insert(0, {"key": key, "name": val["name"], "icon": val["icon"], "count": len(available_symbols)})
+            result.insert(0, {"key": key, "name": idx_info["name"], "icon": idx_info["icon"], "count": len(available_symbols)})
         else:
-            # Uses 24-hour cached NSE data
+            # Uses 24-hour cached data or DB data
             index_stocks = get_index_stocks(key)
             if index_stocks:
                 index_upper = set(s.upper() for s in index_stocks)
@@ -650,13 +358,12 @@ def get_dynamic_indices(available_symbols: list) -> List[Dict]:
                     result.append(
                         {
                             "key": key,
-                            "name": f"{val['name']} ({match_count})",
-                            "icon": val["icon"],
+                            "name": f"{idx_info['name']} ({match_count})",
+                            "icon": idx_info["icon"],
                             "count": match_count,
                         }
                     )
 
-    # Sort by count (descending) but keep 'all' first
     if len(result) > 1:
         all_idx = result[0]
         rest = sorted(result[1:], key=lambda x: x["count"], reverse=True)
@@ -684,7 +391,6 @@ def get_stocks_data_from_db(tickers: List[str], date: str = None) -> pd.DataFram
         if not tickers:
             return pd.DataFrame()
 
-        # If no date provided, get latest date from futures_oi_cache
         if not date:
             date_query = text(
                 """
@@ -702,7 +408,6 @@ def get_stocks_data_from_db(tickers: List[str], date: str = None) -> pd.DataFram
             print("[ERROR] No data available in futures_oi_cache")
             return pd.DataFrame()
 
-        # Fetch stock data from futures_oi_cache
         placeholders = ",".join([f"'{ticker}'" for ticker in tickers])
         query = text(
             f"""
@@ -725,7 +430,6 @@ def get_stocks_data_from_db(tickers: List[str], date: str = None) -> pd.DataFram
 
         df = pd.read_sql(query, engine, params={"date": date})
 
-        # Try to get more detailed data from individual stock tables
         inspector = inspect(engine)
         all_tables = inspector.get_table_names(schema="public")
 
@@ -735,7 +439,6 @@ def get_stocks_data_from_db(tickers: List[str], date: str = None) -> pd.DataFram
 
             if table_name in all_tables:
                 try:
-                    # Get previous day price for change calculation
                     prev_query = text(
                         f"""
                         SELECT "UndrlygPric" as prev_price
@@ -848,13 +551,11 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
     Returns:
         List of dicts with stock data
     """
-    # Get constituents from pre-fetched JSON (instant)
     tickers = fetch_index_constituents(index_key)
     if not tickers:
         return []
 
     try:
-        # Get latest date if not provided
         if not date:
             date_query = text(
                 """
@@ -870,18 +571,14 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
             print(f"[WARNING] No date found in cache")
             return []
 
-        # Helper: Convert ticker to cache format (special chars become underscores)
         def ticker_to_cache_name(ticker):
             return ticker.replace("-", "_").replace("&", "_")
 
-        # Create ticker mapping: original -> cache name
         ticker_mapping = {t: ticker_to_cache_name(t) for t in tickers}
         cache_tickers = list(ticker_mapping.values())
 
-        # Create ticker filter for SQL (using cache names)
         ticker_list = ",".join([f"'{t}'" for t in cache_tickers])
 
-        # Query 1: Get price and OI from futures_oi_cache (CME data)
         cache_query = text(
             f"""
             WITH latest_data AS (
@@ -904,7 +601,6 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
         with engine.connect() as conn:
             stocks_df = pd.read_sql(cache_query, conn, params={"date": date})
 
-        # Query 2: Get previous day prices for change calculation
         prev_date_query = text(
             f"""
             WITH dates AS (
@@ -929,8 +625,6 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
 
         with engine.connect() as conn:
             prev_df = pd.read_sql(prev_date_query, conn, params={"date": date})
-
-        # Merge previous prices
         if not prev_df.empty and not stocks_df.empty:
             stocks_df = stocks_df.merge(prev_df, on="ticker", how="left")
             stocks_df["prev_price"] = stocks_df["prev_price"].fillna(stocks_df["price"])
@@ -943,12 +637,9 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
             stocks_df["change"] = 0.0
             stocks_df["change_pct"] = 0.0
 
-        # Convert cache names back to original ticker names
         reverse_mapping = {v: k for k, v in ticker_mapping.items()}
         if not stocks_df.empty:
             stocks_df["ticker"] = stocks_df["ticker"].map(reverse_mapping).fillna(stocks_df["ticker"])
-
-        # Create dataframe with ALL tickers (including missing ones) - using ORIGINAL names
         all_tickers_df = pd.DataFrame({"ticker": tickers})
 
         if stocks_df.empty:
@@ -962,24 +653,17 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
         else:
             stocks_df = all_tickers_df.merge(stocks_df, on="ticker", how="left")
             stocks_df = stocks_df.fillna({"price": 0.0, "change": 0.0, "change_pct": 0.0, "oi": 0, "prev_price": 0.0})
-            # Initialize columns
             stocks_df["iv"] = 0.0
             stocks_df["volume"] = 0
 
-        # Query 3: Get Volume and ATM IV from DERIVED tables
-        # Build a batch query for all tickers at once
         try:
-            # Get list of DERIVED tables that exist
             inspector = inspect(engine)
             all_tables = set(inspector.get_table_names(schema="public"))
 
-            # Helper to convert ticker to table name (special chars become underscores)
             def ticker_to_table(ticker):
-                # Replace special characters with underscores
                 safe_ticker = ticker.replace("-", "_").replace("&", "_")
                 return f"TBL_{safe_ticker}_DERIVED"
 
-            # Build UNION query for all tickers that have DERIVED tables
             union_parts = []
             for ticker in tickers:
                 table_name = ticker_to_table(ticker)
@@ -1005,7 +689,6 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
                     vol_iv_df["volume"] = pd.to_numeric(vol_iv_df["volume"], errors="coerce").fillna(0).astype(int)
                     vol_iv_df["atm_iv"] = pd.to_numeric(vol_iv_df["atm_iv"], errors="coerce").fillna(0).round(1)
 
-                    # Merge volume and IV data
                     for _, row in vol_iv_df.iterrows():
                         ticker = row["ticker"]
                         stocks_df.loc[stocks_df["ticker"] == ticker, "volume"] = int(row["volume"])
@@ -1015,13 +698,10 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
         except Exception as e:
             print(f"[WARNING] Could not get volume/IV data: {e}")
 
-        # Get signals from signal_service (the correct source!)
-        # Note: signal_service uses cache-format tickers (BAJAJ_AUTO not BAJAJ-AUTO)
         try:
             from ..services.signal_service import compute_signals_simple
 
             signals = compute_signals_simple(date)
-            # Look up signals using cache-format names, but store against original names
             stocks_df["signal"] = stocks_df["ticker"].apply(lambda t: signals.get(ticker_mapping.get(t, t), "NEUTRAL"))
             print(f"[INFO] Got {len(signals)} signals from signal_service")
         except Exception as e:
@@ -1031,7 +711,6 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
             traceback.print_exc()
             stocks_df["signal"] = "NEUTRAL"
 
-        # Format values
         stocks_df["volume"] = stocks_df["volume"].fillna(0).astype(int)
         stocks_df["oi"] = stocks_df["oi"].fillna(0).astype(int)
         stocks_df["price"] = stocks_df["price"].round(2)
@@ -1041,28 +720,21 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
 
         result = stocks_df.to_dict("records")
 
-        # Enrich with Fundamental Data (Market Cap, PE, etc.)
         try:
             from ..services.fundamental_service import fundamental_service
 
-            # Batch fetch fundamentals is not available, so we do it one by one (cached in memory)
             for stock in result:
                 ticker = stock.get("ticker")
-                # Get fundamental data
                 fund_data = fundamental_service.get_stock_fundamentals(ticker)
 
-                # Add Market Cap and PE
                 stock["market_cap"] = fund_data.get("market_cap", 0)
                 stock["pe"] = fund_data.get("pe", 0)
 
-                # For "Key Metric", we can use something relevant like 3yr Profit Growth or ROCE
-                # Using ROCE as a quality metric
                 stock["custom_metric_value"] = f"ROCE: {fund_data.get('roce', 0):.2f}%"
 
         except Exception as e:
             print(f"[WARNING] Failed to enrich with fundamental data: {e}")
 
-        # Log stats
         stocks_with_data = len(stocks_df[stocks_df["price"] > 0])
         print(f"[INFO] Loaded {len(result)} {index_key} stocks from cache ({stocks_with_data} with data)")
 

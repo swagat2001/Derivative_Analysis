@@ -469,16 +469,6 @@ def _get_heatmap_data_cached(selected_date: str):
             cached_df = pd.read_sql(query_cache, con=conn, params={"result_date": selected_date})
 
         if not cached_df.empty:
-            # FILTER REMOVED: Moved to get_heatmap_data to allow optional filtering
-            # fo_symbols = _get_fo_symbols_cached()
-            # if fo_symbols:
-            #     cached_df = cached_df[cached_df["symbol"].isin(fo_symbols)]
-            #     print(f"[INFO] Filtered to {len(cached_df)} F&O stocks (from {len(cached_df) + len(set(cached_df['symbol']) - fo_symbols)} total)")
-
-            # if cached_df.empty:
-            #     print(f"[WARN] No F&O stocks found for {selected_date} after filtering")
-            #     return tuple()
-
             # OPTIMIZATION: Vectorized type conversion (100x faster than iterrows)
             cached_df["symbol"] = cached_df["symbol"].astype(str)
             cached_df["close"] = cached_df["close"].astype(float)
@@ -591,10 +581,16 @@ def get_heatmap_data(selected_date: str, period: str = "1D", comparison_date: st
     if start_date == selected_date:
         # Same as 1D
         result = []
+        fo_symbols = _get_fo_symbols_cached() if filter_fo else None
+
         for row in cached_data:
+            symbol = row[0]
+            if filter_fo and fo_symbols and symbol not in fo_symbols:
+                continue
+
             result.append(
                 {
-                    "symbol": row[0],
+                    "symbol": symbol,
                     "close": row[1],
                     "change_pct": row[2],
                     "volume": row[3],
@@ -1189,8 +1185,8 @@ def _get_delivery_data_cached(selected_date: str):
         return tuple()
 
 
-def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
-    """Get stocks with high delivery percentage (F&O stocks only)."""
+def get_delivery_data(selected_date: str, min_delivery_pct: float = 0, filter_fo: bool = True):
+    """Get stocks with high delivery percentage."""
     cached_data = _get_delivery_data_cached(selected_date)
 
     if not cached_data:
@@ -1200,16 +1196,16 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0):
     # Get F&O symbols for filtering
     fo_symbols = _get_fo_symbols_cached()
 
-    # Get heatmap data for price change info
-    heatmap_data = get_heatmap_data(selected_date)
+    # Get heatmap data for price change info (fetch for all stocks, not just F&O)
+    heatmap_data = get_heatmap_data(selected_date, filter_fo=False)
     heatmap_map = {item['symbol']: item for item in heatmap_data}
 
     result = []
     for row in cached_data:
         symbol = row[0]
 
-        # Filter: Only F&O stocks
-        if fo_symbols and symbol not in fo_symbols:
+        # Filter: Only F&O stocks if requested
+        if filter_fo and fo_symbols and symbol not in fo_symbols:
             continue
 
         if row[4] >= min_delivery_pct:

@@ -154,11 +154,15 @@ def _get_prev_date(selected_date, dates_list):
 # Utilities
 # -------------------------
 def _clean_ticker(ticker: str) -> str:
-    """Sanitize ticker to prevent SQL injection."""
+    """Sanitize ticker to prevent SQL injection and handle common aliases."""
     if not ticker:
         return ""
+    # Handle aliases
+    ticker = ticker.upper().strip()
+    if ticker == "RELI":
+        return "RELIANCE"
     # Allow alphanumeric, &, and -
-    return "".join(c for c in ticker.upper() if c.isalnum() or c in ['&', '-'])
+    return "".join(c for c in ticker if c.isalnum() or c in ["&", "-"])
 
 
 def _derived_table_name(ticker: str) -> str:
@@ -537,6 +541,10 @@ def get_stock_detail_data(ticker: str, selected_date: str, selected_expiry: str 
         use_derived = _table_exists(derived_table)
         table_to_use = derived_table if use_derived else base_table
 
+        if not _table_exists(table_to_use):
+            print(f"[WARN] Table {table_to_use} does not exist for ticker {ticker}")
+            return []
+
         # Check which greeks are available (for cache key)
         has_gamma = False
         has_theta = False
@@ -738,6 +746,10 @@ def get_stock_expiry_data(ticker: str, selected_date: str):
         derived_table = _derived_table_name(ticker)
         base_table = _base_table_name(ticker)
         table_to_use = derived_table if _table_exists(derived_table) else base_table
+
+        if not _table_exists(table_to_use):
+            print(f"[WARN] Table {table_to_use} does not exist for ticker {ticker}")
+            return []
 
         # Get previous date
         dates = get_available_dates()
@@ -1190,6 +1202,10 @@ def get_stock_chart_data(ticker: str, days: int = 40):
         # Use derived table if available
         use_derived = _table_exists(derived_table)
         table_to_use = derived_table if use_derived else base_table
+
+        if not _table_exists(table_to_use):
+            print(f"[WARN] Table {table_to_use} does not exist for ticker {ticker}")
+            return []
 
         # Get cached data
         cached_data = _get_stock_chart_data_cached(ticker, days, table_to_use)

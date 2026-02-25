@@ -1411,6 +1411,16 @@
                 </select>
             </div>
 
+            <!-- Date Selector -->
+            <div class="control-group">
+                <label>Date :</label>
+                <select id="dateSelectDisplay" onchange="changeDate(this.value)">
+                    {% for d in dates %}
+                    <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <!-- Hidden date selector for actual data -->
             <input type="hidden" id="dateSelect" value="{{ selected_date }}">
 
@@ -1517,6 +1527,14 @@
                     </select>
                 </div>
                 <div class="control-group">
+                    <label>Index :</label>
+                    <select id="deliveryIndex" onchange="currentIndex=this.value; loadDelivery()">
+                        {% for idx in index_list %}
+                        <option value="{{ idx.key }}" {% if idx.key=="all" %}selected{% endif %}>{{ idx.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="control-group">
                     <label>Sort By :</label>
                     <select id="deliverySort" onchange="loadDelivery()">
                         <option value="delivery_pct" selected>High Delivery %</option>
@@ -1594,546 +1612,497 @@
 
 
 
-        <div id="delivery-tab" class="tab-content {% if active_tab == 'delivery' %}active{% endif %}">
-            <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
-                <div class="control-group"><label>Min Delivery %:</label><select id="minDelivery"
-                        onchange="loadDelivery()">
-                        <option value="0">All</option>
-                        <option value="30">≥ 30%</option>
-                        <option value="50" selected>≥ 50%</option>
-                        <option value="70">≥ 70%</option>
-                        <option value="80">≥ 80%</option>
-                    </select></div>
-                <div class="control-group"><label>Sort:</label><select id="deliverySort" onchange="loadDelivery()">
-                        <option value="delivery_pct">By Delivery %</option>
-                        <option value="volume">By Volume</option>
-                    </select></div>
-            </div>
-            <div id="delivery-container">
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </div>
+        {% endblock %}
 
-        <div id="52week-tab" class="tab-content {% if active_tab == '52week' %}active{% endif %}">
-            <div id="week52-container">
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </div>
+        {% block page_js %}
+        <script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/highcharts-accessibility.js') }}"></script>
+        <script>
+            let currentDate = '{{ selected_date }}';
+            if (currentDate === 'None') currentDate = '';
 
-        <div id="volume-tab" class="tab-content {% if active_tab == 'volume' %}active{% endif %}">
-            <div class="controls-bar" style="margin-bottom: 16px;padding: 10px 16px;">
-                <div class="control-group"><label>Volume Multiplier:</label><select id="volumeMultiplier"
-                        onchange="loadVolume()">
-                        <option value="1.5">≥ 1.5x Avg</option>
-                        <option value="2" selected>≥ 2x Avg</option>
-                        <option value="3">≥ 3x Avg</option>
-                    </select></div>
-            </div>
-            <div id="volume-container">
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </div>
+            let currentTab = '{{ active_tab }}';
+            if (currentTab === 'None') currentTab = 'heatmap';
 
-        <div id="sectors-tab" class="tab-content {% if active_tab == 'sectors' %}active{% endif %}">
-            <div id="sectors-container">
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+            let currentIndex = '{{ selected_index }}';
+            if (currentIndex === 'None' || !currentIndex) currentIndex = 'all';
 
-{% block page_js %}
-<script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
-<script src="{{ url_for('static', filename='js/highcharts-accessibility.js') }}"></script>
-<script>
-    let currentDate = '{{ selected_date }}';
-    if (currentDate === 'None') currentDate = '';
+            const indexIcons = { 'all': '📊', 'nifty50': '🏆', 'niftynext50': '📈', 'niftybank': '🏦', 'niftyit': '💻', 'niftypharma': '💊', 'niftyauto': '🚗', 'niftymetal': '⚙️', 'niftyfmcg': '🛒', 'niftyenergy': '⚡', 'niftypsubank': '🏛️', 'niftyfinancial': '💰', 'sensex': '🎯' };
 
-    let currentTab = '{{ active_tab }}';
-    if (currentTab === 'None') currentTab = 'heatmap';
+            function switchTab(tab) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+                document.getElementById(tab + '-tab').classList.add('active');
 
-    let currentIndex = '{{ selected_index }}';
-    if (currentIndex === 'None' || !currentIndex) currentIndex = 'all';
-
-    const indexIcons = { 'all': '📊', 'nifty50': '🏆', 'niftynext50': '📈', 'niftybank': '🏦', 'niftyit': '💻', 'niftypharma': '💊', 'niftyauto': '🚗', 'niftymetal': '⚙️', 'niftyfmcg': '🛒', 'niftyenergy': '⚡', 'niftypsubank': '🏛️', 'niftyfinancial': '💰', 'sensex': '🎯' };
-
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tab + '-tab').classList.add('active');
-
-        // Robustly set active class on button - FIX for TypeError
-        let btn = null;
-        if (typeof event !== 'undefined' && event && event.target && typeof event.target.closest === 'function') {
-            btn = event.target.closest('.tab-btn');
-        }
-
-        // Fallback: find button by data attribute if explicit event didn't work
-        if (!btn) {
-            btn = document.querySelector(`.tab-btn[onclick*="'${tab}'"]`) || document.querySelector(`.tab-btn[data-tab="${tab}"]`);
-        }
-
-        if (btn) btn.classList.add('active');
-
-        currentTab = tab;
-
-        // UI Updates based on Tab
-        const heatmapControls = document.getElementById('heatmapControls');
-        const titleText = document.getElementById('heatmapTitleText');
-        const indexBoxes = document.getElementById('indexPriceBox'); // The right side index info
-
-        if (tab === 'heatmap') {
-            heatmapControls.style.display = 'flex';
-            titleText.textContent = 'Nifty 50 Heatmap'; // Will be updated by loadHeatmap dynamic index name
-            if (indexBoxes) indexBoxes.style.display = 'flex';
-        } else {
-            heatmapControls.style.display = 'none';
-            if (indexBoxes) indexBoxes.style.display = 'none';
-
-            // Set Titles
-            const titles = {
-                'fii-dii': 'FII/DII Activity',
-                'delivery': 'Delivery Percentage Analysis',
-                '52week': '52-Week High/Low Analysis',
-                'volume': 'Volume Breakout Scanner',
-                'sectors': 'Sector Performance'
-            };
-            titleText.textContent = titles[tab] || 'Market Neev';
-        }
-
-        const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDiiEnhanced, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors, 'rs-matrix': loadRSMatrix };
-        if (loaders[tab]) loaders[tab]();
-    }
-
-    let currentPerformance = 'D';
-
-    // ============================================
-    // FILTER TYPE: INDEX vs SECTOR TOGGLE
-    // ============================================
-
-    let currentFilterType = 'index';  // 'index' or 'sector'
-    let currentFilterValue = 'all';
-
-    // Sectors list (will be populated from API data)
-    let availableSectors = [];
-
-    function changeFilterType(filterType) {
-        currentFilterType = filterType;
-        const filterLabel = document.getElementById('filterLabel');
-        const filterSelect = document.getElementById('filterSelect');
-
-        if (filterType === 'sector') {
-            // Switch to sector filtering
-            filterLabel.textContent = 'Sector :';
-
-            // Get unique sectors from current data
-            if (availableSectors.length === 0) {
-                // Extract sectors from last loaded heatmap data
-                const cacheKeys = Array.from(heatmapDataCache.keys());
-                if (cacheKeys.length > 0) {
-                    const lastData = heatmapDataCache.get(cacheKeys[0]);
-                    if (lastData && lastData.stocks) {
-                        const sectorSet = new Set();
-                        lastData.stocks.forEach(stock => {
-                            if (stock.sector) sectorSet.add(stock.sector);
-                        });
-                        availableSectors = Array.from(sectorSet).sort();
-                    }
+                // Robustly set active class on button - FIX for TypeError
+                let btn = null;
+                if (typeof event !== 'undefined' && event && event.target && typeof event.target.closest === 'function') {
+                    btn = event.target.closest('.tab-btn');
                 }
+
+                // Fallback: find button by data attribute if explicit event didn't work
+                if (!btn) {
+                    btn = document.querySelector(`.tab-btn[onclick*="'${tab}'"]`) || document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+                }
+
+                if (btn) btn.classList.add('active');
+
+                currentTab = tab;
+
+                // UI Updates based on Tab
+                const heatmapControls = document.getElementById('heatmapControls');
+                const titleText = document.getElementById('heatmapTitleText');
+                const indexBoxes = document.getElementById('indexPriceBox'); // The right side index info
+
+                if (tab === 'heatmap') {
+                    heatmapControls.style.display = 'flex';
+                    titleText.textContent = 'Nifty 50 Heatmap'; // Will be updated by loadHeatmap dynamic index name
+                    if (indexBoxes) indexBoxes.style.display = 'flex';
+                } else {
+                    heatmapControls.style.display = 'none';
+                    if (indexBoxes) indexBoxes.style.display = 'none';
+
+                    // Set Titles
+                    const titles = {
+                        'fii-dii': 'FII/DII Activity',
+                        'delivery': 'Delivery Percentage Analysis',
+                        '52week': '52-Week High/Low Analysis',
+                        'volume': 'Volume Breakout Scanner',
+                        'sectors': 'Sector Performance'
+                    };
+                    titleText.textContent = titles[tab] || 'Market Neev';
+                }
+
+                const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDiiEnhanced, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors, 'rs-matrix': loadRSMatrix };
+                if (loaders[tab]) loaders[tab]();
             }
 
-            // Populate sector dropdown
-            filterSelect.innerHTML = '<option value="all">All Sectors</option>';
-            availableSectors.forEach(sector => {
-                filterSelect.innerHTML += `<option value="${sector}">${sector}</option>`;
-            });
+            let currentPerformance = 'D';
 
-            currentFilterValue = 'all';
+            // ============================================
+            // FILTER TYPE: INDEX vs SECTOR TOGGLE
+            // ============================================
 
-        } else {
-            // Switch to index filtering
-            filterLabel.textContent = 'Index :';
+            let currentFilterType = 'index';  // 'index' or 'sector'
+            let currentFilterValue = 'all';
 
-            // Populate index dropdown (restore original)
-            filterSelect.innerHTML = `
+            // Sectors list (will be populated from API data)
+            let availableSectors = [];
+
+            function changeFilterType(filterType) {
+                currentFilterType = filterType;
+                const filterLabel = document.getElementById('filterLabel');
+                const filterSelect = document.getElementById('filterSelect');
+
+                if (filterType === 'sector') {
+                    // Switch to sector filtering
+                    filterLabel.textContent = 'Sector :';
+
+                    // Get unique sectors from current data
+                    if (availableSectors.length === 0) {
+                        // Extract sectors from last loaded heatmap data
+                        const cacheKeys = Array.from(heatmapDataCache.keys());
+                        if (cacheKeys.length > 0) {
+                            const lastData = heatmapDataCache.get(cacheKeys[0]);
+                            if (lastData && lastData.stocks) {
+                                const sectorSet = new Set();
+                                lastData.stocks.forEach(stock => {
+                                    if (stock.sector) sectorSet.add(stock.sector);
+                                });
+                                availableSectors = Array.from(sectorSet).sort();
+                            }
+                        }
+                    }
+
+                    // Populate sector dropdown
+                    filterSelect.innerHTML = '<option value="all">All Sectors</option>';
+                    availableSectors.forEach(sector => {
+                        filterSelect.innerHTML += `<option value="${sector}">${sector}</option>`;
+                    });
+
+                    currentFilterValue = 'all';
+
+                } else {
+                    // Switch to index filtering
+                    filterLabel.textContent = 'Index :';
+
+                    // Populate index dropdown (restore original)
+                    filterSelect.innerHTML = `
                 {% for idx in index_list %}
                 <option value="{{ idx.key }}">{{ idx.name }}</option>
                 {% endfor %}
             `;
 
-            // Set to current index value
-            filterSelect.value = currentIndex || 'all';
-            currentFilterValue = currentIndex || 'all';
-        }
-
-        // Reload heatmap with new filter
-        loadHeatmap();
-    }
-
-    function changeFilter(value) {
-        currentFilterValue = value;
-
-        if (currentFilterType === 'index') {
-            currentIndex = value;
-            changeIndex(value);
-        } else {
-            // Sector filtering
-            loadHeatmap();
-            if (window.initTableSorting) window.initTableSorting();
-        }
-    }
-
-    function changeIndex(index) {
-        currentIndex = index;
-        loadHeatmap();
-    }
-
-    function changeDate(date) {
-        currentDate = date;
-        loadHeatmap();
-    }
-
-    function changePerformance(period) {
-        currentPerformance = period;
-        // For now, just reload with the latest data
-        // In future, this could fetch historical data based on period
-        loadHeatmap();
-    }
-
-    function getHeatClass(change) {
-        if (change >= 5) return 'heat-5';
-        if (change >= 3) return 'heat-4';
-        if (change >= 2) return 'heat-3';
-        if (change >= 1) return 'heat-2';
-        if (change >= 0.3) return 'heat-1';
-        if (change > -0.3) return 'heat-0';
-        if (change > -1) return 'heat--1';
-        if (change > -2) return 'heat--2';
-        if (change > -3) return 'heat--3';
-        if (change > -5) return 'heat--4';
-        return 'heat--5';
-    }
-
-    function formatNumber(num) {
-        // Handle null, undefined, or non-numeric values
-        if (num === null || num === undefined || isNaN(num)) return '0';
-
-        // Convert to number if it's a string
-        const numValue = typeof num === 'string' ? parseFloat(num.replace(/[^0-9.-]/g, '')) : num;
-
-        // Handle NaN after conversion
-        if (isNaN(numValue)) return '0';
-
-        const absNum = Math.abs(numValue);
-        const sign = numValue < 0 ? '-' : '';
-
-        // Format large numbers consistently in Crores
-        if (absNum >= 1e7) {
-            return sign + (absNum / 1e7).toFixed(2) + 'Cr';
-        }
-        if (absNum >= 1e5) {
-            return sign + (absNum / 1e5).toFixed(2) + 'L';
-        }
-        if (absNum >= 1e3) {
-            return sign + (absNum / 1e3).toFixed(0) + 'K';
-        }
-
-        return sign + absNum.toLocaleString('en-IN');
-    }
-
-    function formatPrice(price) { return '₹' + parseFloat(price).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-
-    // ============================================
-    // SQUARIFIED TREEMAP ALGORITHM
-    // Box sizes proportional to volume/turnover
-    // ============================================
-
-    // Filter out index derivatives that skew the treemap
-    const INDEX_SYMBOLS = ['BANKNIFTY', 'NIFTY', 'MIDCPNIFTY', 'NIFTYIT', 'FINNIFTY', 'SENSEX', 'BANKEX'];
-
-    function squarify(values, x, y, width, height) {
-        const rects = [];
-        const total = values.reduce((s, v) => s + v.value, 0);
-
-        if (values.length === 0 || total === 0) return rects;
-        if (values.length === 1) {
-            return [{ ...values[0], x, y, width, height }];
-        }
-
-        // Calculate normalized areas
-        const area = width * height;
-        const normalized = values.map(v => ({
-            ...v,
-            area: (v.value / total) * area
-        })).sort((a, b) => b.area - a.area);
-
-        // Use slice-and-dice for simplicity and reliability
-        let remaining = [...normalized];
-        let currentX = x, currentY = y;
-        let currentW = width, currentH = height;
-
-        while (remaining.length > 0) {
-            // Determine layout direction based on aspect ratio
-            const isHorizontal = currentW >= currentH;
-
-            // Find how many items to place in this row
-            let row = [];
-            let rowSum = 0;
-            const side = isHorizontal ? currentH : currentW;
-
-            for (let i = 0; i < remaining.length; i++) {
-                const item = remaining[i];
-                const newRow = [...row, item];
-                const newSum = rowSum + item.area;
-
-                if (row.length === 0) {
-                    row = newRow;
-                    rowSum = newSum;
-                    continue;
+                    // Set to current index value
+                    filterSelect.value = currentIndex || 'all';
+                    currentFilterValue = currentIndex || 'all';
                 }
 
-                // Calculate aspect ratios
-                const oldWorst = calculateWorst(row, side, rowSum);
-                const newWorst = calculateWorst(newRow, side, newSum);
+                // Reload heatmap with new filter
+                loadHeatmap();
+            }
 
-                if (newWorst <= oldWorst) {
-                    row = newRow;
-                    rowSum = newSum;
+            function changeFilter(value) {
+                currentFilterValue = value;
+
+                if (currentFilterType === 'index') {
+                    currentIndex = value;
+                    changeIndex(value);
                 } else {
-                    break;
+                    // Sector filtering
+                    loadHeatmap();
+                    if (window.initTableSorting) window.initTableSorting();
                 }
             }
 
-            // Layout the row
-            const rowThickness = side > 0 ? rowSum / side : 0;
-            let offset = 0;
+            function changeIndex(index) {
+                currentIndex = index;
+                loadHeatmap();
+            }
 
-            row.forEach(item => {
-                const itemSize = rowThickness > 0 ? item.area / rowThickness : 0;
+            function changeDate(date) {
+                currentDate = date;
+                loadHeatmap();
+            }
 
-                if (isHorizontal) {
-                    rects.push({
-                        ...item,
-                        x: currentX,
-                        y: currentY + offset,
-                        width: rowThickness,
-                        height: itemSize
-                    });
-                    offset += itemSize;
-                } else {
-                    rects.push({
-                        ...item,
-                        x: currentX + offset,
-                        y: currentY,
-                        width: itemSize,
-                        height: rowThickness
-                    });
-                    offset += itemSize;
+            function changeDate(date) {
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('date', date);
+                window.location.search = urlParams.toString();
+            }
+
+            function changePerformance(period) {
+                currentPerformance = period;
+                // For now, just reload with the latest data
+                // In future, this could fetch historical data based on period
+                loadHeatmap();
+            }
+
+            function getHeatClass(change) {
+                if (change >= 5) return 'heat-5';
+                if (change >= 3) return 'heat-4';
+                if (change >= 2) return 'heat-3';
+                if (change >= 1) return 'heat-2';
+                if (change >= 0.3) return 'heat-1';
+                if (change > -0.3) return 'heat-0';
+                if (change > -1) return 'heat--1';
+                if (change > -2) return 'heat--2';
+                if (change > -3) return 'heat--3';
+                if (change > -5) return 'heat--4';
+                return 'heat--5';
+            }
+
+            function formatNumber(num) {
+                // Handle null, undefined, or non-numeric values
+                if (num === null || num === undefined || isNaN(num)) return '0';
+
+                // Convert to number if it's a string
+                const numValue = typeof num === 'string' ? parseFloat(num.replace(/[^0-9.-]/g, '')) : num;
+
+                // Handle NaN after conversion
+                if (isNaN(numValue)) return '0';
+
+                const absNum = Math.abs(numValue);
+                const sign = numValue < 0 ? '-' : '';
+
+                // Format large numbers consistently in Crores
+                if (absNum >= 1e7) {
+                    return sign + (absNum / 1e7).toFixed(2) + 'Cr';
                 }
-            });
+                if (absNum >= 1e5) {
+                    return sign + (absNum / 1e5).toFixed(2) + 'L';
+                }
+                if (absNum >= 1e3) {
+                    return sign + (absNum / 1e3).toFixed(0) + 'K';
+                }
 
-            // Update remaining space
-            if (isHorizontal) {
-                currentX += rowThickness;
-                currentW -= rowThickness;
-            } else {
-                currentY += rowThickness;
-                currentH -= rowThickness;
+                return sign + absNum.toLocaleString('en-IN');
             }
 
-            // Remove placed items
-            remaining = remaining.slice(row.length);
+            function formatPrice(price) { return '₹' + parseFloat(price).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-            // Safety check
-            if (currentW <= 0 || currentH <= 0) break;
-        }
+            // ============================================
+            // SQUARIFIED TREEMAP ALGORITHM
+            // Box sizes proportional to volume/turnover
+            // ============================================
 
-        return rects;
-    }
+            // Filter out index derivatives that skew the treemap
+            const INDEX_SYMBOLS = ['BANKNIFTY', 'NIFTY', 'MIDCPNIFTY', 'NIFTYIT', 'FINNIFTY', 'SENSEX', 'BANKEX'];
 
-    function calculateWorst(row, side, sum) {
-        if (row.length === 0 || side === 0 || sum === 0) return Infinity;
-        const thickness = sum / side;
-        let worst = 0;
-        row.forEach(item => {
-            const length = item.area / thickness;
-            const aspect = Math.max(thickness / length, length / thickness);
-            worst = Math.max(worst, aspect);
-        });
-        return worst;
-    }
+            function squarify(values, x, y, width, height) {
+                const rects = [];
+                const total = values.reduce((s, v) => s + v.value, 0);
 
-    // OPTIMIZATION: Client-side cache to enable instant tab switching
-    const heatmapDataCache = new Map();
+                if (values.length === 0 || total === 0) return rects;
+                if (values.length === 1) {
+                    return [{ ...values[0], x, y, width, height }];
+                }
 
-    async function loadHeatmap() {
-        const container = document.getElementById('heatmap-container');
-        const view = document.getElementById('heatmapView').value;
-        const sort = document.getElementById('heatmapSort').value;
+                // Calculate normalized areas
+                const area = width * height;
+                const normalized = values.map(v => ({
+                    ...v,
+                    area: (v.value / total) * area
+                })).sort((a, b) => b.area - a.area);
 
-        // Construct cache key (include filter type and value)
-        const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
-        const cacheKey = `${dateParam}_${sort}_${currentIndex}_${currentPerformance}_${view}_${currentFilterType}_${currentFilterValue}`;
+                // Use slice-and-dice for simplicity and reliability
+                let remaining = [...normalized];
+                let currentX = x, currentY = y;
+                let currentW = width, currentH = height;
 
-        // Check Cache First
-        if (heatmapDataCache.has(cacheKey)) {
-            // console.log("[CACHE] Loading heatmap from JS cache"); // Debug
-            const data = heatmapDataCache.get(cacheKey);
-            renderHeatmapWithData(data, view, sort);
-            return;
-        }
+                while (remaining.length > 0) {
+                    // Determine layout direction based on aspect ratio
+                    const isHorizontal = currentW >= currentH;
 
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                    // Find how many items to place in this row
+                    let row = [];
+                    let rowSum = 0;
+                    const side = isHorizontal ? currentH : currentW;
 
-        try {
-            // Use index or sector filtering based on current filter type
-            let filterParam = currentFilterType === 'index' ? `index=${currentIndex}` : `index=all`;
+                    for (let i = 0; i < remaining.length; i++) {
+                        const item = remaining[i];
+                        const newRow = [...row, item];
+                        const newSum = rowSum + item.area;
 
-            const response = await fetch(`/neev/api/heatmap?date=${dateParam}&sort=${sort}&${filterParam}&period=${currentPerformance}`);
-            const data = await response.json();
+                        if (row.length === 0) {
+                            row = newRow;
+                            rowSum = newSum;
+                            continue;
+                        }
 
-            if (!data.success || !data.stocks.length) {
-                container.innerHTML = '<div class="empty-state"><p>No data available</p></div>';
-                return;
+                        // Calculate aspect ratios
+                        const oldWorst = calculateWorst(row, side, rowSum);
+                        const newWorst = calculateWorst(newRow, side, newSum);
+
+                        if (newWorst <= oldWorst) {
+                            row = newRow;
+                            rowSum = newSum;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Layout the row
+                    const rowThickness = side > 0 ? rowSum / side : 0;
+                    let offset = 0;
+
+                    row.forEach(item => {
+                        const itemSize = rowThickness > 0 ? item.area / rowThickness : 0;
+
+                        if (isHorizontal) {
+                            rects.push({
+                                ...item,
+                                x: currentX,
+                                y: currentY + offset,
+                                width: rowThickness,
+                                height: itemSize
+                            });
+                            offset += itemSize;
+                        } else {
+                            rects.push({
+                                ...item,
+                                x: currentX + offset,
+                                y: currentY,
+                                width: itemSize,
+                                height: rowThickness
+                            });
+                            offset += itemSize;
+                        }
+                    });
+
+                    // Update remaining space
+                    if (isHorizontal) {
+                        currentX += rowThickness;
+                        currentW -= rowThickness;
+                    } else {
+                        currentY += rowThickness;
+                        currentH -= rowThickness;
+                    }
+
+                    // Remove placed items
+                    remaining = remaining.slice(row.length);
+
+                    // Safety check
+                    if (currentW <= 0 || currentH <= 0) break;
+                }
+
+                return rects;
             }
 
-            // Save to Cache
-            heatmapDataCache.set(cacheKey, data);
-
-            renderHeatmapWithData(data, view, sort);
-
-        } catch (error) {
-            console.error('Error:', error);
-            container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>';
-        }
-    }
-
-    function renderHeatmapWithData(data, view, sort) {
-        if (data.indices) updateIndexDropdown(data.indices);
-
-        // Extract and store available sectors
-        if (data.stocks) {
-            const sectorSet = new Set();
-            data.stocks.forEach(stock => {
-                if (stock.sector) sectorSet.add(stock.sector);
-            });
-            availableSectors = Array.from(sectorSet).sort();
-        }
-
-        // Apply sector filtering if needed
-        let filteredStocks = data.stocks;
-        if (currentFilterType === 'sector' && currentFilterValue !== 'all') {
-            filteredStocks = data.stocks.filter(stock => stock.sector === currentFilterValue);
-
-            // Recalculate stats for filtered stocks
-            if (filteredStocks.length > 0) {
-                const advances = filteredStocks.filter(s => s.change_pct > 0).length;
-                const declines = filteredStocks.filter(s => s.change_pct < 0).length;
-                const unchanged = filteredStocks.filter(s => s.change_pct === 0).length;
-
-                data.stats = {
-                    advances,
-                    declines,
-                    unchanged,
-                    total: filteredStocks.length
-                };
+            function calculateWorst(row, side, sum) {
+                if (row.length === 0 || side === 0 || sum === 0) return Infinity;
+                const thickness = sum / side;
+                let worst = 0;
+                row.forEach(item => {
+                    const length = item.area / thickness;
+                    const aspect = Math.max(thickness / length, length / thickness);
+                    worst = Math.max(worst, aspect);
+                });
+                return worst;
             }
-        }
 
-        updateMarketSummary(data.stats);
+            // OPTIMIZATION: Client-side cache to enable instant tab switching
+            const heatmapDataCache = new Map();
 
-        if (view === 'sector') renderSectorHeatmap(filteredStocks);
-        else renderTreemapHeatmap(filteredStocks, sort);
-    }
+            async function loadHeatmap() {
+                const container = document.getElementById('heatmap-container');
+                const view = document.getElementById('heatmapView').value;
+                const sort = document.getElementById('heatmapSort').value;
 
-    function updateIndexDropdown(indices) {
-        const select = document.getElementById('filterSelect');
+                // Construct cache key (include filter type and value)
+                const dateParam = (currentDate && currentDate !== 'None') ? currentDate : '';
+                const cacheKey = `${dateParam}_${sort}_${currentIndex}_${currentPerformance}_${view}_${currentFilterType}_${currentFilterValue}`;
 
-        // Only update if we're in index mode
-        if (currentFilterType === 'index') {
-            // Use global currentIndex if available, else fallback
-            const selectedVal = currentIndex || select.value || 'all';
-            select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === selectedVal ? 'selected' : ''}>${idx.name}</option>`).join('');
-        }
-    }
+                // Check Cache First
+                if (heatmapDataCache.has(cacheKey)) {
+                    // console.log("[CACHE] Loading heatmap from JS cache"); // Debug
+                    const data = heatmapDataCache.get(cacheKey);
+                    renderHeatmapWithData(data, view, sort);
+                    return;
+                }
 
-    function updateMarketSummary(stats) {
-        if (!stats) return;
+                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
-        // Get selected filter name (index or sector)
-        const filterSelect = document.getElementById('filterSelect');
-        let filterName = 'All F&O';
+                try {
+                    // Use index or sector filtering based on current filter type
+                    let filterParam = currentFilterType === 'index' ? `index=${currentIndex}` : `index=all`;
 
-        if (filterSelect) {
-            if (currentFilterType === 'sector') {
-                filterName = currentFilterValue === 'all' ? 'All Sectors' : currentFilterValue;
-            } else {
-                filterName = filterSelect.options[filterSelect.selectedIndex].text.split(' (')[0];
+                    const response = await fetch(`/neev/api/heatmap?date=${dateParam}&sort=${sort}&${filterParam}&period=${currentPerformance}`);
+                    const data = await response.json();
+
+                    if (!data.success || !data.stocks.length) {
+                        container.innerHTML = '<div class="empty-state"><p>No data available</p></div>';
+                        return;
+                    }
+
+                    // Save to Cache
+                    heatmapDataCache.set(cacheKey, data);
+
+                    renderHeatmapWithData(data, view, sort);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>';
+                }
             }
-        }
 
-        // Update title to reflect selected filter
-        const titleText = document.getElementById('heatmapTitleText');
-        if (titleText) {
-            titleText.textContent = filterName + ' Heatmap';
-        }
+            function renderHeatmapWithData(data, view, sort) {
+                if (data.indices) updateIndexDropdown(data.indices);
 
-        // Update right side index info (using stats for now since we don't have live price)
-        const indexLabel = document.getElementById('indexLabel');
-        const indexChange = document.getElementById('indexChange');
-        const indexArrow = document.getElementById('indexArrow');
+                // Extract and store available sectors
+                if (data.stocks) {
+                    const sectorSet = new Set();
+                    data.stocks.forEach(stock => {
+                        if (stock.sector) sectorSet.add(stock.sector);
+                    });
+                    availableSectors = Array.from(sectorSet).sort();
+                }
 
-        if (indexLabel) indexLabel.textContent = filterName;
+                // Apply sector filtering if needed
+                let filteredStocks = data.stocks;
+                if (currentFilterType === 'sector' && currentFilterValue !== 'all') {
+                    filteredStocks = data.stocks.filter(stock => stock.sector === currentFilterValue);
 
-        if (indexChange) {
-            const changeText = `${stats.advances} ↑ ${stats.declines} ↓`;
-            indexChange.textContent = changeText;
-            indexChange.className = 'index-change ' + (stats.advances > stats.declines ? 'positive' : 'negative');
-        }
+                    // Recalculate stats for filtered stocks
+                    if (filteredStocks.length > 0) {
+                        const advances = filteredStocks.filter(s => s.change_pct > 0).length;
+                        const declines = filteredStocks.filter(s => s.change_pct < 0).length;
+                        const unchanged = filteredStocks.filter(s => s.change_pct === 0).length;
 
-        if (indexArrow) {
-            indexArrow.textContent = stats.advances > stats.declines ? '↗' : '↘';
-            indexArrow.className = 'index-arrow ' + (stats.advances > stats.declines ? 'up' : 'down');
-        }
-    }
+                        data.stats = {
+                            advances,
+                            declines,
+                            unchanged,
+                            total: filteredStocks.length
+                        };
+                    }
+                }
 
-    function createTreemapCellAbsolute(stock, x, y, width, height) {
-        const changeClass = stock.change_pct >= 0 ? 'positive' : 'negative';
-        const changeSign = stock.change_pct >= 0 ? '+' : '';
-        const heatClass = getHeatClass(stock.change_pct);
-        const initials = stock.symbol.substring(0, 2);
+                updateMarketSummary(data.stats);
 
-        // Determine content visibility based on cell size
-        const area = width * height;
-        const showLogo = area > 3000;
-        const showPrice = area > 5000;
-        const showSymbol = area > 1500;
-        const showChange = area > 2500;
+                if (view === 'sector') renderSectorHeatmap(filteredStocks);
+                else renderTreemapHeatmap(filteredStocks, sort);
+            }
 
-        // Dynamic font sizes based on cell size
-        const symbolSize = Math.min(14, Math.max(8, Math.sqrt(area) / 8));
-        const priceSize = Math.min(12, Math.max(7, Math.sqrt(area) / 10));
-        const changeSize = Math.min(11, Math.max(7, Math.sqrt(area) / 11));
-        const logoSize = Math.min(40, Math.max(18, Math.sqrt(area) / 4));
+            function updateIndexDropdown(indices) {
+                const select = document.getElementById('filterSelect');
 
-        const logoHtml = showLogo ? `<div class="stock-logo" style="width:${logoSize}px;height:${logoSize}px;font-size:${logoSize / 3}px;">${initials}</div>` : '';
+                // Only update if we're in index mode
+                if (currentFilterType === 'index') {
+                    // Use global currentIndex if available, else fallback
+                    const selectedVal = currentIndex || select.value || 'all';
+                    select.innerHTML = indices.map(idx => `<option value="${idx.key}" ${idx.key === selectedVal ? 'selected' : ''}>${idx.name}</option>`).join('');
+                }
+            }
 
-        // Check if cell is in the top row (y < 100px) and apply bottom tooltip
-        const layoutClass = y < 100 ? 'bottom' : '';
-        const symbolHtml = showSymbol ? `<span class="symbol" style="font-size:${symbolSize}px;">${stock.symbol}</span>` : '';
-        const priceHtml = showPrice ? `<span class="price" style="font-size:${priceSize}px;">${formatPrice(stock.close)}</span>` : '';
-        const changeHtml = showChange ? `<span class="change" style="font-size:${changeSize}px;">${changeSign}${stock.change_pct.toFixed(2)}%</span>` : '';
+            function updateMarketSummary(stats) {
+                if (!stats) return;
 
-        return `
+                // Get selected filter name (index or sector)
+                const filterSelect = document.getElementById('filterSelect');
+                let filterName = 'All F&O';
+
+                if (filterSelect) {
+                    if (currentFilterType === 'sector') {
+                        filterName = currentFilterValue === 'all' ? 'All Sectors' : currentFilterValue;
+                    } else {
+                        filterName = filterSelect.options[filterSelect.selectedIndex].text.split(' (')[0];
+                    }
+                }
+
+                // Update title to reflect selected filter
+                const titleText = document.getElementById('heatmapTitleText');
+                if (titleText) {
+                    titleText.textContent = filterName + ' Heatmap';
+                }
+
+                // Update right side index info (using stats for now since we don't have live price)
+                const indexLabel = document.getElementById('indexLabel');
+                const indexChange = document.getElementById('indexChange');
+                const indexArrow = document.getElementById('indexArrow');
+
+                if (indexLabel) indexLabel.textContent = filterName;
+
+                if (indexChange) {
+                    const changeText = `${stats.advances} ↑ ${stats.declines} ↓`;
+                    indexChange.textContent = changeText;
+                    indexChange.className = 'index-change ' + (stats.advances > stats.declines ? 'positive' : 'negative');
+                }
+
+                if (indexArrow) {
+                    indexArrow.textContent = stats.advances > stats.declines ? '↗' : '↘';
+                    indexArrow.className = 'index-arrow ' + (stats.advances > stats.declines ? 'up' : 'down');
+                }
+            }
+
+            function createTreemapCellAbsolute(stock, x, y, width, height) {
+                const changeClass = stock.change_pct >= 0 ? 'positive' : 'negative';
+                const changeSign = stock.change_pct >= 0 ? '+' : '';
+                const heatClass = getHeatClass(stock.change_pct);
+                const initials = stock.symbol.substring(0, 2);
+
+                // Determine content visibility based on cell size
+                const area = width * height;
+                const showLogo = area > 3000;
+                const showPrice = area > 5000;
+                const showSymbol = area > 1500;
+                const showChange = area > 2500;
+
+                // Dynamic font sizes based on cell size
+                const symbolSize = Math.min(14, Math.max(8, Math.sqrt(area) / 8));
+                const priceSize = Math.min(12, Math.max(7, Math.sqrt(area) / 10));
+                const changeSize = Math.min(11, Math.max(7, Math.sqrt(area) / 11));
+                const logoSize = Math.min(40, Math.max(18, Math.sqrt(area) / 4));
+
+                const logoHtml = showLogo ? `<div class="stock-logo" style="width:${logoSize}px;height:${logoSize}px;font-size:${logoSize / 3}px;">${initials}</div>` : '';
+
+                // Check if cell is in the top row (y < 100px) and apply bottom tooltip
+                const layoutClass = y < 100 ? 'bottom' : '';
+                const symbolHtml = showSymbol ? `<span class="symbol" style="font-size:${symbolSize}px;">${stock.symbol}</span>` : '';
+                const priceHtml = showPrice ? `<span class="price" style="font-size:${priceSize}px;">${formatPrice(stock.close)}</span>` : '';
+                const changeHtml = showChange ? `<span class="change" style="font-size:${changeSize}px;">${changeSign}${stock.change_pct.toFixed(2)}%</span>` : '';
+
+                return `
         <a href="/stock/${stock.symbol}" target="_blank" class="treemap-cell-abs ${heatClass}"
            style="left:${x}px;top:${y}px;width:${width}px;height:${height}px;">
             ${logoHtml}
@@ -2154,111 +2123,111 @@
             </div>
         </a>
     `;
-    }
-
-    function renderTreemapHeatmap(stocks, sortBy) {
-        const container = document.getElementById('heatmap-container');
-
-        // Get container dimensions
-        const containerWidth = container.offsetWidth || 1200;
-        const containerHeight = Math.max(600, Math.min(800, containerWidth * 0.55));
-
-        // Filter out index derivatives that have disproportionate turnover
-        let filteredStocks = stocks.filter(s => !INDEX_SYMBOLS.includes(s.symbol.toUpperCase()));
-
-        // If filtering removed too many stocks, use original
-        if (filteredStocks.length < 10) filteredStocks = stocks;
-
-        // Determine value key based on sort
-        let valueKey = 'turnover';
-        if (sortBy === 'volume') valueKey = 'volume';
-
-        // Prepare data for treemap
-        const treemapData = filteredStocks.map(s => ({
-            ...s,
-            value: Math.max(s[valueKey] || 1, 1)
-        }));
-
-        // Generate treemap layout using the squarify function
-        const rects = squarify(treemapData, 4, 4, containerWidth - 8, containerHeight - 8);
-
-        // Build HTML
-        let html = `<div class="treemap-container-abs" style="width:${containerWidth}px;height:${containerHeight}px;position:relative;">`;
-
-        rects.forEach(rect => {
-            if (rect.width > 2 && rect.height > 2) {
-                html += createTreemapCellAbsolute(rect, rect.x, rect.y, rect.width - 2, rect.height - 2);
             }
-        });
 
-        html += '</div>';
-        container.innerHTML = html;
-    }
+            function renderTreemapHeatmap(stocks, sortBy) {
+                const container = document.getElementById('heatmap-container');
 
-    function renderSectorHeatmap(stocks) {
-        const container = document.getElementById('heatmap-container');
-        const sectorGroups = {};
+                // Get container dimensions
+                const containerWidth = container.offsetWidth || 1200;
+                const containerHeight = Math.max(600, Math.min(800, containerWidth * 0.55));
 
-        stocks.forEach(stock => {
-            if (!sectorGroups[stock.sector]) sectorGroups[stock.sector] = [];
-            sectorGroups[stock.sector].push(stock);
-        });
+                // Filter out index derivatives that have disproportionate turnover
+                let filteredStocks = stocks.filter(s => !INDEX_SYMBOLS.includes(s.symbol.toUpperCase()));
 
-        const sortedSectors = Object.entries(sectorGroups)
-            .map(([sector, sectorStocks]) => ({
-                sector,
-                stocks: sectorStocks.sort((a, b) => b.change_pct - a.change_pct),
-                avgChange: sectorStocks.reduce((sum, s) => sum + s.change_pct, 0) / sectorStocks.length
-            }))
-            .sort((a, b) => b.avgChange - a.avgChange);
+                // If filtering removed too many stocks, use original
+                if (filteredStocks.length < 10) filteredStocks = stocks;
 
-        let html = '<div class="sector-heatmap">';
-        sortedSectors.forEach(({ sector, stocks: sectorStocks, avgChange }) => {
-            const changeClass = avgChange >= 0 ? 'positive' : 'negative';
-            const changeSign = avgChange >= 0 ? '+' : '';
+                // Determine value key based on sort
+                let valueKey = 'turnover';
+                if (sortBy === 'volume') valueKey = 'volume';
 
-            html += `<div class="sector-card"><div class="sector-header"><span class="sector-name">${sector}</span><span class="sector-change ${changeClass}">${changeSign}${avgChange.toFixed(2)}%</span></div><div class="sector-stocks">`;
-            sectorStocks.forEach(stock => {
-                const heatClass = getHeatClass(stock.change_pct);
-                const sSign = stock.change_pct >= 0 ? '+' : '';
-                html += `<a href="/stock/${stock.symbol}" target="_blank" class="stock-tile ${heatClass}"><span class="symbol">${stock.symbol}</span><span class="change">${sSign}${stock.change_pct.toFixed(2)}%</span></a>`;
-            });
-            html += '</div></div>';
-        });
-        html += '</div>';
-        container.innerHTML = html;
-    }
+                // Prepare data for treemap
+                const treemapData = filteredStocks.map(s => ({
+                    ...s,
+                    value: Math.max(s[valueKey] || 1, 1)
+                }));
+
+                // Generate treemap layout using the squarify function
+                const rects = squarify(treemapData, 4, 4, containerWidth - 8, containerHeight - 8);
+
+                // Build HTML
+                let html = `<div class="treemap-container-abs" style="width:${containerWidth}px;height:${containerHeight}px;position:relative;">`;
+
+                rects.forEach(rect => {
+                    if (rect.width > 2 && rect.height > 2) {
+                        html += createTreemapCellAbsolute(rect, rect.x, rect.y, rect.width - 2, rect.height - 2);
+                    }
+                });
+
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            function renderSectorHeatmap(stocks) {
+                const container = document.getElementById('heatmap-container');
+                const sectorGroups = {};
+
+                stocks.forEach(stock => {
+                    if (!sectorGroups[stock.sector]) sectorGroups[stock.sector] = [];
+                    sectorGroups[stock.sector].push(stock);
+                });
+
+                const sortedSectors = Object.entries(sectorGroups)
+                    .map(([sector, sectorStocks]) => ({
+                        sector,
+                        stocks: sectorStocks.sort((a, b) => b.change_pct - a.change_pct),
+                        avgChange: sectorStocks.reduce((sum, s) => sum + s.change_pct, 0) / sectorStocks.length
+                    }))
+                    .sort((a, b) => b.avgChange - a.avgChange);
+
+                let html = '<div class="sector-heatmap">';
+                sortedSectors.forEach(({ sector, stocks: sectorStocks, avgChange }) => {
+                    const changeClass = avgChange >= 0 ? 'positive' : 'negative';
+                    const changeSign = avgChange >= 0 ? '+' : '';
+
+                    html += `<div class="sector-card"><div class="sector-header"><span class="sector-name">${sector}</span><span class="sector-change ${changeClass}">${changeSign}${avgChange.toFixed(2)}%</span></div><div class="sector-stocks">`;
+                    sectorStocks.forEach(stock => {
+                        const heatClass = getHeatClass(stock.change_pct);
+                        const sSign = stock.change_pct >= 0 ? '+' : '';
+                        html += `<a href="/stock/${stock.symbol}" target="_blank" class="stock-tile ${heatClass}"><span class="symbol">${stock.symbol}</span><span class="change">${sSign}${stock.change_pct.toFixed(2)}%</span></a>`;
+                    });
+                    html += '</div></div>';
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
 
 
-    async function loadDelivery() {
-        document.getElementById('heatmapTitleText').innerHTML = "Delivery Percentage Analysis";
-        const container = document.getElementById('delivery-container');
-        const minPct = document.getElementById('minDelivery').value;
-        const sort = document.getElementById('deliverySort').value;
-        const index = currentIndex || 'all';
+            async function loadDelivery() {
+                document.getElementById('heatmapTitleText').innerHTML = "Delivery Percentage Analysis";
+                const container = document.getElementById('delivery-container');
+                const minPct = document.getElementById('minDelivery').value;
+                const sort = document.getElementById('deliverySort').value;
+                const index = currentIndex || 'all';
 
-        if (container.innerHTML.trim() === '') {
-            container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        }
+                if (container.innerHTML.trim() === '') {
+                    container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                }
 
-        try {
-            const response = await fetch(`/neev/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}`);
-            const data = await response.json();
+                try {
+                    const response = await fetch(`/neev/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}`);
+                    const data = await response.json();
 
-            if (!data.success || !data.data || data.data.length === 0) {
-                container.innerHTML = `<div class="empty-state">
+                    if (!data.success || !data.data || data.data.length === 0) {
+                        container.innerHTML = `<div class="empty-state">
                         <h3>📦 No Delivery Data Available</h3>
                         <p>Delivery percentage data is not available for ${currentDate}.</p>
                     </div>`;
-                return;
-            }
+                        return;
+                    }
 
-            // HEADER SUMMARY
-            // HEADER SUMMARY removed as per request
-            let html = '';
+                    // HEADER SUMMARY
+                    // HEADER SUMMARY removed as per request
+                    let html = '';
 
-            // TABLE START
-            html += `
+                    // TABLE START
+                    html += `
             <div class="screener-card" style="padding:0; overflow:hidden;">
             <div style="overflow-x:auto;">
             <table class="delivery-table sortable-table">
@@ -2275,13 +2244,13 @@
                 </thead>
                 <tbody>`;
 
-            // TABLE ROWS
-            data.data.forEach(s => {
-                const changeClass = s.change_pct >= 0 ? 'positive' : 'negative';
-                const changeSign = s.change_pct >= 0 ? '+' : '';
-                const logoInitials = s.symbol.substring(0, 2);
+                    // TABLE ROWS
+                    data.data.forEach(s => {
+                        const changeClass = s.change_pct >= 0 ? 'positive' : 'negative';
+                        const changeSign = s.change_pct >= 0 ? '+' : '';
+                        const logoInitials = s.symbol.substring(0, 2);
 
-                html += `
+                        html += `
                 <tr>
                     <td>
                         <a href="/stock/${s.symbol}" target="_blank" class="stock-cell">
@@ -2303,55 +2272,55 @@
                         </div>
                     </td>
                 </tr>`;
-            });
+                    });
 
-            html += `</tbody></table></div></div>`;
-            container.innerHTML = html;
-            if (window.initTableSorting) window.initTableSorting();
+                    html += `</tbody></table></div></div>`;
+                    container.innerHTML = html;
+                    if (window.initTableSorting) window.initTableSorting();
 
-        } catch (e) {
-            console.error('Error loading delivery data:', e);
-            container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load delivery data.</p></div>';
-        }
-    }
+                } catch (e) {
+                    console.error('Error loading delivery data:', e);
+                    container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load delivery data.</p></div>';
+                }
+            }
 
-    async function load52Week() {
-        document.getElementById('heatmapTitleText').innerHTML = "52 Week High/Low Analysis";
-        const container = document.getElementById('week52-container');
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        try {
-            const response = await fetch(`/neev/api/52-week?date=${currentDate}&index=${currentIndex}`);
-            const data = await response.json();
-            if (!data.success) { container.innerHTML = '<div class="empty-state"><p>No 52-week data</p></div>'; return; }
-            container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
-            if (window.initTableSorting) window.initTableSorting();
-        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
-    }
+            async function load52Week() {
+                document.getElementById('heatmapTitleText').innerHTML = "52 Week High/Low Analysis";
+                const container = document.getElementById('week52-container');
+                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                try {
+                    const response = await fetch(`/neev/api/52-week?date=${currentDate}&index=${currentIndex}`);
+                    const data = await response.json();
+                    if (!data.success) { container.innerHTML = '<div class="empty-state"><p>No 52-week data</p></div>'; return; }
+                    container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
+                    if (window.initTableSorting) window.initTableSorting();
+                } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+            }
 
-    async function loadVolume() {
-        document.getElementById('heatmapTitleText').innerHTML = "Volume Analysis";
-        const container = document.getElementById('volume-container');
-        const multiplier = document.getElementById('volumeMultiplier').value;
-        const index = currentIndex || 'all';
+            async function loadVolume() {
+                document.getElementById('heatmapTitleText').innerHTML = "Volume Analysis";
+                const container = document.getElementById('volume-container');
+                const multiplier = document.getElementById('volumeMultiplier').value;
+                const index = currentIndex || 'all';
 
-        if (container.innerHTML.trim() === '') {
-            container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        }
+                if (container.innerHTML.trim() === '') {
+                    container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                }
 
-        try {
-            const response = await fetch(`/neev/api/volume-breakouts?date=${currentDate}&multiplier=${multiplier}&index=${index}`);
-            const data = await response.json();
+                try {
+                    const response = await fetch(`/neev/api/volume-breakouts?date=${currentDate}&multiplier=${multiplier}&index=${index}`);
+                    const data = await response.json();
 
-            if (!data.success || !data.data || data.data.length === 0) {
-                container.innerHTML = `<div class="empty-state">
+                    if (!data.success || !data.data || data.data.length === 0) {
+                        container.innerHTML = `<div class="empty-state">
                         <h3>📊 No Volume Breakout Data</h3>
                         <p>No stocks found with volume ≥ ${multiplier}x average for ${currentDate}.</p>
                     </div>`;
-                return;
-            }
+                        return;
+                    }
 
-            // TABLE START
-            let html = `
+                    // TABLE START
+                    let html = `
             <div class="screener-card" style="padding:0; overflow:hidden;">
             <div style="overflow-x:auto;">
             <table class="delivery-table sortable-table">
@@ -2368,18 +2337,18 @@
                 </thead>
                 <tbody>`;
 
-            // TABLE ROWS
-            data.data.forEach(s => {
-                const changeClass = s.change_pct >= 0 ? 'positive' : 'negative';
-                const changeSign = s.change_pct >= 0 ? '+' : '';
-                const logoInitials = s.symbol.substring(0, 2);
+                    // TABLE ROWS
+                    data.data.forEach(s => {
+                        const changeClass = s.change_pct >= 0 ? 'positive' : 'negative';
+                        const changeSign = s.change_pct >= 0 ? '+' : '';
+                        const logoInitials = s.symbol.substring(0, 2);
 
-                // Color code the ratio - higher = more significant
-                let ratioColor = '#8b5cf6'; // purple default
-                if (s.volume_ratio >= 5) ratioColor = '#dc2626'; // red for extreme
-                else if (s.volume_ratio >= 3) ratioColor = '#f59e0b'; // orange for high
+                        // Color code the ratio - higher = more significant
+                        let ratioColor = '#8b5cf6'; // purple default
+                        if (s.volume_ratio >= 5) ratioColor = '#dc2626'; // red for extreme
+                        else if (s.volume_ratio >= 3) ratioColor = '#f59e0b'; // orange for high
 
-                html += `
+                        html += `
                 <tr>
                     <td>
                         <a href="/stock/${s.symbol}" target="_blank" class="stock-cell">
@@ -2401,170 +2370,170 @@
                     </td>
                     <td style="font-size:11px; color:#64748b;">${s.sector || '-'}</td>
                 </tr>`;
-            });
+                    });
 
-            html += `</tbody></table></div></div>`;
-            container.innerHTML = html;
-            if (window.initTableSorting) window.initTableSorting();
+                    html += `</tbody></table></div></div>`;
+                    container.innerHTML = html;
+                    if (window.initTableSorting) window.initTableSorting();
 
-        } catch (e) {
-            console.error('Error loading volume data:', e);
-            container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load volume breakout data.</p></div>';
-        }
-    }
-
-    async function loadSectors() {
-        document.getElementById('heatmapTitleText').innerHTML = "Sector Performance Analysis";
-        const container = document.getElementById('sectors-container');
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        try {
-            const response = await fetch(`/neev/api/sector-performance?date=${currentDate}`);
-            const data = await response.json();
-            if (!data.success || !data.sectors.length) { container.innerHTML = '<div class="empty-state"><p>No sector data</p></div>'; return; }
-            container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Sector Performance</span></div><table class="card-table sortable-table"><thead><tr><th>#</th><th>Sector</th><th>Avg Change</th><th>Turnover</th><th>Stocks</th><th>Top Movers</th></tr></thead><tbody>${data.sectors.filter(s => s.stock_count > 0).map((s, i) => `<tr><td>${i + 1}</td><td><strong>${s.sector}</strong></td><td class="${s.avg_change >= 0 ? 'positive' : 'negative'}">${s.avg_change >= 0 ? '+' : ''}${s.avg_change}%</td><td>${formatNumber(s.total_turnover)}</td><td>${s.stock_count}</td><td>${s.stocks.slice(0, 3).map(sym => `<a href="/stock/${sym}" class="symbol-link">${sym}</a>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
-            if (window.initTableSorting) window.initTableSorting();
-        } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
-    }
-
-    let currentRSMatrixIndex = null;
-
-    function handleRSMatrixBoxPctChange() {
-        if (currentRSMatrixIndex) {
-            loadStockRSMatrix(currentRSMatrixIndex);
-        } else {
-            loadRSMatrix();
-        }
-    }
-
-    async function loadRSMatrix() {
-        currentRSMatrixIndex = null;
-        document.getElementById('heatmapTitleText').innerHTML = "RS Matrix Scanner";
-        const container = document.getElementById('rs-matrix-container');
-        const boxPctSelect = document.getElementById('rsMatrixBoxPct');
-        const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
-
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        try {
-            const response = await fetch(`/neev/api/rs-matrix?box_pct=${boxPct}`);
-            const data = await response.json();
-            if (!data.success) {
-                container.innerHTML = `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
-                return;
+                } catch (e) {
+                    console.error('Error loading volume data:', e);
+                    container.innerHTML = '<div class="empty-state"><h3>❌ Error</h3><p>Failed to load volume breakout data.</p></div>';
+                }
             }
-            container.innerHTML = data.html;
-        } catch (e) {
-            console.error(e);
-            container.innerHTML = '<div class="empty-state"><p>Error loading RS Matrix</p></div>';
-        }
-    }
 
-    async function loadStockRSMatrix(indexName) {
-        currentRSMatrixIndex = indexName;
-        document.getElementById('heatmapTitleText').innerHTML = `${indexName} Constituent RS Matrix`;
-        const container = document.getElementById('rs-matrix-container');
-        const boxPctSelect = document.getElementById('rsMatrixBoxPct');
-        const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
+            async function loadSectors() {
+                document.getElementById('heatmapTitleText').innerHTML = "Sector Performance Analysis";
+                const container = document.getElementById('sectors-container');
+                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                try {
+                    const response = await fetch(`/neev/api/sector-performance?date=${currentDate}`);
+                    const data = await response.json();
+                    if (!data.success || !data.sectors.length) { container.innerHTML = '<div class="empty-state"><p>No sector data</p></div>'; return; }
+                    container.innerHTML = `<div class="screener-card"><div class="card-header"><span class="card-title">Sector Performance</span></div><table class="card-table sortable-table"><thead><tr><th>#</th><th>Sector</th><th>Avg Change</th><th>Turnover</th><th>Stocks</th><th>Top Movers</th></tr></thead><tbody>${data.sectors.filter(s => s.stock_count > 0).map((s, i) => `<tr><td>${i + 1}</td><td><strong>${s.sector}</strong></td><td class="${s.avg_change >= 0 ? 'positive' : 'negative'}">${s.avg_change >= 0 ? '+' : ''}${s.avg_change}%</td><td>${formatNumber(s.total_turnover)}</td><td>${s.stock_count}</td><td>${s.stocks.slice(0, 3).map(sym => `<a href="/stock/${sym}" class="symbol-link">${sym}</a>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
+                    if (window.initTableSorting) window.initTableSorting();
+                } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
+            }
 
-        container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        try {
-            const response = await fetch(`/neev/api/rs-matrix/stock?index_name=${encodeURIComponent(indexName)}&box_pct=${boxPct}`);
-            const data = await response.json();
+            let currentRSMatrixIndex = null;
 
-            let backButtonHtml = `<div style="margin-bottom: 15px;">
+            function handleRSMatrixBoxPctChange() {
+                if (currentRSMatrixIndex) {
+                    loadStockRSMatrix(currentRSMatrixIndex);
+                } else {
+                    loadRSMatrix();
+                }
+            }
+
+            async function loadRSMatrix() {
+                currentRSMatrixIndex = null;
+                document.getElementById('heatmapTitleText').innerHTML = "RS Matrix Scanner";
+                const container = document.getElementById('rs-matrix-container');
+                const boxPctSelect = document.getElementById('rsMatrixBoxPct');
+                const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
+
+                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                try {
+                    const response = await fetch(`/neev/api/rs-matrix?box_pct=${boxPct}`);
+                    const data = await response.json();
+                    if (!data.success) {
+                        container.innerHTML = `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
+                        return;
+                    }
+                    container.innerHTML = data.html;
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = '<div class="empty-state"><p>Error loading RS Matrix</p></div>';
+                }
+            }
+
+            async function loadStockRSMatrix(indexName) {
+                currentRSMatrixIndex = indexName;
+                document.getElementById('heatmapTitleText').innerHTML = `${indexName} Constituent RS Matrix`;
+                const container = document.getElementById('rs-matrix-container');
+                const boxPctSelect = document.getElementById('rsMatrixBoxPct');
+                const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
+
+                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+                try {
+                    const response = await fetch(`/neev/api/rs-matrix/stock?index_name=${encodeURIComponent(indexName)}&box_pct=${boxPct}`);
+                    const data = await response.json();
+
+                    let backButtonHtml = `<div style="margin-bottom: 15px;">
                 <button onclick="loadRSMatrix()" class="button primary" style="padding: 6px 14px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to All Indices
                 </button>
             </div>`;
 
-            if (!data.success) {
-                container.innerHTML = backButtonHtml + `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
-                return;
-            }
+                    if (!data.success) {
+                        container.innerHTML = backButtonHtml + `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
+                        return;
+                    }
 
-            container.innerHTML = backButtonHtml + data.html;
-        } catch (e) {
-            console.error(e);
-            container.innerHTML = `<div class="empty-state">
+                    container.innerHTML = backButtonHtml + data.html;
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = `<div class="empty-state">
                 <button onclick="loadRSMatrix()" class="button primary">Back to All Indices</button>
                 <p>Error loading Stock RS Matrix</p>
             </div>`;
-        }
-    }
+                }
+            }
 
-    // Update globalFiiDiiState period when user changes selection
-    function updateFiiPeriodSelection() {
-        if (typeof globalFiiDiiState !== 'undefined') {
-            globalFiiDiiState.selectedDays = parseInt(document.getElementById('fiiDiiPeriod').value);
-        }
-    }
+            // Update globalFiiDiiState period when user changes selection
+            function updateFiiPeriodSelection() {
+                if (typeof globalFiiDiiState !== 'undefined') {
+                    globalFiiDiiState.selectedDays = parseInt(document.getElementById('fiiDiiPeriod').value);
+                }
+            }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize tab UI state and load data
-        if (currentTab && currentTab !== 'None') {
-            switchTab(currentTab);
-        } else {
-            switchTab('heatmap');
-        }
-    });
-    // OPTIMIZATION: Client-Side Tab Switching
-    window.switchMainTab = function (tabName) {
-        if (event) event.preventDefault();
+            document.addEventListener('DOMContentLoaded', function () {
+                // Initialize tab UI state and load data
+                if (currentTab && currentTab !== 'None') {
+                    switchTab(currentTab);
+                } else {
+                    switchTab('heatmap');
+                }
+            });
+            // OPTIMIZATION: Client-Side Tab Switching
+            window.switchMainTab = function (tabName) {
+                if (event) event.preventDefault();
 
-        // 1. Update URL without reload
-        const newUrl = new URL(window.location);
-        newUrl.searchParams.set('tab', tabName);
-        window.history.pushState({}, '', newUrl);
+                // 1. Update URL without reload
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('tab', tabName);
+                window.history.pushState({}, '', newUrl);
 
-        // 2. Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.insights-sidebar .menu-item').forEach(el => el.classList.remove('active'));
+                // 2. Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.insights-sidebar .menu-item').forEach(el => el.classList.remove('active'));
 
-        // 3. Show selected tab
-        const tabContent = document.getElementById(tabName + '-tab');
-        if (tabContent) tabContent.classList.add('active');
+                // 3. Show selected tab
+                const tabContent = document.getElementById(tabName + '-tab');
+                if (tabContent) tabContent.classList.add('active');
 
-        // 4. Update Sidebar Active State
-        const sidebarLink = document.getElementById('nav-' + tabName);
-        if (sidebarLink) sidebarLink.classList.add('active');
+                // 4. Update Sidebar Active State
+                const sidebarLink = document.getElementById('nav-' + tabName);
+                if (sidebarLink) sidebarLink.classList.add('active');
 
-        // 5. Load Data
-        if (tabName === 'heatmap') loadHeatmap();
-        else if (tabName === 'fii-dii') {
-            // Use existing wrapper if available
-            if (window.switchTab) window.switchTab('fii-dii');
-            else if (window.initEnhancedFiiDii) window.initEnhancedFiiDii();
-        }
-        else if (tabName === 'delivery') loadDelivery();
-        else if (tabName === '52week') load52Week();
-        else if (tabName === 'volume') loadVolume();
-        else if (tabName === 'sectors') loadSectors();
-        else if (tabName === 'rs-matrix') loadRSMatrix();
+                // 5. Load Data
+                if (tabName === 'heatmap') loadHeatmap();
+                else if (tabName === 'fii-dii') {
+                    // Use existing wrapper if available
+                    if (window.switchTab) window.switchTab('fii-dii');
+                    else if (window.initEnhancedFiiDii) window.initEnhancedFiiDii();
+                }
+                else if (tabName === 'delivery') loadDelivery();
+                else if (tabName === '52week') load52Week();
+                else if (tabName === 'volume') loadVolume();
+                else if (tabName === 'sectors') loadSectors();
+                else if (tabName === 'rs-matrix') loadRSMatrix();
 
-        // Handle control visibility
-        const heatmapControls = document.getElementById('heatmapControls');
-        if (heatmapControls) {
-            heatmapControls.style.display = (tabName === 'heatmap') ? 'flex' : 'none';
-        }
-    };
-</script>
+                // Handle control visibility
+                const heatmapControls = document.getElementById('heatmapControls');
+                if (heatmapControls) {
+                    heatmapControls.style.display = (tabName === 'heatmap') ? 'flex' : 'none';
+                }
+            };
+        </script>
 
-<!-- Enhanced FII/DII Module -->
-<script src="{{ url_for('static', filename='js/fii_dii_enhanced.js') }}?v=11.0"></script>
-<script>
-    // Initialize enhanced FII/DII module when tab is activated
-    const originalSwitchTab = window.switchTab;
-    window.switchTab = function (tab) {
-        if (typeof originalSwitchTab === 'function') {
-            originalSwitchTab(tab);
-        }
+        <!-- Enhanced FII/DII Module -->
+        <script src="{{ url_for('static', filename='js/fii_dii_enhanced.js') }}?v=11.0"></script>
+        <script>
+            // Initialize enhanced FII/DII module when tab is activated
+            const originalSwitchTab = window.switchTab;
+            window.switchTab = function (tab) {
+                if (typeof originalSwitchTab === 'function') {
+                    originalSwitchTab(tab);
+                }
 
-        // Initialize enhanced FII/DII module if switching to that tab
-        if (tab === 'fii-dii' && typeof initEnhancedFiiDii === 'function') {
-            setTimeout(() => {
-                initEnhancedFiiDii();
-            }, 100);
-        }
-    };
-</script>
-{% endblock %}
+                // Initialize enhanced FII/DII module if switching to that tab
+                if (tab === 'fii-dii' && typeof initEnhancedFiiDii === 'function') {
+                    setTimeout(() => {
+                        initEnhancedFiiDii();
+                    }, 100);
+                }
+            };
+        </script>
+        {% endblock %}

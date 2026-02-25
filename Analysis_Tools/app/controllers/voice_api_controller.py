@@ -388,6 +388,7 @@ def get_stock_aliases():
             "finnifty": "FINNIFTY",
             # Top stocks with common names
             "reliance": "RELIANCE",
+            "reli": "RELIANCE",
             "tcs": "TCS",
             "infosys": "INFY",
             "infy": "INFY",

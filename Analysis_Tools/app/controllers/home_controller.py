@@ -303,6 +303,33 @@ def api_market_breadth():
         }), 200
 
 
+@home_bp.route("/api/market-breadth-history")
+def api_market_breadth_history():
+    """API endpoint for historical market breadth (Advances/Declines) chart data."""
+    try:
+        days = int(request.args.get("days", 30))
+        from Analysis_Tools.Database.Cash.market_breadth_eod import get_breadth_history
+        history = get_breadth_history(days)
+        return jsonify({"success": True, "data": history}), 200
+    except Exception as e:
+        # Fallback: try reading directly from DB
+        try:
+            from ..models.db_config import engine_cash
+            from sqlalchemy import text as sa_text
+            days = int(request.args.get("days", 30))
+            with engine_cash.connect() as conn:
+                rows = conn.execute(sa_text("""
+                    SELECT date::text, advances, declines, unchanged, total
+                    FROM market_breadth_eod
+                    ORDER BY date DESC LIMIT :d
+                """), {"d": days}).fetchall()
+            data = [{"date": r[0], "advances": r[1], "declines": r[2],
+                     "unchanged": r[3], "total": r[4]} for r in reversed(rows)]
+            return jsonify({"success": True, "data": data}), 200
+        except Exception as e2:
+            return jsonify({"success": False, "message": str(e2), "data": []}), 200
+
+
 @home_bp.route("/api/advance-decline")
 def advance_decline():
     """API endpoint for live NSE advance-decline data"""
