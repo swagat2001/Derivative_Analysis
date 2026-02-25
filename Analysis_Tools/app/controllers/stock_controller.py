@@ -1,4 +1,3 @@
-# controllers/stock_controller.py
 import json
 import os
 from pathlib import Path
@@ -149,9 +148,6 @@ def calculate_fundamental_metrics(symbol):
         "volume_display": "",
     }
 
-    # ── 1. FundamentalService (same source as goldmine scanner) ───────────
-    # Covers: price, volume, change%, pe_ratio, market_cap, eps, book_value
-    # Price comes from daily_market_heatmap → works for ALL stocks incl. USASEEDS
     fs = fundamental_service.get_stock_fundamentals(symbol)
     if fs:
         metrics["current_price"] = fs.get("price", 0) or 0
@@ -164,15 +160,30 @@ def calculate_fundamental_metrics(symbol):
         metrics["sales"]         = fs.get("sales", 0) or 0
         metrics["net_profit"]    = fs.get("net_profit", 0) or 0
 
-    # ── 2. technical_screener_cache → 52W High/Low + price date ──────────
-    # FundamentalService doesn't track 52W range; we get it separately.
+    # Fallback: if price is still 0, read latest close from TBL_<symbol>
+    if not metrics["current_price"]:
+        try:
+            cash_table = f"TBL_{symbol}"
+            with engine_cash.connect() as conn:
+                row = conn.execute(text(f"""
+                    SELECT "ClsPric", "TtlTradgVol"
+                    FROM public."{cash_table}"
+                    WHERE "ClsPric" IS NOT NULL
+                    ORDER BY "BizDt" DESC
+                    LIMIT 1
+                """)).fetchone()
+            if row:
+                metrics["current_price"] = float(row[0] or 0)
+                metrics["volume"]        = int(row[1] or 0)
+        except Exception as e:
+            print(f"[WARN] Price fallback from {cash_table} failed: {e}")
+
     w52 = get_52w_and_date(symbol)
     if w52:
         metrics["high_52w"]   = w52.get("high_52w", 0)
         metrics["low_52w"]    = w52.get("low_52w", 0)
         metrics["price_date"] = w52.get("price_date", "")
 
-    # ── 3. Volume display format ──────────────────────────────────────────
     vol = metrics["volume"]
     if vol >= 10_000_000:
         metrics["volume_display"] = f"{vol / 10_000_000:.2f} Cr"
@@ -197,135 +208,117 @@ def get_available_fundamental_stocks():
 @stock_bp.route("/stock/<ticker>")
 def stock_detail(ticker):
     """
-    Stock detail page — routes to F&O page or cash stock page depending on the ticker.
-    F&O stocks  → option chain, greeks, OI charts (existing page)
-    Cash stocks → OHLCV, technicals, scanner appearances (new page)
-    Query params: date, expiry
+    Cash / overview page for ALL stocks.
+    F&O stocks get an extra "F&O / Options" button that links to /stock/<ticker>/options.
+    """
+    ticker = ticker.upper().strip()
+    fo     = is_fo_stock(ticker)
+
+    cash_info    = get_cash_stock_info(ticker)
+    scanner_hits = get_stock_scanner_appearances(ticker)
+    import json as _json
+    ohlcv_json = _json.dumps(cash_info.get("ohlcv", []))
+
+    return render_template(
+        "cash_stock_detail.html",
+        ticker       = ticker,
+        stock_symbol = ticker,
+        cash_info    = cash_info,
+        scanner_hits = scanner_hits,
+        ohlcv_json   = ohlcv_json,
+        is_fo        = fo,
+        indices      = get_live_indices(),
+        stock_list   = get_filtered_tickers(),
+    )
+
+
+@stock_bp.route("/stock/<ticker>/options")
+def stock_options(ticker):
+    """
+    F&O / Option-chain page — only reachable for F&O stocks.
+    Redirects to the cash page if the ticker has no F&O data.
     """
     ticker = ticker.upper().strip()
 
-    #  Route cash stocks to their own page
     if not is_fo_stock(ticker):
-        cash_info      = get_cash_stock_info(ticker)
-        scanner_hits   = get_stock_scanner_appearances(ticker)
-        import json as _json
-        ohlcv_json = _json.dumps(cash_info.get("ohlcv", []))
-        return render_template(
-            "cash_stock_detail.html",
-            ticker         = ticker,
-            stock_symbol   = ticker,
-            cash_info      = cash_info,
-            scanner_hits   = scanner_hits,
-            ohlcv_json     = ohlcv_json,
-            indices        = get_live_indices(),
-            stock_list     = get_filtered_tickers(),
-        )
-    #  F&O path continues below
+        return redirect(url_for("stock.stock_detail", ticker=ticker))
 
     # ==============================
     #  Fetch all available dates and symbols
     # ==============================
     dates = get_available_dates()
-    all_symbols = get_filtered_tickers()  #  Filter by Excel list
+    all_symbols = get_filtered_tickers()
 
     # ==============================
     #  Determine selected date and expiry
     # ==============================
-    selected_date = request.args.get("date", dates[0] if dates else None)
+    selected_date   = request.args.get("date",   dates[0] if dates else None)
     selected_expiry = request.args.get("expiry", None)
 
-    data = []
+    data        = []
     expiry_data = []
-    stats = {}
+    stats       = {}
+    underlying  = None
+    futures_price = None
+    atm         = None
 
     if selected_date:
-        # ==============================
-        #  Expiry data for left panel
-        # ==============================
         expiry_data = get_stock_expiry_data(ticker, selected_date)
 
-        # Auto-select first expiry if none chosen
-        if not selected_expiry and expiry_data and len(expiry_data) > 0:
+        if not selected_expiry and expiry_data:
             selected_expiry = expiry_data[0]["expiry"]
 
-        # Fetch option chain & summary stats
-        data = get_stock_detail_data(ticker, selected_date, selected_expiry)
+        data  = get_stock_detail_data(ticker, selected_date, selected_expiry)
         stats = get_stock_stats(ticker, selected_date, selected_expiry)
-
-        # ==============================
-        #  Detect Underlying Price & Futures Price
-        # ==============================
-        underlying = None
-        futures_price = None
 
         if data:
             for row in data:
-                if row.get("UndrlygPric"):
-                    underlying = row["UndrlygPric"]
-                    break
-                elif row.get("UnderlyingValue"):
-                    underlying = row["UnderlyingValue"]
-                    break
-                elif row.get("underlying"):
-                    underlying = row["underlying"]
+                for key in ("UndrlygPric", "UnderlyingValue", "underlying"):
+                    if row.get(key):
+                        underlying = row[key]
+                        break
+                if underlying:
                     break
 
-        # Get futures price for selected expiry from expiry_data
         if selected_expiry and expiry_data:
             for exp_row in expiry_data:
                 if exp_row.get("expiry") == selected_expiry:
                     futures_price = exp_row.get("price")
                     break
 
-        # Fallback to underlying if futures price not found
         if futures_price is None:
             futures_price = underlying
 
-        # Safely clean underlying and futures price strings (e.g. "5,298.00 ")
-        if underlying:
-            try:
-                underlying = float(str(underlying).replace(",", "").strip())
-            except Exception:
-                underlying = None
+        for attr in ("underlying", "futures_price"):
+            val = underlying if attr == "underlying" else futures_price
+            if val:
+                try:
+                    val = float(str(val).replace(",", "").strip())
+                except Exception:
+                    val = None
+            if attr == "underlying":
+                underlying = val
+            else:
+                futures_price = val if val else underlying
 
-        if futures_price:
-            try:
-                futures_price = float(str(futures_price).replace(",", "").strip())
-            except Exception:
-                futures_price = underlying
-
-        # ==============================
-        #  Find ATM Strike (Closest to Underlying)
-        # ==============================
-        atm = None
         if data and underlying:
             try:
-                # FIX #6: Add error handling for None/NaN values
-                strike_prices = sorted(
-                    {
-                        float(row["StrkPric"])
-                        for row in data
-                        if row.get("StrkPric") is not None and pd.notna(row.get("StrkPric"))
-                    }
-                )
+                strike_prices = sorted({
+                    float(row["StrkPric"])
+                    for row in data
+                    if row.get("StrkPric") is not None and pd.notna(row.get("StrkPric"))
+                })
                 if strike_prices:
-                    # Find strike with smallest distance from underlying
                     atm = min(strike_prices, key=lambda x: abs(x - underlying))
             except (ValueError, TypeError) as e:
-                print(f"[WARNING] Error calculating ATM strike: {e}")
-                atm = None
+                print(f"[WARNING] ATM calc: {e}")
 
-        # ==============================
-        #  Compute Average IV
-        # ==============================
-        # FIX #5: Only override avg_iv if stats doesn't have it or if we have better data from option chain
         if data:
             iv_values = [row.get("IV") for row in data if row.get("IV") is not None and row["IV"] > 0]
             if iv_values:
                 avg_iv = sum(iv_values) / len(iv_values)
                 if avg_iv < 1:
                     avg_iv *= 100
-                # Only override if stats doesn't have avg_iv or if our calculation is more accurate
                 if "avg_iv" not in stats or stats.get("avg_iv", 0) == 0:
                     stats["avg_iv"] = round(avg_iv, 2)
             elif "avg_iv" not in stats:
@@ -333,36 +326,30 @@ def stock_detail(ticker):
         elif "avg_iv" not in stats:
             stats["avg_iv"] = 0
 
-    # ==============================
-    #  Generate OI Chart Data
-    # ==============================
     chart_data = None
     if selected_date and selected_expiry:
-        # Pass data and expiry_data to avoid redundant queries
-        oi_chart_dict = generate_oi_chart(ticker, selected_date, selected_expiry, data=data, expiry_data=expiry_data)
+        oi_chart_dict = generate_oi_chart(ticker, selected_date, selected_expiry,
+                                          data=data, expiry_data=expiry_data)
         if oi_chart_dict:
             chart_data = json.dumps(oi_chart_dict)
 
-    # ==============================
-    #  Render Template
-    # ==============================
     return render_template(
         "stock_detail.html",
-        ticker=ticker,
-        stock_symbol=ticker,  # For header navigation
-        all_symbols=all_symbols,
-        data=data,
-        expiry_data=expiry_data,
-        stats=stats,
-        dates=dates,
-        selected_date=selected_date,
-        selected_expiry=selected_expiry,
-        chart_data=chart_data,
-        underlying=underlying,  #  spot price (for display)
-        futures_price=futures_price,  #  futures price for selected expiry (for Fair Price calculation)
-        atm=atm,  #  correct closest strike
-        indices=get_live_indices(),  #  Add indices for header
-        stock_list=get_filtered_tickers(),  #  Add stock list for search
+        ticker          = ticker,
+        stock_symbol    = ticker,
+        all_symbols     = all_symbols,
+        data            = data,
+        expiry_data     = expiry_data,
+        stats           = stats,
+        dates           = dates,
+        selected_date   = selected_date,
+        selected_expiry = selected_expiry,
+        chart_data      = chart_data,
+        underlying      = underlying,
+        futures_price   = futures_price,
+        atm             = atm,
+        indices         = get_live_indices(),
+        stock_list      = get_filtered_tickers(),
     )
 
 
@@ -388,7 +375,6 @@ def stock_fundamental(ticker):
     Fundamental analysis page - displays financial data from Data_scraper
     """
     try:
-        # Load all fundamental data
         quarterly = load_fundamental_json(ticker, "quarterly")
         pnl = load_fundamental_json(ticker, "pnl")
         balance_sheet = load_fundamental_json(ticker, "balance_sheet")
@@ -396,10 +382,8 @@ def stock_fundamental(ticker):
         ratios = load_fundamental_json(ticker, "ratios")
         shareholding = load_fundamental_json(ticker, "shareholding")
 
-        # Calculate metrics (DB-first, scrape-supplement)
         metrics = calculate_fundamental_metrics(ticker)
 
-        # Price chart data: from DB (OHLCV) — includes real volume
         chart_data = get_db_price_chart(ticker)
 
         return render_template(

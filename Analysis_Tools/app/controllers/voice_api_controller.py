@@ -42,6 +42,38 @@ def get_available_stocks():
         return jsonify({"success": False, "stocks": [], "error": str(e)})
 
 
+@voice_api_bp.route("/search/stocks")
+def search_all_stocks():
+    """
+    Search all NSE cash stocks by symbol prefix.
+    Used by the universal header search to return all stocks (not just F&O).
+    Query param: q (prefix to search)
+    """
+    from ..models.db_config import engine_cash
+    q_param = request.args.get("q", "").strip().upper()
+    try:
+        with engine_cash.connect() as conn:
+            result = conn.execute(
+                text("""
+                    SELECT DISTINCT symbol
+                    FROM daily_market_heatmap
+                    WHERE symbol ILIKE :prefix
+                      AND LENGTH(symbol) <= 15
+                      AND symbol ~ '^[A-Z]'
+                      AND symbol NOT LIKE '%GS20%'
+                      AND symbol NOT LIKE '%_RE'
+                    ORDER BY symbol
+                    LIMIT 15
+                """),
+                {"prefix": f"{q_param}%"}
+            )
+            symbols = [row[0] for row in result.fetchall()]
+        return jsonify({"success": True, "symbols": symbols})
+    except Exception as e:
+        print(f"[ERROR] search_all_stocks: {e}")
+        return jsonify({"success": False, "symbols": []})
+
+
 @voice_api_bp.route("/stock/<ticker>")
 def get_stock_voice_data(ticker):
     """

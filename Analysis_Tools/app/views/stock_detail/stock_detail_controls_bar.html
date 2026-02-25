@@ -2,7 +2,7 @@
     <div class="control-group">
         <label for="symbolSelect">Select Symbol</label>
         <select id="symbolSelect" name="symbol"
-            onchange="window.location.href='/stock/'+this.value+'?date='+document.getElementById('dateSelect').value">
+            onchange="window.location.href='/stock/'+this.value+'/options?date='+document.getElementById('dateSelect').value">
             {% for symbol in all_symbols %}
             <option value="{{ symbol }}" {% if symbol==ticker %}selected{% endif %}>{{ symbol }}</option>
             {% endfor %}
@@ -11,7 +11,7 @@
     <div class="control-group">
         <label for="expirySelect">Expiry Date</label>
         <select id="expirySelect" name="expiry"
-            onchange="window.location.href='/stock/{{ ticker }}?date='+document.getElementById('dateSelect').value+'&expiry='+this.value">
+            onchange="window.location.href='/stock/{{ ticker }}/options?date='+document.getElementById('dateSelect').value+'&expiry='+this.value">
             {% for exp in expiry_data %}
             <option value="{{ exp.expiry }}" {% if exp.expiry==selected_expiry %}selected{% endif %}>{{
                 exp.expiry|format_expiry }}</option>
@@ -21,11 +21,12 @@
     <div class="control-group">
         <label for="dateSelect">Select Date</label>
         <select id="dateSelect" name="date" data-expiry="{{ selected_expiry or '' }}"
-            onchange="var url='/stock/{{ ticker }}?date='+this.value; if(this.dataset.expiry){url+='&expiry='+this.dataset.expiry;} window.location.href=url;">
+            onchange="var url='/stock/{{ ticker }}/options?date='+this.value; if(this.dataset.expiry){url+='&expiry='+this.dataset.expiry;} window.location.href=url;">
             {% for d in dates %}
             <option value="{{ d }}" {% if d==selected_date %}selected{% endif %}>{{ d }}</option>
             {% endfor %}
         </select>
     </div>
+    <a href="/stock/{{ ticker }}" class="fundamental-btn btn-secondary" style="background:#f1f5f9;color:#374151;border:1px solid #e2e8f0;">&#8592; Overview</a>
     <a href="/stock/{{ ticker }}/fundamental" class="fundamental-btn btn-secondary">Fundamental Details</a>
 </div>

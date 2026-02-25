@@ -87,7 +87,7 @@ def get_macd_bullish_crossover(date, limit=20):
     try:
         q = text(
             """
-            SELECT ticker, underlying_price, macd, macd_signal, rsi_14
+            SELECT ticker, underlying_price, macd, macd_signal, rsi_14, adx_14
             FROM public.technical_screener_cache
             WHERE cache_date = :date AND macd_pos_cross = TRUE
             ORDER BY macd DESC
@@ -106,7 +106,7 @@ def get_macd_bearish_crossover(date, limit=20):
     try:
         q = text(
             """
-            SELECT ticker, underlying_price, macd, macd_signal, rsi_14
+            SELECT ticker, underlying_price, macd, macd_signal, rsi_14, adx_14
             FROM public.technical_screener_cache
             WHERE cache_date = :date AND macd_neg_cross = TRUE
             ORDER BY macd ASC
@@ -126,7 +126,7 @@ def get_above_both_sma(date, limit=20):
         q = text(
             """
             SELECT ticker, underlying_price, sma_50, sma_200,
-                   dist_from_50sma_pct, dist_from_200sma_pct, rsi_14
+                   dist_from_50sma_pct, dist_from_200sma_pct, rsi_14, adx_14
             FROM public.technical_screener_cache
             WHERE cache_date = :date AND above_50_sma = TRUE AND above_200_sma = TRUE
             ORDER BY dist_from_200sma_pct DESC
@@ -146,7 +146,7 @@ def get_below_both_sma(date, limit=20):
         q = text(
             """
             SELECT ticker, underlying_price, sma_50, sma_200,
-                   dist_from_50sma_pct, dist_from_200sma_pct, rsi_14
+                   dist_from_50sma_pct, dist_from_200sma_pct, rsi_14, adx_14
             FROM public.technical_screener_cache
             WHERE cache_date = :date AND below_50_sma = TRUE AND below_200_sma = TRUE
             ORDER BY dist_from_200sma_pct ASC
@@ -268,11 +268,11 @@ def get_golden_crossover_stocks(date, limit=50):
                 AND above_50_sma = TRUE
                 AND above_200_sma = TRUE
                 AND sma_50 > sma_200
-            ORDER BY sma_diff_pct ASC
+            ORDER BY sma_diff_pct DESC
             LIMIT :limit
         """
         )
-        df = pd.read_sql(q, engine, params={"date": date, "limit": limit})
+        df = pd.read_sql(q, engine, params={"date": date, "limit": 500})
         return df.to_dict("records")
     except Exception as e:
         print(f"Error getting golden crossover: {e}")
@@ -281,7 +281,7 @@ def get_golden_crossover_stocks(date, limit=50):
 
 # ====== NEW SCREENER QUERY FUNCTIONS ======
 
-def get_rsi_overbought_stocks(date, limit=100):
+def get_rsi_overbought_stocks(date, limit=2000):
     """Get stocks with RSI > 75 (ScanX threshold for overbought)"""
     try:
         q = text("""
@@ -299,7 +299,7 @@ def get_rsi_overbought_stocks(date, limit=100):
         return []
 
 
-def get_rsi_oversold_stocks(date, limit=100):
+def get_rsi_oversold_stocks(date, limit=2000):
     """Get stocks with RSI < 25 (ScanX threshold for oversold)"""
     try:
         q = text("""
@@ -317,7 +317,7 @@ def get_rsi_oversold_stocks(date, limit=100):
         return []
 
 
-def get_r1_breakout_stocks(date, limit=100):
+def get_r1_breakout_stocks(date, limit=2000):
     """Get stocks breaking above R1 resistance"""
     try:
         q = text("""
@@ -335,7 +335,7 @@ def get_r1_breakout_stocks(date, limit=100):
         return []
 
 
-def get_r2_breakout_stocks(date, limit=100):
+def get_r2_breakout_stocks(date, limit=2000):
     """Get stocks breaking above R2 resistance"""
     try:
         q = text("""
@@ -353,7 +353,7 @@ def get_r2_breakout_stocks(date, limit=100):
         return []
 
 
-def get_r3_breakout_stocks(date, limit=100):
+def get_r3_breakout_stocks(date, limit=2000):
     """Get stocks breaking above R3 resistance"""
     try:
         q = text("""
@@ -371,7 +371,7 @@ def get_r3_breakout_stocks(date, limit=100):
         return []
 
 
-def get_s1_breakout_stocks(date, limit=100):
+def get_s1_breakout_stocks(date, limit=2000):
     """Get stocks breaking below S1 support"""
     try:
         q = text("""
@@ -389,7 +389,7 @@ def get_s1_breakout_stocks(date, limit=100):
         return []
 
 
-def get_s2_breakout_stocks(date, limit=100):
+def get_s2_breakout_stocks(date, limit=2000):
     """Get stocks breaking below S2 support"""
     try:
         q = text("""
@@ -407,7 +407,7 @@ def get_s2_breakout_stocks(date, limit=100):
         return []
 
 
-def get_s3_breakout_stocks(date, limit=100):
+def get_s3_breakout_stocks(date, limit=2000):
     """Get stocks breaking below S3 support"""
     try:
         q = text("""
@@ -425,7 +425,7 @@ def get_s3_breakout_stocks(date, limit=100):
         return []
 
 
-def get_momentum_stocks(date, limit=100):
+def get_momentum_stocks(date, limit=2000):
     """Get stocks with high momentum score"""
     try:
         q = text("""
@@ -443,7 +443,7 @@ def get_momentum_stocks(date, limit=100):
         return []
 
 
-def get_squeezing_range_stocks(date, limit=100):
+def get_squeezing_range_stocks(date, limit=2000):
     """Get stocks with Bollinger Band squeeze (tightening bands)"""
     try:
         q = text("""
@@ -461,7 +461,7 @@ def get_squeezing_range_stocks(date, limit=100):
         return []
 
 
-def get_death_crossover_stocks(date, limit=50):
+def get_death_crossover_stocks(date, limit=2000):
     """
     Get stocks with Death Crossover (50-day SMA crosses below 200-day SMA)
     Returns stocks where 50 SMA < 200 SMA (bearish signal)
@@ -484,7 +484,7 @@ def get_death_crossover_stocks(date, limit=50):
                 AND below_50_sma = TRUE
                 AND below_200_sma = TRUE
                 AND sma_50 < sma_200
-            ORDER BY sma_diff_pct DESC
+            ORDER BY sma_diff_pct ASC
             LIMIT :limit
         """
         )
@@ -499,7 +499,7 @@ def get_death_crossover_stocks(date, limit=50):
 
 # ====== PRICE & VOLUME SCREENER QUERIES ======
 
-def get_week1_high_breakout_stocks(date, limit=100):
+def get_week1_high_breakout_stocks(date, limit=2000):
     """Stocks breaking above 1-week high"""
     try:
         q = text("""
@@ -516,7 +516,7 @@ def get_week1_high_breakout_stocks(date, limit=100):
         print(f"Error getting week1 high breakout: {e}")
         return []
 
-def get_week1_low_breakout_stocks(date, limit=100):
+def get_week1_low_breakout_stocks(date, limit=2000):
     """Stocks breaking below 1-week low"""
     try:
         q = text("""
@@ -533,7 +533,7 @@ def get_week1_low_breakout_stocks(date, limit=100):
         print(f"Error getting week1 low breakout: {e}")
         return []
 
-def get_week4_high_breakout_stocks(date, limit=100):
+def get_week4_high_breakout_stocks(date, limit=2000):
     """Stocks breaking above 4-week high"""
     try:
         q = text("""
@@ -550,7 +550,7 @@ def get_week4_high_breakout_stocks(date, limit=100):
         print(f"Error getting week4 high breakout: {e}")
         return []
 
-def get_week4_low_breakout_stocks(date, limit=100):
+def get_week4_low_breakout_stocks(date, limit=2000):
     """Stocks breaking below 4-week low"""
     try:
         q = text("""
@@ -567,7 +567,7 @@ def get_week4_low_breakout_stocks(date, limit=100):
         print(f"Error getting week4 low breakout: {e}")
         return []
 
-def get_week52_high_breakout_stocks(date, limit=100):
+def get_week52_high_breakout_stocks(date, limit=2000):
     """Stocks breaking above 52-week high"""
     try:
         q = text("""
@@ -584,7 +584,7 @@ def get_week52_high_breakout_stocks(date, limit=100):
         print(f"Error getting week52 high breakout: {e}")
         return []
 
-def get_week52_low_breakout_stocks(date, limit=100):
+def get_week52_low_breakout_stocks(date, limit=2000):
     """Stocks breaking below 52-week low"""
     try:
         q = text("""
@@ -601,7 +601,7 @@ def get_week52_low_breakout_stocks(date, limit=100):
         print(f"Error getting week52 low breakout: {e}")
         return []
 
-def get_potential_high_volume_stocks(date, limit=100):
+def get_potential_high_volume_stocks(date, limit=2000):
     """Stocks with potential high volume (>1.5x avg)"""
     try:
         q = text("""
@@ -618,7 +618,7 @@ def get_potential_high_volume_stocks(date, limit=100):
         return []
 
 
-def get_unusually_high_volume_stocks(date, limit=100):
+def get_unusually_high_volume_stocks(date, limit=2000):
     """Stocks with unusually high volume (>2.5x avg)"""
     try:
         q = text("""
@@ -635,7 +635,7 @@ def get_unusually_high_volume_stocks(date, limit=100):
         return []
 
 
-def get_price_gainers_stocks(date, limit=100):
+def get_price_gainers_stocks(date, limit=2000):
     """Get top price gainers"""
     try:
         q = text("""
@@ -652,7 +652,7 @@ def get_price_gainers_stocks(date, limit=100):
         return []
 
 
-def get_price_losers_stocks(date, limit=100):
+def get_price_losers_stocks(date, limit=2000):
     """Get top price losers"""
     try:
         q = text("""
@@ -669,7 +669,7 @@ def get_price_losers_stocks(date, limit=100):
         return []
 
 
-def get_high_volume_stocks(date, limit=100):
+def get_high_volume_stocks(date, limit=2000):
     """Get high volume stocks"""
     try:
         q = text("""

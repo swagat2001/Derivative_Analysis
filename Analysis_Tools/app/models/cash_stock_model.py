@@ -116,12 +116,38 @@ def get_cash_stock_info(ticker: str) -> dict:
         result["price"]         = 0
         result["change_pct"]    = 0
 
-    #  2. OHLCV history from CashStocks_Database TBL_<TICKER>
+    #  2. OHLCV history — try CashStocks_Database first, then F&O database fallback
     result["ohlcv"] = []
     cash_table = f"TBL_{ticker}"
+
+    def _parse_ohlcv_rows(rows):
+        seen_dates = set()
+        data = []
+        for r in rows:
+            dt = str(r[0])
+            if dt in seen_dates:
+                continue
+            seen_dates.add(dt)
+            data.append({
+                "date":   dt,
+                "open":   float(r[1] or 0),
+                "high":   float(r[2] or 0),
+                "low":    float(r[3] or 0),
+                "close":  float(r[4] or 0),
+                "volume": int(r[5]   or 0),
+            })
+            # Safety checks for high/low
+            idx = len(data) - 1
+            if data[idx]["high"] == 0: data[idx]["high"] = max(data[idx]["open"], data[idx]["close"])
+            if data[idx]["low"] == 0:  data[idx]["low"]  = min(data[idx]["open"], data[idx]["close"])
+
+        # Return in ascending order for the chart
+        return data[::-1]
+
+    # ── 2a. Cash database (CashStocks_Database) ──────────────────
     try:
         with engine_cash.connect() as conn:
-            exists = conn.execute(text("""
+            cash_exists = conn.execute(text("""
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.tables
                     WHERE table_schema = 'public'
@@ -129,10 +155,10 @@ def get_cash_stock_info(ticker: str) -> dict:
                 )
             """), {"tname": cash_table}).scalar()
 
-        if exists:
+        if cash_exists:
             with engine_cash.connect() as conn:
                 rows = conn.execute(text(f"""
-                    SELECT
+                    SELECT DISTINCT ON ("BizDt")
                         "BizDt"::text           AS date,
                         "OpnPric"::float        AS open,
                         "HghPric"::float        AS high,
@@ -140,34 +166,61 @@ def get_cash_stock_info(ticker: str) -> dict:
                         "ClsPric"::float        AS close,
                         "TtlTradgVol"::bigint   AS volume
                     FROM public."{cash_table}"
-                    WHERE "ClsPric" IS NOT NULL
+                    WHERE "ClsPric" IS NOT NULL AND "ClsPric" > 0
                     ORDER BY "BizDt" DESC
-                    LIMIT 90
+                    LIMIT 120
                 """)).fetchall()
-
-            result["ohlcv"] = [
-                {
-                    "date":   r[0],
-                    "open":   float(r[1] or 0),
-                    "high":   float(r[2] or 0),
-                    "low":    float(r[3] or 0),
-                    "close":  float(r[4] or 0),
-                    "volume": int(r[5]   or 0),
-                }
-                for r in reversed(rows)
-            ]
-
-            # If no technical cache, derive price from latest OHLCV
-            if not result["has_technical"] and result["ohlcv"]:
-                latest = result["ohlcv"][-1]
-                prev   = result["ohlcv"][-2] if len(result["ohlcv"]) > 1 else latest
-                result["price"]      = latest["close"]
-                result["volume"]     = latest["volume"]
-                pchg = ((latest["close"] - prev["close"]) / prev["close"] * 100) if prev["close"] else 0
-                result["change_pct"] = round(pchg, 2)
-
+            result["ohlcv"] = _parse_ohlcv_rows(rows)
     except Exception as e:
-        print(f"[WARN] get_cash_stock_info OHLCV ({ticker}): {e}")
+        print(f"[WARN] get_cash_stock_info OHLCV cash_db ({ticker}): {e}")
+
+    # ── 2b. F&O database fallback (BhavCopy_Database) ────────────
+    # Used for F&O stocks whose cash OHLCV lives in BhavCopy_Database
+    # as the base table rows where OptnTp IS NULL (futures/EQ rows)
+    if not result["ohlcv"]:
+        try:
+            with engine.connect() as conn:
+                fo_exists = conn.execute(text("""
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.tables
+                        WHERE table_schema = 'public'
+                          AND table_name    = :tname
+                    )
+                """), {"tname": cash_table}).scalar()
+
+            if fo_exists:
+                with engine.connect() as conn:
+                    rows = conn.execute(text(f"""
+                        SELECT DISTINCT ON ("BizDt")
+                            "BizDt"::text                AS date,
+                            "OpnPric"::float             AS open,
+                            "HghPric"::float             AS high,
+                            "LwPric"::float              AS low,
+                            "ClsPric"::float             AS close,
+                            COALESCE("TtlTradgVol", 0)::bigint AS volume
+                        FROM public."{cash_table}"
+                        WHERE "OptnTp" IS NULL
+                          AND "ClsPric" IS NOT NULL AND "ClsPric" > 0
+                        ORDER BY "BizDt" DESC, "FininstrmActlXpryDt" ASC
+                        LIMIT 120
+                    """)).fetchall()
+
+                if rows:
+                    result["ohlcv"] = _parse_ohlcv_rows(rows)
+                    print(f"[INFO] get_cash_stock_info: used F&O base table for OHLCV ({ticker}), {len(rows)} rows")
+        except Exception as e:
+            print(f"[WARN] get_cash_stock_info OHLCV fo_db ({ticker}): {e}")
+
+    # ── 2c. Derive price from OHLCV if technical cache missed ────
+    if result["ohlcv"]:
+        if not result["has_technical"] or not result.get("price"):
+            latest = result["ohlcv"][-1]
+            prev   = result["ohlcv"][-2] if len(result["ohlcv"]) > 1 else latest
+            result["price"]      = latest["close"]
+            result["volume"]     = latest["volume"]
+            pchg = ((latest["close"] - prev["close"]) / prev["close"] * 100) if prev["close"] else 0
+            if not result["has_technical"]:
+                result["change_pct"] = round(pchg, 2)
 
     result["ticker"] = ticker
     return result
@@ -192,10 +245,10 @@ _SCANNER_CHECKS = [
     ("RSI Oversold",          "/scanner/technical-indicators/rsi-oversold",      "bullish",
      lambda r: (r.get("rsi_14") or 0) < 25),
 
-    ("MACD Bullish Cross",    "/scanner/technical-indicators/",                  "bullish",
+    ("MACD Bullish Cross",    "/scanner/technical-indicators/macd-bullish-cross",   "bullish",
      lambda r: r.get("macd_pos_cross")),
 
-    ("MACD Bearish Cross",    "/scanner/technical-indicators/",                  "bearish",
+    ("MACD Bearish Cross",    "/scanner/technical-indicators/macd-bearish-cross",   "bearish",
      lambda r: r.get("macd_neg_cross")),
 
     ("Momentum Stock",        "/scanner/technical-indicators/momentum-stocks",   "bullish",
@@ -246,13 +299,13 @@ _SCANNER_CHECKS = [
     ("Potential High Volume", "/scanner/technical-indicators/potential-high-volume","neutral",
      lambda r: r.get("is_potential_high_vol")),
 
-    ("Strong ADX Trend",      "/scanner/technical-indicators/",                  "neutral",
+    ("Strong ADX Trend",      "/scanner/technical-indicators/strong-adx-trend",   "neutral",
      lambda r: r.get("strong_trend")),
 
-    ("Above 50 & 200 SMA",    "/scanner/technical-indicators/",                  "bullish",
+    ("Above 50 & 200 SMA",    "/scanner/technical-indicators/above-50-200-sma",   "bullish",
      lambda r: r.get("above_50_sma") and r.get("above_200_sma")),
 
-    ("Below 50 & 200 SMA",    "/scanner/technical-indicators/",                  "bearish",
+    ("Below 50 & 200 SMA",    "/scanner/technical-indicators/below-50-200-sma",   "bearish",
      lambda r: r.get("below_50_sma") and r.get("below_200_sma")),
 ]
 

@@ -709,7 +709,7 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
             import traceback
 
             traceback.print_exc()
-            stocks_df["signal"] = "NEUTRAL"
+        stocks_df["signal"] = stocks_df["signal"].fillna("NEUTRAL")
 
         stocks_df["volume"] = stocks_df["volume"].fillna(0).astype(int)
         stocks_df["oi"] = stocks_df["oi"].fillna(0).astype(int)
@@ -730,7 +730,20 @@ def get_index_stocks_with_data(index_key: str, date: str = None) -> List[Dict]:
                 stock["market_cap"] = fund_data.get("market_cap", 0)
                 stock["pe"] = fund_data.get("pe", 0)
 
-                stock["custom_metric_value"] = f"ROCE: {fund_data.get('roce', 0):.2f}%"
+                opm = fund_data.get('opm', 0.0) or 0.0
+                net_profit = fund_data.get('net_profit', 0.0) or 0.0
+                sales = fund_data.get('sales', 0.0) or 0.0
+                pe = fund_data.get('pe', 0.0) or 0.0
+                # Use OPM first; fall back to Net Profit Margin for banks/financials; then P/E
+                if opm and opm != 0.0:
+                    stock["custom_metric_value"] = f"OPM: {opm:.1f}%"
+                elif sales and sales > 0 and net_profit:
+                    npm = (net_profit / sales) * 100
+                    stock["custom_metric_value"] = f"NPM: {npm:.1f}%"
+                elif pe and pe > 0:
+                    stock["custom_metric_value"] = f"P/E: {pe:.1f}x"
+                else:
+                    stock["custom_metric_value"] = "-"
 
         except Exception as e:
             print(f"[WARNING] Failed to enrich with fundamental data: {e}")

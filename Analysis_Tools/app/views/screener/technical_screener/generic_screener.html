@@ -88,6 +88,12 @@
                         </div>
                     </div>
 
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <input type="text" id="screenerSearch" placeholder="Search Symbol..."
+                            style="padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; width: 220px; outline: none; transition: border-color 0.2s;"
+                            onkeyup="filterScreenerTable()">
+                    </div>
+
                     <div style="display: flex; align-items: center; gap: 30px;">
                         <div style="text-align: center;">
                             <div class="metric-value">{{ stocks|length }}</div>
@@ -142,8 +148,10 @@
                                 {% if col.suffix %}{{ col.suffix }}{% endif %}
                             </td>
                             {% endfor %}
-                            <td>{{ "%.1f"|format(stock.rsi_14) if stock.rsi_14 else 'N/A' }}</td>
-                            <td>{{ "%.1f"|format(stock.adx_14) if stock.adx_14 else 'N/A' }}</td>
+                            <td>{{ "%.1f"|format(stock.get('rsi_14')) if stock.get('rsi_14') is not none else 'N/A' }}
+                            </td>
+                            <td>{{ "%.1f"|format(stock.get('adx_14')) if stock.get('adx_14') is not none else 'N/A' }}
+                            </td>
                             <td>
                                 <span class="signal-badge {{ stock.signal|lower }}">
                                     {{ stock.signal }}
@@ -195,6 +203,25 @@
 </div>
 
 <script>
+    function filterScreenerTable() {
+        const input = document.getElementById('screenerSearch');
+        const filter = input.value.toUpperCase();
+        const table = document.querySelector('.card-table');
+        const tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            const tdTicker = tr[i].getElementsByTagName('td')[1]; // Ticker column
+            if (tdTicker) {
+                const txtValue = tdTicker.textContent || tdTicker.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
     function exportScreenerCSV() {
         const table = document.querySelector('.card-table');
         if (!table) return;

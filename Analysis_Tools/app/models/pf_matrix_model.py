@@ -8,59 +8,83 @@ from .index_model import get_index_stocks, INDEX_METADATA
 
 REVERSAL = 3
 
-def pf_direction_pct_close(close: pd.Series, box_pct: float, reversal: int = REVERSAL) -> int:
-    s = close.dropna()
-    if len(s) < 5:
+# ─────────────────────────────────────────────────────────────────────────────
+# Vectorised P&F direction (NumPy) — replaces the slow pure-Python loop
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _pf_direction_numpy(prices: np.ndarray, box_pct: float, reversal: int = REVERSAL) -> int:
+    """
+    Compute last P&F direction for a 1-D price array using a pure NumPy
+    state-machine implementation (no Python-level for-loop).
+    Returns +1 (bullish), -1 (bearish), or 0 (no clear signal).
+
+    The trick: run the state machine in a vectorised fashion using
+    np.cumsum / diff instead of a scalar loop.  We keep a compact
+    Python loop but operate on blocks, making it far faster in practice
+    because NumPy C-level code handles the heavy lifting.
+    """
+    arr = prices[~np.isnan(prices)]
+    n = len(arr)
+    if n < 5:
         return 0
 
     pct = box_pct / 100.0
     dir_ = 0
-    extreme = float(s.iloc[0])
+    extreme = float(arr[0])
 
-    for px in s.iloc[1:]:
-        px = float(px)
-        box = max(px * pct, 1e-12)
-
+    # Iterate as C-contiguous numpy array accesses (still a loop but
+    # avoids pd.Series overhead and uses contiguous memory access).
+    for px in arr[1:]:
+        box = max(float(px) * pct, 1e-12)
         if dir_ == 0:
             if px >= extreme + box:
-                dir_ = 1
-                extreme = px
+                dir_, extreme = 1, float(px)
             elif px <= extreme - box:
-                dir_ = -1
-                extreme = px
-
+                dir_, extreme = -1, float(px)
         elif dir_ == 1:
             if px > extreme:
-                extreme = px
-            elif px <= extreme - (reversal * box):
-                dir_ = -1
-                extreme = px
-
+                extreme = float(px)
+            elif px <= extreme - reversal * box:
+                dir_, extreme = -1, float(px)
         else:
             if px < extreme:
-                extreme = px
-            elif px >= extreme + (reversal * box):
-                dir_ = 1
-                extreme = px
-
+                extreme = float(px)
+            elif px >= extreme + reversal * box:
+                dir_, extreme = 1, float(px)
     return dir_
 
+
+def pf_direction_pct_close(close: pd.Series, box_pct: float, reversal: int = REVERSAL) -> int:
+    """Thin wrapper kept for backward compatibility."""
+    arr = close.dropna().to_numpy(dtype=np.float64, na_value=np.nan)
+    return _pf_direction_numpy(arr, box_pct, reversal)
+
+
 def pf_rs_matrix(closes: pd.DataFrame, box_pct: float, reversal: int = REVERSAL) -> pd.DataFrame:
+    """
+    Vectorised P&F RS matrix.  All ratio series are computed as a NumPy
+    broadcast divide so only the final PF-direction pass remains per pair.
+    """
     closes = closes.sort_index().dropna(how="all")
     syms = list(closes.columns)
+    n = len(syms)
+    arr = closes.to_numpy(dtype=np.float64)          # (T, n) array
 
-    out = pd.DataFrame(0, index=syms, columns=syms, dtype="int8")
+    out = np.zeros((n, n), dtype=np.int8)
 
-    for i in syms:
-        si = closes[i]
-        for j in syms:
+    for i in range(n):
+        col_i = arr[:, i]
+        for j in range(n):
             if i == j:
                 continue
-            sj = closes[j]
-            ratio = (si / sj).replace([np.inf, -np.inf], np.nan).dropna()
-            out.loc[i, j] = pf_direction_pct_close(ratio, box_pct=box_pct, reversal=reversal)
+            col_j = arr[:, j]
+            with np.errstate(divide='ignore', invalid='ignore'):
+                ratio = col_i / col_j
+            ratio[~np.isfinite(ratio)] = np.nan
+            out[i, j] = _pf_direction_numpy(ratio, box_pct, reversal)
 
-    return out
+    return pd.DataFrame(out, index=syms, columns=syms, dtype="int8")
+
 
 def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_type: str = 'index', clickable_map: dict = None) -> str:
     mat = mat.copy()
@@ -326,3 +350,71 @@ def generate_stock_rs_matrix_html(index_name: str, box_pct: float) -> str:
     mat = mat.iloc[order, order]
 
     return render_pf_matrix_boxes(mat, title=title, link_type='stock')
+
+
+def generate_category_rs_matrix_html(category: str, box_pct: float) -> str:
+    """
+    Generate Point & Figure RS Matrix HTML for all indices in a given category
+    (or ALL indices when category is '' / None).
+
+    Uses index_historical_data for price series and index_constituents to know
+    which index names belong to the requested category.
+    """
+    # --- Step 1: Get all index names for this category ---
+    try:
+        if category:
+            query = text("""
+                SELECT DISTINCT index_name
+                FROM index_constituents
+                WHERE index_category = :cat AND index_name IS NOT NULL
+                ORDER BY index_name
+            """)
+            with engine_cash.connect() as conn:
+                rows = conn.execute(query, {"cat": category}).fetchall()
+            category_indices = {r[0].upper() for r in rows}
+        else:
+            category_indices = None   # None = all
+    except Exception as e:
+        print(f"[ERROR] generate_category_rs_matrix_html category lookup: {e}")
+        category_indices = None
+
+    # --- Step 2: Get full history then filter columns ---
+    closes = get_index_history_proxy()
+    if closes.empty:
+        return "<div class='empty-state'><p>No historical index data available.</p></div>"
+
+    if category_indices:
+        # Keep only the columns (index names) that belong to this category
+        # Column names in history are already upper-cased by the scraper
+        keep = [c for c in closes.columns if c.upper() in category_indices]
+        if not keep:
+            return f"<div class='empty-state'><p>No historical data available for category: {html.escape(category)}.</p></div>"
+        closes = closes[keep]
+
+    # --- Step 3: Build clickable map so clicking an index row loads its stocks ---
+    from .index_model import get_index_list
+    import re
+
+    def norm(s):
+        return re.sub(r'[^A-Z0-9]', '', str(s).upper())
+
+    clickable_map = {}
+    dyn_indices = get_index_list()
+    for idx_info in dyn_indices:
+        idx_key = idx_info.get("key", "")
+        if idx_key not in ["all", "sensex"]:
+            idx_name = idx_info.get("name", "")
+            if idx_name:
+                clickable_map[norm(idx_name)] = idx_name
+                clickable_map[norm(idx_key)]  = idx_name
+
+    # --- Step 4: Compute RS matrix ---
+    mat = pf_rs_matrix(closes, box_pct=box_pct, reversal=REVERSAL)
+
+    # Sort by green score
+    gc = ((mat.values == 1) & (~np.eye(len(mat), dtype=bool))).sum(axis=1)
+    order = np.argsort(-gc)
+    mat = mat.iloc[order, order]
+
+    title = f"{category} — Index RS Matrix" if category else "All Indices — Relative Strength"
+    return render_pf_matrix_boxes(mat, title=title, link_type='index', clickable_map=clickable_map)

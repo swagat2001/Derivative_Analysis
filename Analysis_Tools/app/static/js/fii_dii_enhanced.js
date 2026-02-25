@@ -36,7 +36,6 @@ async function loadFiiDiiEnhanced() {
     }
 
     try {
-        // Get currentDate from global scope or use empty string
         const dateParam = (typeof currentDate !== 'undefined' && currentDate && currentDate !== 'None') ? currentDate : '';
         const url = `/neev/api/fii-dii?end_date=${dateParam}&days=${days}`;
 
@@ -84,10 +83,13 @@ function formatNumber(num) {
 // TIME AGGREGATION
 // ============================================
 function aggregateDataByPeriod(data, period) {
-    if (period === 'daily' || !data || !data.length) return data;
+    if (!data || !data.length) return [];
+
+    if (period === 'daily') {
+        return [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
 
     const grouped = {};
-
     data.forEach(row => {
         const date = new Date(row.date);
         let key;
@@ -153,12 +155,9 @@ function renderEquityView(container) {
     console.log('[FII/DII Enhanced] Active participant:', activeParticipant);
     console.log('[FII/DII Enhanced] Time period:', timePeriod);
     console.log('[FII/DII Enhanced] Raw data count:', rawData?.length);
-
-    // Aggregate data based on time period
     const aggregatedData = aggregateDataByPeriod(rawData, timePeriod);
     console.log('[FII/DII Enhanced] Aggregated data count:', aggregatedData?.length);
 
-    // Check if we have sufficient data
     if (!aggregatedData || aggregatedData.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -174,7 +173,6 @@ function renderEquityView(container) {
         console.warn('[FII/DII Enhanced] Insufficient data - only', aggregatedData.length, 'days available');
     }
 
-    // Determine which columns to show
     let tableHeaders = '';
     let showFii = activeParticipant === 'fii' || activeParticipant === 'both';
     let showDii = activeParticipant === 'dii' || activeParticipant === 'both';
@@ -205,7 +203,6 @@ function renderEquityView(container) {
         `;
     }
 
-    // Generate table rows
     let tableRows = aggregatedData.slice().reverse().map(row => {
         if (activeParticipant === 'fii') {
             return `
@@ -259,12 +256,9 @@ function renderEquityView(container) {
         </div>
     `;
 
-    // Initialize Sorting
     if (window.initTableSorting) {
         setTimeout(window.initTableSorting, 50);
     }
-
-    // Render chart
     console.log('[FII/DII Enhanced] About to render chart with', aggregatedData?.length, 'data points');
     renderDualAxisChart(aggregatedData, showFii, showDii);
 }
@@ -363,11 +357,11 @@ async function renderDualAxisChart(data, showFii, showDii) {
             categories: labels,
             crosshair: true,
             min: 0,
-            max: data.length === 1 ? 0 : undefined  // Fix single point rendering
+            max: data.length === 1 ? 0 : undefined
         },
         plotOptions: {
             column: {
-                pointWidth: data.length === 1 ? 60 : undefined,  // Wider bars for single point
+                pointWidth: data.length === 1 ? 60 : undefined,
                 maxPointWidth: 80
             }
         },
@@ -398,7 +392,6 @@ function renderDerivativeView(container, category) {
     console.log('[FII/DII Enhanced] Derivatives data keys:', Object.keys(derivativesData || {}).length);
     console.log('[FII/DII Enhanced] Active participant:', activeParticipant);
 
-    // Map category names
     const categoryMap = {
         'index_futures': 'index_futures',
         'index_options': 'index_options',
@@ -411,7 +404,6 @@ function renderDerivativeView(container, category) {
 
     console.log('[FII/DII Enhanced] Mapped category:', mappedCategory, 'Participant:', participant);
 
-    // Extract and aggregate data for this category and participant
     const aggregatedData = aggregateDerivativesForChart(derivativesData, mappedCategory, participant);
     console.log('[FII/DII Enhanced] Aggregated derivatives data points:', aggregatedData.length);
 
@@ -444,7 +436,6 @@ function renderDerivativeView(container, category) {
         `;
         tableRows = renderOptionsTableRows(derivativesData, mappedCategory, participant);
     } else if (isFutures) {
-        // Futures: Specific headers for contracts
         tableHeaders = `
             <th>Date</th>
             <th>Buy OI (Contracts)</th>
@@ -486,12 +477,9 @@ function renderDerivativeView(container, category) {
         </div>
     `;
 
-    // Initialize Sorting
     if (window.initTableSorting) {
         setTimeout(window.initTableSorting, 50);
     }
-
-    // Render appropriate chart
     if (isOptions) {
         renderOptionsChart(derivativesData, mappedCategory, participant);
     } else if (isFutures) {
@@ -520,7 +508,6 @@ function aggregateDerivativesForChart(derivData, category, participant) {
         );
 
         if (items.length > 0) {
-            // Sum all items for this date/category/participant
             const dayTotal = items.reduce((acc, item) => ({
                 buy_value: acc.buy_value + (item.buy_value || 0),
                 sell_value: acc.sell_value + (item.sell_value || 0),
@@ -539,10 +526,9 @@ function aggregateDerivativesForChart(derivData, category, participant) {
     return result;
 }
 
-// NEW: Specific Chart for Futures (Long vs Short)
 async function renderFuturesChart(derivData, category, participant) {
     console.log('[FII/DII Enhanced] renderFuturesChart called');
-    const dates = Object.keys(derivData).sort().slice(-30); // Last 30 days
+    const dates = Object.keys(derivData).sort().slice(-30);
     const labels = dates.map(d => {
         const date = new Date(d);
         return `${date.getDate()}/${date.getMonth() + 1}`;
@@ -561,7 +547,6 @@ async function renderFuturesChart(derivData, category, participant) {
         shortData.push(s);
         netData.push(l - s);
 
-        // Nifty Price
         niftyPrices.push(globalFiiDiiState.niftyData[d] || null);
     });
 
@@ -602,7 +587,7 @@ async function renderOptionsChart(derivData, category, participant) {
         return `${date.getDate()}/${date.getMonth() + 1}`;
     });
 
-    const type = category.split('_')[0]; // index or stock
+    const type = category.split('_')[0];
     const callCat = `${type}_call_options`;
     const putCat = `${type}_put_options`;
 
@@ -700,7 +685,6 @@ function renderDerivativeTableRows(derivData, category, participant) {
         const items = derivData[date].filter(x => x.category === category && x.participant_type === participant);
         items.forEach(item => {
             if (isFutures) {
-                // Futures: Contracts and Position
                 const long_oi = item.oi_long || 0;
                 const short_oi = item.oi_short || 0;
                 const net_oi = long_oi - short_oi;
@@ -718,7 +702,6 @@ function renderDerivativeTableRows(derivData, category, participant) {
                     </tr>
                 `;
             } else {
-                // Options list: Full 7 columns
                 rows += `
                     <tr>
                         <td>${date}</td>

@@ -39,7 +39,7 @@ from ...models.insights_model import (
     get_volume_breakouts,
 )
 from ...models.stock_model import get_filtered_tickers
-from ...models.pf_matrix_model import generate_rs_matrix_html, generate_stock_rs_matrix_html
+from ...models.pf_matrix_model import generate_rs_matrix_html, generate_stock_rs_matrix_html, generate_category_rs_matrix_html
 
 # Blueprint setup
 insights_bp = Blueprint("insights", __name__, url_prefix="/neev", template_folder="../../views/insights")
@@ -765,8 +765,181 @@ def api_sector_performance():
 
 
 # =============================================================
-# RS MATRIX API endpoint
+# RS MATRIX API endpoints
 # =============================================================
+
+@insights_bp.route("/api/rs-matrix/index-categories")
+def api_rs_matrix_index_categories():
+    """
+    Return all indices grouped by category from index_constituents table.
+    Used to populate the RS-matrix dropdown.
+    Category order: Indices Eligible in Derivatives > Broad Market > Sectoral > Strategy & Thematic > Fixed Income > Other
+    """
+    CATEGORY_ORDER = [
+        "Indices Eligible in Derivatives",
+        "Broad Market Indices",
+        "Sectoral Indices",
+        "Thematic Indices",
+        "Strategy Indices",
+        "Fixed Income Indices",
+        "Other Indices",
+    ]
+    try:
+        with engine_cash.connect() as conn:
+            rows = conn.execute(text("""
+                SELECT DISTINCT
+                    index_name,
+                    index_key,
+                    COALESCE(index_category, 'Other Indices') AS index_category
+                FROM index_constituents
+                WHERE index_name IS NOT NULL AND index_name != ''
+                ORDER BY index_name
+            """)).fetchall()
+
+        if not rows:
+            # Fallback: return hardcoded minimal set
+            return jsonify({
+                "success": True,
+                "categories": [
+                    {
+                        "category": "Indices Eligible in Derivatives",
+                        "indices": [
+                            {"name": "NIFTY 50",                 "key": "NIFTY50"},
+                            {"name": "NIFTY NEXT 50",            "key": "NIFTYNEXT50"},
+                            {"name": "NIFTY BANK",               "key": "NIFTYBANK"},
+                            {"name": "NIFTY FINANCIAL SERVICES", "key": "NIFTYFINANCIALSERVICES"},
+                            {"name": "NIFTY MIDCAP SELECT",      "key": "NIFTYMIDCAPSELECT"},
+                        ]
+                    },
+                ]
+            })
+
+        # Group by category
+        from collections import defaultdict
+        grouped = defaultdict(list)
+        seen = set()  # avoid duplicate index_names
+        for row in rows:
+            index_name, index_key, category = row[0], row[1], row[2]
+            if index_name not in seen:
+                seen.add(index_name)
+                grouped[category].append({"name": index_name, "key": index_key})
+
+        # Sort within each category alphabetically
+        for cat in grouped:
+            grouped[cat].sort(key=lambda x: x["name"])
+
+        # Build ordered response
+        result = []
+        for cat in CATEGORY_ORDER:
+            if cat in grouped:
+                result.append({"category": cat, "indices": grouped[cat]})
+        # Append any leftover categories not in our order list
+        for cat, indices in grouped.items():
+            if cat not in CATEGORY_ORDER:
+                result.append({"category": cat, "indices": indices})
+
+        return jsonify({"success": True, "categories": result})
+
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        # If index_category column doesn't exist yet (old schema), return fallback
+        return jsonify({
+            "success": True,
+            "categories": [
+                {
+                    "category": "Indices Eligible in Derivatives",
+                    "indices": [
+                        {"name": "NIFTY 50",                 "key": "NIFTY50"},
+                        {"name": "NIFTY NEXT 50",            "key": "NIFTYNEXT50"},
+                        {"name": "NIFTY BANK",               "key": "NIFTYBANK"},
+                        {"name": "NIFTY FINANCIAL SERVICES", "key": "NIFTYFINANCIALSERVICES"},
+                        {"name": "NIFTY MIDCAP SELECT",      "key": "NIFTYMIDCAPSELECT"},
+                    ]
+                },
+            ],
+            "_note": "Run index_constituents_db_scraper.py to populate full category data"
+        })
+
+
+@insights_bp.route("/api/rs-matrix/ad-ratio")
+def api_rs_matrix_ad_ratio():
+    """
+    Compute Advance/Decline ratio for a specific index on the latest date.
+    Uses daily_market_heatmap filtered by index constituents.
+    """
+    index_name = request.args.get("index_name", type=str)
+    if not index_name:
+        return jsonify({"success": False, "error": "index_name is required"})
+
+    try:
+        import re
+        def norm(s):
+            return re.sub(r'[^A-Z0-9]', '', str(s).upper())
+
+        from ...models.index_model import get_index_list, get_index_stocks
+        idx_key = None
+        norm_input = norm(index_name)
+        for info in get_index_list():
+            if norm(info.get("name", "")) == norm_input or norm(info.get("key", "")) == norm_input:
+                idx_key = info.get("key", "")
+                break
+
+        if not idx_key:
+            return jsonify({"success": False, "error": f"Unknown index: {index_name}"})
+
+        stocks = get_index_stocks(idx_key)
+        if not stocks:
+            return jsonify({"success": False, "error": "No constituents found"})
+
+        stock_list_str = str(tuple(stocks)) if len(stocks) > 1 else f"('{stocks[0]}')"
+
+        with engine_cash.connect() as conn:
+            latest_date = conn.execute(text(
+                "SELECT MAX(date) FROM daily_market_heatmap"
+            )).scalar()
+
+            if not latest_date:
+                return jsonify({"success": False, "error": "No heatmap data"})
+
+            rows = conn.execute(text(f"""
+                SELECT symbol, change_pct, close, volume
+                FROM daily_market_heatmap
+                WHERE date = :dt AND symbol IN {stock_list_str}
+            """), {"dt": latest_date}).fetchall()
+
+        if not rows:
+            return jsonify({"success": False, "error": "No constituent data for latest date"})
+
+        advances  = sum(1 for r in rows if (r[1] or 0) > 0)
+        declines  = sum(1 for r in rows if (r[1] or 0) < 0)
+        unchanged = sum(1 for r in rows if (r[1] or 0) == 0)
+        total     = len(rows)
+        ad_ratio  = round(advances / declines, 2) if declines > 0 else float(advances)
+
+        sorted_rows = sorted(rows, key=lambda r: r[1] or 0)
+        losers  = [{"symbol": r[0], "change_pct": round(r[1] or 0, 2), "close": round(float(r[2] or 0), 2)} for r in sorted_rows[:5]]
+        gainers = [{"symbol": r[0], "change_pct": round(r[1] or 0, 2), "close": round(float(r[2] or 0), 2)} for r in sorted_rows[-5:][::-1]]
+
+        sentiment = "Bullish" if ad_ratio > 1.2 else ("Bearish" if ad_ratio < 0.8 else "Neutral")
+
+        return jsonify({
+            "success":   True,
+            "index":     index_name,
+            "date":      str(latest_date),
+            "advances":  advances,
+            "declines":  declines,
+            "unchanged": unchanged,
+            "total":     total,
+            "ad_ratio":  ad_ratio,
+            "sentiment": sentiment,
+            "gainers":   gainers,
+            "losers":    losers,
+        })
+
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)})
+
 
 @insights_bp.route("/api/rs-matrix")
 def api_rs_matrix():
@@ -830,6 +1003,164 @@ def api_rs_matrix_stock():
         "index_name": index_name,
         "html": html_content
     })
+
+
+@insights_bp.route("/api/rs-matrix/indices")
+def api_rs_matrix_indices():
+    """
+    Index-vs-Index P&F RS Matrix (with DB caching to avoid recomputation).
+    Params: category (optional), box_pct (default 0.5)
+    """
+    box_pct  = request.args.get("box_pct", 0.5, type=float)
+    category = request.args.get("category", "", type=str).strip()
+
+    # Sanitise category for a safe cache key
+    import re as _re
+    cat_slug  = _re.sub(r'[^A-Za-z0-9]', '_', category) if category else "all"
+    cache_key = f"indices_{cat_slug}_{box_pct}"
+
+    # ── Try DB cache first ─────────────────────────────────────────────────────
+    try:
+        with engine_cash.connect() as conn:
+            result = conn.execute(
+                text("SELECT html_content FROM rs_matrix_cache WHERE cache_key = :k"),
+                {"k": cache_key}
+            ).scalar()
+        if result:
+            return jsonify({"success": True, "category": category or "all",
+                            "box_pct": box_pct, "html": result, "cached": True})
+    except Exception:
+        pass   # cache miss or table not yet created — fall through
+
+    # ── Compute (slow path) ────────────────────────────────────────────────────
+    html_content = generate_category_rs_matrix_html(category, box_pct)
+
+    # ── Write to DB cache ──────────────────────────────────────────────────────
+    try:
+        with engine_cash.begin() as conn:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS rs_matrix_cache (
+                    cache_key    VARCHAR(200) PRIMARY KEY,
+                    html_content TEXT
+                )
+            """))
+            conn.execute(text("""
+                INSERT INTO rs_matrix_cache (cache_key, html_content)
+                VALUES (:k, :h)
+                ON CONFLICT (cache_key) DO UPDATE SET
+                    html_content = EXCLUDED.html_content
+            """), {"k": cache_key, "h": html_content})
+    except Exception as e:
+        print(f"[WARN] Could not write indices RS matrix to cache: {e}")
+
+    return jsonify({"success": True, "category": category or "all",
+                    "box_pct": box_pct, "html": html_content})
+
+
+@insights_bp.route("/api/rs-matrix/ad-ratio-batch")
+def api_rs_matrix_ad_ratio_batch():
+    """
+    Batch A/D ratio endpoint — returns A/D for many indices in ONE DB query
+    instead of N individual calls.  Replaces the 140 parallel front-end fetches.
+
+    Params:
+      - category: optional, filter to this category's indices (empty = all)
+      - date:     optional trading date (default = latest available)
+    """
+    category = request.args.get("category", "", type=str).strip()
+    date_str = request.args.get("date", "", type=str).strip()
+
+    try:
+        # Step 1 — resolve which index_keys belong to this category
+        if category:
+            with engine_cash.connect() as conn:
+                rows = conn.execute(text("""
+                    SELECT DISTINCT index_name, index_key
+                    FROM index_constituents
+                    WHERE index_category = :cat
+                    ORDER BY index_name
+                """), {"cat": category}).fetchall()
+        else:
+            with engine_cash.connect() as conn:
+                rows = conn.execute(text("""
+                    SELECT DISTINCT index_name, index_key
+                    FROM index_constituents
+                    WHERE index_name IS NOT NULL
+                    ORDER BY index_name
+                """)).fetchall()
+
+        if not rows:
+            return jsonify({"success": True, "indices": []})
+
+        # Step 2 — build {index_key: index_name} map
+        key_to_name = {r[1]: r[0] for r in rows}
+
+        # Step 3 — single query: advances, declines, unchanged per index
+        if date_str:
+            date_clause = "AND date = :dt"
+            params = {"dt": date_str}
+        else:
+            # Use the latest available date in the table
+            with engine_cash.connect() as conn:
+                latest = conn.execute(text("SELECT MAX(date) FROM daily_market_heatmap")).scalar()
+            date_clause = "AND date = :dt"
+            params = {"dt": str(latest) if latest else "2099-01-01"}
+
+        # We need to look up constituents in daily_market_heatmap
+        index_keys = list(key_to_name.keys())
+        placeholders = ", ".join([f"'{k}'" for k in index_keys])
+
+        query = text(f"""
+            SELECT
+                ic.index_key,
+                ic.index_name,
+                COUNT(*) FILTER (WHERE h.change_pct > 0)  AS advances,
+                COUNT(*) FILTER (WHERE h.change_pct < 0)  AS declines,
+                COUNT(*) FILTER (WHERE h.change_pct = 0)  AS unchanged,
+                COUNT(*) AS total
+            FROM index_constituents ic
+            JOIN daily_market_heatmap h
+                ON ic.symbol = h.symbol {date_clause}
+            WHERE ic.index_key IN ({placeholders})
+            GROUP BY ic.index_key, ic.index_name
+            ORDER BY ic.index_name
+        """)
+
+        with engine_cash.connect() as conn:
+            result = conn.execute(query, params).fetchall()
+
+        # Step 4 — format response
+        indices_data = []
+        for row in result:
+            idx_key, idx_name, adv, dec, unch, total = row
+            adv   = adv   or 0
+            dec   = dec   or 0
+            unch  = unch  or 0
+            total = total or 1
+            ad_ratio = round(adv / dec, 2) if dec else (999.0 if adv else 0.0)
+            if ad_ratio > 1.5:
+                sentiment = "Bullish"
+            elif ad_ratio < 0.7:
+                sentiment = "Bearish"
+            else:
+                sentiment = "Neutral"
+            indices_data.append({
+                "index_name": idx_name,
+                "index_key":  idx_key,
+                "advances":   int(adv),
+                "declines":   int(dec),
+                "unchanged":  int(unch),
+                "total":      int(total),
+                "ad_ratio":   ad_ratio,
+                "sentiment":  sentiment,
+                "success":    True,
+            })
+
+        return jsonify({"success": True, "category": category or "all", "indices": indices_data})
+
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return jsonify({"success": False, "error": str(e), "indices": []})
 
 
 # =============================================================

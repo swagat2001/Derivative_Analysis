@@ -41,6 +41,11 @@ from ....models.technical_screener_model import (
     get_price_gainers_stocks,
     get_price_losers_stocks,
     get_high_volume_stocks,
+    get_macd_bullish_crossover,
+    get_macd_bearish_crossover,
+    get_above_both_sma,
+    get_below_both_sma,
+    get_strong_trending_stocks,
 )
 from ....services.signal_service import compute_signals_simple
 
@@ -138,18 +143,18 @@ def technical_screener():
             breakout_date = request.args.get("date", tech_dates[-1] if tech_dates else selected_date)
             try:
                 breakout_data = {
-                    "r1": get_r1_breakout_stocks(breakout_date, limit=100),
-                    "r2": get_r2_breakout_stocks(breakout_date, limit=100),
-                    "r3": get_r3_breakout_stocks(breakout_date, limit=100),
-                    "s1": get_s1_breakout_stocks(breakout_date, limit=100),
-                    "s2": get_s2_breakout_stocks(breakout_date, limit=100),
-                    "s3": get_s3_breakout_stocks(breakout_date, limit=100),
-                    "week1_high": get_week1_high_breakout_stocks(breakout_date, limit=100),
-                    "week1_low": get_week1_low_breakout_stocks(breakout_date, limit=100),
-                    "week4_high": get_week4_high_breakout_stocks(breakout_date, limit=100),
-                    "week4_low": get_week4_low_breakout_stocks(breakout_date, limit=100),
-                    "week52_high": get_week52_high_breakout_stocks(breakout_date, limit=100),
-                    "week52_low": get_week52_low_breakout_stocks(breakout_date, limit=100),
+                    "r1": get_r1_breakout_stocks(breakout_date, limit=2000),
+                    "r2": get_r2_breakout_stocks(breakout_date, limit=2000),
+                    "r3": get_r3_breakout_stocks(breakout_date, limit=2000),
+                    "s1": get_s1_breakout_stocks(breakout_date, limit=2000),
+                    "s2": get_s2_breakout_stocks(breakout_date, limit=2000),
+                    "s3": get_s3_breakout_stocks(breakout_date, limit=2000),
+                    "week1_high": get_week1_high_breakout_stocks(breakout_date, limit=2000),
+                    "week1_low": get_week1_low_breakout_stocks(breakout_date, limit=2000),
+                    "week4_high": get_week4_high_breakout_stocks(breakout_date, limit=2000),
+                    "week4_low": get_week4_low_breakout_stocks(breakout_date, limit=2000),
+                    "week52_high": get_week52_high_breakout_stocks(breakout_date, limit=2000),
+                    "week52_low": get_week52_low_breakout_stocks(breakout_date, limit=2000),
                     "selected_date": breakout_date,
                     "dates": tech_dates,
                 }
@@ -235,7 +240,7 @@ def golden_crossover():
             )
 
         selected_date = request.args.get("date", dates[-1])  # Most recent date
-        stocks = get_golden_crossover_stocks(selected_date, limit=100)
+        stocks = get_golden_crossover_stocks(selected_date, limit=2000)
 
         # Add signal field
         for stock in stocks:
@@ -279,7 +284,7 @@ def death_crossover():
             )
 
         selected_date = request.args.get("date", dates[-1])  # Most recent date
-        stocks = get_death_crossover_stocks(selected_date, limit=100)
+        stocks = get_death_crossover_stocks(selected_date, limit=2000)
 
         # Add signal field
         for stock in stocks:
@@ -323,7 +328,7 @@ def render_generic_screener(title, desc, icon, signal, signal_color, data_func,
             )
 
         selected_date = request.args.get("date", dates[-1])
-        stocks = data_func(selected_date, limit=100)
+        stocks = data_func(selected_date, limit=2000)
 
         # Fetch signals from service
         signals_map = compute_signals_simple(selected_date)
@@ -674,5 +679,81 @@ def high_volume():
         table_columns=[
             {"key": "volume", "label": "Volume"},
             {"key": "volume_change_pct", "label": "Vol Change %", "format": "+%.2f", "suffix": "%", "css_class": "positive"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/macd-bullish-cross")
+def macd_bullish_cross():
+    """MACD bullish crossover screener"""
+    return render_generic_screener(
+        title="MACD Bullish Cross",
+        desc="Detects stocks where the MACD line has crossed above the signal line.",
+        icon="", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_macd_bullish_crossover,
+        table_columns=[
+            {"key": "macd", "label": "MACD", "format": "%.2f"},
+            {"key": "macd_signal", "label": "Signal", "format": "%.2f"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/macd-bearish-cross")
+def macd_bearish_cross():
+    """MACD bearish crossover screener"""
+    return render_generic_screener(
+        title="MACD Bearish Cross",
+        desc="Detects stocks where the MACD line has crossed below the signal line.",
+        icon="", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_macd_bearish_crossover,
+        table_columns=[
+            {"key": "macd", "label": "MACD", "format": "%.2f"},
+            {"key": "macd_signal", "label": "Signal", "format": "%.2f"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/strong-adx-trend")
+def strong_adx_trend():
+    """Strong ADX trend screener"""
+    return render_generic_screener(
+        title="Strong Trend (ADX > 25)",
+        desc="Stocks with ADX above 25, indicating a strong trend is in progress.",
+        icon="", signal="NEUTRAL", signal_color="#d97706",
+        data_func=get_strong_trending_stocks,
+        table_columns=[
+            {"key": "adx_14", "label": "ADX", "format": "%.2f"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/above-50-200-sma")
+def above_50_200_sma():
+    """Above both 50 and 200 SMA screener"""
+    return render_generic_screener(
+        title="Above 50 & 200 SMA",
+        desc="Strong bullish setup where the price is trading above both major moving averages.",
+        icon="", signal="BULLISH", signal_color="#16a34a",
+        data_func=get_above_both_sma,
+        table_columns=[
+            {"key": "sma_50", "label": "SMA 50", "format": "₹%.2f"},
+            {"key": "sma_200", "label": "SMA 200", "format": "₹%.2f"},
+            {"key": "dist_from_200sma_pct", "label": "Dist 200 SMA", "format": "%.2f%%"},
+        ],
+    )
+
+
+@technical_screener_bp.route("/below-50-200-sma")
+def below_50_200_sma():
+    """Below both 50 and 200 SMA screener"""
+    return render_generic_screener(
+        title="Below 50 & 200 SMA",
+        desc="Weak bearish setup where the price is trading below both major moving averages.",
+        icon="", signal="BEARISH", signal_color="#dc2626",
+        data_func=get_below_both_sma,
+        table_columns=[
+            {"key": "sma_50", "label": "SMA 50", "format": "₹%.2f"},
+            {"key": "sma_200", "label": "SMA 200", "format": "₹%.2f"},
+            {"key": "dist_from_200sma_pct", "label": "Dist 200 SMA", "format": "%.2f%%"},
         ],
     )

@@ -100,7 +100,7 @@ def get_scan_results(category):
                         if category == "negative_working_capital"
                         else f"Growth: {stock['profit_growth_3yr']:.1f}%"
                         if category in ["potential_multibagger", "best_results"]
-                        else f"ROCE: {stock['roce']*100:.1f}%"
+                        else f"OPM: {stock['opm']:.1f}%"
                     ),
                 }
             )

@@ -111,25 +111,20 @@
 
   let currentStocks = [];
   let currentDataKey = '';
+  const LATEST_DATE = "{{ dates[0] if dates else 'today' }}";
 
-  // Removed topMenu as it's no longer used
   const screenerList = document.getElementById("screenerList");
-  // const sectionTitle = document.getElementById("sectionTitle"); // Removed
   const screenerListView = document.getElementById("screenerListView");
   const detailView = document.getElementById("detailView");
 
   /* ===== RENDER SCREENER LIST ===== */
   function renderAll() {
-    // sectionTitle.textContent = "All Screeners"; // Removed
     screenerList.innerHTML = "";
-
-    // Flatten all screeners from all categories
     const allScreeners = [];
     Object.values(SCREENER_DATA).forEach(items => {
       allScreeners.push(...items);
     });
 
-    // Render them in a flat list
     if (allScreeners.length === 0) {
       screenerList.innerHTML = '<div style="padding: 20px; color: #666;">No scanners found.</div>';
       return;
@@ -149,12 +144,14 @@
       badgeHTML = `<span class="screener-badge badge-${badgeClass}">${item.badge}</span>`;
     }
 
+    const description = item.description.replace('{date}', LATEST_DATE);
+
     card.innerHTML = `
     <div class="screener-left">
       <div class="icon">${item.icon}</div>
       <div class="screener-info">
         <div class="screener-title">${item.title} ${badgeHTML}</div>
-        <div class="screener-desc">${item.description}</div>
+        <div class="screener-desc">${description}</div>
       </div>
     </div>
     <div class="screener-right">
@@ -164,31 +161,16 @@
     </div>
   `;
 
-    // Handle click
     card.onclick = () => {
-      // Logic for inline API fetching (Fundamental / Intraday)
       if (item.inline) {
         if (item.apiUrl) {
           fetchAndShowDetailView(item.dataKey, item.apiUrl);
-        } else {
-          // Check if data exists in STOCK_DATA (fallback or static)
-          if (STOCK_DATA[item.dataKey]) {
-            showDetailView(item.dataKey);
-          } else {
-            // Try loading full page inline if no dataKey match?
-            // Logic from original file was: loadScreenerPageInline(item.title, item.url);
-            // But newer screener_data.js uses apiUrl.
-            // If we have inline=true but no apiUrl, we might still want loadScreenerPageInline if url exists?
-            if (item.url) {
-              loadScreenerPageInline(item.title, item.url);
-            } else {
-              console.error("No data source for inline screener:", item.title);
-            }
-          }
+        } else if (STOCK_DATA[item.dataKey]) {
+          showDetailView(item.dataKey);
+        } else if (item.url) {
+          loadScreenerPageInline(item.title, item.url);
         }
-      }
-      // Logic for external URL navigation
-      else if (item.url) {
+      } else if (item.url) {
         window.location.href = item.url;
       }
     };
@@ -198,7 +180,6 @@
 
   /* ===== DATA FETCHING ===== */
   function fetchAndShowDetailView(dataKey, apiUrl) {
-    // Show loading state
     detailView.innerHTML = `
     <button class="back-btn" onclick="showScreenerList()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -220,29 +201,23 @@
         return response.json();
       })
       .then(data => {
-        console.log('Data received:', data);
-
-        // Store data (merging with existing if needed, or overwriting)
         STOCK_DATA[dataKey] = {
-          title: data.title || SCREENER_DATA[Object.keys(SCREENER_DATA).find(cat => SCREENER_DATA[cat].some(s => s.dataKey === dataKey))].find(s => s.dataKey === dataKey).title,
+          title: data.title || (SCREENER_DATA[Object.keys(SCREENER_DATA).find(cat => SCREENER_DATA[cat].some(s => s.dataKey === dataKey))] ? SCREENER_DATA[Object.keys(SCREENER_DATA).find(cat => SCREENER_DATA[cat].some(s => s.dataKey === dataKey))].find(s => s.dataKey === dataKey).title : dataKey),
           tag: data.tag || dataKey,
           description: data.description || "",
           stocks: data.stocks || []
         };
 
-        // If title/desc missing in API, use from SCREENER_DATA
-        if (!STOCK_DATA[dataKey].title) {
-          // Find item
+        if (!STOCK_DATA[dataKey].title || !STOCK_DATA[dataKey].description) {
           for (const cat in SCREENER_DATA) {
             const item = SCREENER_DATA[cat].find(s => s.dataKey === dataKey);
             if (item) {
-              STOCK_DATA[dataKey].title = item.title;
-              STOCK_DATA[dataKey].description = item.description;
+              if (!STOCK_DATA[dataKey].title) STOCK_DATA[dataKey].title = item.title;
+              if (!STOCK_DATA[dataKey].description) STOCK_DATA[dataKey].description = item.description;
               break;
             }
           }
         }
-
         showDetailView(dataKey);
       })
       .catch(error => {
@@ -256,9 +231,7 @@
       });
   }
 
-  /* ===== DETAIL VIEW FUNCTIONS ===== */
   function loadScreenerPageInline(title, url) {
-    // Show loading state
     detailView.innerHTML = `
     <button class="back-btn" onclick="showScreenerList()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -270,27 +243,16 @@
       <div class="loading-spinner"></div>
       <p>Loading ${title}...</p>
     </div>
-  `;
+    `;
     screenerListView.classList.add('hidden');
     detailView.classList.add('active');
 
-    // Fetch the full page
     fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text();
-      })
+      .then(response => response.text())
       .then(html => {
-        // Extract the main content from the fetched page
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-
-        // Get the main content (everything inside .container or main)
         const mainContent = doc.querySelector('main') || doc.querySelector('.container') || doc.body;
-
-        // Update detail view with back button + content
         detailView.innerHTML = `
         <button class="back-btn" onclick="showScreenerList()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -301,93 +263,26 @@
         <div class="inline-screener-content">
           ${mainContent.innerHTML}
         </div>
-      `;
-
-        // Re-execute any scripts in the loaded content
+        `;
         const scripts = detailView.querySelectorAll('script');
         scripts.forEach(oldScript => {
           const newScript = document.createElement('script');
-          Array.from(oldScript.attributes).forEach(attr => {
-            newScript.setAttribute(attr.name, attr.value);
-          });
+          Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
           newScript.textContent = oldScript.textContent;
           oldScript.parentNode.replaceChild(newScript, oldScript);
         });
       })
       .catch(error => {
-        console.error('Error loading screener page:', error);
-        detailView.innerHTML = `
-        <button class="back-btn" onclick="showScreenerList()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-          Back to Scanners
-        </button>
-        <div style="padding: 40px; text-align: center;">
-          <p style="color: #e74c3c; margin-bottom: 10px;">Failed to load ${title}</p>
-          <p style="color: #666; font-size: 14px;">${error.message}</p>
-          <button class="btn primary" onclick="showScreenerList()" style="margin-top: 20px;">Back to Scanners</button>
-        </div>
-      `;
-      });
-  }
-
-  function fetchAndShowDetailView(dataKey, apiUrl) {
-    // Show loading state
-    detailView.innerHTML = '<div style="padding: 40px; text-align: center;"><div class="loading-spinner"></div><p>Loading data...</p></div>';
-    screenerListView.classList.add('hidden');
-    detailView.classList.add('active');
-
-    // Fetch data from Flask API
-    fetch(apiUrl)
-      .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Data received:', data);
-
-        // Validate data structure
-        if (!data || !data.stocks || !Array.isArray(data.stocks)) {
-          throw new Error('Invalid data structure received');
-        }
-
-        // Store in STOCK_DATA for offline use
-        STOCK_DATA[dataKey] = {
-          title: data.title,
-          tag: data.tag,
-          description: data.description,
-          stocks: data.stocks
-        };
-
-        console.log(`Stored ${data.stocks.length} stocks in STOCK_DATA['${dataKey}']`);
-
-        // Show detail view with fetched data
-        showDetailView(dataKey);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        detailView.innerHTML = `
-        <div style="padding: 40px; text-align: center;">
-          <p style="color: #e74c3c; margin-bottom: 10px;">Failed to load data</p>
-          <p style="color: #666; font-size: 14px;">${error.message}</p>
-          <button class="btn primary" onclick="location.reload()" style="margin-top: 20px;">Refresh Page</button>
-        </div>
-      `;
+        console.error('Error loading screener:', error);
       });
   }
 
   function showDetailView(dataKey) {
     const data = STOCK_DATA[dataKey];
     if (!data) return;
-
     currentDataKey = dataKey;
     currentStocks = [...data.stocks];
 
-    // Restore full detail view HTML
     detailView.innerHTML = `
     <button class="back-btn" onclick="showScreenerList()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -395,36 +290,32 @@
       </svg>
       Back to Scanners
     </button>
-
     <div class="detail-header">
       <div class="detail-header-left">
         <div class="detail-title">
           <span id="detailTitle">${data.title}</span>
           <span class="author">by @goldmine</span>
         </div>
-        <div class="detail-desc" id="detailDesc">${data.description}</div>
+        <div class="detail-desc" id="detailDesc">${data.description.replace('{date}', LATEST_DATE)}</div>
       </div>
       <div class="detail-actions">
         <button class="btn" onclick="exportToCSV()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
           Export
         </button>
         <button class="btn primary" onclick="window.print()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8"/>
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
           </svg>
           Print
         </button>
       </div>
     </div>
-
-
-
     <div class="table-wrap">
       <table class="detail-table sortable-table" id="stocksTable">
         <thead>
@@ -439,12 +330,10 @@
             <th>Volume</th>
             <th>Key Metric</th>
             <th>Signal</th>
-
           </tr>
         </thead>
         <tbody id="stocksTableBody"></tbody>
       </table>
-
       <div class="table-footer">
         <div class="footer-left">
           Showing <strong id="showingCount">0</strong> of <strong id="totalCount">0</strong> results
@@ -452,31 +341,17 @@
         <div class="footer-right">
           <button class="btn-small" onclick="exportToCSV()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             Download CSV
           </button>
         </div>
       </div>
     </div>
-  `;
-
-    // Calculate stats
-    const bullish = currentStocks.filter(s => s.signal === 'BULLISH').length;
-    const bearish = currentStocks.filter(s => s.signal === 'BEARISH').length;
-    const neutral = currentStocks.filter(s => s.signal === 'NEUTRAL').length;
-
-
-
-    // Render table
+    `;
     renderStocksTable(currentStocks);
-
-    // Set first filter tab (All) as active
-
-
-    // Show detail view, hide list
     screenerListView.classList.add('hidden');
     detailView.classList.add('active');
   }
@@ -489,21 +364,17 @@
   function renderStocksTable(stocks) {
     const tbody = document.getElementById('stocksTableBody');
     tbody.innerHTML = '';
-
     stocks.forEach(stock => {
       const row = document.createElement('tr');
-      row.dataset.ticker = stock.ticker;
-
+      row.dataset.ticker = stock.ticker; // Add this line
       const changeClass = stock.change > 0 ? 'positive' : (stock.change < 0 ? 'negative' : '');
       const changeSign = stock.change > 0 ? '+' : '';
-      const signalClass = stock.signal.toLowerCase();
+      const signal = stock.signal || 'NEUTRAL';
+      const signalLower = signal.toLowerCase();
 
       row.innerHTML = `
       <td><input type="checkbox" class="stock-checkbox" value="${stock.ticker}"/></td>
-      <td class="stock-name">
-        <span>${stock.ticker}</span>
-        <span class="exchange">NSE</span>
-      </td>
+      <td class="stock-name"><span>${stock.ticker}</span><span class="exchange">NSE</span></td>
       <td>₹${parseFloat(stock.price || 0).toFixed(2)}</td>
       <td>₹${parseInt(stock.market_cap || 0).toLocaleString()} Cr</td>
       <td>${stock.pe ? parseFloat(stock.pe).toFixed(2) : '-'}</td>
@@ -511,19 +382,11 @@
       <td class="${changeClass}">${changeSign}${parseFloat(stock.change_pct || 0).toFixed(2)}%</td>
       <td>${parseInt(stock.volume || 0).toLocaleString()}</td>
       <td style="font-weight: 500; color: #3498db;">${stock.custom_metric_value || '-'}</td>
-      <td><span class="signal-badge ${signalClass}">${stock.signal}</span></td>
-
-    `;
-
-      // Double click to navigate
-      row.ondblclick = () => {
-        window.location.href = `/stock/${stock.ticker}`;
-      };
-
+      <td><span class="signal-badge ${signalLower}">${signal}</span></td>
+      `;
+      row.ondblclick = () => window.location.href = `/stock/${stock.ticker}`;
       tbody.appendChild(row);
     });
-
-    // Update counts
     document.getElementById('showingCount').textContent = stocks.length;
     document.getElementById('totalCount').textContent = STOCK_DATA[currentDataKey] ? STOCK_DATA[currentDataKey].stocks.length : stocks.length;
 
@@ -554,8 +417,6 @@
     renderStocksTable(filtered);
   }
 
-
-
   /* ===== UTILITY FUNCTIONS ===== */
   function toggleSelectAll() {
     const selectAll = document.getElementById('selectAll');
@@ -567,7 +428,8 @@
     let csv = 'Ticker,Price,Change,Change%,Volume,OI,IV,Signal\n';
 
     currentStocks.forEach(stock => {
-      csv += `${stock.ticker},${stock.price},${stock.change},${stock.change_pct}%,${stock.volume},${stock.oi},${stock.iv}%,${stock.signal}\n`;
+      csv +=
+        `${stock.ticker},${stock.price},${stock.change},${stock.change_pct}%,${stock.volume},${stock.oi},${stock.iv}%,${stock.signal}\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -579,10 +441,7 @@
     window.URL.revokeObjectURL(url);
   }
 
-
-
   /* INIT */
-  // buildMenu(); // Removed as we are showing flat list only
   renderAll();
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof initTableSorting === 'function') {

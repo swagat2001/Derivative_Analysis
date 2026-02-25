@@ -1586,28 +1586,122 @@
         </div>
 
         <div id="rs-matrix-tab" class="tab-content {% if active_tab == 'rs-matrix' %}active{% endif %}">
-            <div class="controls-bar scanx-controls" style="margin-bottom: 16px; padding: 10px 16px;">
-                <div class="control-group">
-                    <label>Box % :</label>
-                    <select id="rsMatrixBoxPct" onchange="handleRSMatrixBoxPctChange()">
-                        <option value="0.25" selected>0.25%</option>
-                        <option value="0.5">0.5%</option>
-                        <option value="1.0">1.0%</option>
-                        <option value="2.0">2.0%</option>
-                    </select>
+
+            <!-- ═══ TWO-COLUMN LAYOUT: Index A/D List (left) + RS Matrix (right) ═══ -->
+            <div
+                style="display:flex;gap:0;height:calc(100vh - 160px);min-height:600px;background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.08);border:1px solid #e5e7eb;overflow:hidden;">
+
+                <!-- ── LEFT PANEL: Category selector + Index A/D list ── -->
+                <div
+                    style="width:300px;min-width:280px;flex-shrink:0;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;background:#fafbfc;">
+
+                    <!-- Category Header -->
+                    <div style="padding:14px 16px;border-bottom:1px solid #e5e7eb;background:white;">
+                        <div
+                            style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">
+                            Index Category</div>
+                        <select id="rsCategoryDropdown" onchange="onRsCategoryChange(this.value)"
+                            style="width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:13px;font-weight:600;color:#1f2937;background:#fff;cursor:pointer;outline:none;appearance:auto;">
+                            <option value="">— Select category —</option>
+                        </select>
+                    </div>
+
+                    <!-- Index List (scrollable) -->
+                    <div id="rsIndexListPanel" style="flex:1;overflow-y:auto;padding:8px 0;">
+                        <div style="text-align:center;padding:40px 16px;color:#9ca3af;font-size:13px;">
+                            Select a category to view indices
+                        </div>
+                    </div>
+
+                    <!-- Footer legend -->
+                    <div
+                        style="padding:10px 16px;border-top:1px solid #e5e7eb;background:white;display:flex;align-items:center;gap:12px;">
+                        <span
+                            style="display:flex;align-items:center;gap:4px;font-size:11px;color:#16a34a;font-weight:700;">
+                            <span
+                                style="width:10px;height:10px;background:#16a34a;border-radius:2px;display:inline-block;"></span>
+                            Advances
+                        </span>
+                        <span
+                            style="display:flex;align-items:center;gap:4px;font-size:11px;color:#dc2626;font-weight:700;">
+                            <span
+                                style="width:10px;height:10px;background:#dc2626;border-radius:2px;display:inline-block;"></span>
+                            Declines
+                        </span>
+                        <span id="rsListLoadSpinner" style="display:none;margin-left:auto;">
+                            <svg style="animation:spin 0.8s linear infinite;width:14px;height:14px;color:#8B2432;"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
-                <div class="controls-spacer"></div>
-                <div style="font-size: 12px; color: #64748b; font-weight: 500;">
-                    Shows Point & Figure Relative Strength based on 2-Year Index Daily Closes
+
+                <!-- ── RIGHT PANEL: RS Matrix for selected index ── -->
+                <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+
+                    <!-- Right panel header (shows selected index info) -->
+                    <div id="rsRightHeader"
+                        style="padding:14px 20px;border-bottom:1px solid #e5e7eb;background:white;display:flex;align-items:center;gap:16px;flex-shrink:0;">
+                        <div>
+                            <div style="font-size:16px;font-weight:800;color:#1f2937;" id="rsRightTitle">RS Matrix</div>
+                            <div style="font-size:12px;color:#9ca3af;margin-top:1px;">Point &amp; Figure Relative
+                                Strength</div>
+                        </div>
+                        <!-- Mini A/D summary in the header -->
+                        <div id="rsRightADSummary"
+                            style="display:none;margin-left:auto;display:flex;align-items:center;gap:20px;">
+                            <span style="font-size:13px;color:#16a34a;font-weight:800;">▲ <span
+                                    id="rsHdrAdvances">--</span> Adv</span>
+                            <span style="font-size:13px;color:#dc2626;font-weight:800;">▼ <span
+                                    id="rsHdrDeclines">--</span> Dec</span>
+                            <span style="padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;"
+                                id="rsHdrSentiment"></span>
+                            <span style="font-size:12px;color:#9ca3af;" id="rsHdrDate"></span>
+                        </div>
+                        <span id="rsLoadingSpinner"
+                            style="display:none;font-size:13px;color:#8B2432;font-weight:700;align-items:center;gap:6px;margin-left:auto;">
+                            <svg style="animation:spin 0.8s linear infinite;width:15px;height:15px;" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0" />
+                            </svg>
+                            Loading RS Matrix…
+                        </span>
+                    </div>
+
+                    <!-- RS Matrix content area (scrollable) -->
+                    <div id="rs-matrix-container" style="flex:1;overflow:auto;padding:16px;">
+                        <div style="text-align:center;padding:80px 20px;color:#9ca3af;">
+                            <svg style="width:48px;height:48px;margin:0 auto 12px;display:block;opacity:0.3;"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                            </svg>
+                            <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Select an index from the left
+                                panel</div>
+                            <div style="font-size:13px;">Choose a category, then click any index to view its RS Matrix
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div id="rs-matrix-container"
-                style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto;">
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                </div>
+
+            <!-- Hidden elements kept for JS compatibility -->
+            <div id="rs-ad-ratio-card" style="display:none;">
+                <span id="adCardTitle"></span><span id="adSentimentBadge"></span>
+                <span id="adDateLabel"></span><span id="adAdvances"></span>
+                <span id="adDeclines"></span><span id="adUnchanged"></span>
+                <span id="adRatioValue"></span><span id="adTotal"></span>
+                <table id="adGainersTable">
+                    <tbody></tbody>
+                </table>
+                <table id="adLosersTable">
+                    <tbody></tbody>
+                </table>
             </div>
+
         </div>
+
 
 
 
@@ -1673,7 +1767,11 @@
                     titleText.textContent = titles[tab] || 'Market Neev';
                 }
 
-                const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDiiEnhanced, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors, 'rs-matrix': loadRSMatrix };
+                const rsLoader = () => {
+                    document.getElementById('heatmapTitleText').textContent = 'RS Matrix';
+                    initRSDropdown();
+                };
+                const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDiiEnhanced, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors, 'rs-matrix': rsLoader };
                 if (loaders[tab]) loaders[tab]();
             }
 
@@ -2395,71 +2493,330 @@
                 } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
             }
 
-            let currentRSMatrixIndex = null;
+            // ==============================================================
+            // RS MATRIX — Category dropdown + Index pills + AD ratio
+            // ==============================================================
 
-            function handleRSMatrixBoxPctChange() {
-                if (currentRSMatrixIndex) {
-                    loadStockRSMatrix(currentRSMatrixIndex);
-                } else {
-                    loadRSMatrix();
+            let currentRSMatrixIndex = null;
+            let rsCategoriesData = [];          // full payload from API
+
+            // Category colour map (matches NSE groupings)
+            const RS_CAT_STYLE = {
+                'Indices Eligible in Derivatives': { bg: '#7c3aed', light: '#f5f3ff', border: '#7c3aed' },
+                'Broad Market Indices': { bg: '#0369a1', light: '#eff6ff', border: '#0369a1' },
+                'Sectoral Indices': { bg: '#065f46', light: '#ecfdf5', border: '#065f46' },
+                'Thematic Indices': { bg: '#b45309', light: '#fffbeb', border: '#b45309' },
+                'Strategy Indices': { bg: '#9a3412', light: '#fff7ed', border: '#9a3412' },
+                'Fixed Income Indices': { bg: '#374151', light: '#f9fafb', border: '#374151' },
+                'Other Indices': { bg: '#6b7280', light: '#f9fafb', border: '#6b7280' },
+            };
+            function rsCatStyle(cat) {
+                return RS_CAT_STYLE[cat] || { bg: '#6b7280', light: '#f9fafb', border: '#6b7280' };
+            }
+
+            /** Fetch categories, populate <select>, then auto-load all-indices RS matrix */
+            async function initRSDropdown() {
+                const sel = document.getElementById('rsCategoryDropdown');
+                if (!sel) return;
+                if (rsCategoriesData.length) {
+                    _populateCategorySelect(sel);
+                    onRsCategoryChange('');   // re-render with current filter
+                    return;
+                }
+                try {
+                    const res = await fetch('/neev/api/rs-matrix/index-categories');
+                    const data = await res.json();
+                    if (!data.success || !data.categories) return;
+                    rsCategoriesData = data.categories;
+                    _populateCategorySelect(sel);
+                    // Load left panel list AND right-panel all-indices matrix in parallel
+                    onRsCategoryChange('');
+                } catch (e) {
+                    console.error('Failed to load RS categories', e);
                 }
             }
 
-            async function loadRSMatrix() {
-                currentRSMatrixIndex = null;
-                document.getElementById('heatmapTitleText').innerHTML = "RS Matrix Scanner";
-                const container = document.getElementById('rs-matrix-container');
-                const boxPctSelect = document.getElementById('rsMatrixBoxPct');
-                const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
+            function _populateCategorySelect(sel) {
+                sel.innerHTML = '<option value="">All Indices</option>';
+                rsCategoriesData.forEach(cat => {
+                    if (!cat.indices || !cat.indices.length) return;
+                    const opt = document.createElement('option');
+                    opt.value = cat.category;
+                    opt.textContent = `${cat.category}  (${cat.indices.length})`;
+                    sel.appendChild(opt);
+                });
+            }
 
+            /**
+             * Build a single index row div.
+             * adData: A/D response or null (shows skeleton-like fallback).
+             * catStyle: the { bg, light, border } object for click highlighting.
+             */
+            function _buildIndexRow(idx, adData, catStyle, listPanel) {
+                const adv = adData && adData.success ? adData.advances : 0;
+                const dec = adData && adData.success ? adData.declines : 0;
+                const total = adv + dec || 1;
+                const advPct = Math.round(adv / total * 100);
+                const decPct = 100 - advPct;
+                const sentiment = adData && adData.success ? adData.sentiment : null;
+                const sentColor = sentiment === 'Bullish' ? '#16a34a' : sentiment === 'Bearish' ? '#dc2626' : '#92400e';
+                const adLoading = !adData;   // still waiting
+
+                const row = document.createElement('div');
+                row.dataset.idx = idx.name;
+                row.style.cssText = 'padding:12px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background 0.12s;';
+                row.onmouseenter = () => { if (!row.classList.contains('rs-list-active')) row.style.background = '#f8fafc'; };
+                row.onmouseleave = () => { if (!row.classList.contains('rs-list-active')) row.style.background = 'white'; };
+
+                if (adLoading) {
+                    // Skeleton placeholder while A/D is fetching
+                    row.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:13px;font-weight:700;color:#1f2937;">${idx.name}</span>
+                            <span style="font-size:10px;color:#d1d5db;">loading…</span>
+                        </div>
+                        <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:#f1f5f9;animation:pulse 1.5s ease-in-out infinite;">
+                            <div style="width:50%;background:#d1d5db;"></div>
+                            <div style="width:50%;background:#e5e7eb;"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                            <span style="font-size:11px;color:#d1d5db;">▲ --</span>
+                            <span style="font-size:11px;color:#d1d5db;">-- ▼</span>
+                        </div>`;
+                } else {
+                    row.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:13px;font-weight:700;color:#1f2937;line-height:1.2;">${idx.name}</span>
+                            ${sentiment
+                            ? `<span style="font-size:10px;font-weight:700;color:${sentColor};background:${sentColor}18;padding:2px 8px;border-radius:10px;">${sentiment}</span>`
+                            : '<span style="font-size:10px;color:#9ca3af;">—</span>'}
+                        </div>
+                        <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:#f1f5f9;">
+                            <div style="width:${advPct}%;background:#16a34a;"></div>
+                            <div style="width:${decPct}%;background:#dc2626;"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                            <span style="font-size:11px;font-weight:700;color:#16a34a;">▲ ${adv}</span>
+                            ${adData && adData.success
+                            ? `<span style="font-size:10px;color:#9ca3af;">A/D&nbsp;${parseFloat(adData.ad_ratio).toFixed(2)}</span>`
+                            : ''}
+                            <span style="font-size:11px;font-weight:700;color:#dc2626;">${dec} ▼</span>
+                        </div>`;
+                }
+
+                row.onclick = () => {
+                    listPanel.querySelectorAll('[data-idx]').forEach(r => {
+                        r.classList.remove('rs-list-active');
+                        r.style.background = 'white';
+                        r.style.borderLeft = 'none';
+                        r.style.paddingLeft = '16px';
+                    });
+                    row.classList.add('rs-list-active');
+                    row.style.background = catStyle.light;
+                    row.style.borderLeft = `3px solid ${catStyle.bg}`;
+                    row.style.paddingLeft = '13px';
+                    onRsIndexChange(idx.name, adData);
+                };
+                return row;
+            }
+
+            /**
+             * Load index-vs-index RS matrix into the right panel.
+             * category = '' → all indices; category = 'Sectoral Indices' → only those.
+             */
+            async function _loadIndexMatrix(category) {
+                const container = document.getElementById('rs-matrix-container');
+                const spinner = document.getElementById('rsLoadingSpinner');
+                if (spinner) spinner.style.display = 'flex';
                 container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+                const catParam = category ? `&category=${encodeURIComponent(category)}` : '';
                 try {
-                    const response = await fetch(`/neev/api/rs-matrix?box_pct=${boxPct}`);
-                    const data = await response.json();
+                    const res = await fetch(`/neev/api/rs-matrix/indices?box_pct=0.5${catParam}`);
+                    const data = await res.json();
+                    if (spinner) spinner.style.display = 'none';
+                    container.innerHTML = data.success ? data.html
+                        : `<div class="empty-state"><p>${data.error || 'Failed to load'}</p></div>`;
+                } catch (e) {
+                    if (spinner) spinner.style.display = 'none';
+                    container.innerHTML = '<div class="empty-state"><p>Error loading RS Matrix</p></div>';
+                }
+            }
+
+            /**
+             * Called when user picks a category.
+             * catName = '' → show ALL indices grouped by category + all-indices RS matrix.
+             * catName = 'Broad Market Indices' → show only that category's list + category RS matrix.
+             */
+            async function onRsCategoryChange(catName) {
+                const listPanel = document.getElementById('rsIndexListPanel');
+                const spinner = document.getElementById('rsListLoadSpinner');
+                currentRSMatrixIndex = null;
+
+                // Update right header
+                document.getElementById('rsRightTitle').textContent = catName || 'All Indices — RS Matrix';
+                document.getElementById('rsRightADSummary').style.display = 'none';
+
+                // Determine which categories to render in left panel
+                const catsToRender = catName
+                    ? rsCategoriesData.filter(c => c.category === catName)
+                    : rsCategoriesData;
+
+                if (!catsToRender.length) {
+                    listPanel.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#9ca3af;">No indices found</div>';
+                    return;
+                }
+
+                // ── Render left panel skeleton rows immediately ───────────────────
+                listPanel.innerHTML = '';
+                const isAllMode = !catName;
+                for (const cat of catsToRender) {
+                    if (!cat.indices || !cat.indices.length) continue;
+                    const s = rsCatStyle(cat.category);
+
+                    if (isAllMode) {
+                        const hdr = document.createElement('div');
+                        hdr.style.cssText = `padding:5px 16px 4px;background:#f1f5f9;font-size:10px;font-weight:700;color:${s.bg};text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e5e7eb;`;
+                        hdr.textContent = cat.category;
+                        listPanel.appendChild(hdr);
+                    }
+
+                    cat.indices.forEach(idx => {
+                        listPanel.appendChild(_buildIndexRow(idx, null, s, listPanel));
+                    });
+                }
+                if (spinner) spinner.style.display = 'inline';
+
+                // ── Fetch RS matrix (right panel) + batch A/D (left panel) in parallel ─
+                const allIndices = catsToRender.flatMap(cat =>
+                    (cat.indices || []).map(idx => ({ idx, cat }))
+                );
+                const catParam = catName ? `category=${encodeURIComponent(catName)}` : '';
+                const [adBatch] = await Promise.all([
+                    fetch(`/neev/api/rs-matrix/ad-ratio-batch${catParam ? '?' + catParam : ''}`)
+                        .then(r => r.json()).catch(() => ({ indices: [] })),
+                    _loadIndexMatrix(catName),   // loads index-vs-index RS matrix on the right
+                ]);
+
+                if (spinner) spinner.style.display = 'none';
+
+
+                // Build a fast name→adData map from the batch response
+                const adMap = new Map(
+                    (adBatch.indices || []).map(d => [d.index_name, d])
+                );
+
+                // ── Update left panel rows with real A/D data ─────────────────────
+                allIndices.forEach(({ idx, cat }) => {
+                    const ad = adMap.get(idx.name) || null;
+                    const s = rsCatStyle(cat.category);
+                    const oldRow = listPanel.querySelector(`[data-idx="${CSS.escape(idx.name)}"]`);
+                    if (oldRow) oldRow.replaceWith(_buildIndexRow(idx, ad, s, listPanel));
+                });
+            }
+
+
+
+            /**
+         * Called when user clicks an index row in the left panel.
+         * adData is the pre-fetched A/D response (may be null if fetch failed).
+         */
+            async function onRsIndexChange(indexName, adData) {
+                if (!indexName) return;
+                currentRSMatrixIndex = indexName;
+
+                // ── Update right header ──
+                document.getElementById('rsRightTitle').textContent = indexName;
+
+                const adSummary = document.getElementById('rsRightADSummary');
+                if (adData && adData.success) {
+                    document.getElementById('rsHdrAdvances').textContent = adData.advances;
+                    document.getElementById('rsHdrDeclines').textContent = adData.declines;
+                    document.getElementById('rsHdrDate').textContent = `As of ${adData.date}`;
+                    const sentBadge = document.getElementById('rsHdrSentiment');
+                    const sentStyles = { Bullish: 'background:#dcfce7;color:#15803d;', Bearish: 'background:#fee2e2;color:#dc2626;', Neutral: 'background:#fef3c7;color:#92400e;' };
+                    sentBadge.style.cssText = sentStyles[adData.sentiment] || sentStyles.Neutral;
+                    sentBadge.textContent = adData.sentiment;
+                    adSummary.style.display = 'flex';
+                } else {
+                    adSummary.style.display = 'none';
+                }
+
+                // ── Update page title bar ──
+                const titleText = document.getElementById('heatmapTitleText');
+                if (titleText) titleText.textContent = indexName + ' — RS Matrix';
+
+                // ── Show loading in matrix area ──
+                const spinner = document.getElementById('rsLoadingSpinner');
+                if (spinner) spinner.style.display = 'flex';
+                const container = document.getElementById('rs-matrix-container');
+                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+                // ── Fetch RS matrix ──
+                try {
+                    const res = await fetch(`/neev/api/rs-matrix/stock?index_name=${encodeURIComponent(indexName)}&box_pct=0.5`);
+                    const data = await res.json();
+                    if (spinner) spinner.style.display = 'none';
                     if (!data.success) {
-                        container.innerHTML = `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
+                        container.innerHTML = `<div class="empty-state"><p>${data.error || 'No constituent data available'}</p></div>`;
                         return;
                     }
                     container.innerHTML = data.html;
                 } catch (e) {
+                    if (spinner) spinner.style.display = 'none';
                     console.error(e);
                     container.innerHTML = '<div class="empty-state"><p>Error loading RS Matrix</p></div>';
                 }
             }
 
-            async function loadStockRSMatrix(indexName) {
-                currentRSMatrixIndex = indexName;
-                document.getElementById('heatmapTitleText').innerHTML = `${indexName} Constituent RS Matrix`;
-                const container = document.getElementById('rs-matrix-container');
-                const boxPctSelect = document.getElementById('rsMatrixBoxPct');
-                const boxPct = boxPctSelect ? boxPctSelect.value : 0.5;
 
-                container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-                try {
-                    const response = await fetch(`/neev/api/rs-matrix/stock?index_name=${encodeURIComponent(indexName)}&box_pct=${boxPct}`);
-                    const data = await response.json();
+            /* ── Render the AD ratio card ── */
+            function renderADCard(ad) {
+                const card = document.getElementById('rs-ad-ratio-card');
+                card.style.display = 'block';
 
-                    let backButtonHtml = `<div style="margin-bottom: 15px;">
-                <button onclick="loadRSMatrix()" class="button primary" style="padding: 6px 14px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to All Indices
-                </button>
-            </div>`;
+                document.getElementById('adCardTitle').textContent = `${ad.index} — Advance / Decline`;
+                document.getElementById('adDateLabel').textContent = `As of ${ad.date}`;
+                document.getElementById('adAdvances').textContent = ad.advances;
+                document.getElementById('adDeclines').textContent = ad.declines;
+                document.getElementById('adUnchanged').textContent = ad.unchanged;
+                document.getElementById('adTotal').textContent = ad.total;
+                document.getElementById('adRatioValue').textContent = ad.ad_ratio.toFixed(2);
 
-                    if (!data.success) {
-                        container.innerHTML = backButtonHtml + `<div class="empty-state"><p>${data.error || 'Failed to load Matrix'}</p></div>`;
-                        return;
-                    }
+                const badge = document.getElementById('adSentimentBadge');
+                const sentimentStyles = {
+                    Bullish: 'background:#dcfce7;color:#15803d;',
+                    Bearish: 'background:#fee2e2;color:#dc2626;',
+                    Neutral: 'background:#fef3c7;color:#92400e;',
+                };
+                badge.style.cssText = sentimentStyles[ad.sentiment] || sentimentStyles.Neutral;
+                badge.textContent = ad.sentiment;
 
-                    container.innerHTML = backButtonHtml + data.html;
-                } catch (e) {
-                    console.error(e);
-                    container.innerHTML = `<div class="empty-state">
-                <button onclick="loadRSMatrix()" class="button primary">Back to All Indices</button>
-                <p>Error loading Stock RS Matrix</p>
-            </div>`;
-                }
+                document.querySelector('#adGainersTable tbody').innerHTML =
+                    (ad.gainers || []).map(s => `
+                        <tr style="border-bottom:1px solid #f3f4f6;">
+                        <td style="padding:5px 8px;"><a href="/stock/${s.symbol}" target="_blank"
+                            style="color:#2563eb;font-weight:700;text-decoration:none;">${s.symbol}</a></td>
+                        <td style="padding:5px 8px;text-align:right;">₹${s.close.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style="padding:5px 8px;text-align:right;color:#16a34a;font-weight:700;">+${parseFloat(s.change_pct || 0).toFixed(2)}%</td>
+                    </tr>`).join('');
+
+                document.querySelector('#adLosersTable tbody').innerHTML =
+                    (ad.losers || []).map(s => `
+                        <tr style="border-bottom:1px solid #f3f4f6;">
+                        <td style="padding:5px 8px;"><a href="/stock/${s.symbol}" target="_blank"
+                            style="color:#2563eb;font-weight:700;text-decoration:none;">${s.symbol}</a></td>
+                        <td style="padding:5px 8px;text-align:right;">₹${s.close.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style="padding:5px 8px;text-align:right;color:#dc2626;font-weight:700;">${parseFloat(s.change_pct || 0).toFixed(2)}%</td>
+                    </tr>`).join('');
             }
+
+            /* ── Legacy stubs: kept to avoid JS errors from switchTab ── */
+            function loadRSMatrix() { initRSDropdown(); }
+            function loadStockRSMatrix(name) { onRsIndexChange(name, name); }
+            function handleRSMatrixBoxPctChange() { }
+            function handleRSIndexChange() { }
+
 
             // Update globalFiiDiiState period when user changes selection
             function updateFiiPeriodSelection() {
@@ -2508,7 +2865,10 @@
                 else if (tabName === '52week') load52Week();
                 else if (tabName === 'volume') loadVolume();
                 else if (tabName === 'sectors') loadSectors();
-                else if (tabName === 'rs-matrix') loadRSMatrix();
+                else if (tabName === 'rs-matrix') {
+                    document.getElementById('heatmapTitleText').textContent = 'RS Matrix';
+                    initRSDropdown();
+                }
 
                 // Handle control visibility
                 const heatmapControls = document.getElementById('heatmapControls');

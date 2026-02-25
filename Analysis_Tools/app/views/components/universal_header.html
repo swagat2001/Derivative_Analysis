@@ -38,21 +38,20 @@
 
     <!-- CENTER-RIGHT: Search Box -->
     <div class="header-search">
-      <div class="search-wrapper">
+      <div class="search-wrapper" style="position:relative;">
         <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
-        <input type="text" id="stockSearchInput" class="search-input" placeholder="Search for stocks" autocomplete="off"
-          list="stockList" onkeypress="handleSearchKeypress(event)">
-        <datalist id="stockList">
-          {% if stock_list %}
-          {% for symbol in stock_list %}
-          <option value="{{ symbol }}">
-            {% endfor %}
-            {% endif %}
-        </datalist>
+        <input type="text" id="stockSearchInput" class="search-input" placeholder="Search all stocks..."
+          autocomplete="off">
+        <ul id="stockSuggestions" style="
+          display:none; position:absolute; top:100%; left:0; right:0;
+          background:#fff; border:1px solid #e5e7eb; border-radius:6px;
+          box-shadow:0 4px 12px rgba(0,0,0,0.1); list-style:none;
+          margin:2px 0 0; padding:4px 0; z-index:9999; max-height:240px; overflow-y:auto;
+        "></ul>
       </div>
     </div>
 
@@ -61,17 +60,16 @@
       {% if current_user %}
       <div class="user-info" style="display:flex; align-items:center; gap:12px;">
         <span style="font-size:13px; color:#374151; font-weight:600;">
-           {{ user_display_name or current_user }}
+          {{ user_display_name or current_user }}
         </span>
         {% if current_user == 'admin' %}
-        <a href="{{ url_for('admin.users_dashboard') }}"
-           style="font-size:12px; color:#6b7280; text-decoration:none; padding:5px 10px;
+        <a href="{{ url_for('admin.users_dashboard') }}" style="font-size:12px; color:#6b7280; text-decoration:none; padding:5px 10px;
                   border:1px solid #e5e7eb; border-radius:5px;"> Admin</a>
         {% endif %}
         <a href="{{ url_for('auth.logout') }}"
-           style="font-size:13px; color:#8B2432; font-weight:600; text-decoration:none; padding:6px 14px; border:1.5px solid #8B2432; border-radius:6px; transition:all 0.2s;"
-           onmouseover="this.style.background='#8B2432';this.style.color='white';"
-           onmouseout="this.style.background='transparent';this.style.color='#8B2432';">
+          style="font-size:13px; color:#8B2432; font-weight:600; text-decoration:none; padding:6px 14px; border:1.5px solid #8B2432; border-radius:6px; transition:all 0.2s;"
+          onmouseover="this.style.background='#8B2432';this.style.color='white';"
+          onmouseout="this.style.background='transparent';this.style.color='#8B2432';">
           Logout
         </a>
       </div>
@@ -80,14 +78,3 @@
 
   </div>
 </header>
-
-<script>
-  function handleSearchKeypress(event) {
-    if (event.key === 'Enter') {
-      const ticker = document.getElementById('stockSearchInput').value.trim().toUpperCase();
-      if (ticker) {
-        window.location.href = '/stock/' + ticker;
-      }
-    }
-  }
-</script>

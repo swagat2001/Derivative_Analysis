@@ -145,6 +145,54 @@ const SCREENER_DATA = {
       inline: false
     },
     {
+      title: "Strong Trend (ADX > 25)",
+      description: "Stocks with ADX above 25, indicating a strong trend is in progress",
+      icon: ICONS.strength,
+      url: "/scanner/technical-indicators/strong-adx-trend",
+      badge: null,
+      inline: false
+    },
+    {
+      title: "Above 50 & 200 SMA",
+      description: "Strong bullish setup where price is trading above both major moving averages",
+      icon: ICONS.trophy,
+      url: "/scanner/technical-indicators/above-50-200-sma",
+      badge: "Bullish",
+      inline: false
+    },
+    {
+      title: "Below 50 & 200 SMA",
+      description: "Weak bearish setup where price is trading below both major moving averages",
+      icon: ICONS.snowflake,
+      url: "/scanner/technical-indicators/below-50-200-sma",
+      badge: "Bearish",
+      inline: false
+    },
+    {
+      title: "MACD Bullish Cross",
+      description: "Stocks where MACD line has crossed above the signal line",
+      icon: ICONS.rocket,
+      url: "/scanner/technical-indicators/macd-bullish-cross",
+      badge: "Bullish",
+      inline: false
+    },
+    {
+      title: "MACD Bearish Cross",
+      description: "Stocks where MACD line has crossed below the signal line",
+      icon: ICONS.arrowDown,
+      url: "/scanner/technical-indicators/macd-bearish-cross",
+      badge: "Bearish",
+      inline: false
+    },
+    {
+      title: "High Volume Stocks",
+      description: "Stocks with the highest trading volume in the current session",
+      icon: ICONS.volume,
+      url: "/scanner/technical-indicators/high-volume",
+      badge: "Popular",
+      inline: false
+    },
+    {
       title: "Momentum Stocks",
       description: "Securities surging in price with strong market enthusiasm and potential for further gains",
       icon: ICONS.rocket,
@@ -228,19 +276,19 @@ const SCREENER_DATA = {
   ],
   "Intraday Scanners": [
     {
-      title: "Price Gainers Today",
-      description: "Top price gainers in today's trading session",
+      title: "Price Gainers",
+      description: "Top price gainers in {date} trading session",
       icon: ICONS.arrowUp,
       url: "/scanner/technical-indicators/price-gainers",
-      badge: "Live",
+      badge: null,
       inline: false
     },
     {
-      title: "Price Losers Today",
-      description: "Top price losers in today's trading session",
+      title: "Price Losers",
+      description: "Top price losers in {date} trading session",
       icon: ICONS.arrowDown,
       url: "/scanner/technical-indicators/price-losers",
-      badge: "Live",
+      badge: null,
       inline: false
     },
     {
