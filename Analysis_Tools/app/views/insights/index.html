@@ -1652,35 +1652,6 @@
                 <!-- ── RIGHT PANEL: RS Matrix for selected index ── -->
                 <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
 
-                    <!-- Right panel header (shows selected index info) -->
-                    <div id="rsRightHeader"
-                        style="padding:14px 20px;border-bottom:1px solid #e5e7eb;background:white;display:flex;align-items:center;gap:16px;flex-shrink:0;">
-                        <div>
-                            <div style="font-size:16px;font-weight:800;color:#1f2937;" id="rsRightTitle">RS Matrix</div>
-                            <div style="font-size:12px;color:#9ca3af;margin-top:1px;">Point &amp; Figure Relative
-                                Strength</div>
-                        </div>
-                        <!-- Mini A/D summary in the header -->
-                        <div id="rsRightADSummary"
-                            style="display:none;margin-left:auto;display:flex;align-items:center;gap:20px;">
-                            <span style="font-size:13px;color:#16a34a;font-weight:800;">▲ <span
-                                    id="rsHdrAdvances">--</span> Adv</span>
-                            <span style="font-size:13px;color:#dc2626;font-weight:800;">▼ <span
-                                    id="rsHdrDeclines">--</span> Dec</span>
-                            <span style="padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;"
-                                id="rsHdrSentiment"></span>
-                            <span style="font-size:12px;color:#9ca3af;" id="rsHdrDate"></span>
-                        </div>
-                        <span id="rsLoadingSpinner"
-                            style="display:none;font-size:13px;color:#8B2432;font-weight:700;align-items:center;gap:6px;margin-left:auto;">
-                            <svg style="animation:spin 0.8s linear infinite;width:15px;height:15px;" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2.5">
-                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0" />
-                            </svg>
-                            Loading RS Matrix…
-                        </span>
-                    </div>
-
                     <!-- RS Matrix content area (scrollable) -->
                     <div id="rs-matrix-container" style="flex:1;overflow:auto;padding:16px;">
                         <div style="text-align:center;padding:80px 20px;color:#9ca3af;">
@@ -1714,10 +1685,6 @@
 
         </div>
 
-
-
-
-
         {% endblock %}
 
         {% block page_js %}
@@ -1735,60 +1702,62 @@
 
             const indexIcons = { 'all': '', 'nifty50': '', 'niftynext50': '', 'niftybank': '', 'niftyit': '', 'niftypharma': '', 'niftyauto': '', 'niftymetal': '', 'niftyfmcg': '', 'niftyenergy': '', 'niftypsubank': '', 'niftyfinancial': '', 'sensex': '' };
 
+            // ─── Central helper: sync all search-bar / header visibility ───────────
+            function _syncHeaderForTab(tab) {
+                const heatmapControls = document.getElementById('heatmapControls');
+                const titleText      = document.getElementById('heatmapTitleText');
+                const indexBoxes     = document.getElementById('indexPriceBox');
+                const dSearch        = document.getElementById('deliverySearchContainer');
+                const vSearch        = document.getElementById('volumeSearchContainer');
+                const wSearch        = document.getElementById('week52SearchContainer');
+
+                // Heatmap controls bar
+                if (heatmapControls) heatmapControls.style.display = (tab === 'heatmap') ? 'flex' : 'none';
+
+                // Page title
+                const titles = {
+                    'heatmap'  : 'Nifty 50 Heatmap',
+                    'fii-dii'  : 'FII/DII Activity',
+                    'delivery' : 'Delivery Percentage Analysis',
+                    '52week'   : '52-Week High/Low Analysis',
+                    'volume'   : 'Volume Breakout Scanner',
+                    'sectors'  : 'Sector Performance',
+                    'rs-matrix': 'RS Matrix'
+                };
+                if (titleText) titleText.textContent = titles[tab] || 'Market Neev';
+
+                // Search-tabs that need the header box + their own search input
+                const searchTabs = ['delivery', 'volume', '52week'];
+                const showHeader = (tab === 'heatmap') || searchTabs.includes(tab);
+                if (indexBoxes) indexBoxes.style.display = showHeader ? 'flex' : 'none';
+
+                // Individual search containers — only one visible at a time
+                if (dSearch) dSearch.style.display = (tab === 'delivery') ? 'block' : 'none';
+                if (vSearch) vSearch.style.display = (tab === 'volume')   ? 'block' : 'none';
+                if (wSearch) wSearch.style.display = (tab === '52week')   ? 'block' : 'none';
+            }
+
             function switchTab(tab) {
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
                 document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-                document.getElementById(tab + '-tab').classList.add('active');
 
-                // Robustly set active class on button - FIX for TypeError
+                const tabEl = document.getElementById(tab + '-tab');
+                if (tabEl) tabEl.classList.add('active');
+
+                // Robustly set active class on button
                 let btn = null;
                 if (typeof event !== 'undefined' && event && event.target && typeof event.target.closest === 'function') {
                     btn = event.target.closest('.tab-btn');
                 }
-
-                // Fallback: find button by data attribute if explicit event didn't work
                 if (!btn) {
                     btn = document.querySelector(`.tab-btn[onclick*="'${tab}'"]`) || document.querySelector(`.tab-btn[data-tab="${tab}"]`);
                 }
-
                 if (btn) btn.classList.add('active');
 
                 currentTab = tab;
 
-                // UI Updates based on Tab
-                const heatmapControls = document.getElementById('heatmapControls');
-                const titleText = document.getElementById('heatmapTitleText');
-                const indexBoxes = document.getElementById('indexPriceBox'); // The right side index info
-
-                if (tab === 'heatmap') {
-                    heatmapControls.style.display = 'flex';
-                    titleText.textContent = 'Nifty 50 Heatmap'; // Will be updated by loadHeatmap dynamic index name
-                    if (indexBoxes) indexBoxes.style.display = 'flex';
-                } else {
-                    heatmapControls.style.display = 'none';
-                    // Show indexBoxes (which now contains search) only for delivery, volume, 52week
-                    const showSearchTabs = ['delivery', 'volume', '52week'];
-                    if (indexBoxes) indexBoxes.style.display = showSearchTabs.includes(tab) ? 'flex' : 'none';
-
-                    // Set Titles
-                    const titles = {
-                        'fii-dii': 'FII/DII Activity',
-                        'delivery': 'Delivery Percentage Analysis',
-                        '52week': '52-Week High/Low Analysis',
-                        'volume': 'Volume Breakout Scanner',
-                        'sectors': 'Sector Performance'
-                    };
-                    titleText.textContent = titles[tab] || 'Market Neev';
-                }
-
-                // Toggle Search Containers visibility in Header
-                const dSearch = document.getElementById('deliverySearchContainer');
-                const vSearch = document.getElementById('volumeSearchContainer');
-                const wSearch = document.getElementById('week52SearchContainer');
-
-                if (dSearch) dSearch.style.display = (tab === 'delivery') ? 'block' : 'none';
-                if (vSearch) vSearch.style.display = (tab === 'volume') ? 'block' : 'none';
-                if (wSearch) wSearch.style.display = (tab === '52week') ? 'block' : 'none';
+                // Sync all header / search-bar UI in one place
+                _syncHeaderForTab(tab);
 
                 const rsLoader = () => {
                     document.getElementById('heatmapTitleText').textContent = 'RS Matrix';
@@ -1842,10 +1811,9 @@
             // FILTER TYPE: INDEX vs SECTOR TOGGLE
             // ============================================
 
-            let currentFilterType = 'index';  // 'index' or 'sector'
+            let currentFilterType = 'index';
             let currentFilterValue = 'all';
 
-            // Sectors list (will be populated from API data)
             let availableSectors = [];
 
             function changeFilterType(filterType) {
@@ -2730,8 +2698,9 @@
                 currentRSMatrixIndex = null;
 
                 // Update right header
-                document.getElementById('rsRightTitle').textContent = catName || 'All Indices — RS Matrix';
-                document.getElementById('rsRightADSummary').style.display = 'none';
+                document.getElementById('rsRightTitle')?.textContent != null && (document.getElementById('rsRightTitle').textContent = catName || 'All Indices — RS Matrix');
+                const _adSumm0 = document.getElementById('rsRightADSummary');
+                if (_adSumm0) _adSumm0.style.display = 'none';
 
                 // Determine which categories to render in left panel
                 const catsToRender = catName
@@ -2802,20 +2771,23 @@
                 currentRSMatrixIndex = indexName;
 
                 // ── Update right header ──
-                document.getElementById('rsRightTitle').textContent = indexName;
+                const _rsTitle = document.getElementById('rsRightTitle');
+                if (_rsTitle) _rsTitle.textContent = indexName;
 
                 const adSummary = document.getElementById('rsRightADSummary');
                 if (adData && adData.success) {
-                    document.getElementById('rsHdrAdvances').textContent = adData.advances;
-                    document.getElementById('rsHdrDeclines').textContent = adData.declines;
-                    document.getElementById('rsHdrDate').textContent = `As of ${adData.date}`;
+                    const _adv = document.getElementById('rsHdrAdvances');
+                    const _dec = document.getElementById('rsHdrDeclines');
+                    const _dt = document.getElementById('rsHdrDate');
+                    if (_adv) _adv.textContent = adData.advances;
+                    if (_dec) _dec.textContent = adData.declines;
+                    if (_dt) _dt.textContent = `As of ${adData.date}`;
                     const sentBadge = document.getElementById('rsHdrSentiment');
                     const sentStyles = { Bullish: 'background:#dcfce7;color:#15803d;', Bearish: 'background:#fee2e2;color:#dc2626;', Neutral: 'background:#fef3c7;color:#92400e;' };
-                    sentBadge.style.cssText = sentStyles[adData.sentiment] || sentStyles.Neutral;
-                    sentBadge.textContent = adData.sentiment;
-                    adSummary.style.display = 'flex';
+                    if (sentBadge) { sentBadge.style.cssText = sentStyles[adData.sentiment] || sentStyles.Neutral; sentBadge.textContent = adData.sentiment; }
+                    if (adSummary) adSummary.style.display = 'flex';
                 } else {
-                    adSummary.style.display = 'none';
+                    if (adSummary) adSummary.style.display = 'none';
                 }
 
                 // ── Update page title bar ──
@@ -2918,7 +2890,7 @@
                 newUrl.searchParams.set('tab', tabName);
                 window.history.pushState({}, '', newUrl);
 
-                // 2. Hide all tabs
+                // 2. Hide all tabs & sidebar items
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
                 document.querySelectorAll('.insights-sidebar .menu-item').forEach(el => el.classList.remove('active'));
 
@@ -2930,10 +2902,12 @@
                 const sidebarLink = document.getElementById('nav-' + tabName);
                 if (sidebarLink) sidebarLink.classList.add('active');
 
-                // 5. Load Data
+                // 5. Sync header / search-bar visibility (single source of truth)
+                _syncHeaderForTab(tabName);
+
+                // 6. Load Data
                 if (tabName === 'heatmap') loadHeatmap();
                 else if (tabName === 'fii-dii') {
-                    // Use existing wrapper if available
                     if (window.switchTab) window.switchTab('fii-dii');
                     else if (window.initEnhancedFiiDii) window.initEnhancedFiiDii();
                 }
@@ -2944,12 +2918,6 @@
                 else if (tabName === 'rs-matrix') {
                     document.getElementById('heatmapTitleText').textContent = 'RS Matrix';
                     initRSDropdown();
-                }
-
-                // Handle control visibility
-                const heatmapControls = document.getElementById('heatmapControls');
-                if (heatmapControls) {
-                    heatmapControls.style.display = (tabName === 'heatmap') ? 'flex' : 'none';
                 }
             };
         </script>

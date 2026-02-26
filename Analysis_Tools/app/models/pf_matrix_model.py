@@ -98,12 +98,12 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
 
     css = """
     <style>
-      .pf-wrap { width: 100%; overflow-x: auto; margin-top: 10px; }
+      .pf-wrap { width: 100%; overflow-x: auto; }
       .pf-title { font-size: 18px; font-weight: 700; margin: 6px 0 10px 0; color: #1f2937; }
       table.pf { border-collapse: separate; border-spacing: 6px; }
       table.pf th, table.pf td { text-align: center; }
-      table.pf th { color: #4b5563; font-size: 12px; font-weight: 600; padding: 6px 4px; white-space: nowrap; }
-      td.rowhdr { text-align: left; color: #1f2937; font-size: 12px; font-weight: 700; padding: 6px 10px; white-space: nowrap; }
+      table.pf th { color: #4b5563; font-size: 12px; font-weight: 600; padding: 6px 4px; white-space: normal; vertical-align: bottom; line-height: 1.3; min-width: 44px; }
+      td.rowhdr { text-align: left; color: #1f2937; font-size: 12px; font-weight: 700; padding: 6px 10px; white-space: normal; line-height: 1.4; }
       .count { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px;
                font-size: 12px; font-weight: 900; background: #1f1f1f; color: #eaeaea; border: 1px solid #333; }
       .pf-cell { width: 44px; height: 24px; border-radius: 4px; font-size: 12px; font-weight: 900; line-height: 24px;
@@ -120,17 +120,21 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
     cols = list(mat.columns)
     rows = list(mat.index)
 
-    parts = [css, f'<div class="pf-title">{html.escape(title)}</div>', '<div class="pf-wrap">', '<table class="pf">']
+    parts = [css, '<div class="pf-wrap">', '<table class="pf">']
 
     import re
     def norm(s):
         return re.sub(r'[^A-Z0-9]', '', str(s).upper())
 
+    def word_lines(s):
+        """Split a name like 'NIFTY PSU BANK' into 'NIFTY<br>PSU<br>BANK'."""
+        return '<br>'.join(html.escape(w) for w in str(s).split())
+
     # header
     parts.append("<thead><tr>")
     parts.append("<th></th>")
     for c in cols:
-        parts.append(f"<th>{html.escape(str(c))}</th>")
+        parts.append(f"<th>{word_lines(c)}</th>")
     parts.append("</tr></thead>")
 
     # body
@@ -151,11 +155,11 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
 
         if is_clickable:
             if link_type == 'index':
-                row_html = f'<a href="javascript:void(0)" onclick="loadStockRSMatrix(\'{html.escape(target_name)}\')" class="matrix-link">{html.escape(r_str)}</a>'
+                row_html = f'<a href="javascript:void(0)" onclick="loadStockRSMatrix(\'{html.escape(target_name)}\')" class="matrix-link">{word_lines(r_str)}</a>'
             elif link_type == 'stock':
-                row_html = f'<a href="/stock/{html.escape(target_name)}" class="matrix-link" target="_blank">{html.escape(r_str)}</a>'
+                row_html = f'<a href="/stock/{html.escape(target_name)}" class="matrix-link" target="_blank">{word_lines(r_str)}</a>'
         else:
-            row_html = html.escape(r_str)
+            row_html = word_lines(r_str)
 
         parts.append("<tr>")
         parts.append(
