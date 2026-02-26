@@ -1345,10 +1345,22 @@
                 </h1>
             </div>
             <div class="header-right" id="indexPriceBox">
-                <!-- <span class="index-label" id="indexLabel">Nifty 50</span> -->
-                <!-- <span class="index-price" id="indexPrice">--</span> -->
-                <!-- <span class="index-change positive" id="indexChange">-- (--)</span> -->
-                <!-- <span class="index-arrow" id="indexArrow">↗</span> -->
+                <!-- Search Containers for Tabs -->
+                <div id="deliverySearchContainer" style="display:none;">
+                    <input type="text" id="deliverySearch" placeholder="Search Symbol..."
+                        style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; width: 180px; outline: none;"
+                        onkeyup="filterTableBySymbol('deliverySearch', 'delivery-container')">
+                </div>
+                <div id="volumeSearchContainer" style="display:none;">
+                    <input type="text" id="volumeSearch" placeholder="Search Symbol..."
+                        style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; width: 180px; outline: none;"
+                        onkeyup="filterTableBySymbol('volumeSearch', 'volume-container')">
+                </div>
+                <div id="week52SearchContainer" style="display:none;">
+                    <input type="text" id="week52Search" placeholder="Search Symbol..."
+                        style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; width: 180px; outline: none;"
+                        onkeyup="filterTableBySymbol('week52Search', 'week52-container')">
+                </div>
             </div>
         </div>
 
@@ -1754,7 +1766,9 @@
                     if (indexBoxes) indexBoxes.style.display = 'flex';
                 } else {
                     heatmapControls.style.display = 'none';
-                    if (indexBoxes) indexBoxes.style.display = 'none';
+                    // Show indexBoxes (which now contains search) only for delivery, volume, 52week
+                    const showSearchTabs = ['delivery', 'volume', '52week'];
+                    if (indexBoxes) indexBoxes.style.display = showSearchTabs.includes(tab) ? 'flex' : 'none';
 
                     // Set Titles
                     const titles = {
@@ -1767,6 +1781,15 @@
                     titleText.textContent = titles[tab] || 'Market Neev';
                 }
 
+                // Toggle Search Containers visibility in Header
+                const dSearch = document.getElementById('deliverySearchContainer');
+                const vSearch = document.getElementById('volumeSearchContainer');
+                const wSearch = document.getElementById('week52SearchContainer');
+
+                if (dSearch) dSearch.style.display = (tab === 'delivery') ? 'block' : 'none';
+                if (vSearch) vSearch.style.display = (tab === 'volume') ? 'block' : 'none';
+                if (wSearch) wSearch.style.display = (tab === '52week') ? 'block' : 'none';
+
                 const rsLoader = () => {
                     document.getElementById('heatmapTitleText').textContent = 'RS Matrix';
                     initRSDropdown();
@@ -1774,6 +1797,44 @@
                 const loaders = { 'heatmap': loadHeatmap, 'fii-dii': loadFiiDiiEnhanced, 'delivery': loadDelivery, '52week': load52Week, 'volume': loadVolume, 'sectors': loadSectors, 'rs-matrix': rsLoader };
                 if (loaders[tab]) loaders[tab]();
             }
+
+            // ============================================
+            // GENERIC TABLE FILTER (By Symbol)
+            // ============================================
+            function filterTableBySymbol(inputId, containerId) {
+                const input = document.getElementById(inputId);
+                const filter = input.value.toUpperCase();
+                const container = document.getElementById(containerId);
+                const tables = container.querySelectorAll('table');
+                if (!tables.length) return;
+
+                tables.forEach(table => {
+                    const tr = table.getElementsByTagName('tr');
+                    for (let i = 1; i < tr.length; i++) {
+                        let symbolText = "";
+                        const stockNameSpan = tr[i].querySelector('.stock-name');
+                        const symbolLink = tr[i].querySelector('.symbol-link');
+
+                        if (stockNameSpan) {
+                            symbolText = stockNameSpan.textContent || stockNameSpan.innerText;
+                        } else if (symbolLink) {
+                            symbolText = symbolLink.textContent || symbolLink.innerText;
+                        } else {
+                            const tds = tr[i].getElementsByTagName('td');
+                            if (tds.length > 0) {
+                                symbolText = tds[0].textContent || tds[0].innerText;
+                            }
+                        }
+
+                        if (symbolText.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                });
+            }
+
 
             let currentPerformance = 'D';
 
@@ -2376,6 +2437,11 @@
                     container.innerHTML = html;
                     if (window.initTableSorting) window.initTableSorting();
 
+                    // Re-apply search filter if there's text in the box
+                    if (document.getElementById('deliverySearch') && document.getElementById('deliverySearch').value) {
+                        filterTableBySymbol('deliverySearch', 'delivery-container');
+                    }
+
                 } catch (e) {
                     console.error('Error loading delivery data:', e);
                     container.innerHTML = '<div class="empty-state"><h3> Error</h3><p>Failed to load delivery data.</p></div>';
@@ -2392,6 +2458,11 @@
                     if (!data.success) { container.innerHTML = '<div class="empty-state"><p>No 52-week data</p></div>'; return; }
                     container.innerHTML = `<div class="market-summary-bar" style="margin-bottom:16px"><div class="summary-stat advances"><span class="stat-value">${data.summary.at_52w_high}</span><span class="stat-label">At 52W High</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_high}</span><span class="stat-label">Near 52W High</span></div><div class="summary-stat declines"><span class="stat-value">${data.summary.at_52w_low}</span><span class="stat-label">At 52W Low</span></div><div class="summary-stat"><span class="stat-value">${data.summary.near_52w_low}</span><span class="stat-label">Near 52W Low</span></div></div><div class="week52-grid"><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week High</span><span class="week52-count high">${data.data.at_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.at_high.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week High</span><span class="week52-count high">${data.data.near_high.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W High</th><th>Away</th></tr></thead><tbody>${data.data.near_high.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_high']).toLocaleString()}</td><td class="positive">${parseFloat(s.away_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">At 52-Week Low</span><span class="week52-count low">${data.data.at_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.at_low.map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div><div class="week52-card"><div class="week52-header"><span class="week52-title">Near 52-Week Low</span><span class="week52-count low">${data.data.near_low.length}</span></div><table class="card-table sortable-table"><thead><tr><th>Symbol</th><th>Close</th><th>52W Low</th><th>Above</th></tr></thead><tbody>${data.data.near_low.slice(0, 15).map(s => `<tr><td><a href="/stock/${s.symbol}" class="symbol-link">${s.symbol}</a></td><td>₹${parseFloat(s.close).toLocaleString()}</td><td>₹${parseFloat(s['52w_low']).toLocaleString()}</td><td class="negative">${parseFloat(s.above_pct).toFixed(2)}%</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#64748b">No stocks</td></tr>'}</tbody></table></div></div>`;
                     if (window.initTableSorting) window.initTableSorting();
+
+                    // Re-apply search filter if there's text in the box
+                    if (document.getElementById('week52Search') && document.getElementById('week52Search').value) {
+                        filterTableBySymbol('week52Search', 'week52-container');
+                    }
                 } catch (e) { console.error(e); container.innerHTML = '<div class="empty-state"><p>Error loading data</p></div>'; }
             }
 
@@ -2473,6 +2544,11 @@
                     html += `</tbody></table></div></div>`;
                     container.innerHTML = html;
                     if (window.initTableSorting) window.initTableSorting();
+
+                    // Re-apply search filter if there's text in the box
+                    if (document.getElementById('volumeSearch') && document.getElementById('volumeSearch').value) {
+                        filterTableBySymbol('volumeSearch', 'volume-container');
+                    }
 
                 } catch (e) {
                     console.error('Error loading volume data:', e);
