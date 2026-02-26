@@ -19,24 +19,38 @@ from .db_config import engine, engine_cash
 # F&O DETECTION
 #
 
-def is_fo_stock(ticker: str) -> bool:
+def is_fo_stock(ticker: str, date: str = None) -> bool:
     """
     Return True if ticker has a table in the F&O database.
-    That means it has options/futures data → use the existing F&O detail page.
+    If date is provided (YYYY-MM-DD), also checks if data exists for that specific date.
     """
     ticker = ticker.upper().strip()
     derived = f"TBL_{ticker}_DERIVED"
     base    = f"TBL_{ticker}"
+
     try:
         with engine.connect() as conn:
+            # First check if tables exist
             row = conn.execute(text("""
                 SELECT COUNT(*) FROM information_schema.tables
                 WHERE table_schema = 'public'
                   AND table_name = ANY(:names)
             """), {"names": [derived, base]}).fetchone()
-            return (row[0] > 0) if row else False
+
+            if not row or row[0] == 0:
+                return False
+
+            # If date is provided, check if data exists for that date in the base table
+            if date:
+                # We check the base table (TBL_TICKER) for presence of rows on BizDt
+                # Some stocks might have the table but no data for recent dates if they exited F&O
+                check_query = text(f'SELECT 1 FROM public."{base}" WHERE "BizDt" = :dt LIMIT 1')
+                res = conn.execute(check_query, {"dt": date}).fetchone()
+                return res is not None
+
+            return True
     except Exception as e:
-        print(f"[WARN] is_fo_stock({ticker}): {e}")
+        print(f"[WARN] is_fo_stock({ticker}, {date}): {e}")
         return False
 
 

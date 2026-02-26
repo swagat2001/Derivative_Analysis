@@ -212,9 +212,15 @@ def stock_detail(ticker):
     F&O stocks get an extra "F&O / Options" button that links to /stock/<ticker>/options.
     """
     ticker = ticker.upper().strip()
-    fo     = is_fo_stock(ticker)
-
     cash_info    = get_cash_stock_info(ticker)
+
+    # Check F&O specifically for the date we are showing on the cash page
+    # cash_info should have 'cache_date'
+    view_date = cash_info.get("cache_date")
+    if view_date and hasattr(view_date, 'strftime'):
+        view_date = view_date.strftime("%Y-%m-%d")
+
+    fo = is_fo_stock(ticker, date=view_date)
     scanner_hits = get_stock_scanner_appearances(ticker)
     import json as _json
     ohlcv_json = _json.dumps(cash_info.get("ohlcv", []))
@@ -240,7 +246,11 @@ def stock_options(ticker):
     """
     ticker = ticker.upper().strip()
 
-    if not is_fo_stock(ticker):
+    # Get the date first to check if F&O data exists for this specific date
+    dates = get_available_dates()
+    selected_date = request.args.get("date", dates[0] if dates else None)
+
+    if not is_fo_stock(ticker, date=selected_date):
         return redirect(url_for("stock.stock_detail", ticker=ticker))
 
     # ==============================

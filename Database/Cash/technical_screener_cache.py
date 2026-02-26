@@ -256,15 +256,14 @@ def calculate_adx(close, period=14):
     adx = dx.rolling(window=period, min_periods=period).mean()
     return adx
 
-def calculate_pivot_points(close):
+def calculate_pivot_points(close, high, low):
     """
-    Calculate classic pivot points using previous day's close.
-    Since we only have close prices, we approximate high/low as close +/- 2%.
+    Calculate classic pivot points using previous day's data.
     Returns: pivot, r1, r2, r3, s1, s2, s3 (all as Series)
     """
     prev_close = close.shift(1)
-    prev_high = prev_close * 1.02   # Approximate high
-    prev_low = prev_close * 0.98    # Approximate low
+    prev_high = high.shift(1)
+    prev_low = low.shift(1)
 
     pivot = (prev_high + prev_low + prev_close) / 3
 
@@ -377,7 +376,7 @@ def precalculate_technical_screener_cache():
             adx = calculate_adx(close, 14)
 
             # NEW: Calculate pivot points, momentum, and squeeze
-            pivot, r1, r2, r3, s1, s2, s3 = calculate_pivot_points(close)
+            pivot, r1, r2, r3, s1, s2, s3 = calculate_pivot_points(close, df["high"], df["low"])
             momentum = calculate_momentum_score(close, lookback=10)
 
             # Create cache rows for MISSING dates only
