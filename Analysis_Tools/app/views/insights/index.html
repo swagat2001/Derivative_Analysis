@@ -1328,10 +1328,98 @@
     .delivery-table .text-right {
         text-align: right !important;
     }
+
+    /* Delivery Chart Modal */
+    .chart-modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+    }
+
+    .chart-modal-content {
+        position: relative;
+        background-color: #ffffff;
+        margin: 5% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 1000px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .chart-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eef2f6;
+        padding-bottom: 10px;
+    }
+
+    .chart-modal-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .close-chart {
+        font-size: 28px;
+        font-weight: bold;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .close-chart:hover {
+        color: #1e293b;
+    }
+
+    .clickable-cell {
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .clickable-cell:hover {
+        background-color: rgba(139, 92, 246, 0.1) !important;
+        text-decoration: underline;
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        border-radius: 12px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Delivery Chart Modal -->
+<div id="deliveryChartModal" class="chart-modal">
+    <div class="chart-modal-content">
+        <div id="chartLoading" class="loading-overlay" style="display:none;">
+            <div class="spinner"></div>
+        </div>
+        <div class="chart-modal-header">
+            <span class="chart-modal-title" id="deliveryChartTitle">Stock Delivery History (Last 21 Days)</span>
+            <span class="close-chart" onclick="closeDeliveryChart()">&times;</span>
+        </div>
+        <div id="deliveryHistoryChart" style="width:100%; height:500px;"></div>
+    </div>
+</div>
+
 <div class="insights-page-wrapper">
     {% include 'components/insights_sidebar.html' %}
 
@@ -1441,6 +1529,21 @@
                     <option value="grid">Treemap</option>
                     <option value="sector">By Sector</option>
                 </select>
+            </div>
+
+            <!-- Delivery Chart Modal -->
+            <div id="deliveryChartModal" class="chart-modal">
+                <div class="chart-modal-content">
+                    <div id="chartLoading" class="loading-overlay" style="display:none;">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="chart-modal-header">
+                        <span class="chart-modal-title" id="deliveryChartTitle">Stock Delivery History (Last 21
+                            Days)</span>
+                        <span class="close-chart" onclick="closeDeliveryChart()">&times;</span>
+                    </div>
+                    <div id="deliveryHistoryChart" style="width:100%; height:500px;"></div>
+                </div>
             </div>
 
             <div class="controls-spacer"></div>
@@ -1685,6 +1788,105 @@
 
         </div>
 
+        <!-- Highcharts for Delivery History -->
+        <script>
+            async function showDeliveryChart(symbol, type) {
+                const modal = document.getElementById('deliveryChartModal');
+                const loading = document.getElementById('chartLoading');
+                const title = document.getElementById('deliveryChartTitle');
+
+                modal.style.display = 'block';
+                loading.style.display = 'flex';
+                title.innerText = `${symbol} - Historical ${type} (Last 21 Days)`;
+
+                try {
+                    const response = await fetch(`/neev/api/stock-delivery-history?symbol=${symbol}&days=21`);
+                    const data = await response.json();
+                    loading.style.display = 'none';
+
+                    if (!data.success || !data.data || data.data.length === 0) {
+                        document.getElementById('deliveryHistoryChart').innerHTML = '<div class="empty-state">No historical data available for this stock.</div>';
+                        return;
+                    }
+
+                    renderHistoryChart(data.symbol, data.data);
+                } catch (e) {
+                    loading.style.display = 'none';
+                    console.error(e);
+                    document.getElementById('deliveryHistoryChart').innerHTML = '<div class="empty-state">Error loading historical data.</div>';
+                }
+            }
+
+            function closeDeliveryChart() {
+                document.getElementById('deliveryChartModal').style.display = 'none';
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function (event) {
+                const modal = document.getElementById('deliveryChartModal');
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            function renderHistoryChart(symbol, history) {
+                const categories = history.map(d => d.date);
+                const tradedVol = history.map(d => d.volume);
+                const deliveredVol = history.map(d => d.delivery_qty);
+                const deliveryPct = history.map(d => parseFloat(d.delivery_pct.toFixed(2)));
+                const prices = history.map(d => parseFloat(d.close.toFixed(2)));
+
+                Highcharts.chart('deliveryHistoryChart', {
+                    chart: { zoomType: 'xy', borderRadius: 8 },
+                    title: { text: null },
+                    xAxis: [{ categories: categories, crosshair: true }],
+                    yAxis: [{ // Primary yAxis
+                        labels: { format: '{value}%' },
+                        title: { text: 'Delivery %' },
+                        opposite: true,
+                        max: 100
+                    }, { // Secondary yAxis
+                        title: { text: 'Volume' },
+                        labels: { format: '{value}' }
+                    }, { // Tertiary yAxis
+                        title: { text: 'Price (₹)' },
+                        opposite: true,
+                        labels: { format: '₹{value}' }
+                    }],
+                    tooltip: { shared: true },
+                    legend: { layout: 'horizontal', align: 'center', verticalAlign: 'bottom' },
+                    series: [{
+                        name: 'Traded Vol',
+                        type: 'column',
+                        yAxis: 1,
+                        data: tradedVol,
+                        color: '#e2e8f0',
+                        tooltip: { valueSuffix: '' }
+                    }, {
+                        name: 'Delivered Vol',
+                        type: 'column',
+                        yAxis: 1,
+                        data: deliveredVol,
+                        color: '#8b5cf6',
+                        tooltip: { valueSuffix: '' }
+                    }, {
+                        name: 'Delivery %',
+                        type: 'spline',
+                        data: deliveryPct,
+                        color: '#059669',
+                        tooltip: { valueSuffix: '%' }
+                    }, {
+                        name: 'Price',
+                        type: 'spline',
+                        yAxis: 2,
+                        data: prices,
+                        color: '#2563eb',
+                        dashStyle: 'ShortDash',
+                        tooltip: { valuePrefix: '₹' }
+                    }]
+                });
+            }
+        </script>
         {% endblock %}
 
         {% block page_js %}
@@ -1705,23 +1907,23 @@
             // ─── Central helper: sync all search-bar / header visibility ───────────
             function _syncHeaderForTab(tab) {
                 const heatmapControls = document.getElementById('heatmapControls');
-                const titleText      = document.getElementById('heatmapTitleText');
-                const indexBoxes     = document.getElementById('indexPriceBox');
-                const dSearch        = document.getElementById('deliverySearchContainer');
-                const vSearch        = document.getElementById('volumeSearchContainer');
-                const wSearch        = document.getElementById('week52SearchContainer');
+                const titleText = document.getElementById('heatmapTitleText');
+                const indexBoxes = document.getElementById('indexPriceBox');
+                const dSearch = document.getElementById('deliverySearchContainer');
+                const vSearch = document.getElementById('volumeSearchContainer');
+                const wSearch = document.getElementById('week52SearchContainer');
 
                 // Heatmap controls bar
                 if (heatmapControls) heatmapControls.style.display = (tab === 'heatmap') ? 'flex' : 'none';
 
                 // Page title
                 const titles = {
-                    'heatmap'  : 'Nifty 50 Heatmap',
-                    'fii-dii'  : 'FII/DII Activity',
-                    'delivery' : 'Delivery Percentage Analysis',
-                    '52week'   : '52-Week High/Low Analysis',
-                    'volume'   : 'Volume Breakout Scanner',
-                    'sectors'  : 'Sector Performance',
+                    'heatmap': 'Nifty 50 Heatmap',
+                    'fii-dii': 'FII/DII Activity',
+                    'delivery': 'Delivery Percentage Analysis',
+                    '52week': '52-Week High/Low Analysis',
+                    'volume': 'Volume Breakout Scanner',
+                    'sectors': 'Sector Performance',
                     'rs-matrix': 'RS Matrix'
                 };
                 if (titleText) titleText.textContent = titles[tab] || 'Market Neev';
@@ -1733,8 +1935,8 @@
 
                 // Individual search containers — only one visible at a time
                 if (dSearch) dSearch.style.display = (tab === 'delivery') ? 'block' : 'none';
-                if (vSearch) vSearch.style.display = (tab === 'volume')   ? 'block' : 'none';
-                if (wSearch) wSearch.style.display = (tab === '52week')   ? 'block' : 'none';
+                if (vSearch) vSearch.style.display = (tab === 'volume') ? 'block' : 'none';
+                if (wSearch) wSearch.style.display = (tab === '52week') ? 'block' : 'none';
             }
 
             function switchTab(tab) {
@@ -2387,9 +2589,9 @@
                     </td>
                     <td class="text-right" style="font-weight:600">₹${s.close.toLocaleString()}</td>
                     <td class="text-right ${changeClass}">${changeSign}${s.change ? s.change.toFixed(2) : '-'}</td>
-                    <td class="text-right ${changeClass}" style="font-weight:700">${changeSign}${s.change_pct ? s.change_pct.toFixed(2) : '0.00'}%</td>
-                    <td class="text-right">${formatNumber(s.volume)}</td>
-                    <td class="text-right">${formatNumber(s.delivery_qty)}</td>
+                    <td class="text-right ${changeClass}" style="font-weight:700; cursor:pointer;" onclick="showDeliveryChart('${s.symbol}', 'Price')">${changeSign}${s.change_pct ? s.change_pct.toFixed(2) : '0.00'}%</td>
+                    <td class="text-right clickable-cell" onclick="showDeliveryChart('${s.symbol}', 'Volume')">${formatNumber(s.volume)}</td>
+                    <td class="text-right clickable-cell" onclick="showDeliveryChart('${s.symbol}', 'Delivery')">${formatNumber(s.delivery_qty)}</td>
                     <td class="text-right">
                         <div style="display:flex; flex-direction:column; align-items:flex-end;">
                             <span style="font-weight:800; color:#8b5cf6;">${s.delivery_pct.toFixed(2)}%</span>

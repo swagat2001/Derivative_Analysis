@@ -669,7 +669,7 @@ def _get_stock_expiry_data_cached(ticker: str, selected_date: str, table_name: s
             f"""
             SELECT
                 "FininstrmActlXpryDt"::text as expiry,
-                SUM(CAST("TtlTradgVol" AS BIGINT)) as volume
+                SUM(COALESCE(NULLIF("TtlTradgVol"::text, ''), '0')::numeric::bigint) as volume
             FROM public."{table_name}"
             WHERE "BizDt" = :bizdt
             AND "FininstrmActlXpryDt" IS NOT NULL

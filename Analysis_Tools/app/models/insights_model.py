@@ -1237,9 +1237,44 @@ def get_delivery_data(selected_date: str, min_delivery_pct: float = 0, filter_fo
 
     if fo_symbols:
         print(f"[INFO] Filtered to {len(result)} F&O stocks with delivery_pct >= {min_delivery_pct}")
-    else:
-        print(f"[INFO] Filtered to {len(result)} stocks with delivery_pct >= {min_delivery_pct}")
+    print(f"[INFO] Filtered to {len(result)} stocks with delivery_pct >= {min_delivery_pct}")
     return result
+
+
+def get_stock_delivery_history(symbol, days=21):
+    """
+    Fetch historical delivery data for a specific stock from its individual table.
+    Returns last N trading days of: date, close, volume, delivery_qty, delivery_pct.
+    """
+    try:
+        table_name = f"TBL_{symbol.upper()}"
+        query = text(f"""
+            SELECT
+                CAST("BizDt" AS DATE)::text as date,
+                CAST("ClsPric" AS NUMERIC) as close,
+                CAST("TtlTradgVol" AS NUMERIC) as volume,
+                CAST("DlvryQty" AS NUMERIC) as delivery_qty,
+                CAST("DlvryPer" AS NUMERIC) as delivery_pct
+            FROM public."{table_name}"
+            WHERE "ClsPric" IS NOT NULL
+            ORDER BY "BizDt" DESC
+            LIMIT :days
+        """)
+
+        with engine_cash.connect() as conn:
+            df = pd.read_sql(query, conn, params={"days": days})
+
+        if df.empty:
+            return []
+
+        # Convert to list of dicts and reverse to get chronological order (oldest to newest)
+        result = df.to_dict("records")
+        result.reverse()
+        return result
+
+    except Exception as e:
+        print(f"[ERROR] get_stock_delivery_history({symbol}): {e}")
+        return []
 
 
 # =============================================================

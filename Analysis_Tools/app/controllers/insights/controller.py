@@ -36,6 +36,7 @@ from ...models.insights_model import (
     get_market_stats,
     get_nifty50_data,
     get_sector_performance,
+    get_stock_delivery_history,
     get_volume_breakouts,
 )
 from ...models.stock_model import get_filtered_tickers
@@ -1161,6 +1162,25 @@ def api_rs_matrix_ad_ratio_batch():
     except Exception as e:
         import traceback; traceback.print_exc()
         return jsonify({"success": False, "error": str(e), "indices": []})
+
+
+@insights_bp.route("/api/stock-delivery-history")
+def api_stock_delivery_history():
+    """API endpoint for 21-day historical delivery data of a stock."""
+    symbol = request.args.get("symbol")
+    days = int(request.args.get("days", 21))
+
+    if not symbol:
+        return jsonify({"success": False, "error": "Symbol is required"}), 400
+
+    history = get_stock_delivery_history(symbol, days)
+
+    return jsonify({
+        "success": True,
+        "symbol": symbol.upper(),
+        "days": len(history),
+        "data": history
+    })
 
 
 # =============================================================

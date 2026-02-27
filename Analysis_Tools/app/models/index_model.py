@@ -121,7 +121,7 @@ NSE_INDEX_URLS = {
 
 # Index metadata
 INDEX_METADATA = {
-    "all": {"name": "All F&O Stocks", "description": "All stocks with F&O trading", "icon": ""},
+    "all": {"name": "All Cash Stocks", "description": "All stocks in the cash market", "icon": ""},
     "all_market": {"name": "All Market Stocks", "description": "All stocks in the cash market", "icon": ""},
     "nifty50": {"name": "Nifty 50", "description": "Top 50 companies by market cap", "icon": ""},
     "niftynext50": {"name": "Nifty Next 50", "description": "Next 50 companies after Nifty 50", "icon": ""},
