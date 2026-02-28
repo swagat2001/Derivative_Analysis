@@ -148,7 +148,7 @@ def get_cash_stock_info(ticker: str) -> dict:
                 "high":   float(r[2] or 0),
                 "low":    float(r[3] or 0),
                 "close":  float(r[4] or 0),
-                "volume": int(float(r[5] or 0)),
+                "volume": int(r[5]   or 0),
             })
             # Safety checks for high/low
             idx = len(data) - 1
@@ -178,9 +178,9 @@ def get_cash_stock_info(ticker: str) -> dict:
                         "HghPric"::float        AS high,
                         "LwPric"::float         AS low,
                         "ClsPric"::float        AS close,
-                        COALESCE(NULLIF("TtlTradgVol"::text, ''), '0')::numeric::bigint AS volume
+                        "TtlTradgVol"::bigint   AS volume
                     FROM public."{cash_table}"
-                    WHERE "ClsPric" IS NOT NULL AND "ClsPric"::float > 0
+                    WHERE "ClsPric" IS NOT NULL AND "ClsPric" > 0
                     ORDER BY "BizDt" DESC
                     LIMIT 120
                 """)).fetchall()
@@ -211,10 +211,10 @@ def get_cash_stock_info(ticker: str) -> dict:
                             "HghPric"::float             AS high,
                             "LwPric"::float              AS low,
                             "ClsPric"::float             AS close,
-                            COALESCE("TtlTradgVol"::text, '0')::numeric::bigint AS volume
+                            COALESCE("TtlTradgVol", '0')::bigint AS volume
                         FROM public."{cash_table}"
                         WHERE "OptnTp" IS NULL
-                          AND "ClsPric" IS NOT NULL AND "ClsPric"::float > 0
+                          AND "ClsPric" IS NOT NULL AND "ClsPric" > 0
                         ORDER BY "BizDt" DESC, "FininstrmActlXpryDt" ASC
                         LIMIT 120
                     """)).fetchall()

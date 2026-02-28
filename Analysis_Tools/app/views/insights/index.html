@@ -1437,7 +1437,7 @@
                 <div id="deliverySearchContainer" style="display:none;">
                     <input type="text" id="deliverySearch" placeholder="Search Symbol..."
                         style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; width: 180px; outline: none;"
-                        onkeyup="filterTableBySymbol('deliverySearch', 'delivery-container')">
+                        onkeyup="onDeliverySearch()">
                 </div>
                 <div id="volumeSearchContainer" style="display:none;">
                     <input type="text" id="volumeSearch" placeholder="Search Symbol..."
@@ -1901,6 +1901,14 @@
 
             let currentIndex = '{{ selected_index }}';
             if (currentIndex === 'None' || !currentIndex) currentIndex = 'all';
+
+            let deliverySearchDebounce = null;
+            function onDeliverySearch() {
+                clearTimeout(deliverySearchDebounce);
+                deliverySearchDebounce = setTimeout(() => {
+                    loadDelivery();
+                }, 400);
+            }
 
             const indexIcons = { 'all': '', 'nifty50': '', 'niftynext50': '', 'niftybank': '', 'niftyit': '', 'niftypharma': '', 'niftyauto': '', 'niftymetal': '', 'niftyfmcg': '', 'niftyenergy': '', 'niftypsubank': '', 'niftyfinancial': '', 'sensex': '' };
 
@@ -2534,13 +2542,14 @@
                 const minPct = document.getElementById('minDelivery').value;
                 const sort = document.getElementById('deliverySort').value;
                 const index = currentIndex || 'all';
+                const search = document.getElementById('deliverySearch') ? document.getElementById('deliverySearch').value : '';
 
                 if (container.innerHTML.trim() === '') {
                     container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
                 }
 
                 try {
-                    const response = await fetch(`/neev/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}`);
+                    const response = await fetch(`/neev/api/delivery?date=${currentDate}&min_pct=${minPct}&sort=${sort}&index=${index}&search=${search}`);
                     const data = await response.json();
 
                     if (!data.success || !data.data || data.data.length === 0) {

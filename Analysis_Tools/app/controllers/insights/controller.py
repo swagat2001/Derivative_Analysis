@@ -512,6 +512,7 @@ def api_delivery():
     min_pct = float(request.args.get("min_pct", 50))
     sort_by = request.args.get("sort", "delivery_pct")
     selected_index = request.args.get("index", "all")
+    search_query = request.args.get("search", "").strip().upper()
 
     if not selected_date:
         dates = get_insights_dates()
@@ -523,13 +524,15 @@ def api_delivery():
             404,
         )
 
-    print(f"[API] Fetching delivery data for {selected_date}, min_pct={min_pct}, index={selected_index}")
+    print(f"[API] Fetching delivery data for {selected_date}, min_pct={min_pct}, index={selected_index}, search={search_query}")
 
     should_filter_fo = False
-    delivery_data = get_delivery_data(selected_date, min_pct, filter_fo=should_filter_fo)
+    # If search_query is provided, we fetch everything first and then filter
+    fetch_min_pct = min_pct if not search_query else 0
+    delivery_data = get_delivery_data(selected_date, fetch_min_pct, filter_fo=should_filter_fo)
 
     # NEW: Fallback mechanism if no data found for selected date (DB lag scenario)
-    if not delivery_data:
+    if not delivery_data and not search_query:
         # Check if we have data for a previous date
         from ...models.db_config import engine_cash
         from sqlalchemy import text
@@ -542,7 +545,7 @@ def api_delivery():
                 if fallback_date and str(fallback_date) != str(selected_date):
                     print(f"[INFO] Fallback: No delivery data for {selected_date}, using {fallback_date}")
                     selected_date = str(fallback_date)
-                    delivery_data = get_delivery_data(selected_date, min_pct, filter_fo=should_filter_fo)
+                    delivery_data = get_delivery_data(selected_date, fetch_min_pct, filter_fo=should_filter_fo)
         except Exception as e:
             print(f"[ERROR] Delivery data fallback failed: {e}")
 
@@ -565,6 +568,10 @@ def api_delivery():
     # Filter by index
     delivery_data = filter_stocks_by_index(delivery_data, selected_index)
 
+    # Search filter (if provided)
+    if search_query:
+        delivery_data = [d for d in delivery_data if search_query in d["symbol"].upper()]
+
     # Sort data
     if sort_by == "delivery_pct":
         delivery_data.sort(key=lambda x: x["delivery_pct"], reverse=True)
@@ -581,11 +588,13 @@ def api_delivery():
 
     print(f"[API] Returning {len(delivery_data)} stocks with delivery data")
 
+    # If searching, return all matches (up to 100), otherwise return top 50
+    limit = 100 if search_query else 50
     return jsonify(
         {
             "success": True,
             "date": selected_date,
-            "data": delivery_data[:50],
+            "data": delivery_data[:limit],
             "summary": {
                 "total_stocks": len(delivery_data),
                 "avg_delivery_pct": round(avg_delivery, 2),

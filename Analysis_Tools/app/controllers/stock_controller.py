@@ -100,7 +100,7 @@ def get_db_price_chart(symbol, limit=1500):
                     SELECT
                         "BizDt"::text      AS date,
                         "ClsPric"::float   AS close,
-                        "TtlTradgVol"::text AS volume
+                        "TtlTradgVol"::bigint AS volume
                     FROM public."{cash_table}"
                     WHERE "ClsPric" IS NOT NULL
                     ORDER BY "BizDt" DESC
@@ -111,7 +111,7 @@ def get_db_price_chart(symbol, limit=1500):
                 {
                     "date":   r[0],
                     "value":  float(r[1] or 0),
-                    "volume": int(float(r[2] or 0)) if r[2] else 0,
+                    "volume": int(r[2] or 0) if r[2] else 0,
                 }
                 for r in reversed(rows)  # oldest first for chart
             ]
@@ -166,7 +166,7 @@ def calculate_fundamental_metrics(symbol):
             cash_table = f"TBL_{symbol}"
             with engine_cash.connect() as conn:
                 row = conn.execute(text(f"""
-                    SELECT "ClsPric", "TtlTradgVol"::text
+                    SELECT "ClsPric", "TtlTradgVol"
                     FROM public."{cash_table}"
                     WHERE "ClsPric" IS NOT NULL
                     ORDER BY "BizDt" DESC
@@ -174,7 +174,7 @@ def calculate_fundamental_metrics(symbol):
                 """)).fetchone()
             if row:
                 metrics["current_price"] = float(row[0] or 0)
-                metrics["volume"]        = int(float(row[1] or 0))
+                metrics["volume"]        = int(row[1] or 0)
         except Exception as e:
             print(f"[WARN] Price fallback from {cash_table} failed: {e}")
 

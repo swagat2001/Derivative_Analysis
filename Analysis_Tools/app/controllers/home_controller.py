@@ -308,7 +308,7 @@ def api_market_breadth_history():
     """API endpoint for historical market breadth (Advances/Declines) chart data."""
     try:
         days = int(request.args.get("days", 30))
-        from Analysis_Tools.Database.Cash.market_breadth_eod import get_breadth_history
+        from Database.Cash.market_breadth_eod import get_breadth_history
         history = get_breadth_history(days)
         return jsonify({"success": True, "data": history}), 200
     except Exception as e:
