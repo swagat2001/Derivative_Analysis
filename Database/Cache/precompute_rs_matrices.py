@@ -12,8 +12,13 @@ if PROJECT_ROOT not in sys.path:
 sys.path.append(os.path.join(PROJECT_ROOT, "Analysis_Tools"))
 
 from app.models.db_config import engine_cash
-from app.models.pf_matrix_model import generate_rs_matrix_html, generate_stock_rs_matrix_html
-
+from app.models.pf_matrix_model import (
+    generate_rs_matrix_html,
+    generate_stock_rs_matrix_html,
+    get_index_category_rs_data,
+    get_stock_rs_data
+)
+import json
 def init_cache_table():
     query = text("""
     CREATE TABLE IF NOT EXISTS rs_matrix_cache (
@@ -48,7 +53,7 @@ def main():
     print("[INFO] Starting RS Matrix Precomputation...")
     init_cache_table()
 
-    box_percents = [0.25, 0.5, 1.0, 2.0]
+    box_percents = [0.25]
 
     # 1. Generate Index Matrices
     print("[INFO] Precomputing Index Matrices...")
@@ -82,6 +87,29 @@ def main():
                  # The user specifically mentioned ALPHALOWVOLATILITY30 error,
                  # so we want to be noisy here if it fails
                  print(f"  [ERROR] Failed to generate constituent matrix for {index_name} @ {pct}%: {e}")
+
+             # Precompute JSON data for Treemap (v2)
+             try:
+                 json_data = get_stock_rs_data(index_name, pct)
+                 json_cache_key = f"stock_json_{index_name}_{pct}_v2"
+                 save_to_cache(json_cache_key, json.dumps(json_data))
+             except Exception as e:
+                 print(f"  [ERROR] Failed to generate JSON data for {index_name} @ {pct}%: {e}")
+
+    # 3. Generate Index Category JSON Data for Treemaps (v2)
+    print("[INFO] Precomputing Index Category JSON Data...")
+    categories = ["all", "broad", "sector", "thematic"]
+    for cat in categories:
+        for pct in box_percents:
+             try:
+                 print(f"  - Generating JSON data for category '{cat}' @ {pct}%...")
+                 import re as _re
+                 cat_slug  = _re.sub(r'[^A-Za-z0-9]', '_', cat)
+                 json_data = get_index_category_rs_data(cat if cat != "all" else "", pct)
+                 json_cache_key = f"indices_json_{cat_slug}_{pct}_v2"
+                 save_to_cache(json_cache_key, json.dumps(json_data))
+             except Exception as e:
+                 print(f"  [ERROR] Failed to generate JSON data for category '{cat}' @ {pct}%: {e}")
 
     print("[INFO] Precomputation complete! All matrices saved to CashStocks database.")
 

@@ -489,6 +489,21 @@
       </div>
     </div>
 
+    <div class="stat-card">
+      <div class="s-label">Delivery Qty</div>
+      {% set dqty = cash_info.get('delivery_qty', 0) | int %}
+      <div class="s-value">
+        {% if dqty >= 10000000 %}{{ '{:.2f}'.format(dqty / 10000000) }} Cr
+        {% elif dqty >= 100000 %}{{ '{:.2f}'.format(dqty / 100000) }} L
+        {% elif dqty > 0 %}{{ '{:,}'.format(dqty) }}
+        {% else %}—{% endif %}
+      </div>
+      <div class="s-sub">
+        {% set dpct = cash_info.get('delivery_pct', 0) | float %}
+        {% if dpct > 0 %}{{ '{:.1f}'.format(dpct) }}% of Vol{% endif %}
+      </div>
+    </div>
+
     {% if cash_info.get('week52_high') %}
     <div class="stat-card">
       <div class="s-label">52W High</div>

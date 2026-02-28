@@ -149,6 +149,8 @@ def get_cash_stock_info(ticker: str) -> dict:
                 "low":    float(r[3] or 0),
                 "close":  float(r[4] or 0),
                 "volume": int(r[5]   or 0),
+                "delivery_qty": int(r[6] or 0) if len(r) > 6 else 0,
+                "delivery_pct": float(r[7] or 0) if len(r) > 7 else 0,
             })
             # Safety checks for high/low
             idx = len(data) - 1
@@ -178,7 +180,9 @@ def get_cash_stock_info(ticker: str) -> dict:
                         "HghPric"::float        AS high,
                         "LwPric"::float         AS low,
                         "ClsPric"::float        AS close,
-                        "TtlTradgVol"::bigint   AS volume
+                        "TtlTradgVol"::bigint   AS volume,
+                        "DlvryQty"::bigint      AS delivery_qty,
+                        "DlvryPer"::float       AS delivery_pct
                     FROM public."{cash_table}"
                     WHERE "ClsPric" IS NOT NULL AND "ClsPric" > 0
                     ORDER BY "BizDt" DESC
@@ -211,7 +215,9 @@ def get_cash_stock_info(ticker: str) -> dict:
                             "HghPric"::float             AS high,
                             "LwPric"::float              AS low,
                             "ClsPric"::float             AS close,
-                            COALESCE("TtlTradgVol", '0')::bigint AS volume
+                            COALESCE("TtlTradgVol", '0')::bigint AS volume,
+                            0::bigint                    AS delivery_qty,
+                            0::float                     AS delivery_pct
                         FROM public."{cash_table}"
                         WHERE "OptnTp" IS NULL
                           AND "ClsPric" IS NOT NULL AND "ClsPric" > 0
@@ -227,8 +233,10 @@ def get_cash_stock_info(ticker: str) -> dict:
 
     # ── 2c. Derive price from OHLCV if technical cache missed ────
     if result["ohlcv"]:
+        latest = result["ohlcv"][-1]
+        result["delivery_qty"] = latest.get("delivery_qty", 0)
+        result["delivery_pct"] = latest.get("delivery_pct", 0)
         if not result["has_technical"] or not result.get("price"):
-            latest = result["ohlcv"][-1]
             prev   = result["ohlcv"][-2] if len(result["ohlcv"]) > 1 else latest
             result["price"]      = latest["close"]
             result["volume"]     = latest["volume"]

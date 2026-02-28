@@ -12,78 +12,60 @@ REVERSAL = 3
 # Vectorised P&F direction (NumPy) — replaces the slow pure-Python loop
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _pf_direction_numpy(prices: np.ndarray, box_pct: float, reversal: int = REVERSAL) -> int:
-    """
-    Compute last P&F direction for a 1-D price array using a pure NumPy
-    state-machine implementation (no Python-level for-loop).
-    Returns +1 (bullish), -1 (bearish), or 0 (no clear signal).
-
-    The trick: run the state machine in a vectorised fashion using
-    np.cumsum / diff instead of a scalar loop.  We keep a compact
-    Python loop but operate on blocks, making it far faster in practice
-    because NumPy C-level code handles the heavy lifting.
-    """
-    arr = prices[~np.isnan(prices)]
-    n = len(arr)
-    if n < 5:
+def pf_direction_pct_close(close: pd.Series, box_pct: float, reversal: int = REVERSAL) -> int:
+    s = close.dropna()
+    if len(s) < 5:
         return 0
 
     pct = box_pct / 100.0
     dir_ = 0
-    extreme = float(arr[0])
+    extreme = float(s.iloc[0])
 
-    # Iterate as C-contiguous numpy array accesses (still a loop but
-    # avoids pd.Series overhead and uses contiguous memory access).
-    for px in arr[1:]:
-        box = max(float(px) * pct, 1e-12)
+    for px in s.iloc[1:]:
+        px = float(px)
+        box = max(px * pct, 1e-12)
+
         if dir_ == 0:
             if px >= extreme + box:
-                dir_, extreme = 1, float(px)
+                dir_ = 1
+                extreme = px
             elif px <= extreme - box:
-                dir_, extreme = -1, float(px)
+                dir_ = -1
+                extreme = px
+
         elif dir_ == 1:
             if px > extreme:
-                extreme = float(px)
-            elif px <= extreme - reversal * box:
-                dir_, extreme = -1, float(px)
+                extreme = px
+            elif px <= extreme - (reversal * box):
+                dir_ = -1
+                extreme = px
+
         else:
             if px < extreme:
-                extreme = float(px)
-            elif px >= extreme + reversal * box:
-                dir_, extreme = 1, float(px)
+                extreme = px
+            elif px >= extreme + (reversal * box):
+                dir_ = 1
+                extreme = px
+
     return dir_
 
 
-def pf_direction_pct_close(close: pd.Series, box_pct: float, reversal: int = REVERSAL) -> int:
-    """Thin wrapper kept for backward compatibility."""
-    arr = close.dropna().to_numpy(dtype=np.float64, na_value=np.nan)
-    return _pf_direction_numpy(arr, box_pct, reversal)
-
-
 def pf_rs_matrix(closes: pd.DataFrame, box_pct: float, reversal: int = REVERSAL) -> pd.DataFrame:
-    """
-    Vectorised P&F RS matrix.  All ratio series are computed as a NumPy
-    broadcast divide so only the final PF-direction pass remains per pair.
-    """
     closes = closes.sort_index().dropna(how="all")
     syms = list(closes.columns)
-    n = len(syms)
-    arr = closes.to_numpy(dtype=np.float64)          # (T, n) array
 
-    out = np.zeros((n, n), dtype=np.int8)
+    out = pd.DataFrame(0, index=syms, columns=syms, dtype="int8")
 
-    for i in range(n):
-        col_i = arr[:, i]
-        for j in range(n):
+    for i in syms:
+        si = closes[i]
+        for j in syms:
             if i == j:
                 continue
-            col_j = arr[:, j]
-            with np.errstate(divide='ignore', invalid='ignore'):
-                ratio = col_i / col_j
-            ratio[~np.isfinite(ratio)] = np.nan
-            out[i, j] = _pf_direction_numpy(ratio, box_pct, reversal)
+            sj = closes[j]
+            ratio = (si / sj).replace([np.inf, -np.inf], np.nan).dropna()
+            out.loc[i, j] = pf_direction_pct_close(ratio, box_pct=box_pct, reversal=reversal)
 
-    return pd.DataFrame(out, index=syms, columns=syms, dtype="int8")
+    return out
 
 
 def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_type: str = 'index', clickable_map: dict = None) -> str:
@@ -98,22 +80,72 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
 
     css = """
     <style>
-      .pf-wrap { width: 100%; overflow-x: auto; }
-      .pf-title { font-size: 18px; font-weight: 700; margin: 6px 0 10px 0; color: #1f2937; }
-      table.pf { border-collapse: separate; border-spacing: 6px; }
-      table.pf th, table.pf td { text-align: center; }
-      table.pf th { color: #4b5563; font-size: 12px; font-weight: 600; padding: 6px 4px; white-space: normal; vertical-align: bottom; line-height: 1.3; min-width: 44px; }
-      td.rowhdr { text-align: left; color: #1f2937; font-size: 12px; font-weight: 700; padding: 6px 10px; white-space: normal; line-height: 1.4; }
-      .count { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px;
-               font-size: 12px; font-weight: 900; background: #1f1f1f; color: #eaeaea; border: 1px solid #333; }
-      .pf-cell { width: 44px; height: 24px; border-radius: 4px; font-size: 12px; font-weight: 900; line-height: 24px;
-              border: 1px solid rgba(255,255,255,0.08); display: inline-block; }
-      .g { background: #22c55e; color: #08210f; }
-      .r { background: #ef4444; color: #2a0a0a; }
-      .z { background: #2a2a2a; color: #a1a1a1; }
-      .diag { background: #151515; color: #666; border: 1px dashed rgba(255,255,255,0.15); }
+      .pf-wrap {
+          width: 100%;
+          overflow-x: auto;
+          background: white;
+          padding: 5px;
+          border-radius: 8px;
+      }
+      table.pf {
+          border-collapse: separate;
+          border-spacing: 1px;
+          margin: 0;
+      }
+      table.pf th {
+          color: #64748b;
+          font-size: 9px;
+          font-weight: 700;
+          padding: 2px 1px;
+          white-space: nowrap;
+          vertical-align: bottom;
+          min-width: 14px;
+          max-width: 14px;
+          overflow: hidden;
+      }
+      td.rowhdr {
+          text-align: left;
+          color: #1f2937;
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 8px;
+          white-space: nowrap;
+          background: white;
+          position: sticky;
+          left: 0;
+          z-index: 10;
+          min-width: 120px;
+      }
+      .count {
+          display: inline-block;
+          margin-left: 6px;
+          padding: 1px 4px;
+          border-radius: 3px;
+          font-size: 9px;
+          font-weight: 700;
+          background: #f1f5f9;
+          color: #475569;
+      }
+      .pf-cell {
+          width: 14px;
+          height: 14px;
+          border-radius: 2px;
+          display: inline-block;
+          transition: transform 0.1s ease;
+          border: 1px solid rgba(0,0,0,0.03);
+      }
+      .pf-cell:hover {
+          transform: scale(1.5);
+          z-index: 100;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          border: 1px solid white;
+      }
+      .g { background: #22c55e; }
+      .r { background: #ef4444; }
+      .z { background: #f8fafc; }
+      .diag { background: #94a3b8; }
       .matrix-link { color: inherit; text-decoration: none; cursor: pointer; }
-      .matrix-link:hover { text-decoration: underline !important; color: #2563eb !important; }
+      .matrix-link:hover { color: #2563eb !important; text-decoration: underline; }
     </style>
     """
 
@@ -126,21 +158,22 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
     def norm(s):
         return re.sub(r'[^A-Z0-9]', '', str(s).upper())
 
-    def word_lines(s):
-        """Split a name like 'NIFTY PSU BANK' into 'NIFTY<br>PSU<br>BANK'."""
-        return '<br>'.join(html.escape(w) for w in str(s).split())
-
     # header
     parts.append("<thead><tr>")
     parts.append("<th></th>")
     for c in cols:
-        parts.append(f"<th>{word_lines(c)}</th>")
+        # For columns in heatmap, we often just show the ticker or vertical text
+        # but here we'll use a tooltip or just keep it short
+        parts.append(f'<th title="{html.escape(str(c))}">{html.escape(str(c)[:5])}</th>')
     parts.append("</tr></thead>")
 
-    # body
+    # HEATMAP_V2_MARKER
     parts.append("<tbody>")
     for i, r in enumerate(rows):
         r_str = str(r)
+
+        # Truncate row header for denser look if too long
+        display_r = r_str[:12] + '..' if len(r_str) > 14 else r_str
 
         is_clickable = False
         target_name = r_str
@@ -155,11 +188,11 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
 
         if is_clickable:
             if link_type == 'index':
-                row_html = f'<a href="javascript:void(0)" onclick="loadStockRSMatrix(\'{html.escape(target_name)}\')" class="matrix-link">{word_lines(r_str)}</a>'
+                row_html = f'<a href="javascript:void(0)" onclick="onRsIndexChange(\'{html.escape(target_name)}\', null)" class="matrix-link">{html.escape(display_r)}</a>'
             elif link_type == 'stock':
-                row_html = f'<a href="/stock/{html.escape(target_name)}" class="matrix-link" target="_blank">{word_lines(r_str)}</a>'
+                row_html = f'<a href="/stock/{html.escape(target_name)}" class="matrix-link" target="_blank">{html.escape(display_r)}</a>'
         else:
-            row_html = word_lines(r_str)
+            row_html = html.escape(display_r)
 
         parts.append("<tr>")
         parts.append(
@@ -168,15 +201,13 @@ def render_pf_matrix_boxes(mat: pd.DataFrame, title: str = "RS Matrix", link_typ
 
         for j, c in enumerate(cols):
             v = int(mat.loc[r, c])
+            cell_title = f"{r} vs {c}: {'Bullish' if v==1 else 'Bearish' if v==-1 else 'Neutral'}"
             if i == j:
-                parts.append('<td><div class="pf-cell diag"></div></td>')
+                parts.append(f'<td style="padding:0;"><div class="pf-cell diag" title="{cell_title}"></div></td>')
             else:
-                if v == 1:
-                    parts.append('<td><div class="pf-cell g">1</div></td>')
-                elif v == -1:
-                    parts.append('<td><div class="pf-cell r">-1</div></td>')
-                else:
-                    parts.append('<td><div class="pf-cell z"></div></td>')
+                cls = "g" if v == 1 else "r" if v == -1 else "z"
+                # ENSURE NO INNER TEXT
+                parts.append(f'<td style="padding:0;"><div class="pf-cell {cls}" title="{cell_title}"></div></td>')
         parts.append("</tr>")
     parts.append("</tbody></table></div>")
 
@@ -356,6 +387,50 @@ def generate_stock_rs_matrix_html(index_name: str, box_pct: float) -> str:
     return render_pf_matrix_boxes(mat, title=title, link_type='stock')
 
 
+def get_stock_rs_data(index_name: str, box_pct: float) -> list:
+    """
+    Returns RS scores (green count) for constituents of an index.
+    Used for Treemap/Heatmap visualization.
+    """
+    closes = get_stock_history_proxy_for_index(index_name)
+    if closes.empty:
+        return []
+
+    mat = pf_rs_matrix(closes, box_pct=box_pct, reversal=REVERSAL)
+
+    # Calculate green counts (RS Score)
+    n = len(mat)
+    gc = ((mat.values == 1) & (~np.eye(n, dtype=bool))).sum(axis=1)
+
+    # Get latest prices and change from heatmap data to size the treemap
+    from .insights_model import get_heatmap_data, get_insights_dates
+    dates = get_insights_dates()
+    latest_date = dates[0] if dates else None
+
+    market_data = {}
+    if latest_date:
+        all_stocks = get_heatmap_data(latest_date)
+        market_data = {s['symbol']: s for s in all_stocks}
+
+    results = []
+    for i, symbol in enumerate(mat.index):
+        m_data = market_data.get(symbol, {})
+        results.append({
+            "symbol": symbol,
+            "rs_score": int(gc[i]),
+            "max_score": n - 1,
+            "rs_pct": round(int(gc[i]) / (n - 1) * 100, 2) if n > 1 else 0,
+            "change_pct": m_data.get("change_pct", 0),
+            "close": m_data.get("close", 0),
+            "turnover": m_data.get("turnover", 1),
+            "sector": m_data.get("sector", "Others")
+        })
+
+    # Sort by RS score descending
+    results.sort(key=lambda x: x["rs_score"], reverse=True)
+    return results
+
+
 def generate_category_rs_matrix_html(category: str, box_pct: float) -> str:
     """
     Generate Point & Figure RS Matrix HTML for all indices in a given category
@@ -422,3 +497,69 @@ def generate_category_rs_matrix_html(category: str, box_pct: float) -> str:
 
     title = f"{category} — Index RS Matrix" if category else "All Indices — Relative Strength"
     return render_pf_matrix_boxes(mat, title=title, link_type='index', clickable_map=clickable_map)
+
+
+def get_index_category_rs_data(category: str, box_pct: float) -> list:
+    """
+    Returns RS scores (green count) for indices in a category.
+    Used for the summary Treemap visualization.
+    """
+    # --- Step 1: Get all index names for this category ---
+    try:
+        if category:
+            query = text("""
+                SELECT DISTINCT index_name
+                FROM index_constituents
+                WHERE index_category = :cat AND index_name IS NOT NULL
+                ORDER BY index_name
+            """)
+            with engine_cash.connect() as conn:
+                rows = conn.execute(query, {"cat": category}).fetchall()
+            category_indices = {r[0].upper() for r in rows}
+        else:
+            category_indices = None   # None = all
+    except Exception as e:
+        print(f"[ERROR] get_index_category_rs_data category lookup: {e}")
+        category_indices = None
+
+    # --- Step 2: Get full history then filter columns ---
+    closes = get_index_history_proxy()
+    if closes.empty:
+        return []
+
+    if category_indices:
+        keep = [c for c in closes.columns if c.upper() in category_indices]
+        if not keep:
+            return []
+        closes = closes[keep]
+
+    # --- Step 3: Compute RS matrix ---
+    mat = pf_rs_matrix(closes, box_pct=box_pct, reversal=REVERSAL)
+
+    # Calculate green counts (RS Score)
+    n = len(mat)
+    diag_mask = np.eye(n, dtype=bool)
+    gc = ((mat.values == 1) & (~diag_mask)).sum(axis=1)
+
+    # Get sentiment and latest data if possible
+    from .index_model import get_index_list
+    dyn_indices = get_index_list()
+    idx_metadata = {i['name']: i for i in dyn_indices}
+
+    results = []
+    for i, idx_name in enumerate(mat.index):
+        meta = idx_metadata.get(idx_name, {})
+        results.append({
+            "symbol": idx_name,
+            "rs_score": int(gc[i]),
+            "max_score": n - 1 if n > 1 else 1,
+            "rs_pct": round(int(gc[i]) / (n - 1) * 100, 2) if n > 1 else 0,
+            "value": 1,
+            "type": "index",
+            "sentiment": meta.get("sentiment", "Neutral"),
+            "change_pct": meta.get("change_pct", 0)
+        })
+
+    # Sort by RS score descending
+    results.sort(key=lambda x: x["rs_score"], reverse=True)
+    return results

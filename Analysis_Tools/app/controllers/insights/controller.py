@@ -588,8 +588,12 @@ def api_delivery():
 
     print(f"[API] Returning {len(delivery_data)} stocks with delivery data")
 
-    # If searching, return all matches (up to 100), otherwise return top 50
-    limit = 100 if search_query else 50
+    # If min_pct == 0, return all. Otherwise limit to top 50 (or 100 for search).
+    if min_pct == 0:
+        limit = len(delivery_data)
+    else:
+        limit = 100 if search_query else 50
+
     return jsonify(
         {
             "success": True,
@@ -954,7 +958,7 @@ def api_rs_matrix_ad_ratio():
 @insights_bp.route("/api/rs-matrix")
 def api_rs_matrix():
     """API endpoint for Point & Figure RS Matrix."""
-    box_pct = request.args.get("box_pct", 0.5, type=float)
+    box_pct = request.args.get("box_pct", 0.25, type=float)
     cache_key = f"index_{box_pct}"
 
     try:
@@ -982,13 +986,13 @@ def api_rs_matrix():
 @insights_bp.route("/api/rs-matrix/stock")
 def api_rs_matrix_stock():
     """API endpoint for Stock Point & Figure RS Matrix within an Index."""
-    box_pct = request.args.get("box_pct", 0.5, type=float)
+    box_pct = request.args.get("box_pct", 0.25, type=float)
     index_name = request.args.get("index_name", type=str)
 
     if not index_name:
         return jsonify({"success": False, "error": "index_name is required"})
 
-    cache_key = f"stock_{index_name}_{box_pct}"
+    cache_key = f"stock_{index_name}_{box_pct}_v2"
 
     try:
         query = text("SELECT html_content FROM rs_matrix_cache WHERE cache_key = :cache_key")
@@ -1021,13 +1025,13 @@ def api_rs_matrix_indices():
     Index-vs-Index P&F RS Matrix (with DB caching to avoid recomputation).
     Params: category (optional), box_pct (default 0.5)
     """
-    box_pct  = request.args.get("box_pct", 0.5, type=float)
+    box_pct  = request.args.get("box_pct", 0.25, type=float)
     category = request.args.get("category", "", type=str).strip()
 
     # Sanitise category for a safe cache key
     import re as _re
     cat_slug  = _re.sub(r'[^A-Za-z0-9]', '_', category) if category else "all"
-    cache_key = f"indices_{cat_slug}_{box_pct}"
+    cache_key = f"indices_{cat_slug}_{box_pct}_v2"
 
     # ── Try DB cache first ─────────────────────────────────────────────────────
     try:
@@ -1065,6 +1069,124 @@ def api_rs_matrix_indices():
 
     return jsonify({"success": True, "category": category or "all",
                     "box_pct": box_pct, "html": html_content})
+
+
+@insights_bp.route("/api/rs-matrix/breadth")
+def api_rs_matrix_breadth():
+    """
+    Returns JSON data for RS breadth treemap.
+    """
+    index_name = request.args.get("index_name", "Nifty 50")
+    box_pct = float(request.args.get("box_pct", 0.25))
+
+    # ── Try DB cache first ─────────────────────────────────────────────────────
+    import json
+    cache_key = f"stock_json_{index_name}_{box_pct}_v2"
+    try:
+        with engine_cash.connect() as conn:
+            result = conn.execute(
+                text("SELECT html_content FROM rs_matrix_cache WHERE cache_key = :k"),
+                {"k": cache_key}
+            ).scalar()
+        if result:
+            cached_data = json.loads(result)
+            return jsonify({
+                "success": True,
+                "index_name": index_name,
+                "stocks": cached_data,
+                "cached": True
+            })
+    except Exception as e:
+        print(f"[WARN] Cache read failed for {cache_key}: {e}")
+        pass   # cache miss or error — fall through
+
+    # ── Compute (slow path) ────────────────────────────────────────────────────
+    from ...models.pf_matrix_model import get_stock_rs_data
+    data = get_stock_rs_data(index_name, box_pct)
+
+    if not data:
+        return jsonify({"success": False, "error": "No data available"}), 404
+
+    # ── Write to DB cache ──────────────────────────────────────────────────────
+    try:
+        json_content = json.dumps(data)
+        with engine_cash.begin() as conn:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS rs_matrix_cache (
+                    cache_key    VARCHAR(200) PRIMARY KEY,
+                    html_content TEXT,
+                    updated_at   TIMESTAMP
+                )
+            """))
+            conn.execute(text("""
+                INSERT INTO rs_matrix_cache (cache_key, html_content, updated_at)
+                VALUES (:k, :h, CURRENT_TIMESTAMP)
+                ON CONFLICT (cache_key) DO UPDATE SET
+                    html_content = EXCLUDED.html_content,
+                    updated_at = EXCLUDED.updated_at
+            """), {"k": cache_key, "h": json_content})
+    except Exception as e:
+        print(f"[WARN] Could not write {cache_key} to cache: {e}")
+
+    return jsonify({
+        "success": True,
+        "index_name": index_name,
+        "stocks": data
+    })
+
+
+@insights_bp.route("/api/rs-matrix/category-breadth")
+def api_rs_matrix_category_breadth():
+    """
+    Returns JSON data for index-category RS breadth treemap.
+    """
+    category = request.args.get("category", "")
+    box_pct = float(request.args.get("box_pct", 0.25))
+
+    # ── Try DB cache first ─────────────────────────────────────────────────────
+    import json
+    import re as _re
+    cat_slug  = _re.sub(r'[^A-Za-z0-9]', '_', category) if category else "all"
+    cache_key = f"indices_json_{cat_slug}_{box_pct}_v2"
+    try:
+        with engine_cash.connect() as conn:
+            result = conn.execute(
+                text("SELECT html_content FROM rs_matrix_cache WHERE cache_key = :k"),
+                {"k": cache_key}
+            ).scalar()
+        if result:
+            cached_data = json.loads(result)
+            return jsonify({"success": True, "indices": cached_data, "cached": True})
+    except Exception as e:
+        print(f"[WARN] Cache read failed for {cache_key}: {e}")
+        pass   # cache miss or error — fall through
+
+    # ── Compute (slow path) ────────────────────────────────────────────────────
+    from ...models.pf_matrix_model import get_index_category_rs_data
+    data = get_index_category_rs_data(category, box_pct)
+
+    # ── Write to DB cache ──────────────────────────────────────────────────────
+    try:
+        json_content = json.dumps(data)
+        with engine_cash.begin() as conn:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS rs_matrix_cache (
+                    cache_key    VARCHAR(200) PRIMARY KEY,
+                    html_content TEXT,
+                    updated_at   TIMESTAMP
+                )
+            """))
+            conn.execute(text("""
+                INSERT INTO rs_matrix_cache (cache_key, html_content, updated_at)
+                VALUES (:k, :h, CURRENT_TIMESTAMP)
+                ON CONFLICT (cache_key) DO UPDATE SET
+                    html_content = EXCLUDED.html_content,
+                    updated_at = EXCLUDED.updated_at
+            """), {"k": cache_key, "h": json_content})
+    except Exception as e:
+        print(f"[WARN] Could not write {cache_key} to cache: {e}")
+
+    return jsonify({"success": True, "indices": data})
 
 
 @insights_bp.route("/api/rs-matrix/ad-ratio-batch")
