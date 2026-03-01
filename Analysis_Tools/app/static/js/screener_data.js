@@ -53,6 +53,14 @@ const SCREENER_DATA = {
       url: "/scanner/futures-oi/",
       badge: null,
       inline: false
+    },
+    {
+      title: "F&O Greeks analysis",
+      description: "Detailed analysis of F&O Greeks, Delta, Vega and Moneyness",
+      icon: ICONS.chart,
+      url: "/dashboard/",
+      badge: "New",
+      inline: false
     }
   ],
   "Technical Scanners": [
@@ -412,75 +420,7 @@ const SCREENER_DATA = {
   ]
 };
 
-/* ===== DUMMY STOCK DATA (Client-side fallback) ===== */
-const STOCK_DATA = {
-  "nifty50": {
-    title: "Nifty 50",
-    tag: "Nifty 50",
-    description: "The Nifty 50 is a benchmark index in the Indian stock market. It includes the top 50 large-cap companies listed on the National Stock Exchange (NSE) based on market capitalization and liquidity.",
-    stocks: [
-      { ticker: "RELIANCE", price: 1473.20, change: -31.00, change_pct: -2.06, volume: 7154042, oi: 12500000, iv: 24.5, signal: "BEARISH" },
-      { ticker: "HDFCBANK", price: 1746.40, change: -2.65, change_pct: -0.28, volume: 12666323, oi: 8900000, iv: 18.2, signal: "NEUTRAL" },
-      { ticker: "ICICIBANK", price: 1434.50, change: 6.80, change_pct: 0.48, volume: 9566450, oi: 7600000, iv: 21.3, signal: "BULLISH" },
-      { ticker: "INFY", price: 1617.30, change: -21.70, change_pct: -1.32, volume: 1989675, oi: 5400000, iv: 22.8, signal: "BEARISH" },
-      { ticker: "TCS", price: 3845.60, change: 45.30, change_pct: 1.19, volume: 1245890, oi: 3200000, iv: 19.4, signal: "BULLISH" },
-      { ticker: "BHARTIARTL", price: 1678.90, change: 12.40, change_pct: 0.74, volume: 3456789, oi: 4500000, iv: 23.1, signal: "BULLISH" },
-      { ticker: "SBIN", price: 845.30, change: -8.90, change_pct: -1.04, volume: 8765432, oi: 9800000, iv: 26.7, signal: "BEARISH" },
-      { ticker: "HDFC", price: 2890.50, change: 34.20, change_pct: 1.20, volume: 2345678, oi: 4100000, iv: 20.5, signal: "BULLISH" },
-      { ticker: "KOTAKBANK", price: 1823.40, change: -15.60, change_pct: -0.85, volume: 1567890, oi: 3400000, iv: 19.8, signal: "NEUTRAL" },
-      { ticker: "LT", price: 3567.80, change: 28.90, change_pct: 0.82, volume: 987654, oi: 2800000, iv: 21.2, signal: "BULLISH" },
-      { ticker: "WIPRO", price: 456.70, change: -5.40, change_pct: -1.17, volume: 4567890, oi: 6700000, iv: 25.3, signal: "BEARISH" },
-      { ticker: "AXISBANK", price: 1234.50, change: 8.90, change_pct: 0.73, volume: 5678901, oi: 5200000, iv: 22.4, signal: "BULLISH" },
-      { ticker: "MARUTI", price: 12456.30, change: -156.70, change_pct: -1.24, volume: 345678, oi: 890000, iv: 24.6, signal: "BEARISH" },
-      { ticker: "SUNPHARMA", price: 1567.80, change: 23.40, change_pct: 1.51, volume: 2345678, oi: 3100000, iv: 27.8, signal: "BULLISH" },
-      { ticker: "TATAMOTORS", price: 987.60, change: -12.30, change_pct: -1.23, volume: 6789012, oi: 8200000, iv: 32.1, signal: "BEARISH" },
-      { ticker: "ASIANPAINT", price: 2890.40, change: 18.60, change_pct: 0.65, volume: 567890, oi: 1200000, iv: 18.9, signal: "NEUTRAL" },
-      { ticker: "BAJFINANCE", price: 7234.50, change: 89.30, change_pct: 1.25, volume: 1234567, oi: 2400000, iv: 28.4, signal: "BULLISH" },
-      { ticker: "HCLTECH", price: 1678.90, change: -18.40, change_pct: -1.08, volume: 1890123, oi: 3800000, iv: 23.6, signal: "BEARISH" },
-      { ticker: "TITAN", price: 3456.70, change: 42.10, change_pct: 1.23, volume: 890123, oi: 1600000, iv: 25.2, signal: "BULLISH" },
-      { ticker: "ULTRACEMCO", price: 11234.50, change: -78.90, change_pct: -0.70, volume: 234567, oi: 450000, iv: 20.1, signal: "NEUTRAL" },
-      { ticker: "TECHM", price: 1567.80, change: 12.30, change_pct: 0.79, volume: 2345678, oi: 4100000, iv: 24.8, signal: "BULLISH" },
-      { ticker: "POWERGRID", price: 312.40, change: 4.50, change_pct: 1.46, volume: 5678901, oi: 7800000, iv: 19.3, signal: "BULLISH" },
-      { ticker: "NTPC", price: 378.90, change: -2.30, change_pct: -0.60, volume: 4567890, oi: 6500000, iv: 18.7, signal: "NEUTRAL" },
-      { ticker: "M&M", price: 2678.40, change: 34.50, change_pct: 1.31, volume: 1890123, oi: 2900000, iv: 26.4, signal: "BULLISH" },
-      { ticker: "HINDALCO", price: 678.90, change: -8.70, change_pct: -1.27, volume: 3456789, oi: 5100000, iv: 29.8, signal: "BEARISH" }
-    ]
-  },
-  "banknifty": {
-    title: "Bank Nifty",
-    tag: "Bank Nifty",
-    description: "Bank Nifty is a sectoral index comprising the most liquid and large capitalized banking stocks. It provides investors and market intermediaries a benchmark that captures the capital market performance of Indian banking sector.",
-    stocks: [
-      { ticker: "HDFCBANK", price: 1746.40, change: -2.65, change_pct: -0.28, volume: 12666323, oi: 8900000, iv: 18.2, signal: "NEUTRAL" },
-      { ticker: "ICICIBANK", price: 1434.50, change: 6.80, change_pct: 0.48, volume: 9566450, oi: 7600000, iv: 21.3, signal: "BULLISH" },
-      { ticker: "SBIN", price: 845.30, change: -8.90, change_pct: -1.04, volume: 8765432, oi: 9800000, iv: 26.7, signal: "BEARISH" },
-      { ticker: "KOTAKBANK", price: 1823.40, change: -15.60, change_pct: -0.85, volume: 1567890, oi: 3400000, iv: 19.8, signal: "NEUTRAL" },
-      { ticker: "AXISBANK", price: 1234.50, change: 8.90, change_pct: 0.73, volume: 5678901, oi: 5200000, iv: 22.4, signal: "BULLISH" },
-      { ticker: "INDUSINDBK", price: 1456.70, change: 18.90, change_pct: 1.31, volume: 2345678, oi: 3100000, iv: 28.5, signal: "BULLISH" },
-      { ticker: "BANDHANBNK", price: 234.50, change: -3.40, change_pct: -1.43, volume: 4567890, oi: 4200000, iv: 35.2, signal: "BEARISH" },
-      { ticker: "FEDERALBNK", price: 178.90, change: 2.10, change_pct: 1.19, volume: 3456789, oi: 5600000, iv: 24.8, signal: "BULLISH" },
-      { ticker: "IDFCFIRSTB", price: 87.60, change: -1.20, change_pct: -1.35, volume: 6789012, oi: 8100000, iv: 31.4, signal: "BEARISH" },
-      { ticker: "PNB", price: 112.30, change: 1.80, change_pct: 1.63, volume: 7890123, oi: 9200000, iv: 29.6, signal: "BULLISH" },
-      { ticker: "AUBANK", price: 678.40, change: -5.60, change_pct: -0.82, volume: 1234567, oi: 2100000, iv: 26.3, signal: "NEUTRAL" },
-      { ticker: "BANKBARODA", price: 267.80, change: 3.40, change_pct: 1.29, volume: 5678901, oi: 6800000, iv: 27.1, signal: "BULLISH" }
-    ]
-  },
-  "high-oi": {
-    title: "High OI Buildup",
-    tag: "High OI",
-    description: "Stocks showing significant Open Interest accumulation. High OI buildup often indicates strong market interest and potential directional moves.",
-    stocks: [] // Will be populated from nifty50
-  },
-  "iv-spike": {
-    title: "IV Spike Alert",
-    tag: "IV Spike",
-    description: "Stocks with unusual Implied Volatility movement. IV spikes often precede significant price movements and can indicate upcoming events or market uncertainty.",
-    stocks: [] // Will be populated from nifty50
-  }
-};
-
-// Populate high-oi and iv-spike from nifty50 data
-STOCK_DATA["high-oi"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.oi - a.oi).slice(0, 15);
-STOCK_DATA["iv-spike"].stocks = [...STOCK_DATA["nifty50"].stocks].sort((a, b) => b.iv - a.iv).slice(0, 15);
+/* ===== STOCK DATA STORAGE (Fetched via API) ===== */
+const STOCK_DATA = {};
 
 console.log(' screener_data.js loaded -', Object.keys(SCREENER_DATA).length, 'categories');
